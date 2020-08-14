@@ -25,7 +25,7 @@ class SuperController extends Controller
             'password' => bcrypt($request->password),
         ]);
         // 1 es el rol de owner, 3 el de comercio
-        $commerce->roles()->sync(1, 3);
+        $commerce->roles()->sync([1, 3]);
         $permissions_can_use = Permission::where('user_id', 0)
                                             ->get();
         foreach ($permissions_can_use as $permission) {

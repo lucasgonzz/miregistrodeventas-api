@@ -62,14 +62,9 @@ class ClientController extends Controller
                     }
                     if (!is_null($sale->percentage_card)) {
                         $total = $total * floatval("1.".$sale->percentage_card);
-                        // dd($total);
                     }
-                    // dd($total);
                     $debt += $total - $sale->debt;
                 }
-                // if ($debt > 0) {
-                //     dd($debt);
-                // }
             }
             $client->debt = $debt;
         }

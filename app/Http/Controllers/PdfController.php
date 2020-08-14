@@ -14,18 +14,13 @@ use App\Http\Controllers\Helpers\PdfPrintArticles;
 class PdfController extends Controller
 {
 
-    function getArticleOwnerId() {
-        $user = Auth()->user();
-        if (is_null($user->owner_id)) {
-            return $user->id;
-        } else {
-            return $user->owner_id;
-        }
-    }
+	function getBarCodeDirectory() {
+		return public_path().'/storage/barcodes/'.$this->userId();
+	}
 
-	function barCodeDirectory() {
-        if(!is_dir(storage_path()."/barcodes/".$this->getArticleOwnerId())) {
-            mkdir(storage_path().'/barcodes/'.$this->getArticleOwnerId());
+	function createBarCodeDirectory() {
+        if(!is_dir($this->getBarCodeDirectory())) {
+            mkdir($this->getBarCodeDirectory());
         }
 	}
 
@@ -48,14 +43,15 @@ class PdfController extends Controller
 			$name = $article->name;
 
 			// Se crea el directorio si no existe
-			$this->barCodeDirectory();
+			$this->createBarCodeDirectory();
 
 	        $widths = [];
 			// Se crea la imagen del codigo de barras si existe
 	        if (!is_null($bar_code)) {
-		        barcode(storage_path().'/barcodes/'.$this->getArticleOwnerId().'/'.$bar_code.'.png', 
+	        	$image_name = $bar_code.'.png';
+		        barcode($this->getBarCodeDirectory().'/'.$image_name, 
 		                $bar_code, 20, 'horizontal', 'code128', 1);
-		        $width_image = getimagesize(storage_path().'/barcodes/'.$this->getArticleOwnerId().'/'.$bar_code.'.png');
+		        $width_image = getimagesize($this->getBarCodeDirectory().'/'.$image_name);
 		        $widths['bar_code'] = $width_image[0] * 50 / 200;
 		        $bar_code_printed = true;
 	        }
@@ -166,8 +162,9 @@ class PdfController extends Controller
 
 	        // Si hay codigo de barra se escribe la imagen
 	        if (!is_null($bar_code)) {
+	        	$image_name = $bar_code.'.png';
 		        $pdf->Image(
-		        				storage_path().'/barcodes/'.$this->getArticleOwnerId().'/'.$bar_code.'.png',
+		        				$this->getBarCodeDirectory().'/'.$image_name,
 		        				$x,
 		        				$y+20,
 		        				$widths['bar_code'],
@@ -254,13 +251,13 @@ class PdfController extends Controller
     	*/
     	$user = Auth()->user();
     	if ($articles_ids_string == 'todos') {
-    		$articles = Article::where('user_id', $this->getArticleOwnerId())
+    		$articles = Article::where('user_id', $this->userId())
     							->orderBy('id', 'DESC')
     							->get();
     	} else {
     		$articles_ids = explode('-', $articles_ids_string);
 	    	foreach ($articles_ids as $id_article) {
-	    		$articles[] = Article::where('user_id', $this->getArticleOwnerId())
+	    		$articles[] = Article::where('user_id', $this->userId())
 	    								->where('id', $id_article)
 	    								->first();
 	    	}

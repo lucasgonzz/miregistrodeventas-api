@@ -60,7 +60,7 @@ class LoginController extends Controller
 
     public function loginOwner(Request $request) {
         if (Auth::attempt(['company_name' => $request->company_name, 
-                            'password' => $request->password, 
+                            'password' => $request->password,
                             'owner_id' => null])) {
             $user = User::where('id', Auth::user()->id)
                             ->with('roles')

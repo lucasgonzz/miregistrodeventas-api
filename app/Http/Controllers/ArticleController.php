@@ -23,6 +23,29 @@ class ArticleController extends Controller
     function index() {
         $user = Auth()->user();
         if ($user->hasRole('commerce')) {
+            return Article::where('user_id',$this->userId())
+                                ->orderBy('id', 'DESC')
+                                ->with('marker')
+                                ->with('images')
+                                ->with('category')
+                                ->with('specialPrices')
+                                ->with(['providers' => function($q) {
+                                    $q->orderBy('cost', 'asc');
+                                }])
+                                ->get();
+        } else {
+            return Article::where('user_id',$this->userId())
+                                ->orderBy('id', 'DESC')
+                                ->with('marker')
+                                ->with('images')
+                                ->with('category')
+                                ->get();
+        }
+    }
+
+    function paginated() {
+        $user = Auth()->user();
+        if ($user->hasRole('commerce')) {
         	$articles = Article::where('user_id',$this->userId())
                                 ->orderBy('id', 'DESC')
                                 ->with('marker')
@@ -65,13 +88,6 @@ class ArticleController extends Controller
         return $article->first();
     }
 
-    // Usado por el buscado en el listado y en vender
-    function names() {
-        return Article::where('user_id', $this->userId())
-                        ->select('id', 'name')
-                        ->get();
-    }
-
     function withMarker($id) {
         return Article::where('id', $id)
                         ->with('marker')
@@ -81,6 +97,13 @@ class ArticleController extends Controller
     function getAvailables() {
         return Article::where('user_id', $this->userId())
                         ->select('bar_code', 'name', 'price', 'uncontable')
+                        ->get();
+    }
+
+    // Usado por el buscado en el listado y en vender
+    function names() {
+        return Article::where('user_id', $this->userId())
+                        ->select('id', 'name')
                         ->get();
     }
 
@@ -136,13 +159,6 @@ class ArticleController extends Controller
                         ->whereNotNull('bar_code')
                         ->orderBy('id', 'DESC')
                         ->pluck('bar_code');
-    }
-
-    function getNames() {
-        return Article::where('user_id', $this->userId())
-                        ->orderBy('id', 'DESC')
-                        // ->whereNull('bar_code')
-                        ->pluck('name');
     }
 
     function search($query) {

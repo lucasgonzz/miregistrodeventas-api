@@ -17,7 +17,9 @@ class SaleHelper {
                                                                         isset($article['measurement']) 
                                                                         ? $article['measurement'] 
                                                                         : null,
-                                                        'cost' => (float)$article['cost'],
+                                                        'cost' => isset($article['cost'])
+                                                                    ? (float)$article['cost']
+                                                                    : null,
                                                         'price' => (float)$article['price'],
                                                     ]);
             $article_ = Article::find($article['id']);

@@ -74,7 +74,7 @@ class PdfPrintSale extends fpdf {
             $suma_precios_pagina = 0;
             $suma_costos_venta = 0;
             $suma_precios_venta = 0;
-            $articulos_por_pagina = 20;
+            $articulos_por_pagina = 30;
 
 			$num_page = 0;
 			$cantidad_articulos = count($articles);
@@ -183,21 +183,21 @@ class PdfPrintSale extends fpdf {
 	function printArticle($article) {
 		$this->SetLineWidth(.4);
 		$this->SetDrawColor(51,51,51);
-        $this->Cell($this->widths['bar_code'],10,$article->bar_code,$this->borders,0,'L');
+        $this->Cell($this->widths['bar_code'],6,$article->bar_code,$this->borders,0,'L');
         $name = $article->name;
         if (strlen($name) > 20) {
             $name = substr($article->name, 0, 20) . ' ..';
         }
-        $this->Cell($this->widths['name'],10,$name,$this->borders,0,'L');
+        $this->Cell($this->widths['name'],6,$name,$this->borders,0,'L');
         if ($this->articles_cost) {
-        	$this->Cell($this->widths['cost'],10,'$'.$this->price($article->cost),$this->borders,0,'L');
+        	$this->Cell($this->widths['cost'],6,'$'.$this->price($article->cost),$this->borders,0,'L');
         }
-        $this->Cell($this->widths['price'],10,'$'.$this->price($article->price),$this->borders,0,'L');
-        $this->Cell($this->widths['amount'],10,PdfArticleHelper::amount($article),$this->borders,0,'L');
+        $this->Cell($this->widths['price'],6,'$'.$this->price($article->price),$this->borders,0,'L');
+        $this->Cell($this->widths['amount'],6,PdfArticleHelper::amount($article),$this->borders,0,'L');
         if ($this->articles_subtotal_cost) {
-            $this->Cell($this->widths['sub_total_cost'],10,'$'.$this->price(PdfArticleHelper::getSubTotalCost($article)),$this->borders,0,'L');
+            $this->Cell($this->widths['sub_total_cost'],6,'$'.$this->price(PdfArticleHelper::getSubTotalCost($article)),$this->borders,0,'L');
         }
-        $this->Cell($this->widths['sub_total'],10,'$'.$this->price(PdfArticleHelper::getSubTotalPrice($article)),$this->borders,0,'L');
+        $this->Cell($this->widths['sub_total'],6,'$'.$this->price(PdfArticleHelper::getSubTotalPrice($article)),$this->borders,0,'L');
         $this->Ln();
     }
 
