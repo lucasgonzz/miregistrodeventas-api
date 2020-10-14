@@ -23,7 +23,7 @@ class ArticleController extends Controller
     function index() {
         $user = Auth()->user();
         if ($user->hasRole('commerce')) {
-            return Article::where('user_id',$this->userId())
+            $articles = Article::where('user_id',$this->userId())
                                 ->orderBy('id', 'DESC')
                                 ->with('marker')
                                 ->with('images')
@@ -34,13 +34,14 @@ class ArticleController extends Controller
                                 }])
                                 ->get();
         } else {
-            return Article::where('user_id',$this->userId())
+            $articles = Article::where('user_id',$this->userId())
                                 ->orderBy('id', 'DESC')
                                 ->with('marker')
                                 ->with('images')
                                 ->with('category')
                                 ->get();
         }
+        return response()->json(['articles' => $articles], 200);
     }
 
     function paginated() {
@@ -75,6 +76,17 @@ class ArticleController extends Controller
                 ],
                 'articles' => $articles 
             ];
+    }
+
+    function mostView($weeks_ago) {
+        $articles = Article::where('user_id', $this->userId())
+                            ->with(['views' => function($q) use($weeks_ago) {
+                                $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
+                            }])
+                            ->with('images')
+                            ->take(50)
+                            ->get();
+        return response()->json(['articles' => $articles], 200);
     }
 
     function show($id) {
@@ -165,6 +177,7 @@ class ArticleController extends Controller
         $user = Auth()->user();
         $articles = Article::where('user_id', $this->userId())
                             ->where('bar_code', $query)
+                            ->with('specialPrices')
                             ->with('images');
         if ($user->hasRole('commerce')) {
             $articles = $articles->with('providers');
@@ -174,47 +187,13 @@ class ArticleController extends Controller
         if (count($articles) == 0) {
             $articles = Article::where('user_id', $this->userId())
                                 ->where('name', 'LIKE', "%$query%")
+                                ->with('specialPrices')
                                 ->with('images');
             if ($user->hasRole('commerce')) {
                 $articles = $articles->with('providers');
             }
             $articles = $articles->get();
         } 
-        return $articles;
-    }
-
-    function preSearch($query, $only_without_bar_code = 0, $with_providers = 0) {
-        $only_without_bar_code = (bool)$only_without_bar_code;
-        $with_providers = (bool)$with_providers;
-        if ($only_without_bar_code) {
-            if ($with_providers) {
-                $articles = Article::where('user_id', $this->userId())
-                                    ->where('name', 'LIKE', "%$query%")
-                                    ->whereNull('bar_code')
-                                    ->with('providers')
-                                    ->limit(5)
-                                    ->get();
-            } else {
-                $articles = Article::where('user_id', $this->userId())
-                                    ->where('name', 'LIKE', "%$query%")
-                                    ->whereNull('bar_code')
-                                    ->limit(5)
-                                    ->get();
-            }
-        } else {
-            if ($with_providers) {
-                $articles = Article::where('user_id', $this->userId())
-                                    ->where('name', 'LIKE', "%$query%")
-                                    ->with('providers')
-                                    ->limit(5)
-                                    ->get();
-            } else {
-                $articles = Article::where('user_id', $this->userId())
-                                    ->where('name', 'LIKE', "%$query%")
-                                    ->limit(5)
-                                    ->get();
-            }
-        }
         return $articles;
     }
 
@@ -233,19 +212,6 @@ class ArticleController extends Controller
                                 ->get();
         }
         return $articles[$index-1];
-    }
-
-    function createOffer(Request $request) {
-        foreach ($request->articles as $article) {
-            $_article = Article::find($article['id']);
-            $_article->offer_price = $article['offer_price'];
-            $_article->save();
-        }
-        // foreach ($request->articles_id as $article_id) {
-        //     $article = Article::find($article_id);
-        //     $article->offer_price = $article->price - round(($request->porcentage/100)*$article->price, 2);
-        //     $article->save();
-        // }
     }
 
     function update(Request $request, $id) {
@@ -307,11 +273,14 @@ class ArticleController extends Controller
     }
 
     function updateImage(Request $request, $article_id) {
-        $path = $request->file('file')->store('public/articles/'.$this->userId());
-        Image::create([
-            'article_id' => $article_id,
-            'url'        => explode('/', $path)[count(explode('/', $path))-1],
-        ]);
+        if ($request->hasFile('file')) {
+            $name = time().$this->userId().'.jpg';
+            $path = $request->file('file')->storeAs('public/articles/'.$this->userId(), $name);
+            Image::create([
+                'article_id' => $article_id,
+                'url'        => explode('/', $path)[count(explode('/', $path))-1],
+            ]);
+        }
     }
 
     function deleteImage($image_id) {
@@ -409,6 +378,20 @@ class ArticleController extends Controller
         }
     }
 
+    function setFeatured($article_id) {
+        $article = Article::find($article_id);
+        if (!is_null($article->featured)) {
+            $article->featured = null;
+        } else {
+            $articles_featured = Article::where('user_id', $this->userId())
+                                        ->whereNotNull('featured')
+                                        ->get();
+            $article->featured = count($articles_featured) + 1;
+        }
+        $article->save();
+        return response()->json(200);
+    }
+
     function setOnline($articles_id) {
         foreach (explode('-', $articles_id) as $id) {
             $article = Article::find($id);
@@ -434,10 +417,12 @@ class ArticleController extends Controller
         if ($request->uncontable == 1) {
             $article->uncontable = 1;
             $article->measurement = $request->measurement;
+        } else {
+            $article->uncontable = 0;
         }
         $article->bar_code = $request->bar_code;
-        if ($request->category_id != 0) {
-            $article->category_id = $request->category_id;
+        if ($request->category != 0) {
+            $article->category_id = $request->category;
         }
         $article->name = ucwords($request->name);
         $article->cost = $request->cost;
@@ -482,6 +467,15 @@ class ArticleController extends Controller
             $bar_code->save();
             // return 'ASD';
         }
+        $article = Article::where('id', $article->id)
+                            ->with('marker')
+                            ->with('images')
+                            ->with('category')
+                            ->with('specialPrices')
+                            ->with(['providers' => function($q) {
+                                $q->orderBy('cost', 'asc');
+                            }])
+                            ->first();
         return $article;
     }
 
@@ -523,6 +517,7 @@ class ArticleController extends Controller
     function filter(Request $request) {
         $user = Auth()->user();
         $mostrar = $request->mostrar;
+        $type = $request->type;
         $ordenar = $request->ordenar;
         $precio_entre = $request->precio_entre;
         $precio_minimo = (float)$request->precio_entre['min'];
@@ -531,46 +526,6 @@ class ArticleController extends Controller
         $fecha_maximo = $request->fecha_entre['max'];
 
         $articles = Article::where('user_id', $this->userId());
-
-        // Mostrar
-        if ($mostrar == 'oferta') {
-            $articles = $articles->whereNotNull('offer_price');
-        }
-        else if ($mostrar == 'marker') {
-                $fecha_actual = date('d-m-Y');
-                $hace_6_meses = date('d-m-Y', strtotime($fecha_actual."- 6 month"));
-                $articles = $articles->where('marker', 1);
-        }
-        else if ($mostrar == 'desactualizados') {
-                $fecha_actual = date('d-m-Y');
-                $hace_6_meses = date('d-m-Y', strtotime($fecha_actual."- 6 month"));
-                $articles = $articles->whereDate('updated_at', '<=', $hace_6_meses);
-        }
-        else if ($mostrar == 'no-vendidos') {
-            $articles = $articles->doesntHave('sales');
-        }
-        else if ($mostrar == 'no-stock') {
-            $articles = $articles->where('stock', 0);
-        }
-
-        if ($user->hasRole('commerce')) {
-            $articles = $articles->with('providers');
-            $provider = $request->provider;
-            if ($provider != 0) {
-                $articles = $articles->whereHas('providers', function(Builder $q) use ($provider) {
-                    $q->where('provider_id', $provider);
-                });
-            }
-        }
-
-        // Categorias
-        $articles = $articles->with('category');
-        $category = $request->category;
-        if ($category != 0) {
-            $articles = $articles->whereHas('category', function(Builder $q) use($category) {
-                $q->where('category_id', $category);
-            });
-        }
 
         // Ordenar
         if ($ordenar == 'nuevos-viejos') {
@@ -585,6 +540,37 @@ class ArticleController extends Controller
         if ($ordenar == 'baratos-caros') {
             $articles = $articles->orderBy('price', 'ASC');
         }
+
+        // Type
+        if ($type === 'markers') {
+            $articles = $articles->whereHas('marker');
+        } else if ($type === 'featured') {
+            $articles = $articles->whereNotNull('featured');
+        }
+
+        if ($user->hasRole('commerce')) {
+            $articles = $articles->with('providers');
+            // $provider = $request->provider;
+            // if ($provider != 0) {
+            //     $articles = $articles->whereHas('providers', function(Builder $q) use ($provider) {
+            //         $q->where('provider_id', $provider);
+            //     });
+            // }
+        }
+
+        // Categorias
+        $category = $request->category;
+        if ($category != 0) {
+            $articles = $articles->where('category_id', $category);
+        }
+
+        // Proveedores
+        // $provider = $request->provider;
+        // if ($provider != 0) {
+        //     $articles = $articles->whereHas('providers', function(Builder $q) use($provider) {
+        //         $q->where('provider_id', $provider);
+        //     });
+        // }
 
         if ($precio_minimo != '' && $precio_maximo != '') {
             $articles = $articles->whereBetween('offer_price', 

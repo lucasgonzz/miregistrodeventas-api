@@ -2,14 +2,15 @@
 
 namespace App;
 
-use Illuminate\Foundation\Auth\User as Authenticatable;
+// use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Model;
 use ChristianKuri\LaravelFavorite\Traits\Favoriteability;
 
-class Buyer extends Authenticatable
+class Buyer extends Model
 {
     use Notifiable;
-    use Favoriteability;
+    // use Favoriteability;
     
     protected $fillable = ['name', 'surname', 'address', 'city', 'email', 'password'];
 }

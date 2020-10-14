@@ -6,13 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Answer extends Model
 {
-    protected $fillable = ['text', 'buyer_id', 'user_id', 'article_id'];
+    protected $guarded = [];
 
-    public function consultation() {
-    	return $this->belongsTo('App\Consultation');
+    public function question() {
+    	return $this->belongsTo('App\Question');
     }
 
-    public function article() {
-    	return $this->belongsTo('App\Answer');
-    }
 }

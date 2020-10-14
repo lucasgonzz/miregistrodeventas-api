@@ -61,7 +61,7 @@ class LoginController extends Controller
     public function loginOwner(Request $request) {
         if (Auth::attempt(['company_name' => $request->company_name, 
                             'password' => $request->password,
-                            'owner_id' => null])) {
+                            'owner_id' => null], $request->remember)) {
             $user = User::where('id', Auth::user()->id)
                             ->with('roles')
                             ->with('permissions')
@@ -71,19 +71,17 @@ class LoginController extends Controller
                 'user'  => $user
             ], 200);
         } else {
-            return [
-                'login' => false,
-            ];
+            return response()->json(['login' => false], 200);
         }
     }
 
     public function loginEmployee(Request $request) {
         // return $request->commerce;
         if (Auth::attempt([
-                            'company_name' => $request->commerce, 
+                            'company_name' => $request->company_name, 
                             'name' => $request->name, 
                             'password' => $request->password, 
-                        ])) {
+                        ], $request->remember)) {
             $user = User::where('id', Auth::user()->id)
                             ->with('roles')
                             ->with('permissions')

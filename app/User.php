@@ -74,4 +74,8 @@ class User extends Authenticatable
     public function commerces() {
         return $this->hasMany('App\User', 'admin_id');
     }
+
+    public function questions() {
+        return $this->hasMany('App\Question');
+    }
 }

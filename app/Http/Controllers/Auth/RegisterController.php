@@ -5,8 +5,11 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use App\User;
+use Caffeinated\Shinobi\Models\Permission;
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class RegisterController extends Controller
@@ -54,6 +57,31 @@ class RegisterController extends Controller
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
         ]);
+    }
+
+
+    function registerCommerce(Request $request) {
+        if (!$this->isCompanyNameRepeated($request->company_name)) {
+            $admin = User::where(['name' => 'lucas', 'status' => 'admin'])->first();
+            $commerce = User::create([  
+                'name' => ucwords($request->name),
+                'company_name' => ucwords($request->company_name),
+                'status' => 'trial',
+                'admin_id' => $admin->id,
+                'expire' => Carbon::now()->addWeeks(2),
+                'password' => bcrypt($request->password),
+            ]);
+            // 1 es el rol de owner, 3 el de comercio
+            $commerce->roles()->sync([1, 3]);
+            $permissions_can_use = Permission::where('user_id', 0)
+                                                ->get();
+            foreach ($permissions_can_use as $permission) {
+                $commerce->permissions()->attach($permission->id);
+            }
+            return response()->json(['repeated' => false]);
+        } else {
+            return response()->json(['repeated' => true, 'rta' => $request->company_name]);
+        }
     }
 
     /**

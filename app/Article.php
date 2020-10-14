@@ -20,6 +20,10 @@ class Article extends Model
         'measurement',
     ];
 
+    function views() {
+        return $this->morphMany('App\View', 'viewable');
+    }
+
     public function user() {
         return $this->belongsTo('App\User');
     }

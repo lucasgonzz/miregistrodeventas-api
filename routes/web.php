@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -13,9 +14,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::post('login-owner', 'Auth\LoginController@loginOwner');
+Route::get('/orders/deliver/{order_id}', 
+	'OrderController@deliver'
+);
+// Route::post('login-owner', function(Request $request) {
+// 	return response()->json(['askd' => $request->password], 200);
+// });
+// Route::post('/login-owner', function() {
+// 	return ['sad' => 23];
+// });
+Route::post('/login-owner', 'LoginController@loginOwner');
 Route::post('login-employee', 'Auth\LoginController@loginEmployee');
 Route::post('login-admin', 'Auth\LoginController@loginAdmin');
+Route::post('register', 'Auth\RegisterController@registerCommerce');
 Route::post('logout', 'Auth\LoginController@logout');
 
 Route::get('/sales/pdf/{sales_id}/{company_name}/{articles_cost}/{articles_subtotal_cost}/{articles_total_price}/{articles_total_cost}/{borders}', 'SaleController@pdf');

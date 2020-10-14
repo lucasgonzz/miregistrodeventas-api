@@ -178,6 +178,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/articles/{id}', 
 		'ArticleController@show'
 	);
+	Route::get('/articles/search/{query}', 
+		'ArticleController@search'
+	);
 	Route::put('/articles/{id}', 
 		'ArticleController@update'
 	);
@@ -239,6 +242,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::get('/marker-groups/add-marker-to-group/{marker_group_id}/{article_id}', 
 		'MarkerGroupController@addMarkerToGroup'
+	);
+
+	// Featured
+	Route::get('/articles/set-featured/{article_id}',
+		'ArticleController@setFeatured'
 	);
 
 	// --------------------------------------------------------------------------------------
@@ -326,6 +334,54 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::get('/permissions/sale-time', 
 		'PermissionController@saleTime'
+	);
+
+	// --------------------------------------------------------------------------------------
+
+	// ONLINE
+	// Questions
+	Route::get('/questions', 
+		'QuestionController@index'
+	);
+	Route::delete('/questions/{id}', 
+		'QuestionController@delete'
+	);
+	// Answers
+	Route::post('/answers', 
+		'AnswerController@store'
+	);
+	// Orders
+	Route::get('/orders/unconfirmed', 
+		'OrderController@unconfirmed'
+	);
+	Route::get('/orders/confirmed-finished', 
+		'OrderController@confirmedFinished'
+	);
+	Route::get('/orders/confirm/{order_id}', 
+		'OrderController@confirm'
+	);
+	Route::get('/orders/cancel/{order_id}', 
+		'OrderController@cancel'
+	);
+	Route::get('/orders/finish/{order_id}', 
+		'OrderController@finish'
+	);
+	Route::get('/orders/deliver/{order_id}', 
+		'OrderController@deliver'
+	);
+	// Examine
+	Route::get('/online/articles/most-view/{weeks_ago}', 
+		'ArticleController@mostView'
+	);
+	Route::get('/online/categories/most-view/{weeks_ago}', 
+		'CategoryController@mostView'
+	);
+	// Title
+	Route::get('/online/titles', 
+		'TitleController@index'
+	);
+	Route::put('/online/titles', 
+		'TitleController@update'
 	);
 });
 

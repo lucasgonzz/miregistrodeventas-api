@@ -163,6 +163,7 @@ class SaleController extends Controller
         $sales = Sale::where('user_id', $this->userId())
                         ->where('created_at', '>=', Carbon::today())
                         ->with('client')
+                        ->with('buyer')
                         ->with('articles')
                         ->with('specialPrice')
                         ->orderBy('created_at', 'DESC')
@@ -399,63 +400,39 @@ class SaleController extends Controller
 
     function store(Request $request) {
         $with_card = (bool)$request->with_card;
-        $debt = null;
-        if ($request->debt != -1) {
-            $debt = $request->debt;
-        }
-        $client_id = null;
-        if ($request->client_id != -1) {
-            $client_id = $request->client_id;
-        }
         $special_price_id = null;
+        $debt = $request->debt;
+        if ($debt == -1) {
+            $debt == null;
+        }
+        $client_id = $request->client_id;
+        if ($client_id == -1) {
+            $client_id == null;
+        }
         if ($request->special_price_id != 0) {
             $special_price_id = $request->special_price_id;
         }
         $user = Auth()->user();
-        $last_sale = Sale::where('user_id', $this->userId())
-                            ->orderby('created_at','DESC')
-                            ->first();
-        if ($last_sale === null) {
-            if ($user->hasRole('provider')) {
-            	$sale = Sale::create([
-            		'user_id' => $this->userId(),
-                    'num_sale' => 1,
-                    'percentage_card' => $with_card ? $user->percentage_card : null,
-                    'client_id' => $request->client_id,
-            		'special_price_id' => $request->special_price_id
-            	]);
-            } else {
-                $sale = Sale::create([
-                    'user_id' => $this->userId(),
-                    'percentage_card' => $with_card ? $user->percentage_card : null,
-                    'num_sale' => 1,
-                    'special_price_id' => $request->special_price_id
-                ]);
-            }
+        $num_sale = SaleHelper::numSale($this->userId());
+        $percentage_card = $with_card ? $user->percentage_card : null;
+        if ($user->hasRole('provider')) {
+            $sale = Sale::create([
+                'user_id' => $this->userId(),
+                'num_sale' => $num_sale,
+                'debt' => $debt,
+                'percentage_card' => $percentage_card,
+                'client_id' => $client_id,
+                'special_price_id' => $request->special_price_id
+            ]);
         } else {
-            if ($user->hasRole('provider')) {
-                $num_sale = $last_sale->num_sale;
-                $num_sale++;
-                $sale = Sale::create([
-                    'user_id' => $this->userId(),
-                    'num_sale' => $num_sale,
-                    'percentage_card' => $with_card ? $user->percentage_card : null,
-                    'debt' => $debt,
-                    'client_id' => $request->client_id,
-                    'special_price_id' => $request->special_price_id
-                ]);
-            } else {
-                $num_sale = $last_sale->num_sale;
-                $num_sale++;
-                $sale = Sale::create([
-                    'user_id' => $this->userId(),
-                    'percentage_card' => $with_card ? $user->percentage_card : null,
-                    'num_sale' => $num_sale,
-                    'debt' => $debt,
-                    'client_id' => $client_id,
-                    'special_price_id' => $request->special_price_id
-                ]);
-            }
+            $sale = Sale::create([
+                'user_id' => $this->userId(),
+                'percentage_card' => $percentage_card,
+                'num_sale' => $num_sale,
+                'debt' => $debt,
+                'client_id' => $client_id,
+                'special_price_id' => $request->special_price_id
+            ]);
         }
         SaleHelper::attachArticles($sale, $request->articles);
         $sale = Sale::where('id', $sale->id)->with('articles')->first();

@@ -36,19 +36,14 @@ class UserController extends Controller
 
     // Confirguracion - Editar
     function update(Request $request) {
-        $user = Auth()->user();
+        $user = User::where('id', $this->userId())->with('employees')->first();
         $user->name = ucwords($request->name);
-        $users = User::where('id', '!=', $user->id)->get();
-        $repeated_company_name = false;
-        if ($user->company_name != $request->company_name) {
-            foreach ($users as $user_) {
-                if ($user_->company_name == ucwords($request->company_name)) {
-                    $repeated_company_name = true;
-                }
-            }
-        }
+        $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {
             $user->company_name = ucwords($request->company_name);
+            foreach ($user->employees as $employee) {
+                $employee->company_name = ucwords($request->company_name);                
+            }
         } else {
             return [
                 'repeated' => true,
