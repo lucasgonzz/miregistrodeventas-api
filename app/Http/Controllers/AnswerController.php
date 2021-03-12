@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Answer;
 use App\Configuration;
 use App\Events\QuestionAnsweredEvent;
+use App\Http\Controllers\NotificationController;
+use Illuminate\Http\Request;
 
 class AnswerController extends Controller
 {
@@ -19,6 +20,8 @@ class AnswerController extends Controller
     	$configuration->questions_seen = 0;
     	$configuration->save();
     	broadcast(new QuestionAnsweredEvent($answer));
+        $notification = new NotificationController();
+        $notification->store($request->buyer_id, 'Respondieron a tu pregunta');
     	return response(null, 201);
     }
 }

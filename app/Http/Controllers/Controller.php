@@ -12,7 +12,6 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-
     function userId() {
         $user = Auth()->user();
         if (is_null($user->owner_id)) {
@@ -21,6 +20,15 @@ class Controller extends BaseController
             return $user->owner_id;
         }
     }
+
+    // static function userId() {
+    //     $user = Auth()->user();
+    //     if (is_null($user->owner_id)) {
+    //         return $user->id;
+    //     } else {
+    //         return $user->owner_id;
+    //     }
+    // }
 
     function isCompanyNameRepeated($company_name) {
         $users = User::whereNull('owner_id')->get();

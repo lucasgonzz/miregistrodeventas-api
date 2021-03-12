@@ -16,6 +16,7 @@
         "laravel/sanctum": "^2.4",
         "laravel/tinker": "^2.0",
         "laravel/ui": "^2.0",
+        "mercadopago/dx-php": "^2.2",
         "pusher/pusher-php-server": "^4.1"
     },
     "require-dev": {

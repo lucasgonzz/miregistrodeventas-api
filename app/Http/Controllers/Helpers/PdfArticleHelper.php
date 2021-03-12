@@ -30,40 +30,15 @@ class PdfArticleHelper {
 	}
 
 	static function amount($article) {
-		if ($article->uncontable == 0) {
-			return $article->pivot->amount;
-		} else {
-			if ($article->pivot->measurement == 'gramo') {
-				$measurement= 'gr';
-			} else {
-				$measurement= 'kg';
-			}
-			return $article->pivot->amount . ' ' . $measurement;
-		}
+		return $article->pivot->amount;
 	}
 
 	static function getSubTotalCost($article) {
-		if ($article->uncontable == 0) {
-			return $article->pivot->cost * $article->pivot->amount;
-		} else {
-			if ($article->pivot->measurement == $article->measurement) {
-				return $article->pivot->cost * $article->pivot->amount;
-			} else {
-				return $article->pivot->cost * $article->pivot->amount / 1000;
-			}
-		}
+		return $article->pivot->cost * $article->pivot->amount;
 	}
 
 	static function getSubTotalPrice($article) {
-		if ($article->uncontable == 0) {
-			return $article->pivot->price * $article->pivot->amount;
-		} else {
-			if ($article->pivot->measurement == $article->measurement) {
-				return $article->pivot->price * $article->pivot->amount;
-			} else {
-				return $article->pivot->price * $article->pivot->amount / 1000;
-			}
-		}
+		return $article->pivot->price * $article->pivot->amount;
 	}
 
 }

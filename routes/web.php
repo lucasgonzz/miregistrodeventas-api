@@ -1,7 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
+use App\Sale;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,16 +17,32 @@ use Illuminate\Http\Request;
 |
 */
 
+
+// Devuelve las comisiones de las ventas que le corresponden al vendedor
+Route::get('/prueba', function() {
+	$sales = Sale::where('user_id', 1)->get();
+	if (array_key_exists(100, $sales->toArray())) {
+		var_dump($sales[2]);
+	} else {
+		echo "no";
+	}
+});
+
+Route::post('/procesar-pago', 
+	function(Request $request) {
+		User::create([
+			'name' => $request->transactionAmount,
+			'password' => 'asd',
+		]);
+	}
+);
+
 Route::get('/orders/deliver/{order_id}', 
 	'OrderController@deliver'
 );
-// Route::post('login-owner', function(Request $request) {
-// 	return response()->json(['askd' => $request->password], 200);
-// });
-// Route::post('/login-owner', function() {
-// 	return ['sad' => 23];
-// });
-Route::post('/login-owner', 'LoginController@loginOwner');
+
+Route::post('/login', 'LoginController@login');
+// Route::post('/login-owner', 'LoginController@loginOwner');
 Route::post('login-employee', 'Auth\LoginController@loginEmployee');
 Route::post('login-admin', 'Auth\LoginController@loginAdmin');
 Route::post('register', 'Auth\RegisterController@registerCommerce');

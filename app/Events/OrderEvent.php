@@ -24,6 +24,10 @@ class OrderEvent implements ShouldBroadcast
     {
         $this->order = $order;
     }
+    
+    public function broadcastQueue () {
+        return 'broadcastable';
+    }
 
     /**
      * Get the channels the event should broadcast on.

@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\Order;
 use App\Sale;
 use App\Events\OrderEvent;
-use App\Http\Controllers\Helpers\SaleHelper;
+use App\Http\Controllers\Helpers\Sale\SaleHelper;
 
 class OrderController extends Controller
 {
@@ -33,6 +33,10 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'confirmed';
         $order->save();
+        if ($order->payment_method == 'tarjeta') {
+            $payment_controller = new PaymentController();
+            $payment_controller->procesarPago($order->payment_id);
+        }
         broadcast(new OrderEvent($order))->toOthers();
         return response(null, 200);
     }
@@ -60,8 +64,8 @@ class OrderController extends Controller
         $order->status = 'delivered';
         $order->save();
         broadcast(new OrderEvent($order))->toOthers();
-        $this->saveSale($order);
-        return response(null, 200);
+        $sale = $this->saveSale($order);
+        return response()->json(['sale' => $sale], 201);
     }
 
     function saveSale($order) {
@@ -72,5 +76,13 @@ class OrderController extends Controller
             'num_sale' => $num_sale
         ]);
         SaleHelper::attachArticlesFromOrder($sale, $order->articles);
+        $sale = Sale::where('id', $sale->id)
+                    ->with('client')
+                    // ->with('buyer')
+                    ->with('articles')
+                    ->with('impressions')
+                    ->with('specialPrice')
+                    ->first();
+        return $sale;
     }
 }

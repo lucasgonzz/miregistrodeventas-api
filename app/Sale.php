@@ -9,8 +9,32 @@ class Sale extends Model
     
     protected $guarded = [];
 
+    public function impressions() {
+        return $this->hasMany('App\Impression');
+    }
+
+    public function sale_type() {
+        return $this->belongsTo('App\SaleType');
+    }
+
+    public function commissioners() {
+        return $this->belongsToMany('App\Commissioner')->withPivot('percentage', 'is_seller');
+    }
+
+    public function current_acounts() {
+        return $this->hasMany('App\CurrentAcount');
+    }
+
+    public function commissions() {
+        return $this->hasMany('App\Commission');
+    }
+
+    public function discounts() {
+        return $this->belongsToMany('App\Discount')->withPivot('percentage');
+    }
+
     public function articles() {
-        return $this->belongsToMany('App\Article')->withPivot('amount', 'measurement', 'cost', 'price');
+        return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'price');
     }
 
     public function client() {

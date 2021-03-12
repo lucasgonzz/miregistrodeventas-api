@@ -8,15 +8,17 @@ use App\SpecialPrice;
 class SpecialPriceController extends Controller
 {
     public function index() {
-    	return SpecialPrice::where('user_id', $this->userId())
+    	$special_prices = SpecialPrice::where('user_id', $this->userId())
     						->get();
+        return response()->json(['special_prices' => $special_prices], 200);
     }
 
     public function store(Request $request) {
-    	return SpecialPrice::create([
+    	$special_price = SpecialPrice::create([
     		'name' 	  => ucwords($request->name),
     		'user_id' => $this->userId()
     	]);
+        return response()->json(['special_price' => $special_price], 201);
     }
 
     public function delete($id) {

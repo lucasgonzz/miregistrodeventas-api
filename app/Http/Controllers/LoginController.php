@@ -58,43 +58,46 @@ class LoginController extends Controller
         Auth::logout();
     }
 
-    public function loginOwner(Request $request) {
-        if (Auth::attempt(['company_name' => $request->company_name, 
-                            'password' => $request->password,
-                            'owner_id' => null], $request->remember)) {
-            $user = User::where('id', Auth::user()->id)
-                            ->with('roles')
-                            ->with('permissions')
-                            ->first();
-            return response()->json([
-                'login' => true,
-                'user'  => $user
-            ], 200);
+    public function login(Request $request) {
+        if ($request->name == '') {
+            if (Auth::attempt(['company_name' => $request->company_name, 
+                                'password' => $request->password,
+                                'owner_id' => null], $request->remember)) {
+                $user = User::where('id', Auth::user()->id)
+                                ->with('roles')
+                                ->with('permissions')
+                                ->first();
+                return response()->json([
+                    'login' => true,
+                    'user'  => $user
+                ], 200);
+            } else {
+                return response()->json(['login' => false], 200);
+            }
         } else {
-            return response()->json(['login' => false], 200);
+            if (Auth::attempt([
+                                'company_name' => $request->company_name, 
+                                'name' => $request->name, 
+                                'password' => $request->password, 
+                            ], $request->remember)) {
+                $user = User::where('id', Auth::user()->id)
+                                ->with('roles')
+                                ->with('permissions')
+                                ->first();
+                return [
+                    'login' => true,
+                    'user'  => $user
+                ];
+            } else {
+                return [
+                    'login' => false
+                ];
+            }
         }
     }
 
     public function loginEmployee(Request $request) {
         // return $request->commerce;
-        if (Auth::attempt([
-                            'company_name' => $request->company_name, 
-                            'name' => $request->name, 
-                            'password' => $request->password, 
-                        ], $request->remember)) {
-            $user = User::where('id', Auth::user()->id)
-                            ->with('roles')
-                            ->with('permissions')
-                            ->first();
-            return [
-                'login' => true,
-                'user'  => $user
-            ];
-        } else {
-            return [
-                'login' => false
-            ];
-        }
     }
 
     public function loginAdmin(Request $request) {

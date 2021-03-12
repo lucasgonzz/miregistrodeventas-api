@@ -24,8 +24,8 @@ class ArticleController extends Controller
         $user = Auth()->user();
         if ($user->hasRole('commerce')) {
             $articles = Article::where('user_id',$this->userId())
-                                ->orderBy('id', 'DESC')
-                                ->with('marker')
+                                ->where('status', 'active')
+                                ->orderBy('created_at', 'DESC')
                                 ->with('images')
                                 ->with('category')
                                 ->with('specialPrices')
@@ -36,7 +36,6 @@ class ArticleController extends Controller
         } else {
             $articles = Article::where('user_id',$this->userId())
                                 ->orderBy('id', 'DESC')
-                                ->with('marker')
                                 ->with('images')
                                 ->with('category')
                                 ->get();
@@ -100,126 +99,9 @@ class ArticleController extends Controller
         return $article->first();
     }
 
-    function withMarker($id) {
-        return Article::where('id', $id)
-                        ->with('marker')
-                        ->first();
-    }
-
-    function getAvailables() {
-        return Article::where('user_id', $this->userId())
-                        ->select('bar_code', 'name', 'price', 'uncontable')
-                        ->get();
-    }
-
-    // Usado por el buscado en el listado y en vender
-    function names() {
-        return Article::where('user_id', $this->userId())
-                        ->select('id', 'name')
-                        ->get();
-    }
-
-    function getMarkers() {
-        return Article::where('user_id', $this->userId())
-                        ->where('marker', 1)
-                        ->get();
-    }
-
-    function getByBarCode($bar_code) {
-        $user = Auth()->user();
-        if ($user->hasRole('commerce')) {
-            return Article::where('user_id', $this->userId())
-                            ->where('bar_code', $bar_code)
-                            ->with('providers')
-                            ->with('specialPrices')
-                            ->first();
-        } else {
-            return Article::where('user_id', $this->userId())
-                            ->with('specialPrices')
-                            ->where('bar_code', $bar_code)
-                            ->first();
-        }
-    }
-
-    function getByName($name) {
-        $user = Auth()->user();
-        if ($user->hasRole('commerce')) {
-            return Article::where('user_id', $this->userId())
-                            ->where('name', $name)
-                            ->whereNull('bar_code')
-                            ->with('providers')
-                            ->first();
-        } else {
-            return Article::where('user_id', $this->userId())
-                            ->where('name', $name)
-                            ->whereNull('bar_code')
-                            ->first();
-        }
-    }
-
-    function getByIds($articles_id) {
-        $articles_id = explode('-', $articles_id);
-        $articles = [];
-        foreach ($articles_id as $article_id) {
-            $articles[]  = Article::find($article_id);
-        }
-        return $articles;
-    }
-
-    function getBarCodes(Request $request) {
-        return Article::where('user_id', $this->userId())
-                        ->whereNotNull('bar_code')
-                        ->orderBy('id', 'DESC')
-                        ->pluck('bar_code');
-    }
-
-    function search($query) {
-        $user = Auth()->user();
-        $articles = Article::where('user_id', $this->userId())
-                            ->where('bar_code', $query)
-                            ->with('specialPrices')
-                            ->with('images');
-        if ($user->hasRole('commerce')) {
-            $articles = $articles->with('providers');
-        }
-        $articles = $articles->get();
-
-        if (count($articles) == 0) {
-            $articles = Article::where('user_id', $this->userId())
-                                ->where('name', 'LIKE', "%$query%")
-                                ->with('specialPrices')
-                                ->with('images');
-            if ($user->hasRole('commerce')) {
-                $articles = $articles->with('providers');
-            }
-            $articles = $articles->get();
-        } 
-        return $articles;
-    }
-
-    function previusNext($index) {
-        $user = Auth()->user();
-        if ($user->hasRole('commerce')) {
-            $articles = Article::where('user_id', $this->userId())
-                                ->orderBy('id', 'DESC')
-                                ->with('providers')
-                                ->take($index)
-                                ->get();
-        } else {
-            $articles = Article::where('user_id', $this->userId())
-                                ->orderBy('id', 'DESC')
-                                ->take($index)
-                                ->get();
-        }
-        return $articles[$index-1];
-    }
-
-    function update(Request $request, $id) {
-        $article = Article::find($id);
+    function update(Request $request) {
+        $article = Article::find($request->id);
         $article->bar_code = $request->bar_code;
-        if (isset($request->offer_price)) {
-            $article->offer_price = $request->offer_price;
-        }
         $article->category_id = $request->category_id != 0 ? $request->category_id : null;
         if ($article->price != $request->price) {
             $article->previus_price = $article->price;
@@ -232,7 +114,8 @@ class ArticleController extends Controller
         $article->price = $request->price;
         if (!is_null($article->stock)) {
             if (!$request->stock_null) {
-                $article->stock += (float)$request->new_stock;
+                $article->stock = $request->stock;
+                $article->stock += $request->new_stock;
             } else {
                 $article->stock = null;
             }
@@ -261,7 +144,15 @@ class ArticleController extends Controller
                 }
             }
         }
-        return $article;
+        $article = Article::where('id', $article->id)
+                            ->with('images')
+                            ->with('category')
+                            ->with('specialPrices')
+                            ->with(['providers' => function($q) {
+                                $q->orderBy('cost', 'asc');
+                            }])
+                            ->first();
+        return response()->json(['article' => $article], 200);
     }
 
     function updateCategory(Request $request) {
@@ -270,6 +161,22 @@ class ArticleController extends Controller
             $article->category_id = $request->category_id;
             $article->save();
         }
+    }
+
+    function addImage(Request $request, $id) {
+        $image = Image::create([
+            'article_id' => $id,
+            'url'        => $request->path,
+        ]);
+        $article = Article::where('id', $id)
+                            ->with('images')
+                            ->with('category')
+                            ->with('specialPrices')
+                            ->with(['providers' => function($q) {
+                                $q->orderBy('cost', 'asc');
+                            }])
+                            ->first();
+        return response()->json(['article' => $article], 201);
     }
 
     function updateImage(Request $request, $article_id) {
@@ -295,30 +202,25 @@ class ArticleController extends Controller
     function setFirstImage($image_id) {
         $image = Image::find($image_id);
         $article = Article::find($image->article_id);
-        // $user = User::find($this->userId());
         $images = Image::where('article_id', $article->id)
                             ->get();
-        $path = 'articles/'.$this->userId().'/';
-        $updated = false;
         foreach ($images as $image_) {
-            if ($image_->url{0} == 'F') {
-                $new_url = substr($image_->url, 1);
-                // Renombrar la que empieza con F por la misma sin F
-                Storage::disk('public')->move($path.$image_->url, $path.$new_url);
-                // Se le cambia el nombre del archivo de la imagen que llega
-                Storage::disk('public')->move($path.$image->url, $path.'F'.$image->url);
-                $image_->url = $new_url;
+            if ($image_->first) {
+                $image_->first = 0;
                 $image_->save();
-                $image->url = 'F'.$image->url;
-                $image->save();
-                $updated = true;
             }
         }
-        if (!$updated) {
-            Storage::disk('public')->move($path.$image->url, $path.'F'.$image->url);
-            $image->url = 'F'.$image->url;
-            $image->save();
-        }
+        $image->first = 1;
+        $image->save();
+        $article = Article::where('id', $article->id)
+                            ->with('images')
+                            ->with('category')
+                            ->with('specialPrices')
+                            ->with(['providers' => function($q) {
+                                $q->orderBy('cost', 'asc');
+                            }])
+                            ->first();
+        return response()->json(['article' => $article], 200);
     }
 
     function updateImages(Request $request) {
@@ -357,6 +259,7 @@ class ArticleController extends Controller
     function updateByPorcentage(Request $request) {
         $decimals = (bool)$request->decimals;
         $articles_ids = $request->articles_ids;
+        $articles = [];
         foreach ($articles_ids as $article_id) {
             $article = Article::find($article_id);
             if (!empty($request->cost)) {
@@ -375,7 +278,9 @@ class ArticleController extends Controller
                 }
             }
             $article->save();
+            $articles[] = $article;
         }
+        return response()->json(['articles' => $articles], 200);
     }
 
     function setFeatured($article_id) {
@@ -389,7 +294,15 @@ class ArticleController extends Controller
             $article->featured = count($articles_featured) + 1;
         }
         $article->save();
-        return response()->json(200);
+        $article = Article::where('id', $article->id)
+                            ->with('images')
+                            ->with('category')
+                            ->with('specialPrices')
+                            ->with(['providers' => function($q) {
+                                $q->orderBy('cost', 'asc');
+                            }])
+                            ->first();
+        return response()->json(['article' => $article], 200);
     }
 
     function setOnline($articles_id) {
@@ -414,27 +327,20 @@ class ArticleController extends Controller
     function store(Request $request) {
         $user = Auth()->user();
         $article = new Article();
-        if ($request->uncontable == 1) {
-            $article->uncontable = 1;
-            $article->measurement = $request->measurement;
-        } else {
-            $article->uncontable = 0;
-        }
         $article->bar_code = $request->bar_code;
-        if ($request->category != 0) {
-            $article->category_id = $request->category;
+        if ($request->category_id != 0) {
+            $article->category_id = $request->category_id;
         }
-        $article->name = ucwords($request->name);
+        $article->name = ucfirst($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
-        $article->previus_price = 0;
         if ($request->stock != '') {
             $article->stock = $request->stock;
         }
         $article->user_id = $user->id;
         $article->save();
         if ($user->hasRole('commerce')) {
-            $article->providers()->attach($request->provider, [
+            $article->providers()->attach($request->provider_id, [
                                             'amount' => $request->stock,
                                             'cost' => $request->cost,
                                             'price' => $request->price
@@ -455,20 +361,7 @@ class ArticleController extends Controller
             }
         }
 
-        // Se fija si hay un codigo de barras creado con el codigo que llega
-        // si hay uno se setea el article_id del bar_code
-        $bar_code = BarCode::where('user_id', $user->id)
-                                ->where('name', $request->bar_code)
-                                ->first();
-        if ($bar_code === null) {
-            // return 'No existe';
-        } else {
-            $bar_code->article_id = $article->id;
-            $bar_code->save();
-            // return 'ASD';
-        }
         $article = Article::where('id', $article->id)
-                            ->with('marker')
                             ->with('images')
                             ->with('category')
                             ->with('specialPrices')
@@ -476,36 +369,22 @@ class ArticleController extends Controller
                                 $q->orderBy('cost', 'asc');
                             }])
                             ->first();
-        return $article;
+        return response()->json(['article' => $article], 201);
     }
-
 
     function destroy($id) {
         $article = Article::find($id);
-        if ($article->marker) {
-            $article->marker->delete();
-        }
-        $article->delete();
+        $article->status = 'inactive';
+        $article->save();
     }
 
-    function deleteArticles($ids) {
-        $images = [];
+    function delete($ids) {
         foreach (explode('-', $ids) as $article_id) {
             $article = Article::find($article_id);
-            $article = Article::where('id', $article_id)
-                                ->with('images')
-                                ->first();
-            if ($article->marker) {
-                $article->marker->delete();
-            }
-            if ($article->images) {
-                foreach ($article->images as $image) {
-                    $images[] = $image->url;
-                    $this->deleteImage($image->id);
-                }
-            }
-            $article->delete();
+            $article->status = 'inactive';
+            $article->save();
         }
+        return response(null, 200);
     }
 
     function deleteOffer($id) {
@@ -518,7 +397,7 @@ class ArticleController extends Controller
         $user = Auth()->user();
         $mostrar = $request->mostrar;
         $type = $request->type;
-        $ordenar = $request->ordenar;
+        // $ordenar = $request->ordenar;
         $precio_entre = $request->precio_entre;
         $precio_minimo = (float)$request->precio_entre['min'];
         $precio_maximo = (float)$request->precio_entre['max'];
@@ -528,18 +407,18 @@ class ArticleController extends Controller
         $articles = Article::where('user_id', $this->userId());
 
         // Ordenar
-        if ($ordenar == 'nuevos-viejos') {
-            $articles = $articles->orderBy('created_at', 'DESC');
-        }
-        if ($ordenar == 'viejos-nuevos') {
-            $articles = $articles->orderBy('created_at', 'ASC');
-        }
-        if ($ordenar == 'caros-baratos') {
-            $articles = $articles->orderBy('price', 'DESC');
-        }
-        if ($ordenar == 'baratos-caros') {
-            $articles = $articles->orderBy('price', 'ASC');
-        }
+        // if ($ordenar == 'nuevos-viejos') {
+        //     $articles = $articles->orderBy('created_at', 'DESC');
+        // }
+        // if ($ordenar == 'viejos-nuevos') {
+        //     $articles = $articles->orderBy('created_at', 'ASC');
+        // }
+        // if ($ordenar == 'caros-baratos') {
+        //     $articles = $articles->orderBy('price', 'DESC');
+        // }
+        // if ($ordenar == 'baratos-caros') {
+        //     $articles = $articles->orderBy('price', 'ASC');
+        // }
 
         // Type
         if ($type === 'markers') {
@@ -589,8 +468,8 @@ class ArticleController extends Controller
         }
 
         $articles->with('images');
-
-        return $articles->get();
+        $articles = $articles->get();
+        return response()->json(['articles' => $articles], 200);
     }
 
     function export() {

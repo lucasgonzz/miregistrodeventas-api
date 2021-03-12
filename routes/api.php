@@ -3,12 +3,16 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+// Route::get('/clients', 
+// 	'ClientController@index'
+// );
 
 Route::middleware('auth:sanctum')->group(function () {
 
 	Route::get('/user', function(Request $request) {
 		$user = Auth::user();
-		return App\User::where('id', $user->id)->with('permissions')->with('roles')->first();
+		$user = App\User::where('id', $user->id)->with('permissions')->with('roles')->first();
+		return response()->json(['user' => $user], 200);
 	});
 
 	// -----------------------CONFIGURACION------------------------------------------
@@ -119,7 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::get('/providers', 
 			'ProviderController@index'
 		);
-		Route::get('/providers/{provider_name}', 
+		Route::post('/providers', 
 			'ProviderController@store'
 		);
 		Route::delete('/providers/{id}', 
@@ -181,14 +185,14 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/articles/search/{query}', 
 		'ArticleController@search'
 	);
-	Route::put('/articles/{id}', 
+	Route::put('/articles', 
 		'ArticleController@update'
 	);
 	Route::post('/articles/filter', 
 		'ArticleController@filter'
 	);
-	Route::delete('/articles/delete-articles/{ids}', 
-		'ArticleController@deleteArticles'
+	Route::delete('/articles/{ids}', 
+		'ArticleController@delete'
 	);
 
 	// Categorias
@@ -202,11 +206,14 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	
 	// Imagenes
+	Route::delete('/images/{image_id}', 
+		'ImageController@delete'
+	);
 	Route::get('/articles/set-first-image/{image_id}', 
 		'ArticleController@setFirstImage'
 	);
 	Route::post('/articles/image/{article_id}', 
-		'ArticleController@updateImage'
+		'ArticleController@addImage'
 	);
 	Route::get('/articles/set-first-image/{image_id}', 
 		'ArticleController@setFirstImage'
@@ -255,8 +262,44 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/sales', 
 		'SaleController@index'
 	);
-	Route::delete('/sales/delete-sales/{sales_id}', 
+	Route::delete('/sales/{sales_id}', 
 		'SaleController@deleteSales'
+	);
+
+	// Descuentos
+	Route::get('/discounts', 
+		'DiscountController@index'
+	);
+	Route::put('/discounts', 
+		'DiscountController@update'
+	);
+	Route::post('/discounts', 
+		'DiscountController@store'
+	);
+
+	// Vendedores
+	Route::get('/sellers', 
+		'SellerController@index'
+	);
+	// Devuelve las comisiones de las ventas que le corresponden al vendedor
+	Route::get('/commissions/from-commissioner/{commissioner_id}', 
+		'CommissionController@fromCommissioner'
+	);
+	Route::post('/commissioners/update-percetage', 
+		'CommissionController@updatePercentage'
+	);
+
+	// Comisionados
+	Route::get('/commissioners', 
+		'CommissionerController@index'
+	);
+	Route::post('/commissioners/pago', 
+		'CommissionController@pagoForCommissioner'
+	);
+
+	// Tipos de venta
+	Route::get('/sale-types', 
+		'SaleTypeController@index'
 	);
 
 	// Clientes
@@ -266,11 +309,23 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/clients', 
 		'ClientController@store'
 	);
-	Route::put('/clients/{id}', 
+	Route::put('/clients', 
 		'ClientController@update'
 	);
 	Route::delete('/clients/{id}', 
 		'ClientController@delete'
+	);
+	Route::get('/clients/current-acounts/{id}', 
+		'ClientController@currentAcounts'
+	);
+	Route::post('/clients/saldo-inicial', 
+		'ClientController@saldoInicial'
+	);
+	Route::post('/clients/pago', 
+		'CurrentAcountController@pagoFromClient'
+	);
+	Route::post('/clients/nota-credito', 
+		'CurrentAcountController@notaCredito'
 	);
 	// Ventas de un cliente
 	Route::get('/sales/client/{client_id}', 

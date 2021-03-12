@@ -9,17 +9,9 @@ use Carbon\Carbon;
 class CategoryController extends Controller
 {
 
-    function getArticleOwnerId() {
-        $user = Auth()->user();
-        if (is_null($user->owner_id)) {
-            return $user->id;
-        } else {
-            return $user->owner_id;
-        }
-    }
-
     function mostView($weeks_ago) {
         $categories = Category::where('user_id', $this->userId())
+                                ->where('status', 'active')
                                 ->with(['views' => function($q) use($weeks_ago) {
                                     $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
                                 }])
@@ -29,19 +21,23 @@ class CategoryController extends Controller
     }
 
     function index() {
-    	return Category::where('user_id', $this->getArticleOwnerId())
-    					->get();
+    	$categories = Category::where('user_id', $this->userId())
+                                ->where('status', 'active')
+    					       ->get();
+        return response()->json(['categories' => $categories], 200);
     }
 
     function store(Request $request) {
-    	return Category::create([
+    	$category = Category::create([
     		'name'    => ucwords($request->name),
-    		'user_id' => $this->getArticleOwnerId(),
+    		'user_id' => $this->userId(),
     	]);
+        return response()->json(['category' => $category], 201);
     }
 
     function delete($id) {
         $category = Category::find($id);
-        $category->delete();
+        $category->status = 'inactive';
+        $category->save();
     }
 }

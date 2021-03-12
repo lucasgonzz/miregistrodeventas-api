@@ -2,17 +2,18 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Sale;
 use App\Article;
+use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\DiscountHelper;
+use App\Http\Controllers\Helpers\PdfPrintArticle;
+use App\Http\Controllers\Helpers\PdfPrintSale;
+use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
+use App\Sale;
 use App\SaleTime;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Jenssegers\Agent\Agent;
-
-// Helpers
-use App\Http\Controllers\Helpers\PdfPrintSale;
-use App\Http\Controllers\Helpers\PdfPrintArticle;
-use App\Http\Controllers\Helpers\SaleHelper;
 
 class SaleController extends Controller
 {
@@ -122,36 +123,35 @@ class SaleController extends Controller
                         ->orderBy('id', 'DESC')
                         ->take($index)
                         ->get();
-        // dd($sales);
-        return $sales[count($sales)-1];
+        return response()->json(['sale' => $sales[count($sales)-1]]);
     }
 
     function pagarDeuda($sale_id, $debt) {
         $sale = Sale::find($sale_id);
         $deuda_pagada = $sale->debt + $debt;
-        $total = 0;
-        foreach ($sale->articles as $article) {
-            if (!is_null($sale->percentage_card)) {
-                $total += ($article->price * floatval('1.'.$sale->percentage_card)) * $article->pivot->amount;
-            } else {
-                $total += $article->price * $article->pivot->amount;
-            }
-        }
+        $total = SaleHelper::getTotalSale($sale);
         if ($deuda_pagada == $total) {
             $sale->debt = null;
         } else {
             $sale->debt = $deuda_pagada;
         }
         $sale->save();
+        $sale = Sale::where('id', $sale->id)
+                    ->with('articles')
+                    ->with('client')
+                    ->with('specialPrice')
+                    ->first();
+        return response()->json(['sale' => $sale], 200);
     }
 
     function saleClient($client_id) {
-        return Sale::where('user_id', $this->userId())
+        $sales = Sale::where('user_id', $this->userId())
                         ->where('client_id', $client_id)
                         ->with('articles')
                         ->with('client')
                         ->orderby('id', 'DESC')
                         ->get();
+        return response()->json(['sales' => $sales], 200);
     }
 
     function getById($id) {
@@ -163,12 +163,13 @@ class SaleController extends Controller
         $sales = Sale::where('user_id', $this->userId())
                         ->where('created_at', '>=', Carbon::today())
                         ->with('client')
-                        ->with('buyer')
+                        // ->with('buyer')
                         ->with('articles')
+                        ->with('impressions')
                         ->with('specialPrice')
                         ->orderBy('created_at', 'DESC')
                         ->get();
-        return $sales;
+        return response()->json(['sales' => $sales], 200);
     }
 
     function fromSaleTime($sale_time_id, $inverted, $only_one_date = null) {
@@ -203,6 +204,8 @@ class SaleController extends Controller
                         ->where('created_at', '>=', $from)
                         ->where('created_at', '<', $to)
                         ->with('articles')
+                        ->with('impressions')
+                        ->with('specialPrice')
                         ->orderBy('id', 'DESC')
                         ->get();
     }
@@ -243,7 +246,7 @@ class SaleController extends Controller
             $result[$index]['sales'] = $sales;
             $index++;
         }
-        return $result;
+        return response()->json(['days_previus_sales' => $result], 200);
     }
     
     function daysPreviusSales($index, $retroceder, $fecha_limite = null) {
@@ -337,10 +340,12 @@ class SaleController extends Controller
         $sales = Sale::where('user_id', $this->userId())
                 ->whereDate('created_at', $date)
                 ->with('articles')
+                ->with('impressions')
                 ->with('client')
+                ->with('specialPrice')
                 ->orderBy('created_at', 'DESC')
                 ->get();
-        return $sales;
+        return response()->json(['sales' => $sales], 200);
     }
 
     function fromDate($from, $to, $last_day_inclusive) {
@@ -353,10 +358,12 @@ class SaleController extends Controller
         $sales = Sale::where('user_id', $this->userId())
                 ->whereBetween('created_at', [$from, $to])
                 ->with('articles')
+                ->with('impressions')
                 ->with('client')
+                ->with('specialPrice')
                 ->orderBy('created_at', 'DESC')
                 ->get();          
-        return $sales;
+        return response()->json(['sales' => $sales], 200);
     }
 
     /* ----------------------------------------------------------------------------------------
@@ -364,16 +371,14 @@ class SaleController extends Controller
      ---------------------------------------------------------------------------------------- */
     function deleteSales($sales_id) {
         foreach (explode('-', $sales_id) as $sale_id) {
+            $current_acount = new CurrentAcountController();
+            $current_acount->delete($sale_id);
+            $commission = new CommissionController();
+            $commission->delete($sale_id);
             $sale = Sale::find($sale_id);
             foreach ($sale->articles as $article) {
-                if ($article->uncontable == 0) {
+                if (!is_null($article->stock)) {
                     $article->stock += $article->pivot->amount;
-                } else {
-                    if ($article->measurement != $article->pivot->measurement) {
-                        $article->stock += $article->pivot->amount / 1000;
-                    } else {
-                        $article->stock += $article->pivot->amount;
-                    }
                 }
                 $article->save();
             }
@@ -386,7 +391,6 @@ class SaleController extends Controller
         $sale = Sale::where('id', $id)
                         ->with('articles')
                         ->first();
-        // return $request->with_card;
         SaleHelper::detachArticles($sale);
         SaleHelper::attachArticles($sale, $request->articles);
         $with_card = (bool)$request->with_card;
@@ -396,15 +400,22 @@ class SaleController extends Controller
             $sale->percentage_card = null;
         }
         $sale->save();
+        $sale = Sale::where('id', $sale->id)
+                        ->with('client')
+                        // ->with('buyer')
+                        ->with('impressions')
+                        ->with('articles')
+                        ->with('discounts')
+                        ->first();
+        $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
+        $helper->detachCommissionersAndCurrentAcounts();
+        $helper->attachCommissionsAndCurrentAcounts();
+        return response()->json(['sale' => $sale], 200);
     }
 
     function store(Request $request) {
         $with_card = (bool)$request->with_card;
         $special_price_id = null;
-        $debt = $request->debt;
-        if ($debt == -1) {
-            $debt == null;
-        }
         $client_id = $request->client_id;
         if ($client_id == -1) {
             $client_id == null;
@@ -415,28 +426,32 @@ class SaleController extends Controller
         $user = Auth()->user();
         $num_sale = SaleHelper::numSale($this->userId());
         $percentage_card = $with_card ? $user->percentage_card : null;
-        if ($user->hasRole('provider')) {
-            $sale = Sale::create([
-                'user_id' => $this->userId(),
-                'num_sale' => $num_sale,
-                'debt' => $debt,
-                'percentage_card' => $percentage_card,
-                'client_id' => $client_id,
-                'special_price_id' => $request->special_price_id
-            ]);
-        } else {
-            $sale = Sale::create([
-                'user_id' => $this->userId(),
-                'percentage_card' => $percentage_card,
-                'num_sale' => $num_sale,
-                'debt' => $debt,
-                'client_id' => $client_id,
-                'special_price_id' => $request->special_price_id
-            ]);
-        }
+        $sale = Sale::create([
+            'user_id' => $this->userId(),
+            'num_sale' => $num_sale,
+            'debt' => $request->debt,
+            'percentage_card' => $percentage_card,
+            'client_id' => $client_id,
+            'special_price_id' => $request->special_price_id,
+            'sale_type_id' => !is_null($request->sale_type) ? $request->sale_type : null,
+        ]);
         SaleHelper::attachArticles($sale, $request->articles);
-        $sale = Sale::where('id', $sale->id)->with('articles')->first();
-        return $sale;
+        if (Auth()->user()->hasRole('provider')) {
+            $discounts = DiscountHelper::getDiscountsFromDiscountsId($request->discounts);
+            SaleHelper::attachDiscounts($sale, $discounts);
+            $helper = new SaleHelper_Commissioners($sale, $discounts);
+            $helper->attachCommissionsAndCurrentAcounts();
+        }
+        $sale = Sale::where('id', $sale->id)
+                        ->with('client')
+                        ->with('specialPrice')
+                        ->with('articles')
+                        ->with('impressions')
+                        ->with('discounts')
+                        ->first();
+        // $current_acount = new CurrentAcountController();
+        // $current_acount->store($sale);
+        return response()->json(['sale' => $sale], 201);
     }
 
     function pdf($sales_id, $company_name, $articles_cost, $articles_subtotal_cost, $articles_total_price, 

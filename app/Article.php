@@ -7,18 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Article extends Model
 {
     
-    protected $fillable = [
-        'user_id',
-        'category_id',
-    	'bar_code',
-    	'name',
-        'cost',
-    	'stock',
-    	'price',
-    	'last_price',
-    	'created_at',
-        'measurement',
-    ];
+    protected $guarded = [];
 
     function views() {
         return $this->morphMany('App\View', 'viewable');

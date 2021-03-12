@@ -13,4 +13,8 @@ class Buyer extends Model
     // use Favoriteability;
     
     protected $fillable = ['name', 'surname', 'address', 'city', 'email', 'password'];
+
+    function notifications() {
+    	return $this->hasMany('app\Notification');
+    }
 }

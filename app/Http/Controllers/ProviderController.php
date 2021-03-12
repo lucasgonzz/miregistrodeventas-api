@@ -18,21 +18,16 @@ class ProviderController extends Controller
     }
 
     function index() {
-    	return Provider::where('user_id', $this->getArticleOwnerId())->get();
+    	$providers = Provider::where('user_id', $this->getArticleOwnerId())->get();
+        return response()->json(['providers' => $providers], 200);
     }
 
-    function store($provider_name) {
-        // return $this->getArticleOwnerId();
+    function store(Request $request) {
         $provider = Provider::create([
-            'name' => ucwords($provider_name),
+            'name' => ucwords($request->name),
             'user_id' => $this->getArticleOwnerId(),
         ]);
-        // return $request->provider['name'];
-        // $provider = new Provider;
-        // $provider->name = ucwords($request->provider['name']);
-        // $provider->user_id = $this->getArticleOwnerId();
-        // $provider->save();
-        return $provider;
+        return response()->json(['provider' => $provider], 201);
     }
 
     function delete($id) {
