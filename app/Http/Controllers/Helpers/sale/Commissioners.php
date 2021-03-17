@@ -26,13 +26,10 @@ class Commissioners extends Controller {
         $this->client = $sale->client;
     }
 
-    function detachCommissionersAndCurrentAcounts() {
+    // function detachCommissionersAndCurrentAcounts() {
+    function detachCommissioners() {
         foreach ($this->sale->commissions as $commission) {
             $commission->delete();
-        }
-        // $current_acounts = CurrentAcount::where('sale_id', $this->sale->id)->get();
-        foreach ($this->sale->current_acounts as $current_acount) {
-            $current_acount->delete();
         }
     }
 

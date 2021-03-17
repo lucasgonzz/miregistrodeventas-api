@@ -20,7 +20,7 @@ class CreateSalesTable extends Migration
             $table->integer('sale_type_id')->unsigned()->nullable();
             $table->integer('num_sale');
             $table->decimal('percentage_card')->nullable();
-            $table->integer('client_id')->nullable()->unsigned();
+            $table->bigInteger('client_id')->nullable()->unsigned();
             $table->integer('buyer_id')->nullable()->unsigned();
             $table->integer('special_price_id')->nullable()->unsigned();
             $table->decimal('debt')->nullable();

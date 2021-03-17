@@ -15,7 +15,7 @@ class CreateImpressionsTable extends Migration
     {
         Schema::create('impressions', function (Blueprint $table) {
             $table->id();
-            $table->integer('sale_id')->unsigned();
+            $table->bigInteger('sale_id')->unsigned();
             $table->foreign('sale_id')->references('id')->on('sales');
             $table->enum('type', ['client', 'commerce']);
             $table->timestamps();

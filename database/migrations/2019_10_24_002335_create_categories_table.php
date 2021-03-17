@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateCommissionersTable extends Migration
+class CreateCategoriesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,17 +13,15 @@ class CreateCommissionersTable extends Migration
      */
     public function up()
     {
-        Schema::create('commissioners', function (Blueprint $table) {
-            $table->id();
-            $table->string('name')->nullable();
-            $table->double('percentage')->nullable();
-            $table->integer('seller_id')->unsigned()->nullable();
+        Schema::create('categories', function (Blueprint $table) {
+            $table->increments('id');
+
+            $table->string('name', 128);
+            $table->enum('status', ['active', 'inactive'])->default('active');
             $table->integer('user_id')->unsigned();
-            $table->foreign('seller_id')
-                    ->references('id')->on('sellers');
+
             $table->foreign('user_id')
                     ->references('id')->on('users');
-            $table->timestamps();
         });
     }
 
@@ -34,6 +32,6 @@ class CreateCommissionersTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('commissioners');
+        Schema::dropIfExists('categories');
     }
 }

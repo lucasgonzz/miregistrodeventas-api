@@ -19,7 +19,7 @@ class CommissionController extends Controller
     function fromCommissioner($commissioner_id) {
         $commissions = Commission::where('commissioner_id', $commissioner_id)
                                     ->where('status', 'active')
-                                    ->orderBy('created_at', 'DESC')
+                                    ->orderBy('created_at', 'ASC')
                                     ->get();
         return response()->json(['commissions' => $commissions], 200);
     }

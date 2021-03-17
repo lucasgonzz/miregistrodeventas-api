@@ -1,6 +1,7 @@
 <?php
 
 use App\Image;
+use App\Article;
 use Illuminate\Database\Seeder;
 
 
@@ -14,7 +15,8 @@ class ImageSeeder extends Seeder
     public function run()
     {
     	$images = ['foto.jpg', 'tostadora.jpeg'];
-    	for ($article_id=1; $article_id <= 1000 ; $article_id++) { 
+        $artices_count = Article::where('user_id', 1)->count(); 
+    	for ($article_id=1; $article_id <= $artices_count ; $article_id++) { 
     		for ($j=0; $j < 2; $j++) { 
 		        Image::create([
 		        	'article_id' => $article_id,

@@ -14,7 +14,7 @@ class CreateUsersTable extends Migration
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
-            $table->bigIncrements('id');
+            $table->increments('id');
             $table->string('name', 128)->nullable();
             $table->string('email')->nullable()->unique();
             $table->string('company_name', 128)->nullable();
@@ -29,7 +29,7 @@ class CreateUsersTable extends Migration
 
             $table->enum('status', ['for_trial', 'trial', 'in_use', 'admin', 'super', 'recommended']);
 
-            $table->foreign('owner_id')->references('id')->on('users');
+            // $table->foreign('owner_id')->references('id')->on('users');
             // $table->foreign('admin_id')->references('id')->on('users');
         });
     }

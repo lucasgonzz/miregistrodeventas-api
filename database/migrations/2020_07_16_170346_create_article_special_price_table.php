@@ -16,7 +16,7 @@ class CreateArticleSpecialPriceTable extends Migration
         Schema::create('article_special_price', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('special_price_id')->unsigned();
-            $table->integer('article_id')->unsigned();
+            $table->bigInteger('article_id')->unsigned();
             $table->decimal('price')->nullable();
             // $table->timestamps();
 

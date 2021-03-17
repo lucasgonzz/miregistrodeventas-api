@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateBarCodesTable extends Migration
+class CreateCommissionersTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,16 @@ class CreateBarCodesTable extends Migration
      */
     public function up()
     {
-        Schema::create('bar_codes', function (Blueprint $table) {
-            $table->bigIncrements('id');
-
-            $table->string('name');
-            $table->integer('amount');
+        Schema::create('commissioners', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable();
+            $table->double('percentage')->nullable();
+            $table->bigInteger('seller_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned();
-            $table->integer('article_id')->unsigned()->nullable();
-
+            $table->foreign('seller_id')
+                    ->references('id')->on('sellers');
             $table->foreign('user_id')
                     ->references('id')->on('users');
-            $table->foreign('article_id')
-                    ->references('id')->on('articles');
-
             $table->timestamps();
         });
     }
@@ -37,6 +34,6 @@ class CreateBarCodesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('bar_codes');
+        Schema::dropIfExists('commissioners');
     }
 }

@@ -407,8 +407,13 @@ class SaleController extends Controller
                         ->with('articles')
                         ->with('discounts')
                         ->first();
+        // Se eliminan las cuentas corrientes y se actualizan los saldos se las siguientes
+        $current_acount = new CurrentAcountController();
+        $current_acount->delete($sale);
+
         $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
-        $helper->detachCommissionersAndCurrentAcounts();
+        $helper->detachCommissioners();
+        // $helper->detachCommissionersAndCurrentAcounts();
         $helper->attachCommissionsAndCurrentAcounts();
         return response()->json(['sale' => $sale], 200);
     }

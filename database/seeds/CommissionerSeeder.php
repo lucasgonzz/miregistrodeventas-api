@@ -35,7 +35,7 @@ class CommissionerSeeder extends Seeder
             'name'       => 'Perdidas',
             'percentage' => 5,
             'user_id' => $user_id,
-            'seller_id' => 0,
+            // 'seller_id' => 0,
         ]);
     }
 }

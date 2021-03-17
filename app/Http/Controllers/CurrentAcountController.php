@@ -363,10 +363,9 @@ class CurrentAcountController extends Controller
         }
     }
 
-    function delete($sale_id) {
-        $current_acounts_to_delete = CurrentAcount::where('sale_id', $sale_id)
+    function delete($sale) {
+        $current_acounts_to_delete = CurrentAcount::where('sale_id', $sale->id)
                                         ->get();
-        $sale = Sale::find($sale_id);
         $ultima_a_eliminar = $current_acounts_to_delete[count($current_acounts_to_delete)-1];
         $current_acounts_que_siguen = CurrentAcount::where('client_id', $sale->client_id)
                                                 ->where('id', '>', $ultima_a_eliminar->id)

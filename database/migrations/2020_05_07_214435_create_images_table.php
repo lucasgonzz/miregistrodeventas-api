@@ -17,7 +17,7 @@ class CreateImagesTable extends Migration
             $table->bigIncrements('id');
 
             // $table->integer('user_id')->unsigned();
-            $table->integer('article_id')->unsigned();
+            $table->bigInteger('article_id')->unsigned();
             $table->string('url', 128);
             $table->boolean('first')->default(false);
 

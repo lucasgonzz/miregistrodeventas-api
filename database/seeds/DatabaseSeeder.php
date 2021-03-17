@@ -15,8 +15,9 @@ class DatabaseSeeder extends Seeder
         $this->call(UsersTableSeeder::class);
         $this->call(PermissionsTableSeeder::class);
         $this->call(CategorySeeder::class);
-        $this->call(ArticlesTableSeeder::class);
+        $this->call(SellerSeeder::class);
         $this->call(ProvidersTableSeeder::class);
+        $this->call(ArticlesTableSeeder::class);
         $this->call(ClientsTableSeeder::class);
         $this->call(BuyerSeeder::class);
         // $this->call(SaleTimesTableSeeder::class);
@@ -24,7 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ImageSeeder::class);
         $this->call(ConfigurationsSeeder::class);
         $this->call(DiscountSeeder::class);
-        $this->call(SellerSeeder::class);
         $this->call(CommissionerSeeder::class);
         $this->call(SaleTypeSeeder::class);
         $this->call(SalesTableSeeder::class);

@@ -16,8 +16,8 @@ class CreateArticleProviderTable extends Migration
         Schema::create('article_provider', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->integer('article_id')->unsigned();
-            $table->integer('provider_id')->unsigned();
+            $table->bigInteger('article_id')->unsigned();
+            $table->bigInteger('provider_id')->unsigned();
             $table->integer('amount')->nullable();
             $table->integer('cost')->nullable();
             $table->integer('price')->nullable();
@@ -25,7 +25,7 @@ class CreateArticleProviderTable extends Migration
             $table->foreign('article_id')
                     ->references('id')->on('articles');
             $table->foreign('provider_id')
-                    ->references('id')->on('users');
+                    ->references('id')->on('providers');
 
             $table->timestamps();
         });

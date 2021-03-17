@@ -15,8 +15,8 @@ class CreateCommissionsTable extends Migration
     {
         Schema::create('commissions', function (Blueprint $table) {
             $table->id();
-            $table->integer('commissioner_id')->unsigned();
-            $table->integer('sale_id')->unsigned()->nullable();
+            $table->bigInteger('commissioner_id')->unsigned();
+            $table->bigInteger('sale_id')->unsigned()->nullable();
             $table->integer('page')->nullable();
             $table->integer('percentage')->nullable();
             $table->decimal('monto');
