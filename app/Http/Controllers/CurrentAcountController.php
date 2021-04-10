@@ -8,6 +8,7 @@ use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
+use App\Http\Controllers\Helpers\PdfPrintCurrentAcounts;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Sale;
 use App\Seller;
@@ -74,6 +75,11 @@ class CurrentAcountController extends Controller
     	    	]);
             }
     	}
+    }
+
+    function pdf($client_id, $months_ago) {
+        $pdf = new PdfPrintCurrentAcounts($client_id, $months_ago);
+        $pdf->printCurrentAcounts();
     }
 
     public function pagoFromClient(Request $request) {

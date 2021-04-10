@@ -10,21 +10,23 @@ use MercadoPago\SDK;
 
 class PaymentController extends Controller
 {
-    function procesarPago($payment_id) {
-        $payment = Payment::find($payment_id);
-        SDK::setAccessToken("TEST-3668585670354328-100112-a353cb99b53860f22fdf7e7b87c4fd8b-163250661");
+    function procesarPago($order) {
+        $payment = Payment::where('order_id', $order->id)
+                            ->first();
+        SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
 
         $mp_payment = new MercadoPagoPayment();
         $mp_payment->transaction_amount = (float)$payment->transaction_amount;
-        $mp_payment->token = $payment->token;
-        $mp_payment->description = $payment->description;
-        $mp_payment->installments = (int)$payment->installments;
-        $mp_payment->payment_method_id = $payment->payment_method_id;
-        $mp_payment->issuer_id = (int)$payment->issuer;
+        $mp_payment->notification_url   = env('APP_URL').'/mercado-pago/notification';
+        $mp_payment->token              = $payment->token;
+        $mp_payment->description        = $payment->description;
+        $mp_payment->installments       = (int)$payment->installments;
+        $mp_payment->payment_method_id  = $payment->payment_method_id;
+        $mp_payment->issuer_id          = (int)$payment->issuer;
 
         $payer = new Payer();
-        $payer->email = $payment->email;
-        $payer->identification = array(
+        $payer->email           = $payment->email;
+        $payer->identification  = array(
             "type" => $payment->doc_type,
             "number" => $payment->doc_number
         );
@@ -32,8 +34,24 @@ class PaymentController extends Controller
 
         $mp_payment->save();
 
-        $payment->status = $mp_payment->status;
-        $payment->status_details = $mp_payment->status_details;
+        $payment->payment_id    = $mp_payment->id;
+        $payment->status        = $mp_payment->status;
+        $payment->status_detail = $mp_payment->status_detail;
         $payment->save();
+    }
+
+    function notification(Request $request) {
+        SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
+        if ($request->type == 'payment') {
+            Payment::create([
+                'payment_id' => $request->id,
+                'description' => $request->data->id,
+                'status' => $request->action,
+            ]);
+            // $payment = Payment::where('payment_id', $request->id);
+            // $payment->status_detail = $payment->action;
+            // $payment->save(); 
+        }
+        return response(null, 200);
     }
 }

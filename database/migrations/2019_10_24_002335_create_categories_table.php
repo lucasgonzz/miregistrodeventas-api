@@ -14,7 +14,7 @@ class CreateCategoriesTable extends Migration
     public function up()
     {
         Schema::create('categories', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
 
             $table->string('name', 128);
             $table->enum('status', ['active', 'inactive'])->default('active');

@@ -23,7 +23,7 @@ class SalesTableSeeder extends Seeder
         $num_sale = 0;
         $num_sale++;
         $now = Carbon::now();
-        $total_ventas = 10;
+        $total_ventas = 90;
         for ($i=1; $i <= $total_ventas; $i++) { 
             $sale = Sale::create([
                 'user_id' => 1,
@@ -46,8 +46,8 @@ class SalesTableSeeder extends Seeder
                 );
             }
             $discounts = DiscountHelper::getDiscountsFromDiscountsId([1]);
-            SaleHelper::attachDiscounts($sale, $discounts);
-            $helper = new SaleHelper_Commissioners($sale, $discounts);
+            SaleHelper::attachDiscounts($sale, $discounts, $i);
+            $helper = new SaleHelper_Commissioners($sale, $discounts, $total_ventas-$i);
             $helper->attachCommissionsAndCurrentAcounts();
         }
     }

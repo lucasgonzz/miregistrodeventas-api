@@ -19,7 +19,7 @@ class CommissionController extends Controller
     function fromCommissioner($commissioner_id) {
         $commissions = Commission::where('commissioner_id', $commissioner_id)
                                     ->where('status', 'active')
-                                    ->orderBy('created_at', 'ASC')
+                                    ->orderBy('id', 'ASC')
                                     ->get();
         return response()->json(['commissions' => $commissions], 200);
     }
@@ -53,10 +53,9 @@ class CommissionController extends Controller
         return response(null, 201);
     }
 
-    function delete($sale_id) {
-        $commissions_to_delete = Commission::where('sale_id', $sale_id)
+    function delete($sale) {
+        $commissions_to_delete = Commission::where('sale_id', $sale->id)
                                         ->get();
-        $sale = Sale::find($sale_id);
         $commissioners_id = [];
         $ultimas_a_eliminar = [];
         foreach ($commissions_to_delete as $index => $commission_to_delete) {

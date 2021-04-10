@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Helpers;
 use App\CurrentAcount;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use Carbon\Carbon;
 
 class CurrentAcountHelper {
 
@@ -22,6 +23,15 @@ class CurrentAcountHelper {
         } else {
             return $last_current_acount->saldo;
         }
+    }
+
+    static function getCurrentAcountsSinceMonths($client_id, $months_ago) {
+        $months_ago = Carbon::now()->subMonths($months_ago);
+        $current_acounts = CurrentAcount::where('client_id', $client_id)
+                                        ->whereDate('created_at', '>=', $months_ago)
+                                        ->orderBy('created_at', 'ASC')
+                                        ->get();
+        return $current_acounts;
     }
 
     static function getDescription($sale, $total = null) {

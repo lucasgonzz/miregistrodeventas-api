@@ -12,9 +12,10 @@ class Buyer extends Model
     use Notifiable;
     // use Favoriteability;
     
-    protected $fillable = ['name', 'surname', 'address', 'city', 'email', 'password'];
+    protected $guarded = [];
 
-    function notifications() {
-    	return $this->hasMany('app\Notification');
-    }
+    public function routeNotificationForWhatsApp()
+	{
+		return $this->phone;
+	}
 }

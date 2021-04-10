@@ -18,7 +18,7 @@ class BuyerSeeder extends Seeder
     		'city' => 'Gualeguay',
             'address' => 'Pellegrini',
             'address_number' => '876',
-    		'phone' => '3444622139',
+    		'phone' => '+5493444622139',
     		// 'email' => 'Lucas@gmail.com',
     		'password' => bcrypt('1234'),
             'user_id' => 2,

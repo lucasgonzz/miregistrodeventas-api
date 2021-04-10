@@ -18,6 +18,7 @@ class CreateQuestionsTable extends Migration
 
             $table->text('text');
             $table->integer('article_id')->unsigned();
+            $table->integer('variant_id')->nullable();
             $table->integer('user_id')->unsigned();
             $table->integer('buyer_id')->unsigned();
 

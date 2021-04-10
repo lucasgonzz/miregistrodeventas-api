@@ -19,6 +19,8 @@ class CreateArticleCartTable extends Migration
             $table->integer('cart_id')->unsigned();
             $table->integer('article_id')->unsigned();
             $table->double('amount');
+            $table->double('price');
+            $table->bigInteger('variant_id')->nullable();
 
             $table->timestamps();
         });

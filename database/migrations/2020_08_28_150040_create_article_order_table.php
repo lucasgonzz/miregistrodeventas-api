@@ -18,9 +18,10 @@ class CreateArticleOrderTable extends Migration
 
             $table->integer('article_id')->unsigned();
             $table->integer('order_id')->unsigned();
-            $table->decimal('cost');
+            $table->decimal('cost')->nullable();
             $table->decimal('price');
             $table->decimal('amount');
+            $table->bigInteger('variant_id')->nullable();
 
             $table->timestamps();
         });

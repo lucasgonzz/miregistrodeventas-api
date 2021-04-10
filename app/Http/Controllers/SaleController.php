@@ -167,6 +167,8 @@ class SaleController extends Controller
                         ->with('articles')
                         ->with('impressions')
                         ->with('specialPrice')
+                        ->with('commissions')
+                        ->with('discounts')
                         ->orderBy('created_at', 'DESC')
                         ->get();
         return response()->json(['sales' => $sales], 200);
@@ -343,6 +345,8 @@ class SaleController extends Controller
                 ->with('impressions')
                 ->with('client')
                 ->with('specialPrice')
+                ->with('commissions')
+                ->with('discounts')
                 ->orderBy('created_at', 'DESC')
                 ->get();
         return response()->json(['sales' => $sales], 200);
@@ -361,6 +365,8 @@ class SaleController extends Controller
                 ->with('impressions')
                 ->with('client')
                 ->with('specialPrice')
+                ->with('commissions')
+                ->with('discounts')
                 ->orderBy('created_at', 'DESC')
                 ->get();          
         return response()->json(['sales' => $sales], 200);
@@ -371,11 +377,11 @@ class SaleController extends Controller
      ---------------------------------------------------------------------------------------- */
     function deleteSales($sales_id) {
         foreach (explode('-', $sales_id) as $sale_id) {
-            $current_acount = new CurrentAcountController();
-            $current_acount->delete($sale_id);
-            $commission = new CommissionController();
-            $commission->delete($sale_id);
             $sale = Sale::find($sale_id);
+            $current_acount = new CurrentAcountController();
+            $current_acount->delete($sale);
+            $commission = new CommissionController();
+            $commission->delete($sale);
             foreach ($sale->articles as $article) {
                 if (!is_null($article->stock)) {
                     $article->stock += $article->pivot->amount;
@@ -411,8 +417,12 @@ class SaleController extends Controller
         $current_acount = new CurrentAcountController();
         $current_acount->delete($sale);
 
+        // Se eliminan las comisiones y se actualizan los saldos se las siguientes
+        $commission = new CommissionController();
+        $commission->delete($sale);
+
         $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
-        $helper->detachCommissioners();
+        // $helper->detachCommissioners();
         // $helper->detachCommissionersAndCurrentAcounts();
         $helper->attachCommissionsAndCurrentAcounts();
         return response()->json(['sale' => $sale], 200);
@@ -437,7 +447,7 @@ class SaleController extends Controller
             'debt' => $request->debt,
             'percentage_card' => $percentage_card,
             'client_id' => $client_id,
-            'special_price_id' => $request->special_price_id,
+            'special_price_id' => $special_price_id,
             'sale_type_id' => !is_null($request->sale_type) ? $request->sale_type : null,
         ]);
         SaleHelper::attachArticles($sale, $request->articles);

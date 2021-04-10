@@ -3,7 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Client;
+use App\Seller;
 use App\CurrentAcount;
+use App\Http\Controllers\Helpers\CurrentAcountHelper;
+use App\Http\Controllers\Helpers\PdfPrintClients;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class ClientController extends Controller
@@ -26,6 +30,25 @@ class ClientController extends Controller
         $client->seller_id = $request->client['seller_id'] != 0 ? $request->client['seller_id'] : null;
         $client->save();
         return response()->json(['client' => $client], 200);
+    }
+
+    function pdf($seller_id) {
+        if ($seller_id == 'undefined') {
+            $seller = new \stdClass();
+            $seller->name = 'Oscar';
+            $seller->surname = '';
+            $clients = Client::where('seller_id', null)
+                                ->get();
+            $clients = $this->setClientsSaldo($clients);
+        } else {
+            $seller = Seller::where('id', $seller_id)
+                            ->with('clients')
+                            ->first();
+            $clients = $this->setClientsSaldo($seller->clients);
+        }
+        // dd($seller->clients);
+        $pdf = new PdfPrintClients($seller, $clients);
+        $pdf->printClients();
     }
 
     function isRegister($client_name) {
@@ -61,11 +84,8 @@ class ClientController extends Controller
         return response(null, 201);
     }
 
-    function currentAcounts($client_id) {
-        $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        // ->where('status', '!=', 'pago_for_seller')
-                                        ->orderBy('created_at', 'ASC')
-                                        ->get();
+    function currentAcounts($client_id, $months_ago) {
+        $current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($client_id, $months_ago);
         return response()->json(['current_acounts' => $current_acounts], 200);
     }
 
@@ -105,7 +125,7 @@ class ClientController extends Controller
             if (!is_null($last_current_acount)) {
                 $client->saldo = $last_current_acount->saldo;
             } else {
-                $client->saldo = '-';
+                // $client->saldo = '-';
             }
         }
         return $clients;

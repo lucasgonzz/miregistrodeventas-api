@@ -136,8 +136,24 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/categories', 
 			'CategoryController@store'
 		);
+		Route::put('/categories', 
+			'CategoryController@update'
+		);
 		Route::delete('/categories/{id}', 
 			'CategoryController@delete'
+		);
+		// Sub Categorias
+		Route::get('/sub-categories', 
+			'SubCategoryController@index'
+		);
+		Route::post('/sub-categories', 
+			'SubCategoryController@store'
+		);
+		Route::put('/sub-categories', 
+			'SubCategoryController@update'
+		);
+		Route::delete('/sub-categories/{id}', 
+			'SubCategoryController@delete'
 		);
 		// Codigos de barra
 		Route::get('/bar-codes', 
@@ -193,6 +209,14 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::delete('/articles/{ids}', 
 		'ArticleController@delete'
+	);
+
+	// Variants
+	Route::post('/articles/variants/{article_id}', 
+		'ArticleController@setVariants'
+	);
+	Route::delete('/articles/variants/{article_id}', 
+		'ArticleController@deleteVariants'
 	);
 
 	// Categorias
@@ -315,7 +339,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/clients/{id}', 
 		'ClientController@delete'
 	);
-	Route::get('/clients/current-acounts/{id}', 
+	Route::get('/clients/current-acounts/{id}/{months_ago}', 
 		'ClientController@currentAcounts'
 	);
 	Route::post('/clients/saldo-inicial', 

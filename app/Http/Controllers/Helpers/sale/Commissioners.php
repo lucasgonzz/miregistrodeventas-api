@@ -8,6 +8,7 @@ use App\Commission;
 use App\Commissioner;
 use App\CurrentAcount;
 use App\Discount;
+use Carbon\Carbon;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
@@ -20,10 +21,15 @@ use App\SaleType;
 
 class Commissioners extends Controller {
 
-    function __construct($sale, $discounts) {
+    function __construct($sale, $discounts, $index = null) {
         $this->sale = $sale;
         $this->discounts = $discounts;
         $this->client = $sale->client;
+        if ($index) {
+            $this->index = $index;
+        } else {
+            $this->index = null;
+        }
     }
 
     // function detachCommissionersAndCurrentAcounts() {
@@ -84,6 +90,7 @@ class Commissioners extends Controller {
             'seller_id'   => $this->sale->client->seller_id,
             'sale_id'     => $this->sale->id,
             'description' => CurrentAcountHelper::getDescription($this->sale, $this->debe_sin_descuentos),
+            'created_at' => $this->getCreatedAt(),
         ]);
     }
 
@@ -106,6 +113,7 @@ class Commissioners extends Controller {
             'detalle'         => $this->getDetalle(),
             'is_seller'       => 1,
             'updated_at'      => null,
+            'created_at' => $this->getCreatedAt(),
         ]);
     }
 
@@ -130,6 +138,7 @@ class Commissioners extends Controller {
             'detalle'         => $this->getDetalle(),
             'is_seller'       => 0,
             'updated_at'      => null,
+            'created_at' => $this->getCreatedAt(),
         ]);
     }
 
@@ -205,6 +214,7 @@ class Commissioners extends Controller {
             'percentage'      => $this->getPerdidaPercentage(),
             'monto'           => $this->getPerdidaMonto(),
             'updated_at'      => null,
+            'created_at' => $this->getCreatedAt(),
         ]);
     }
 
@@ -236,6 +246,7 @@ class Commissioners extends Controller {
                 'percentage'      => $commissioner->percentage,
                 'monto'           => $this->getMontoForOscarFedePapi($commissioner),
                 'updated_at'      => null,
+                'created_at' => $this->getCreatedAt(),
             ]);
             // $this->sale->commissioners()->attach($commissioner->id, [
             //     'percentage' => $commissioner->percentage
@@ -250,6 +261,14 @@ class Commissioners extends Controller {
         } 
         $commission = $total_a_restar * Numbers::percentage($commissioner->percentage);
         return $commission;
+    }
+
+    function getCreatedAt() {
+        $created_at = Carbon::now();
+        if ($this->index) {
+            $created_at->subDays($this->index);
+        }
+        return $created_at;
     }
 }
 

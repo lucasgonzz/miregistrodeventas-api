@@ -5,15 +5,18 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\BarCode;
 use App\Exports\ArticlesExport;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Image;
 use App\Imports\ArticlesImport;
-use App\User;
 use App\SpecialPrice;
+use App\User;
+use App\Variant;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use \Gumlet\ImageResize;
 
@@ -27,7 +30,8 @@ class ArticleController extends Controller
                                 ->where('status', 'active')
                                 ->orderBy('created_at', 'DESC')
                                 ->with('images')
-                                ->with('category')
+                                ->with('sub_category')
+                                ->with('variants')
                                 ->with('specialPrices')
                                 ->with(['providers' => function($q) {
                                     $q->orderBy('cost', 'asc');
@@ -37,7 +41,7 @@ class ArticleController extends Controller
             $articles = Article::where('user_id',$this->userId())
                                 ->orderBy('id', 'DESC')
                                 ->with('images')
-                                ->with('category')
+                                ->with('sub_category')
                                 ->get();
         }
         return response()->json(['articles' => $articles], 200);
@@ -50,7 +54,8 @@ class ArticleController extends Controller
                                 ->orderBy('id', 'DESC')
                                 ->with('marker')
                                 ->with('images')
-                                ->with('category')
+                                ->with('sub_category')
+                                ->with('variants')
                                 ->with('specialPrices')
                                 ->with(['providers' => function($q) {
                                     $q->orderBy('cost', 'asc');
@@ -61,7 +66,7 @@ class ArticleController extends Controller
                                 ->orderBy('id', 'DESC')
                                 ->with('marker')
                                 ->with('images')
-                                ->with('category')
+                                ->with('sub_category')
                                 ->paginate(10);
         }
     	return [
@@ -89,20 +94,14 @@ class ArticleController extends Controller
     }
 
     function show($id) {
-        $article = Article::where('id', $id)
-                            ->with('category')
-                            ->with('specialPrices')
-                            ->with('images');
-        if (Auth::user()->hasRole('commerce')) {
-            $article = $article->with('providers');
-        }
-        return $article->first();
+        $article = ArticleHelper::getFullArticle($article->id);
+        return response()->json(['article' => $article], 200);
     }
 
     function update(Request $request) {
         $article = Article::find($request->id);
         $article->bar_code = $request->bar_code;
-        $article->category_id = $request->category_id != 0 ? $request->category_id : null;
+        $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
         if ($article->price != $request->price) {
             $article->previus_price = $article->price;
         }
@@ -110,15 +109,14 @@ class ArticleController extends Controller
             $article->timestamps = false;
         } 
         $article->name = ucwords($request->name);
+        $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
-        if (!is_null($article->stock)) {
-            if (!$request->stock_null) {
-                $article->stock = $request->stock;
-                $article->stock += $request->new_stock;
-            } else {
-                $article->stock = null;
-            }
+        if (!$request->stock_null && $request->stock != '') {
+            $article->stock = $request->stock;
+            $article->stock += $request->new_stock;
+        } else {
+            $article->stock = null;
         }
         $article->save();
         if ($request->new_stock != 0) {
@@ -144,23 +142,41 @@ class ArticleController extends Controller
                 }
             }
         }
-        $article = Article::where('id', $article->id)
-                            ->with('images')
-                            ->with('category')
-                            ->with('specialPrices')
-                            ->with(['providers' => function($q) {
-                                $q->orderBy('cost', 'asc');
-                            }])
-                            ->first();
+        $article = ArticleHelper::getFullArticle($article->id);
+        return response()->json(['article' => $article], 200);
+    }
+
+    function setVariants(Request $request, $article_id) {
+        $article = Article::find($article_id);
+        ArticleHelper::deleteVariants($article);
+        foreach ($request->variants as $variant) {
+            Variant::create([
+                'article_id'  => $article->id,
+                'description' => $variant['description'],
+                'stock'       => ArticleHelper::getStockVariantToAdd($variant),
+                'url'         => $variant['url'],
+            ]);
+        }
+        $article = ArticleHelper::getFullArticle($article->id);
+        return response()->json(['article' => $article], 200);
+    }
+
+    function deleteVariants($article_id) {
+        $article = Article::find($article_id);
+        ArticleHelper::deleteVariants($article);
+        $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 200);
     }
 
     function updateCategory(Request $request) {
-        foreach ($request->articles_id as $id) {
+        $articles = [];
+        foreach ($request->articles_ids as $id) {
             $article = Article::find($id);
-            $article->category_id = $request->category_id;
+            $article->sub_category_id = $request->sub_category_id;
             $article->save();
+            $articles[] = ArticleHelper::getFullArticle($article->id);
         }
+        return response()->json(['articles' => $articles], 200);
     }
 
     function addImage(Request $request, $id) {
@@ -168,14 +184,7 @@ class ArticleController extends Controller
             'article_id' => $id,
             'url'        => $request->path,
         ]);
-        $article = Article::where('id', $id)
-                            ->with('images')
-                            ->with('category')
-                            ->with('specialPrices')
-                            ->with(['providers' => function($q) {
-                                $q->orderBy('cost', 'asc');
-                            }])
-                            ->first();
+        $article = ArticleHelper::getFullArticle($id);
         return response()->json(['article' => $article], 201);
     }
 
@@ -212,14 +221,7 @@ class ArticleController extends Controller
         }
         $image->first = 1;
         $image->save();
-        $article = Article::where('id', $article->id)
-                            ->with('images')
-                            ->with('category')
-                            ->with('specialPrices')
-                            ->with(['providers' => function($q) {
-                                $q->orderBy('cost', 'asc');
-                            }])
-                            ->first();
+        $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 200);
     }
 
@@ -294,14 +296,7 @@ class ArticleController extends Controller
             $article->featured = count($articles_featured) + 1;
         }
         $article->save();
-        $article = Article::where('id', $article->id)
-                            ->with('images')
-                            ->with('category')
-                            ->with('specialPrices')
-                            ->with(['providers' => function($q) {
-                                $q->orderBy('cost', 'asc');
-                            }])
-                            ->first();
+        $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 200);
     }
 
@@ -328,10 +323,11 @@ class ArticleController extends Controller
         $user = Auth()->user();
         $article = new Article();
         $article->bar_code = $request->bar_code;
-        if ($request->category_id != 0) {
-            $article->category_id = $request->category_id;
+        if ($request->sub_category_id != 0) {
+            $article->sub_category_id = $request->sub_category_id;
         }
         $article->name = ucfirst($request->name);
+        $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
         if ($request->stock != '') {
@@ -361,14 +357,7 @@ class ArticleController extends Controller
             }
         }
 
-        $article = Article::where('id', $article->id)
-                            ->with('images')
-                            ->with('category')
-                            ->with('specialPrices')
-                            ->with(['providers' => function($q) {
-                                $q->orderBy('cost', 'asc');
-                            }])
-                            ->first();
+        $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 201);
     }
 

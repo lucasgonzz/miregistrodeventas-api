@@ -16,14 +16,14 @@ class CreatePaymentsTable extends Migration
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
             // $table->double('transaction_amount');
-            $table->string('token');
-            $table->string('description');
-            $table->string('email');
-            $table->integer('installments');
-            $table->string('payment_method_id');
-            $table->integer('issuer');
-            $table->string('doc_type');
-            $table->string('doc_number');
+            $table->string('token')->nullable();
+            $table->string('description')->nullable();
+            $table->string('email')->nullable();
+            $table->integer('installments')->nullable();
+            $table->string('payment_method_id')->nullable();
+            $table->integer('issuer')->nullable();
+            $table->string('doc_type')->nullable();
+            $table->string('doc_number')->nullable();
             $table->string('status')->nullable();
             $table->string('status_detail')->nullable();
             $table->integer('payment_id')->nullable();

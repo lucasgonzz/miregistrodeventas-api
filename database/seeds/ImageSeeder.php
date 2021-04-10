@@ -15,14 +15,14 @@ class ImageSeeder extends Seeder
     public function run()
     {
     	$images = ['foto.jpg', 'tostadora.jpeg'];
-        $artices_count = Article::where('user_id', 1)->count(); 
-    	for ($article_id=1; $article_id <= $artices_count ; $article_id++) { 
+        $articles = Article::where('user_id', 2)->get(); 
+        foreach ($articles as $article) {
     		for ($j=0; $j < 2; $j++) { 
 		        Image::create([
-		        	'article_id' => $article_id,
-		        	'url'        => 'v1614388222/articles/c7tspfd4lwvkvuhx70xv.jpg',
+		        	'article_id' => $article->id,
+		        	'url'        => 'v1616079010/articles/ztaa7kyj1cfqoj8fmsjp.jpg',
 		        ]);
     		}
-    	}
+        }
     }
 }

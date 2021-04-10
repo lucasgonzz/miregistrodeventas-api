@@ -12,6 +12,7 @@ use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Sale;
 use App\SaleType;
+use App\Variant;
 
 class SaleHelper extends Controller {
 
@@ -67,7 +68,17 @@ class SaleHelper extends Controller {
                                                         'price' => (float)$article['price'],
                                                     ]);
             $article_ = Article::find($article['id']);
-            if (!is_null($article_->stock)) {
+            if (isset($article['selected_variant_id'])) {
+                $variant = Variant::find($article['selected_variant_id']);
+                $stock_resultante = $variant->stock - $article['amount'];
+                if ($stock_resultante > 0) {
+                    $variant->stock = $stock_resultante;
+                } else {
+                    $variant->stock = 0;
+                }
+                // $variant->description = 'hola';
+                $variant->save();
+            } else if (!is_null($article_->stock)) {
                 $stock_resultante = $article_->stock - $article['amount'];
                 if ($stock_resultante > 0) {
                     $article_->stock = $stock_resultante;

@@ -15,4 +15,8 @@ class Seller extends Model
     public function seller() {
     	return $this->belongsTo('App\Seller');
     }
+
+    public function clients() {
+    	return $this->hasMany('App\Client');
+    }
 }

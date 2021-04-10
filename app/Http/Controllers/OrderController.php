@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Buyer;
+use App\Events\OrderEvent;
+use App\Http\Controllers\Helpers\OrderHelper;
+use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Notifications\OrderConfirmed;
+use App\Notifications\OrderDelivered;
+use App\Notifications\OrderFinished;
 use App\Order;
 use App\Sale;
-use App\Events\OrderEvent;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
@@ -14,8 +19,10 @@ class OrderController extends Controller
         $orders = Order::where('user_id', $this->userId())
                         ->where('status', 'unconfirmed')
                         ->with('articles.images')
+                        ->with('articles.variants')
                         ->with('buyer')
                         ->get();
+        $orders = OrderHelper::setArticlesKey($orders);
         return response()->json(['orders' => $orders], 200);
     }
     
@@ -24,8 +31,10 @@ class OrderController extends Controller
                         ->where('status', 'confirmed')
                         ->orWhere('status', 'finished')
                         ->with('articles.images')
+                        ->with('articles.variants')
                         ->with('buyer')
                         ->get();
+        $orders = OrderHelper::setArticlesKey($orders);
         return response()->json(['orders' => $orders], 200);
     }
 
@@ -35,9 +44,15 @@ class OrderController extends Controller
         $order->save();
         if ($order->payment_method == 'tarjeta') {
             $payment_controller = new PaymentController();
-            $payment_controller->procesarPago($order->payment_id);
+            $payment_controller->procesarPago($order);
         }
-        broadcast(new OrderEvent($order))->toOthers();
+
+        // Notification
+        $buyer = Buyer::find($order->buyer_id);
+        $buyer->notify(new OrderConfirmed($order));
+        
+        // OrderEvent to broadcast
+        // broadcast(new OrderEvent($order))->toOthers();
         return response(null, 200);
     }
 
@@ -53,6 +68,12 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'finished';
         $order->save();
+
+        // Notification
+        $buyer = Buyer::find($order->buyer_id);
+        $buyer->notify(new OrderFinished($order));
+
+        // OrderEvent to broadcast
         broadcast(new OrderEvent($order))->toOthers();
         return response(null, 200);
     }
@@ -63,7 +84,11 @@ class OrderController extends Controller
                         ->first();
         $order->status = 'delivered';
         $order->save();
-        broadcast(new OrderEvent($order))->toOthers();
+
+        // Notification
+        $buyer = Buyer::find($order->buyer_id);
+        $buyer->notify(new OrderDelivered($order));
+
         $sale = $this->saveSale($order);
         return response()->json(['sale' => $sale], 201);
     }

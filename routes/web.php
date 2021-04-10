@@ -1,7 +1,10 @@
 <?php
 
+use App\Article;
 use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
+use App\Notifications\OrderConfirmed;
 use App\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,23 +22,15 @@ use Illuminate\Support\Facades\Route;
 
 
 // Devuelve las comisiones de las ventas que le corresponden al vendedor
-Route::get('/prueba', function() {
-	$sales = Sale::where('user_id', 1)->get();
-	if (array_key_exists(100, $sales->toArray())) {
-		var_dump($sales[2]);
-	} else {
-		echo "no";
+Route::get('/slugs', function() {
+	$articles = Article::where('user_id', 1)->get();
+	foreach ($articles as $article) {
+		$article->slug = ArticleHelper::slug($article->name);
+		$article->save();
+		echo $article->slug.'</br>';
 	}
+	echo "listo";
 });
-
-Route::post('/procesar-pago', 
-	function(Request $request) {
-		User::create([
-			'name' => $request->transactionAmount,
-			'password' => 'asd',
-		]);
-	}
-);
 
 Route::get('/orders/deliver/{order_id}', 
 	'OrderController@deliver'
@@ -48,6 +43,8 @@ Route::post('login-admin', 'Auth\LoginController@loginAdmin');
 Route::post('register', 'Auth\RegisterController@registerCommerce');
 Route::post('logout', 'Auth\LoginController@logout');
 
+Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
+Route::get('/current-acounts/pdf/{client_id}/{months_ago}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{company_name}/{articles_cost}/{articles_subtotal_cost}/{articles_total_price}/{articles_total_cost}/{borders}', 'SaleController@pdf');
 // Imprimir articulos
 Route::get('/pdf/{columns}/{articles_ids}/{orientation}/{header?}', 'PdfController@articles');

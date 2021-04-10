@@ -9,7 +9,7 @@ class Order extends Model
     protected $guarded = [];
 
     function articles() {
-    	return $this->belongsToMany('App\Article')->withPivot('cost', 'price', 'amount');
+    	return $this->belongsToMany('App\Article')->withPivot('cost', 'price', 'amount', 'variant_id');
     }
 
     function buyer() {

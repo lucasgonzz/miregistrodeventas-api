@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Answer;
-use App\Configuration;
+use App\Buyer;
 use App\Events\QuestionAnsweredEvent;
 use App\Http\Controllers\NotificationController;
+use App\Notifications\QuestionAnswered;
+use App\Question;
 use Illuminate\Http\Request;
 
 class AnswerController extends Controller
@@ -15,13 +17,12 @@ class AnswerController extends Controller
     		'text'		  => ucfirst($request->text),
     		'question_id' => $request->question_id
     	]);
-    	$configuration = Configuration::where('buyer_id', $request->buyer_id)
-    									->first();
-    	$configuration->questions_seen = 0;
-    	$configuration->save();
-    	broadcast(new QuestionAnsweredEvent($answer));
-        $notification = new NotificationController();
-        $notification->store($request->buyer_id, 'Respondieron a tu pregunta');
+        $question = Question::where('id', $request->question_id)
+                            ->with('article')
+                            ->first();
+        $buyer = Buyer::find($question->buyer_id);
+        $buyer->notify(new QuestionAnswered($question));
+    	// broadcast(new QuestionAnsweredEvent($answer));
     	return response(null, 201);
     }
 }

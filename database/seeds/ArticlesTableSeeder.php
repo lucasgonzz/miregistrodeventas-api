@@ -1,10 +1,13 @@
 <?php
 
 use App\Article;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Image;
 use App\Provider;
+use App\Variant;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Str;
 
 class ArticlesTableSeeder extends Seeder
 {
@@ -15,38 +18,42 @@ class ArticlesTableSeeder extends Seeder
      */
     public function run()
     {
-        $names = ['lomo', 'costillas', 'matambre', 'chorizo', 'pollo', 'pechuga', 'patas de muslo', 'peceto', 'pulpa comun', 'pulpa especial', 'puchero', 'vacio', 'asado', 'azotillo', 'bola de lomo', 'riñon', 'tripa gorda', 'molleja', 'chinchulin', 'lengua', 'pollo'];
 
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
-        $categories_id = [1,1,1,1,1,1,6,3,2,2,2,4,5,6,7,1,1,3,3,3,8,8,5,1,1,1,1,1,1,1,1,6,3,2,2,2,4,5,6,7,1,1,3,3,3,8,8,5,1,1];
-        $costs = [2000,2000,2000,2000,2000,2000,150,5000,500,500,500,300,1200,450,800,1000,1100,800,700,500,3500,3200,1000,540,300,2000,2000,2000,2000,2000,2000,150,5000,500,500,500,300,1200,450,800,1000,1100,800,700,500,3500,3200,1000,540,300,];
-        Article::create([
-            'bar_code'     => 123,
-            'name'         => 'Hola',
-            'cost'         => 500,
-            'price'        => 1000,
-            'stock'        => null,
-            'user_id'      => 1,
-            'category_id'  => null,
-            'created_at'   => Carbon::now()->subDays(1),
-            'featured' => null,
-        ]);
+       
         for ($user_id=1; $user_id < 3; $user_id++) { 
-            for ($i=0;  $i < count($names); $i++) { 
+            for ($i=0;  $i < 200; $i++) { 
                 $cost = rand(50, 3000);
+                $name = 'Articulo '.$i;
                 $bar_code = rand(1000000000000, 9999999999999);
                 $article = Article::create([
                     'bar_code'     => $bar_code,
-                    'name'         => ucwords($names[$i]).' '.$i,
-                    'cost'         => $costs[$i],
-                    'price'        => $costs[$i] * 1.35,
-                    'stock'        => 15,
+                    'name'         => $name,
+                    'slug'         => ArticleHelper::slug($name),
+                    'cost'         => 5,
+                    'price'        => 10,
+                    'stock'        => 14,
                     'user_id'      => $user_id,
-                    'category_id'  => $categories_id[$i],
+                    'sub_category_id'  => rand(1,40),
                     'created_at'   => Carbon::now()->subDays($i),
-                    'featured' => $i < 6 ? $i : null
+                    'featured' => $i < 8 ? $i : null
                 ]);
                 if ($user_id == 2) {
+                    $images = [
+                        'v1616079010/articles/ztaa7kyj1cfqoj8fmsjp.jpg', 
+                        'v1616538802/articles/kboz26romcgmiswoocjw.jpg', 
+                        'v1615988247/articles/cumc9e2hifffpr498nz6.jpg', 
+                        'v1615989993/articles/ofzfakuwnre6qy6plzw0.jpg',
+                        'v1615988968/articles/b6gcidfseqa3f59zyjr1.jpg',
+                        'v1616507853/articles/guuyxregqgje3nhmmefj.jpg',
+                        'v1616506825/articles/kcjbnqtkphlyacfc3bks.jpg'
+                    ];
+                    for ($j=0; $j < 2; $j++) { 
+                        Image::create([
+                            'article_id' => $article->id,
+                            'url'        => $images[$j],
+                        ]);
+                    }
                     $providers = Provider::where('user_id', $user_id)->get();
                     foreach ($providers as $provider) {
                         $article->providers()->attach($provider->id, [
@@ -55,43 +62,36 @@ class ArticlesTableSeeder extends Seeder
                                                         'amount' => 15,
                                                     ]);
                     }
-                }
-                if ($user_id == 3) {
-                    for ($j=0; $j < 2 ; $j++) {
-                        if ($i + 1 < count($names)) {
-                            $index = $i + $j;
-                        } else {
-                            $index = $i - $j;
+                    if ($i < 10) {
+                        for ($j=0; $j < 7; $j++) { 
+                            Variant::create([
+                                'description' => 'Modelo '.$j,
+                                'stock'       => 7,
+                                'article_id'  => $article->id,
+                                'url'         => $images[$j],
+                            ]);
                         }
-                        Image::create([
-                            'article_id' => $article->id,
-                            'url'        => str_replace(' ', '-', $names[$index]).'.jpg',
-                        ]);
                     }
                 }
             }
         }
-        Article::create([
-            'bar_code'     => 111,
-            'name'         => 'Hola2',
-            'cost'         => 500,
-            'price'        => 1000,
-            'stock'        => null,
-            'user_id'      => 1,
-            'category_id'  => null,
-            'created_at'   => Carbon::now()->subDays(1),
-            'featured' => null,
-        ]);
-        Article::create([
-            'bar_code'     => 222,
-            'name'         => 'Hola3',
-            'cost'         => 500,
-            'price'        => 1000,
-            'stock'        => null,
-            'user_id'      => 1,
-            'category_id'  => null,
-            'created_at'   => Carbon::now()->subDays(1),
-            'featured' => null,
-        ]);
+        for ($i=1; $i < 4; $i++) { 
+            $article = Article::create([
+                'bar_code'     => 111,
+                'name'         => 'Hola '.$i,
+                'slug'         => ArticleHelper::slug('Hola '.$i),
+                'cost'         => 500,
+                'price'        => 1000,
+                'stock'        => null,
+                'user_id'      => 2,
+                'sub_category_id'  => null,
+                'created_at'   => Carbon::now()->subDays(1),
+                'featured' => null,
+            ]);
+            Image::create([
+                'article_id' => $article->id,
+                'url'        => $images[0],
+            ]);
+        }
     }
 }
