@@ -378,10 +378,12 @@ class SaleController extends Controller
     function deleteSales($sales_id) {
         foreach (explode('-', $sales_id) as $sale_id) {
             $sale = Sale::find($sale_id);
-            $current_acount = new CurrentAcountController();
-            $current_acount->delete($sale);
-            $commission = new CommissionController();
-            $commission->delete($sale);
+            if (auth()->user()->hasRole('provider')) {
+                $current_acount = new CurrentAcountController();
+                $current_acount->delete($sale);
+                $commission = new CommissionController();
+                $commission->delete($sale);
+            }
             foreach ($sale->articles as $article) {
                 if (!is_null($article->stock)) {
                     $article->stock += $article->pivot->amount;
@@ -463,6 +465,7 @@ class SaleController extends Controller
                         ->with('articles')
                         ->with('impressions')
                         ->with('discounts')
+                        ->with('commissions')
                         ->first();
         // $current_acount = new CurrentAcountController();
         // $current_acount->store($sale);

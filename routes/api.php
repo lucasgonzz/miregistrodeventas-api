@@ -397,22 +397,19 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// EMPLEADOS
 	Route::get('/employees', 
-		'UserController@getEmployees'
+		'EmployeeController@index'
 	);
-	Route::get('/employees/{name}/{password}/{permissions}', 
-		'UserController@saveEmployee'
+	Route::post('/employees', 
+		'EmployeeController@store'
 	);
-	Route::put('/employees/permissions/{employee_id}', 
-		'UserController@updateEmployeePermissions'
+	Route::put('/employees', 
+		'EmployeeController@update'
 	);
 	Route::delete('/employees/{id}', 
-		'UserController@deleteEmployee'
+		'EmployeeController@delete'
 	);
 	Route::get('/permissions', 
 		'PermissionController@index'
-	);
-	Route::get('/permissions/sale-time', 
-		'PermissionController@saleTime'
 	);
 
 	// --------------------------------------------------------------------------------------
@@ -439,7 +436,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/orders/confirm/{order_id}', 
 		'OrderController@confirm'
 	);
-	Route::get('/orders/cancel/{order_id}', 
+	Route::put('/orders/cancel', 
 		'OrderController@cancel'
 	);
 	Route::get('/orders/finish/{order_id}', 

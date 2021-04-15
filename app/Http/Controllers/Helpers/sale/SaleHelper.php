@@ -102,7 +102,17 @@ class SaleHelper extends Controller {
                                                         'price' => $article->pivot->price,
                                                     ]);
             $article_ = Article::find($article->id);
-            if (!is_null($article_->stock)) {
+            if (!is_null($article->pivot->variant_id)) {
+                $variant = Variant::find($article->pivot->variant_id);
+                $stock_resultante = $variant->stock - $article->pivot->amount;
+                if ($stock_resultante > 0) {
+                    $variant->stock = $stock_resultante;
+                } else {
+                    $variant->stock = 0;
+                }
+                // $variant->description = 'hola';
+                $variant->save();
+            } else if (!is_null($article_->stock)) {
                 $stock_resultante = $article_->stock - $article->pivot->amount;
                 if ($stock_resultante > 0) {
                     $article_->stock = $stock_resultante;

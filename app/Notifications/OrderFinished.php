@@ -40,9 +40,7 @@ class OrderFinished extends Notification
 
     public function broadcastOn()
     {
-        return [
-            new \Illuminate\Broadcasting\Channel('orderChannel')
-        ];
+        return 'order.'.$this->order->buyer_id;
     }
 
 

@@ -39,9 +39,7 @@ class QuestionAnswered extends Notification
 
     public function broadcastOn()
     {
-        return [
-            new \Illuminate\Broadcasting\Channel('questionChannel')
-        ];
+        return 'question.'.$this->question->buyer_id;
     }
 
 
@@ -69,8 +67,8 @@ class QuestionAnswered extends Notification
     public function toArray($notifiable)
     {
         return [
-            'article_id'  => $this->question->article_id,
-            'variant_id'  => $this->question->variant_id,
+            'article_slug'  => $this->question->article->slug,
+            // 'variant_id'  => $this->question->variant_id,
             'message'  => $this->getMessage(),
         ];
     }

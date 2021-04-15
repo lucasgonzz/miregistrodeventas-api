@@ -25,30 +25,32 @@ class SalesTableSeeder extends Seeder
         $now = Carbon::now();
         $total_ventas = 90;
         for ($i=1; $i <= $total_ventas; $i++) { 
-            $sale = Sale::create([
-                'user_id' => 1,
-                'num_sale' => $i,
-                'percentage_card' => null,
-                'client_id' => 2,
-                'sale_type_id' => 1,
-                'created_at' => Carbon::now()->subDays($total_ventas-$i),
-            ]);
-            $articles = Article::where('user_id', 1)
-                                ->take(30)
-                                ->get();
-            foreach ($articles as $article) {
-                $sale->articles()->attach($article->id, 
-                    [
-                        'amount'      => 2,
-                        'cost'        => $article->cost,
-                        'price'       => $article->price,
-                    ]
-                );
+            for ($j=0; $j < 5; $j++) { 
+                $sale = Sale::create([
+                    'user_id' => 1,
+                    'num_sale' => $i,
+                    'percentage_card' => null,
+                    'client_id' => 2,
+                    'sale_type_id' => 1,
+                    'created_at' => Carbon::now()->subDays($total_ventas-$i),
+                ]);
+                $articles = Article::where('user_id', 1)
+                                    ->take(30)
+                                    ->get();
+                foreach ($articles as $article) {
+                    $sale->articles()->attach($article->id, 
+                        [
+                            'amount'      => 2,
+                            'cost'        => $article->cost,
+                            'price'       => $article->price,
+                        ]
+                    );
+                }
+                $discounts = DiscountHelper::getDiscountsFromDiscountsId([1]);
+                SaleHelper::attachDiscounts($sale, $discounts, $i);
+                $helper = new SaleHelper_Commissioners($sale, $discounts, $total_ventas-$i);
+                $helper->attachCommissionsAndCurrentAcounts();
             }
-            $discounts = DiscountHelper::getDiscountsFromDiscountsId([1]);
-            SaleHelper::attachDiscounts($sale, $discounts, $i);
-            $helper = new SaleHelper_Commissioners($sale, $discounts, $total_ventas-$i);
-            $helper->attachCommissionsAndCurrentAcounts();
         }
     }
 

@@ -13,14 +13,14 @@ use Illuminate\Support\Facades\Broadcast;
 |
 */
 
-Broadcast::channel('App.User.{id}', function ($user, $id) {
-    return (int) $user->id === (int) $id;
-});
+// Broadcast::channel('App.User.{id}', function ($user, $id) {
+//     return (int) $user->id === (int) $id;
+// });
 
-Broadcast::channel('orderChannel', function () {
-	return true; //Always return true or false
-});
+// Broadcast::channel('orderChannel', function () {
+// 	return true; //Always return true or false
+// });
 
-Broadcast::channel('questionChannel', function () {
-	return true; //Always return true or false
-});
+// Broadcast::channel('questionChannel', function () {
+// 	return true; //Always return true or false
+// });

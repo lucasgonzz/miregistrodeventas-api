@@ -36,7 +36,7 @@ class PaymentController extends Controller
 
         $payment->payment_id    = $mp_payment->id;
         $payment->status        = $mp_payment->status;
-        $payment->status_detail = $mp_payment->status_detail;
+        $payment->status_detail = 'Se proceso';
         $payment->save();
     }
 

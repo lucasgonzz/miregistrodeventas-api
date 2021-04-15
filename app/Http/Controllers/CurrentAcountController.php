@@ -254,7 +254,7 @@ class CurrentAcountController extends Controller
 
     public function getFirstCurrentAcountSinPagar($client_id) {
         $first_current_acount_sin_pagar = CurrentAcount::where('client_id', $client_id)
-                                                        ->where('status', 'sin_pagar')
+                                                        ->where(['status' => ['sin_pagar', 'saldo_inicial']])
                                                         ->orderBy('created_at', 'ASC')
                                                         ->first();
         return $first_current_acount_sin_pagar;

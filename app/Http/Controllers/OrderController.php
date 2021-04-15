@@ -6,6 +6,7 @@ use App\Buyer;
 use App\Events\OrderEvent;
 use App\Http\Controllers\Helpers\OrderHelper;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Notifications\OrderCanceled;
 use App\Notifications\OrderConfirmed;
 use App\Notifications\OrderDelivered;
 use App\Notifications\OrderFinished;
@@ -56,11 +57,12 @@ class OrderController extends Controller
         return response(null, 200);
     }
 
-    function cancel($order_id) {
-        $order = Order::find($order_id);
+    function cancel(Request $request) {
+        $order = Order::find($request->id);
         $order->status = 'canceled';
         $order->save();
-        broadcast(new OrderEvent($order))->toOthers();
+        $buyer = Buyer::find($order->buyer_id);
+        $buyer->notify(new OrderCanceled($order, $request->description));
         return response(null, 200);
     }
 
@@ -107,6 +109,8 @@ class OrderController extends Controller
                     ->with('articles')
                     ->with('impressions')
                     ->with('specialPrice')
+                    ->with('discounts')
+                    ->with('commissions')
                     ->first();
         return $sale;
     }

@@ -11,20 +11,22 @@ use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class OrderConfirmed extends Notification implements ShouldQueue
+class OrderCanceled extends Notification implements ShouldQueue
 {
     use Queueable;
 
     private $order;
+    private $description;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(Order $order)
+    public function __construct(Order $order, $description)
     {
         $this->order = $order;
+        $this->description = $description;
     }
 
     /**
@@ -40,10 +42,6 @@ class OrderConfirmed extends Notification implements ShouldQueue
 
     public function broadcastOn()
     {
-        // return 'order.'
-        // return [
-        //     new \Illuminate\Broadcasting\Channel('orderChannel')
-        // ];
         return 'order.'.$this->order->buyer_id;
     }
 
@@ -78,12 +76,6 @@ class OrderConfirmed extends Notification implements ShouldQueue
     }
 
     function getMessage() {
-        $message = 'Tu pedido fue aprobado. ';
-        if ($this->order->deliver) {
-            $message .= 'Te avisamos cuando lo enviemos.';
-        } else {
-            $message .= 'Te avisamos cuando puedas retirarlo.';
-        }
-        return $message;
+        return  'Tuvimos que cancelar tu pedido por la siguiente razon: '.$this->description;
     }
 }
