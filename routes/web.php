@@ -36,6 +36,8 @@ Route::get('/orders/deliver/{order_id}',
 	'OrderController@deliver'
 );
 
+Route::post('/payment-notification', 'PaymentController@notification');
+
 Route::post('/login', 'LoginController@login');
 // Route::post('/login-owner', 'LoginController@loginOwner');
 Route::post('login-employee', 'Auth\LoginController@loginEmployee');

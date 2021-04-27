@@ -15,4 +15,8 @@ class Order extends Model
     function buyer() {
     	return $this->belongsTo('App\Buyer');
     }
+
+    function payment() {
+    	return $this->hasOne('App\Payment');
+    }
 }

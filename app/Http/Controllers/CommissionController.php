@@ -6,6 +6,7 @@ use App\Commission;
 use App\Commissioner;
 use App\Http\Controllers\Helpers\CommissionHelper;
 use App\Sale;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class CommissionController extends Controller
@@ -16,8 +17,10 @@ class CommissionController extends Controller
     	]);
     }
 
-    function fromCommissioner($commissioner_id) {
+    function fromCommissioner($commissioner_id, $weeks_ago) {
+        $from_week = Carbon::now()->subWeeks($weeks_ago);
         $commissions = Commission::where('commissioner_id', $commissioner_id)
+                                    ->whereDate('created_at', '>=', $from_week)
                                     ->where('status', 'active')
                                     ->orderBy('id', 'ASC')
                                     ->get();
@@ -39,7 +42,9 @@ class CommissionController extends Controller
 
     function updatePercentage(Request $request) {
         $commission = Commission::find($request->id);
-        $commission->percentage = $request->percentage;
+        $commission->monto = $request->monto;
+        $commission->save();
+        return response()->json(['commission' => $commission], 200);
     }
 
     public function pagoForCommissioner(Request $request) {

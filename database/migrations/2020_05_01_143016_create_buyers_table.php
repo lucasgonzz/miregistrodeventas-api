@@ -19,6 +19,7 @@ class CreateBuyersTable extends Migration
             $table->string('name', 128);
             $table->string('avatar')->nullable();
             $table->string('surname', 128)->nullable();
+            $table->string('notification_id', 128)->nullable();
             $table->string('city', 128)->nullable();
             $table->string('address', 128)->nullable();
             $table->string('address_number', 128)->nullable();

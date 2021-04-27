@@ -306,10 +306,10 @@ Route::middleware('auth:sanctum')->group(function () {
 		'SellerController@index'
 	);
 	// Devuelve las comisiones de las ventas que le corresponden al vendedor
-	Route::get('/commissions/from-commissioner/{commissioner_id}', 
+	Route::get('/commissions/from-commissioner/{commissioner_id}/{weeks_ago}', 
 		'CommissionController@fromCommissioner'
 	);
-	Route::post('/commissioners/update-percetage', 
+	Route::post('/commissions/update-percentage', 
 		'CommissionController@updatePercentage'
 	);
 

@@ -39,7 +39,8 @@ class SubCategoryController extends Controller
         return response()->json(['sub_category' => $sub_category], 200);
     }
 
-    function delete(SubCategory $sub_category) {
+    function delete($id) {
+        $sub_category = SubCategory::find($id);
     	$sub_category->status = 'inactive';
     	$sub_category->save();
     	return response(null, 200);

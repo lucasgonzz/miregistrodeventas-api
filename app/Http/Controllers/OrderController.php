@@ -3,13 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Buyer;
-use App\Events\OrderEvent;
+use App\Events\OrderCanceled as OrderCanceledEvent;
+use App\Events\OrderDelivered as OrderDeliveredEvent;
+use App\Events\OrderFinished as OrderFinishedEvent;
 use App\Http\Controllers\Helpers\OrderHelper;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
-use App\Notifications\OrderCanceled;
-use App\Notifications\OrderConfirmed;
-use App\Notifications\OrderDelivered;
-use App\Notifications\OrderFinished;
+use App\Notifications\OrderCanceled as OrderCanceledNotification;
+use App\Notifications\OrderDelivered as OrderDeliveredNotification;
+use App\Notifications\OrderFinished as OrderFinishedNotification;
 use App\Order;
 use App\Sale;
 use Illuminate\Http\Request;
@@ -34,6 +35,7 @@ class OrderController extends Controller
                         ->with('articles.images')
                         ->with('articles.variants')
                         ->with('buyer')
+                        ->with('payment')
                         ->get();
         $orders = OrderHelper::setArticlesKey($orders);
         return response()->json(['orders' => $orders], 200);
@@ -43,17 +45,8 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'confirmed';
         $order->save();
-        if ($order->payment_method == 'tarjeta') {
-            $payment_controller = new PaymentController();
-            $payment_controller->procesarPago($order);
-        }
-
-        // Notification
-        $buyer = Buyer::find($order->buyer_id);
-        $buyer->notify(new OrderConfirmed($order));
-        
-        // OrderEvent to broadcast
-        // broadcast(new OrderEvent($order))->toOthers();
+        OrderHelper::checkPaymentMethod($order);
+        OrderHelper::sendOrderConfrimedNotification($order);
         return response(null, 200);
     }
 
@@ -62,7 +55,8 @@ class OrderController extends Controller
         $order->status = 'canceled';
         $order->save();
         $buyer = Buyer::find($order->buyer_id);
-        $buyer->notify(new OrderCanceled($order, $request->description));
+        $buyer->notify(new OrderCanceledNotification($order, $request->description));
+        event(new OrderCanceledEvent($order, $request->description));
         return response(null, 200);
     }
 
@@ -73,10 +67,12 @@ class OrderController extends Controller
 
         // Notification
         $buyer = Buyer::find($order->buyer_id);
-        $buyer->notify(new OrderFinished($order));
+        $buyer->notify(new OrderFinishedNotification($order));
+
+        event(new OrderFinishedEvent($order));
 
         // OrderEvent to broadcast
-        broadcast(new OrderEvent($order))->toOthers();
+        // broadcast(new OrderEvent($order))->toOthers();
         return response(null, 200);
     }
 
@@ -89,7 +85,8 @@ class OrderController extends Controller
 
         // Notification
         $buyer = Buyer::find($order->buyer_id);
-        $buyer->notify(new OrderDelivered($order));
+        $buyer->notify(new OrderDeliveredNotification($order));
+        event(new OrderDeliveredEvent($order));
 
         $sale = $this->saveSale($order);
         return response()->json(['sale' => $sale], 201);

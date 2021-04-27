@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Channels\Messages\WhatsAppMessage;
 use App\Channels\WhatsAppChannel;
+use App\Http\Controllers\Helpers\OrderNotificationHelper;
 use App\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -56,7 +57,7 @@ class OrderCanceled extends Notification implements ShouldQueue
     public function toWhatsApp($notifiable)
     {
         $buyer_name = $notifiable->name;
-        $message = "Hola {$buyer_name}. ".$this->getMessage();
+        $message = "Hola {$buyer_name}. ".OrderNotificationHelper::getCanceledMessage($this->description);
         return (new WhatsAppMessage)
             ->content($message);
     }
@@ -71,11 +72,7 @@ class OrderCanceled extends Notification implements ShouldQueue
     {
         return [
             'order_id' => $this->order->id,
-            'message'  => $this->getMessage(),
+            'message'  => OrderNotificationHelper::getCanceledMessage($this->description),
         ];
-    }
-
-    function getMessage() {
-        return  'Tuvimos que cancelar tu pedido por la siguiente razon: '.$this->description;
     }
 }

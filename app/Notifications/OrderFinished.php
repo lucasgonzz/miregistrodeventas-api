@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Channels\Messages\WhatsAppMessage;
 use App\Channels\WhatsAppChannel;
+use App\Http\Controllers\Helpers\OrderNotificationHelper;
 use App\Order;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -54,7 +55,7 @@ class OrderFinished extends Notification
     public function toWhatsApp($notifiable)
     {
         $buyer_name = $notifiable->name;
-        $message = $buyer_name.'. '.$this->getMessage();
+        $message = $buyer_name.'. '.OrderNotificationHelper::getFinishedMessage($this->order);
         return (new WhatsAppMessage)
             ->content($message);
     }
@@ -68,17 +69,7 @@ class OrderFinished extends Notification
     public function toArray($notifiable)
     {
         return [
-            'message' => $this->getMessage(),
+            'message' => OrderNotificationHelper::getFinishedMessage($this->order),
         ];
-    }
-
-    function getMessage() {
-        $message = 'Tu pedido ya esta listo. ';
-        if ($this->order->deliver) {
-            $message .= '¡El repartidor va en camino!';
-        } else {
-            $message .= '¡Podes retirarlo cuando quieras!';
-        }
-        return $message;
     }
 }

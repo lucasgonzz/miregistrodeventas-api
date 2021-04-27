@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\Recommendation;
 use App\Collection;
+use App\Http\Controllers\Helpers\StringHelper;
+use App\Recommendation;
+use App\User;
 use Carbon\Carbon;
-use Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use Validator;
 
 class UserController extends Controller
 {
@@ -37,7 +38,7 @@ class UserController extends Controller
     // Confirguracion - Editar
     function update(Request $request) {
         $user = User::where('id', $this->userId())->with('employees')->first();
-        $user->name = ucwords($request->name);
+        $user->name = StringHelper::modelName($request->name, true);
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {
             $user->company_name = ucwords($request->company_name);
@@ -45,14 +46,20 @@ class UserController extends Controller
                 $employee->company_name = ucwords($request->company_name);                
             }
         } else {
-            return [
-                'repeated' => true,
-            ];
+            return response()->json(['repeated' => true], 200);
         }
         $user->save();
-        return [
-            'repeated' => false,
-        ];
+        return response()->json(['repeated' => false], 200);
+    }
+
+    function isCompanyNameRepeated($company_name) {
+        $user = User::where('company_name', $company_name)
+                    ->where('id', '!=', $this->userId())
+                    ->first();
+        if (is_null($user)) {
+            return false;
+        }
+        return true;
     }
 
     function updateImage(Request $request) {
@@ -141,9 +148,9 @@ class UserController extends Controller
             $user->update([
                 'password' => bcrypt($request->new_password),
             ]);
-            return response('ok');
+            return response()->json(['updated' => true], 200);
         } else {
-            return response('no');
+            return response()->json(['updated' => false], 200);
         }
     }
 }

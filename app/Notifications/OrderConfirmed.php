@@ -4,7 +4,9 @@ namespace App\Notifications;
 
 use App\Channels\Messages\WhatsAppMessage;
 use App\Channels\WhatsAppChannel;
+use App\Http\Controllers\Helpers\OrderNotificationHelper;
 use App\Order;
+use App\Payment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -40,10 +42,6 @@ class OrderConfirmed extends Notification implements ShouldQueue
 
     public function broadcastOn()
     {
-        // return 'order.'
-        // return [
-        //     new \Illuminate\Broadcasting\Channel('orderChannel')
-        // ];
         return 'order.'.$this->order->buyer_id;
     }
 
@@ -58,7 +56,7 @@ class OrderConfirmed extends Notification implements ShouldQueue
     public function toWhatsApp($notifiable)
     {
         $buyer_name = $notifiable->name;
-        $message = "Hola {$buyer_name}. ".$this->getMessage();
+        $message = "Hola {$buyer_name}. ".OrderNotificationHelper::getConfirmedMessage($this->order);
         return (new WhatsAppMessage)
             ->content($message);
     }
@@ -73,17 +71,8 @@ class OrderConfirmed extends Notification implements ShouldQueue
     {
         return [
             'order_id' => $this->order->id,
-            'message'  => $this->getMessage(),
+            'message'  => OrderNotificationHelper::getConfirmedMessage($this->order),
         ];
     }
 
-    function getMessage() {
-        $message = 'Tu pedido fue aprobado. ';
-        if ($this->order->deliver) {
-            $message .= 'Te avisamos cuando lo enviemos.';
-        } else {
-            $message .= 'Te avisamos cuando puedas retirarlo.';
-        }
-        return $message;
-    }
 }

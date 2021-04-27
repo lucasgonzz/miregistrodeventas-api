@@ -326,7 +326,7 @@ class ArticleController extends Controller
         if ($request->sub_category_id != 0) {
             $article->sub_category_id = $request->sub_category_id;
         }
-        $article->name = ucfirst($request->name);
+        $article->name = ucfirst(strtolower($request->name));
         $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;

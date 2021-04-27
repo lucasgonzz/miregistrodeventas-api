@@ -84,7 +84,7 @@ class Commissioners extends Controller {
             'detalle'     => 'Rto '.$this->sale->num_sale.' pag '.$this->page,
             'page'        => $this->page,
             'debe'        => $this->debe,
-            'saldo'       => CurrentAcountHelper::getSaldo($this->sale->client_id) + $this->debe,
+            'saldo'       => $this->getCurrentAcountSaldo(),
             'status'      => 'sin_pagar',
             'client_id'   => $this->sale->client_id,
             'seller_id'   => $this->sale->client->seller_id,
@@ -92,6 +92,10 @@ class Commissioners extends Controller {
             'description' => CurrentAcountHelper::getDescription($this->sale, $this->debe_sin_descuentos),
             'created_at' => $this->getCreatedAt(),
         ]);
+    }
+
+    function getCurrentAcountSaldo() {
+        return $this->redondear(CurrentAcountHelper::getSaldo($this->sale->client_id) + $this->debe);
     }
 
     function isSaleFromSeller() {
@@ -159,12 +163,26 @@ class Commissioners extends Controller {
         } else {
             if ($discounts_percentage < 20) {
                 return 10;
-            } else if ($discounts_percentage < 25) {
+            } else if ($discounts_percentage < 25 || $this->tieneUn10MasUn20()) {
                 return 7;
             } else if ($discounts_percentage >= 25) {
                 return 5;
             }
         }
+    }
+
+    function tieneUn10MasUn20() {
+        $has_10 = false;
+        $has_20 = false;
+        foreach ($this->discounts as $discount) {
+            if ($discount->percentage == 10) {
+                $has_10 = true;
+            }
+            if ($discount->percentage == 20) {
+                $has_20 = true;
+            }
+        }
+        return $has_10 && $has_20;
     }
 
     function getSellerSellerPercentage() {
@@ -177,14 +195,18 @@ class Commissioners extends Controller {
 
     function getSellerMonto() {
         $commission_seller = $this->debe * Numbers::percentage($this->getSellerPercentage());
-        return $commission_seller;
+        return $this->redondear($commission_seller);
     }
 
     function getSellerSellerMonto() {
         $total_a_restar = $this->debe;
         $total_a_restar -= $this->getSellerMonto();
         $commission_seller_owner = $total_a_restar * Numbers::percentage($this->getSellerSellerPercentage());
-        return $commission_seller_owner;
+        return $this->redondear($commission_seller_owner);
+    }
+
+    function redondear($num) {
+        return round($num, 2, PHP_ROUND_HALF_UP);
     }
 
     function isSellerFromSeller() {
@@ -229,7 +251,7 @@ class Commissioners extends Controller {
 
     function getPerdidaMonto() {
         $commission_perdidas = $this->debe * Numbers::percentage($this->getPerdidaPercentage());
-        return $commission_perdidas;
+        return $this->redondear($commission_perdidas);
     }
 
     function commissionOscarFedePapi() {
@@ -260,7 +282,7 @@ class Commissioners extends Controller {
             $total_a_restar -= $this->getSellerMonto();
         } 
         $commission = $total_a_restar * Numbers::percentage($commissioner->percentage);
-        return $commission;
+        return $this->redondear($commission);
     }
 
     function getCreatedAt() {

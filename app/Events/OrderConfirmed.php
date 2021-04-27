@@ -10,23 +10,15 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class OrderEvent implements ShouldBroadcast
+class OrderConfirmed
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
     public $order;
 
-    /**
-     * Create a new event instance.
-     *
-     * @return void
-     */
     public function __construct($order)
     {
         $this->order = $order;
-    }
-    
-    public function broadcastQueue () {
-        return 'broadcastable';
     }
 
     /**
@@ -36,6 +28,6 @@ class OrderEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new Channel('orderChannel');
+        return new PrivateChannel('channel-name');
     }
 }

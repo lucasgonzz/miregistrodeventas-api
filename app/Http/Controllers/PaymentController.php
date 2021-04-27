@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\PaymentUpdated;
 use App\Payment;
 use Illuminate\Http\Request;
 use MercadoPago\Payer;
@@ -17,7 +18,7 @@ class PaymentController extends Controller
 
         $mp_payment = new MercadoPagoPayment();
         $mp_payment->transaction_amount = (float)$payment->transaction_amount;
-        $mp_payment->notification_url   = env('APP_URL').'/mercado-pago/notification';
+        // $mp_payment->notification_url = 'https://api.miregistrodeventas.com/public/payment-notification';
         $mp_payment->token              = $payment->token;
         $mp_payment->description        = $payment->description;
         $mp_payment->installments       = (int)$payment->installments;
@@ -36,21 +37,24 @@ class PaymentController extends Controller
 
         $payment->payment_id    = $mp_payment->id;
         $payment->status        = $mp_payment->status;
-        $payment->status_detail = 'Se proceso';
+        $payment->status_detail = $mp_payment->status_detail;
         $payment->save();
     }
 
     function notification(Request $request) {
         SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
-        if ($request->type == 'payment') {
+        if ($request->topic == 'payment') {
             Payment::create([
-                'payment_id' => $request->id,
-                'description' => $request->data->id,
+                'payment_id' => $request->data_id,
+                // 'description' => 'notification data id: '.$request->data->id,
                 'status' => $request->action,
             ]);
-            // $payment = Payment::where('payment_id', $request->id);
-            // $payment->status_detail = $payment->action;
-            // $payment->save(); 
+            $payment = Payment::where('payment_id', $request->id)->first();
+            $payment->status_detail = $payment->action;
+            $payment->save(); 
+            $order = Order::find($payment->order_id);
+            $buyer = Buyer::find($order->user_id);
+            $buyer->notify(new PaymentUpdated());
         }
         return response(null, 200);
     }
