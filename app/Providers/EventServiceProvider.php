@@ -30,6 +30,9 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\OrderDelivered' => [
             'App\Listerners\OrderDeliveredListener',
         ],
+        'App\Events\QuestionAnswered' => [
+            'App\Listerners\QuestionAnsweredListener',
+        ],
     ];
 
     /**

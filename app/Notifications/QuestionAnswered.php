@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Channels\Messages\WhatsAppMessage;
 use App\Channels\WhatsAppChannel;
+use App\Http\Controllers\Helpers\QuestionNotificationHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\BroadcastMessage;
@@ -53,7 +54,7 @@ class QuestionAnswered extends Notification
     public function toWhatsApp($notifiable)
     {
         $buyer_name = $notifiable->name;
-        $message = 'Hola '.$buyer_name.'. '.$this->getMessage();
+        $message = 'Hola '.$buyer_name.'. '.QuestionNotificationHelper::getQuestionAnsweredMessage($this->question);
         return (new WhatsAppMessage)
             ->content($message);
     }
@@ -69,11 +70,7 @@ class QuestionAnswered extends Notification
         return [
             'article_slug'  => $this->question->article->slug,
             // 'variant_id'  => $this->question->variant_id,
-            'message'  => $this->getMessage(),
+            'message'  => QuestionNotificationHelper::getQuestionAnsweredMessage($this->question),
         ];
-    }
-
-    function getMessage() {
-        return "Respondimos a tu pregunta de ".$this->question->article->name;
     }
 }

@@ -4,9 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Answer;
 use App\Buyer;
-use App\Events\QuestionAnsweredEvent;
-use App\Http\Controllers\NotificationController;
-use App\Notifications\QuestionAnswered;
+use App\Events\QuestionAnswered as QuestionAnsweredEvent;
+use App\Notifications\QuestionAnswered as QuestionAnsweredNotification;
 use App\Question;
 use Illuminate\Http\Request;
 
@@ -21,8 +20,8 @@ class AnswerController extends Controller
                             ->with('article')
                             ->first();
         $buyer = Buyer::find($question->buyer_id);
-        $buyer->notify(new QuestionAnswered($question));
-    	// broadcast(new QuestionAnsweredEvent($answer));
+        $buyer->notify(new QuestionAnsweredNotification($question));
+        event(new QuestionAnsweredEvent($question));
     	return response(null, 201);
     }
 }
