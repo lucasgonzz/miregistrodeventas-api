@@ -21,7 +21,8 @@ class CreateUsersTable extends Migration
             $table->string('password', 128);
             $table->integer('owner_id')->nullable()->unsigned();
             // $table->integer('admin_id')->nullable()->unsigned();
-            $table->decimal('percentage_card')->nullable();
+            $table->integer('percentage_card')->nullable();
+            $table->decimal('deliver_amount')->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('expire')->nullable();
             $table->string('online')->nullable();

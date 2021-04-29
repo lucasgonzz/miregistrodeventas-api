@@ -6,6 +6,8 @@ use App\Buyer;
 use App\Events\OrderCanceled as OrderCanceledEvent;
 use App\Events\OrderDelivered as OrderDeliveredEvent;
 use App\Events\OrderFinished as OrderFinishedEvent;
+use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\CartHelper;
 use App\Http\Controllers\Helpers\OrderHelper;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Notifications\OrderCanceled as OrderCanceledNotification;
@@ -47,16 +49,20 @@ class OrderController extends Controller
         $order->save();
         OrderHelper::checkPaymentMethod($order);
         OrderHelper::sendOrderConfrimedNotification($order);
+        OrderHelper::deleteOrderCart($order);
         return response(null, 200);
     }
 
     function cancel(Request $request) {
-        $order = Order::find($request->id);
+        $order = Order::find($request->order['id']);
         $order->status = 'canceled';
         $order->save();
+        $order->articles = ArticleHelper::setArticlesKey($order->articles);
+        CartHelper::detachArticulosFaltantes($request->articulos_faltantes, $order);
         $buyer = Buyer::find($order->buyer_id);
-        $buyer->notify(new OrderCanceledNotification($order, $request->description));
-        event(new OrderCanceledEvent($order, $request->description));
+        $message = OrderHelper::getCanceledDescription($request->articulos_faltantes, $request->order);
+        $buyer->notify(new OrderCanceledNotification($order, $message));
+        event(new OrderCanceledEvent($order, $message));
         return response(null, 200);
     }
 

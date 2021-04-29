@@ -27,15 +27,17 @@ class UsersTableSeeder extends Seeder
         // $lucas->permissions()->sync([9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
 
         $commerce = User::create([
-            'name'          => 'Mi Negocio',
-            'online'        => 'http://localhost:8080',
-            'email'         => 'marcos@gmail.com',
-            'company_name'  => 'Mi Negocio',
-            'status'        => 'trial',
-            'password'      => bcrypt('1234'),
+            'name'            => 'Mi Negocio',
+            'online'          => 'http://localhost:8080',
+            'email'           => 'marcos@gmail.com',
+            'company_name'    => 'Mi Negocio',
+            'status'          => 'trial',
+            'password'        => bcrypt('1234'),
+            'percentage_card' => 20,
+            'deliver_amount'  => 70,
             // 'admin_id'      => $admin->id,
-            'created_at'    => Carbon::now()->subMonths(2),
-            'expire'        => Carbon::now()->subDay(),
+            'created_at'      => Carbon::now()->subMonths(2),
+            'expire'          => Carbon::now()->subDay(),
         ]);
         $commerce->roles()->sync([1,3]);
         // $commerce->permissions()->sync([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);

@@ -19,6 +19,7 @@ class CreateCartsTable extends Migration
             $table->boolean('deliver');
             $table->integer('user_id')->unsigned();
             $table->integer('buyer_id')->unsigned();
+            $table->integer('order_id')->unsigned()->nullable();
 
             $table->timestamps();
         });

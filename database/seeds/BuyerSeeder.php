@@ -13,14 +13,25 @@ class BuyerSeeder extends Seeder
     public function run()
     {
         Buyer::create([
-    		'name' => 'Lucas',
-    		'surname' => 'Gonzalez',
-    		'city' => 'Gualeguay',
+            'name' => 'Lucas',
+            'surname' => 'Gonzalez',
+            'city' => 'Gualeguay',
             'address' => 'Pellegrini',
             'address_number' => '876',
-    		'phone' => '+5493444622139',
-    		// 'email' => 'Lucas@gmail.com',
-    		'password' => bcrypt('1234'),
+            'phone' => '+5493444622139',
+            // 'email' => 'Lucas@gmail.com',
+            'password' => bcrypt('1234'),
+            'user_id' => 2,
+        ]);
+        Buyer::create([
+            'name' => 'Marcos',
+            'surname' => 'Gonzalez',
+            'city' => 'Gualeguay',
+            'address' => 'Pellegrini',
+            'address_number' => '876',
+            'phone' => '+5493444622138',
+            // 'email' => 'Lucas@gmail.com',
+            'password' => bcrypt('1234'),
             'user_id' => 2,
         ]);
     }
