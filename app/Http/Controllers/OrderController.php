@@ -50,6 +50,7 @@ class OrderController extends Controller
         OrderHelper::checkPaymentMethod($order);
         OrderHelper::sendOrderConfrimedNotification($order);
         OrderHelper::deleteOrderCart($order);
+        SaleHelper::discountArticleStockFromOrder($order->articles);
         return response(null, 200);
     }
 

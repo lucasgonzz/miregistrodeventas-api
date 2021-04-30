@@ -40,17 +40,19 @@ class UserController extends Controller
         $user = User::where('id', $this->userId())->with('employees')->first();
         $user->name = StringHelper::modelName($request->name, true);
         $user->deliver_amount = StringHelper::modelName($request->deliver_amount, true);
+        $user->save();
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {
             $user->company_name = ucwords($request->company_name);
             foreach ($user->employees as $employee) {
                 $employee->company_name = ucwords($request->company_name);                
+                $employee->save();
             }
+            $user->save();
+            return response()->json(['repeated' => false], 200);
         } else {
             return response()->json(['repeated' => true], 200);
         }
-        $user->save();
-        return response()->json(['repeated' => false], 200);
     }
 
     function isCompanyNameRepeated($company_name) {

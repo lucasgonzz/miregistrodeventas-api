@@ -91,16 +91,8 @@ class SaleHelper extends Controller {
         }
     }
 
-    static function attachArticlesFromOrder($order, $articles) {
+    static function discountArticleStockFromOrder($articles) {
         foreach ($articles as $article) {
-            $price = 0;
-            $order->articles()->attach($article->id, [
-                                                        'amount' => $article->pivot->amount,
-                                                        'cost' => isset($article->pivot->cost)
-                                                                    ? $article->pivot->cost
-                                                                    : null,
-                                                        'price' => $article->pivot->price,
-                                                    ]);
             $article_ = Article::find($article->id);
             if (!is_null($article->pivot->variant_id)) {
                 $variant = Variant::find($article->pivot->variant_id);
@@ -122,6 +114,20 @@ class SaleHelper extends Controller {
                 $article_->timestamps = false;
                 $article_->save();
             }
+        }
+
+    }
+
+    static function attachArticlesFromOrder($order, $articles) {
+        foreach ($articles as $article) {
+            $order->articles()->attach($article->id, [
+                                            'amount' => $article->pivot->amount,
+                                            'cost' => isset($article->pivot->cost)
+                                                        ? $article->pivot->cost
+                                                        : null,
+                                            'price' => $article->pivot->price,
+                                        ]);
+            
         }
     }
 

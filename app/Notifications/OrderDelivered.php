@@ -36,7 +36,8 @@ class OrderDelivered extends Notification
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast', WhatsAppChannel::class];
+        return ['database', 'broadcast'];
+        // return ['database', 'broadcast', WhatsAppChannel::class];
     }
 
     public function broadcastOn()

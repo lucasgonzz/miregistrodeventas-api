@@ -38,7 +38,8 @@ class OrderCanceled extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast', WhatsAppChannel::class];
+        return ['database', 'broadcast'];
+        // return ['database', 'broadcast', WhatsAppChannel::class];
     }
 
     public function broadcastOn()
