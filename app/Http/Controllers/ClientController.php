@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Client;
-use App\Seller;
 use App\CurrentAcount;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
+use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
+use App\Seller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -87,6 +88,29 @@ class ClientController extends Controller
     function currentAcounts($client_id, $months_ago) {
         $current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($client_id, $months_ago);
         return response()->json(['current_acounts' => $current_acounts], 200);
+    }
+
+
+    function checkSaldos($client_id) {
+        $current_acounts = CurrentAcount::where('client_id', $client_id)
+                                        ->orderBy('created_at', 'ASC')
+                                        ->get();
+        foreach ($current_acounts as $current_acount) {
+            // echo "detalle: ".$current_acount->detalle."</br>";
+            if ($current_acount->debe) {
+                // echo "debe: ".Numbers::price($current_acount->debe)."</br>";
+                // echo "getSaldo = ".Numbers::price(CurrentAcountHelper::getSaldo($client_id, $current_acount))."</br>";
+                $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($client_id, $current_acount) + $current_acount->debe);
+            }
+            if ($current_acount->haber) {
+                // echo "haber: ".Numbers::price($current_acount->haber)."</br>";
+                $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($client_id, $current_acount) - $current_acount->haber);
+            }
+            // echo "nuevo saldo: ".Numbers::price($current_acount->saldo)."</br>";
+            // echo "----------------------------------------------------------------</br>";
+            $current_acount->save();
+        }
+        return response(null, 200);
     }
 
     function delete($id) {

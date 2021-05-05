@@ -28,6 +28,7 @@ class CreatePaymentsTable extends Migration
             $table->string('status_detail')->nullable();
             $table->string('payment_id')->nullable();
             $table->integer('order_id')->unsigned()->nullable();
+            $table->boolean('updated')->default(false);
             $table->timestamps();
         });
     }

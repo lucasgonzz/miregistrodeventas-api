@@ -91,33 +91,6 @@ class SaleHelper extends Controller {
         }
     }
 
-    static function discountArticleStockFromOrder($articles) {
-        foreach ($articles as $article) {
-            $article_ = Article::find($article->id);
-            if (!is_null($article->pivot->variant_id)) {
-                $variant = Variant::find($article->pivot->variant_id);
-                $stock_resultante = $variant->stock - $article->pivot->amount;
-                if ($stock_resultante > 0) {
-                    $variant->stock = $stock_resultante;
-                } else {
-                    $variant->stock = 0;
-                }
-                // $variant->description = 'hola';
-                $variant->save();
-            } else if (!is_null($article_->stock)) {
-                $stock_resultante = $article_->stock - $article->pivot->amount;
-                if ($stock_resultante > 0) {
-                    $article_->stock = $stock_resultante;
-                } else {
-                    $article_->stock = 0;
-                }
-                $article_->timestamps = false;
-                $article_->save();
-            }
-        }
-
-    }
-
     static function attachArticlesFromOrder($order, $articles) {
         foreach ($articles as $article) {
             $order->articles()->attach($article->id, [

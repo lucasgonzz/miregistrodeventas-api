@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Buyer;
 use App\Notifications\PaymentUpdated;
 use App\Payment;
 use Illuminate\Http\Request;
@@ -44,17 +45,26 @@ class PaymentController extends Controller
     function notification(Request $request) {
         SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
         if ($request->topic == 'payment') {
-            Payment::create([
-                'payment_id' => $request->data_id,
-                // 'description' => 'notification data id: '.$request->data->id,
-                'status' => $request->action,
+            $pay = Payment::create([
+                'description' => 'actualizacion, id: '.$request->id,
             ]);
-            $payment = Payment::where('payment_id', $request->id)->first();
-            $payment->status_detail = $payment->action;
-            $payment->save(); 
-            $order = Order::find($payment->order_id);
-            $buyer = Buyer::find($order->user_id);
-            $buyer->notify(new PaymentUpdated());
+            $payment = Payment::where('payment_id', $request->id);
+            $payment_mp = MercadoPagoPayment::find_by_id($request->id);
+            if (!is_null($payment) && !is_null($payment_mp)) {
+                $pay->status = $payment_mp->status;
+                $pay->status_detail = $payment_mp->status_detail;
+                $pay->save();
+                $payment->status = $payment_mp->status;
+                $payment->status_detail = $payment_mp->status_detail;
+                $payment->updated = 1;
+                $payment->save();
+                $order = Order::find($payment->order_id);
+                
+                $user = User::find($order->user_id);
+                $user->notify(new PaymentUpdated($order));
+
+                OrderHelper::checkPaymentMethodError($order, $buyer); 
+            }
         }
         return response(null, 200);
     }

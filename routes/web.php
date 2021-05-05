@@ -32,6 +32,10 @@ Route::get('/slugs', function() {
 	echo "listo";
 });
 
+Route::get('/clients/check-saldos/{client_id}', 
+	'ClientController@checkSaldos'
+);
+
 Route::get('/orders/deliver/{order_id}', 
 	'OrderController@deliver'
 );

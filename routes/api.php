@@ -320,6 +320,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/commissioners/pago', 
 		'CommissionController@pagoForCommissioner'
 	);
+	Route::get('/commissioners/check-saldos/{commissioner_id}', 
+		'CommissionerController@checkSaldos'
+	);
 
 	// Tipos de venta
 	Route::get('/sale-types', 
@@ -341,6 +344,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::get('/clients/current-acounts/{id}/{months_ago}', 
 		'ClientController@currentAcounts'
+	);
+	Route::get('/clients/check-saldos/{client_id}', 
+		'ClientController@checkSaldos'
 	);
 	Route::post('/clients/saldo-inicial', 
 		'ClientController@saldoInicial'

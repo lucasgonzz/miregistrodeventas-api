@@ -20,6 +20,8 @@ class ImageController extends Controller
 
     function deleteVariant($image) {
         $variant = Variant::where('url', $image->url)->first();
-        $variant->delete();
+        if ($variant) {
+            $variant->delete();
+        }
     }
 }

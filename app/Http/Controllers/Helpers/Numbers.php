@@ -13,6 +13,10 @@ class Numbers {
 		return '0.'.$percentage_card;
 	}
 
+    static function redondear($num) {
+        return round($num, 2, PHP_ROUND_HALF_UP);
+    }
+
 	static function price($price) {
 		$pos = strpos($price, '.');
 		if ($pos != false) {

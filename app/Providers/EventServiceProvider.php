@@ -33,6 +33,12 @@ class EventServiceProvider extends ServiceProvider
         'App\Events\QuestionAnswered' => [
             'App\Listerners\QuestionAnsweredListener',
         ],
+        'App\Events\PaymentError' => [
+            'App\Listerners\PaymentErrorListener',
+        ],
+        'App\Events\PaymentSuccess' => [
+            'App\Listerners\PaymentSuccessListener',
+        ],
     ];
 
     /**

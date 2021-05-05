@@ -6,13 +6,12 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use App\Http\Controllers\Helpers\OrderNotificationHelper;
 
-class PaymentUpdated extends Notification
+class PaymentError extends Notification
 {
     use Queueable;
-
     public $order;
-
     /**
      * Create a new notification instance.
      *
@@ -31,22 +30,19 @@ class PaymentUpdated extends Notification
      */
     public function via($notifiable)
     {
-        return ['broadcast'];
+        return ['database', 'broadcast'];
     }
 
-    public function broadcastOn($notifiable)
+    public function broadcastOn()
     {
-        return 'payment.'.$this->order->user_id;
+        return 'payment.'.$this->order->buyer_id;
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
     public function toArray($notifiable)
     {
-        return [];
+        return [
+            'order_id' => $this->order->id,
+            'message'  => OrderNotificationHelper::checkPaymentMethod($this->order)['message'],
+        ];
     }
 }

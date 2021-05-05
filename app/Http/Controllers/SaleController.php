@@ -413,6 +413,7 @@ class SaleController extends Controller
                         // ->with('buyer')
                         ->with('impressions')
                         ->with('articles')
+                        ->with('commissions')
                         ->with('discounts')
                         ->first();
         // Se eliminan las cuentas corrientes y se actualizan los saldos se las siguientes
@@ -424,8 +425,6 @@ class SaleController extends Controller
         $commission->delete($sale);
 
         $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
-        // $helper->detachCommissioners();
-        // $helper->detachCommissionersAndCurrentAcounts();
         $helper->attachCommissionsAndCurrentAcounts();
         return response()->json(['sale' => $sale], 200);
     }
@@ -467,8 +466,6 @@ class SaleController extends Controller
                         ->with('discounts')
                         ->with('commissions')
                         ->first();
-        // $current_acount = new CurrentAcountController();
-        // $current_acount->store($sale);
         return response()->json(['sale' => $sale], 201);
     }
 

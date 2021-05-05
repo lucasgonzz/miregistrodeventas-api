@@ -27,6 +27,6 @@ class DatabaseSeeder extends Seeder
         $this->call(DiscountSeeder::class);
         $this->call(CommissionerSeeder::class);
         $this->call(SaleTypeSeeder::class);
-        // $this->call(SalesTableSeeder::class);
+        $this->call(SalesTableSeeder::class);
     }
 }

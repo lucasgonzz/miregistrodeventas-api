@@ -20,15 +20,14 @@ class SalesTableSeeder extends Seeder
     public function run()
     {
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
-        $num_sale = 0;
-        $num_sale++;
         $now = Carbon::now();
-        $total_ventas = 90;
+        $total_ventas = 20;
         for ($i=1; $i <= $total_ventas; $i++) { 
-            for ($j=0; $j < 5; $j++) { 
+            // for ($j=0; $j < 5; $j++) { 
+                $num_sale = SaleHelper::numSale(1);
                 $sale = Sale::create([
                     'user_id' => 1,
-                    'num_sale' => $i,
+                    'num_sale' => $num_sale,
                     'percentage_card' => null,
                     'client_id' => 2,
                     'sale_type_id' => 1,
@@ -38,19 +37,17 @@ class SalesTableSeeder extends Seeder
                                     ->take(30)
                                     ->get();
                 foreach ($articles as $article) {
-                    $sale->articles()->attach($article->id, 
-                        [
-                            'amount'      => 2,
-                            'cost'        => $article->cost,
-                            'price'       => $article->price,
-                        ]
-                    );
+                    $sale->articles()->attach($article->id, [
+                                                'amount'      => 2,
+                                                'cost'        => $article->cost,
+                                                'price'       => $article->price,
+                                            ]);
                 }
                 $discounts = DiscountHelper::getDiscountsFromDiscountsId([1]);
                 SaleHelper::attachDiscounts($sale, $discounts, $i);
                 $helper = new SaleHelper_Commissioners($sale, $discounts, $total_ventas-$i);
                 $helper->attachCommissionsAndCurrentAcounts();
-            }
+            // }
         }
     }
 

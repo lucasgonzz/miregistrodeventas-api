@@ -5,14 +5,12 @@ namespace App\Http\Controllers;
 use App\Buyer;
 use App\Events\OrderCanceled as OrderCanceledEvent;
 use App\Events\OrderDelivered as OrderDeliveredEvent;
-use App\Events\OrderFinished as OrderFinishedEvent;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\CartHelper;
 use App\Http\Controllers\Helpers\OrderHelper;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Notifications\OrderCanceled as OrderCanceledNotification;
 use App\Notifications\OrderDelivered as OrderDeliveredNotification;
-use App\Notifications\OrderFinished as OrderFinishedNotification;
 use App\Order;
 use App\Sale;
 use Illuminate\Http\Request;
@@ -47,10 +45,9 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'confirmed';
         $order->save();
-        OrderHelper::checkPaymentMethod($order);
+        OrderHelper::procesarPago($order);
         OrderHelper::sendOrderConfrimedNotification($order);
-        OrderHelper::deleteOrderCart($order);
-        SaleHelper::discountArticleStockFromOrder($order->articles);
+        OrderHelper::discountArticleStock($order->articles);
         return response(null, 200);
     }
 
@@ -71,15 +68,8 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'finished';
         $order->save();
-
-        // Notification
-        $buyer = Buyer::find($order->buyer_id);
-        $buyer->notify(new OrderFinishedNotification($order));
-
-        event(new OrderFinishedEvent($order));
-
-        // OrderEvent to broadcast
-        // broadcast(new OrderEvent($order))->toOthers();
+        OrderHelper::deleteCartOrder($order);
+        OrderHelper::sendOrderFinishedNotification($order);
         return response(null, 200);
     }
 

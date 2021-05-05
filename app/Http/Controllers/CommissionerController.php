@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Commission;
 use App\Commissioner;
+use App\Http\Controllers\Helpers\CommissionHelper;
+use App\Http\Controllers\Helpers\Numbers;
 use Illuminate\Http\Request;
 
 class CommissionerController extends Controller
@@ -19,69 +22,16 @@ class CommissionerController extends Controller
         return response()->json(['commissioners' => $commissioners], 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+    function checkSaldos($commissioner_id) {
+        $commissioner = Commissioner::find($commissioner_id);
+        $commissions = Commission::where('commissioner_id', $commissioner_id)
+                                        ->orderBy('created_at', 'ASC')
+                                        ->get();
+        foreach ($commissions as $commission) {
+            $commission->saldo = Numbers::redondear(CommissionHelper::getCommissionerSaldo($commissioner, $commission) + $commission->monto);
+            $commission->save();
+        }
+        return response(null, 200);
     }
 }
