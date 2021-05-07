@@ -14,7 +14,7 @@ class TwilioHelper {
                         ->whereNotNull('notification_id');
         $identities = $buyers->pluck('notification_id')->toArray();
         $client = new Client(getenv('TWILIO_API_KEY'), getenv('TWILIO_API_SECRET'),
-            getenv('TWILIO_API_KEY'));
+            getenv('TWILIO_ACCOUNT_SID'));
         try {
             $n = $client->notify->v1->services(getenv('TWILIO_NOTIFY_SERVICE_SID'))
                 ->notifications

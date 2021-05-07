@@ -58,7 +58,7 @@ class PdfPrintSale extends fpdf {
 		// Se setean los magenes
 		$this->margins = (210 - array_sum($widths)) / 2;
 
-        $this->articulos_por_pagina = 2;
+        $this->articulos_por_pagina = 30;
 
         $this->articulos_en_esta_pagina = 0;
         $this->suma_costos_pagina = 0;

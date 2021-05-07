@@ -49,7 +49,7 @@ class Commissioners extends Controller {
             $articulos_en_venta++;
             $articulos_en_pagina++;
             $this->debe += (float)$article->pivot->price * (int)$article->pivot->amount;
-            if ($articulos_en_pagina == 2 || $articulos_en_venta == $total_articles) {
+            if ($articulos_en_pagina == 30 || $articulos_en_venta == $total_articles) {
                 $this->page++;
                 $this->debe_sin_descuentos = $this->debe;
                 if ($this->hasSaleDiscounts()) {

@@ -115,10 +115,11 @@ class OrderNotificationHelper {
                         case 'cc_rejected_other_reason':
                             $message .= "{$payment->payment_method_id} no procesó el pago.";
                             break;
+                        default:
+                            $message .= "";
+                            break;
+
                     }
-                default: 
-                    $message = 'No pudimos procesar el pago. ';
-                    $with_error = true;
             }
             $message .= ' ';
             return ['is_with_card' => true, 'with_error' => $with_error, 'message' => $message];
