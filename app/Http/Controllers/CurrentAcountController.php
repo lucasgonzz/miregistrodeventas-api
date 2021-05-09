@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Commissioner;
 use App\CurrentAcount;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
@@ -75,6 +76,15 @@ class CurrentAcountController extends Controller
     	    	]);
             }
     	}
+    }
+
+    function updateDebe(Request $request) {
+        $current_acount = CurrentAcount::find($request->id);
+        $current_acount->debe = $request->debe;
+        $current_acount->save();
+        $client_controller = new ClientController();
+        $client_controller->checkSaldos($current_acount->client_id);
+        // $this->updateCurrentAcountsQueSiguen($current_acount);
     }
 
     function pdf($client_id, $months_ago) {
@@ -315,16 +325,24 @@ class CurrentAcountController extends Controller
         foreach ($current_acounts_to_delete as $current_acount_to_delete) {
             $current_acount_to_delete->delete();
         }
-        $this->updateSaldo($sale, $current_acounts_que_siguen);
+        $this->updateSaldo($sale->client_id, $current_acounts_que_siguen);
     }
 
     function getDetalleForUpdated($sale, $page, $index) {
         return "Rtoo ".count($sale->articles)." $index ".$sale->num_sale.' pag '.$page;
     }
 
-    function updateSaldo($sale, $current_acounts) {
+    function updateCurrentAcountsQueSiguen($since_current_acount) {
+        $current_acounts_que_siguen = CurrentAcount::where('client_id', $since_current_acount->client_id)
+                                                ->where('id', '>', $since_current_acount->id)
+                                                ->orderBy('created_at', 'ASC')
+                                                ->get();
+        $this->updateSaldo($since_current_acount->client_id, $current_acounts_que_siguen);
+    }
+
+    function updateSaldo($client_id, $current_acounts) {
         foreach ($current_acounts as $current_acount) {
-            $current_acount->saldo = CurrentAcountHelper::getSaldo($sale->client_id, $current_acount) + $current_acount->debe;
+            $current_acount->saldo = CurrentAcountHelper::getSaldo($client_id, $current_acount) + $current_acount->debe;
             $current_acount->save();
         }
     }

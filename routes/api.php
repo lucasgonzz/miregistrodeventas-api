@@ -345,6 +345,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/clients/current-acounts/{id}/{months_ago}', 
 		'ClientController@currentAcounts'
 	);
+	Route::post('/current-acounts/update-debe', 
+		'CurrentAcountController@updateDebe'
+	);
 	Route::get('/clients/check-saldos/{client_id}', 
 		'ClientController@checkSaldos'
 	);

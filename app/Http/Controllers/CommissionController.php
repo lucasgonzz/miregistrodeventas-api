@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Commission;
 use App\Commissioner;
 use App\Http\Controllers\Helpers\CommissionHelper;
+use App\Http\Controllers\Helpers\Numbers;
+use App\Http\Controllers\CommissionerController;
 use App\Sale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -42,8 +44,12 @@ class CommissionController extends Controller
 
     function updatePercentage(Request $request) {
         $commission = Commission::find($request->id);
-        $commission->monto = $request->monto;
+        $debe = $commission->monto / Numbers::percentage($commission->percentage);
+        $commission->percentage = $request->percentage;
+        $commission->monto = $debe * Numbers::percentage($request->percentage);
         $commission->save();
+        $commissioner_controller = new CommissionerController();
+        $commissioner_controller->checkSaldos($commission->commissioner_id);
         return response()->json(['commission' => $commission], 200);
     }
 
