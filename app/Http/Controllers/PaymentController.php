@@ -21,17 +21,23 @@ class PaymentController extends Controller
                             ->first();
         SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
 
-        $mp_payment = new MercadoPagoPayment();
-        $mp_payment->transaction_amount = (float)$payment->transaction_amount;
-        $mp_payment->token              = $payment->token;
-        $mp_payment->installments       = (int)$payment->installments;
-        $mp_payment->description        = $payment->description;
-        if ($payment->card_id) {
+        if (!is_null($payment->card_id)) {
+            $mp_payment = new MercadoPagoPayment();
+            $mp_payment->transaction_amount = (float)$payment->transaction_amount;
+            $mp_payment->token              = $payment->token;
+            $mp_payment->installments       = (int)$payment->installments;
+            $mp_payment->description        = $payment->description;
             $mp_payment->payer = [
                 'type' => 'customer',
                 'id'   => $payment->customer_id,
             ];
+            $mp_payment->save();
         } else {
+            $mp_payment = new MercadoPagoPayment();
+            $mp_payment->transaction_amount = (float)$payment->transaction_amount;
+            $mp_payment->token              = $payment->token;
+            $mp_payment->installments       = (int)$payment->installments;
+            $mp_payment->description        = $payment->description;
             $mp_payment->payment_method_id  = $payment->payment_method_id;
             $mp_payment->issuer_id          = (int)$payment->issuer;
             $payer = new Payer();
@@ -41,8 +47,8 @@ class PaymentController extends Controller
                 "number" => $payment->doc_number
             );
             $mp_payment->payer = $payer;
+            $mp_payment->save();
         }
-        $mp_payment->save();
 
         $payment->payment_id    = $mp_payment->id;
         $payment->status        = $mp_payment->status;
@@ -54,20 +60,63 @@ class PaymentController extends Controller
     function saveCustomerAndCard($payment) {
         if ($payment->status == 'approved') {
             SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
-
-            $local_customer = LocalCustomer::where('email', $payment->email)->first();
-
-            if (is_null($local_customer)) {
+            $filters = ['email' => $payment->email];
+            $customers = Customer::search($filters);
+            if ($customers->total >= 1) {
+                $customer_id = $customers[0]->id;
+            } else {
                 $customer = new Customer();
                 $customer->email = $payment->email;
-                $customer_controller = new CustomerController();
-                $local_customer = $customer_controller->store($customer->save());
+                $customer->save();
+                $customer_id = $customer->id;
             }
+            if ($customer_id) {
+                $card = new Card();
+                $card->token = $payment->token;
+                $card->customer_id = $customer_id;
+                $card->save();
+            }
+        }
+    }
 
-            $card = new Card();
-            $card->token = $payment->token;
-            $card->customer_id = $local_customer->customer_id;
-            $card->save();
+    function customer($payment_id) {
+        $payment = Payment::find($payment_id);
+        if ($payment->status == 'approved') {
+            SDK::setAccessToken(env('MERCADO_PAGO_ACCESS_TOKEN'));
+            $filters = ['email' => $payment->email];
+            $customers = Customer::search($filters);
+            if ($customers->total >= 1) {
+                dd($customers[0]);
+                $customer_id = $customers[0]->id;
+            } else {
+                $customer = new Customer();
+                $customer->email = $payment->email;
+                $customer->save();
+                $customer_id = $customer->id;
+            }
+            if ($customer_id) {
+                $card = new Card();
+                $card->token = $payment->token;
+                $card->customer_id = $customer_id;
+                $card->save();
+            }
+        }
+    }
+    
+    function refresh() {
+        $payments = Payment::all();
+        foreach ($payments as $payment) {
+            $payment->delete();
+        }
+        $orders = \App\Order::all();
+        foreach ($orders as $order) {
+            $order->articles()->detach();
+            $order->delete();
+        }
+        $carts = \App\Cart::all();
+        foreach ($carts as $cart) {
+            $cart->articles()->detach();
+            $cart->delete();
         }
     }
 

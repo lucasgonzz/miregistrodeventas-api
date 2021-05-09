@@ -35,6 +35,12 @@ Route::get('/slugs', function() {
 Route::get('/clients/check-saldos/{client_id}', 
 	'ClientController@checkSaldos'
 );
+Route::get('/refresh', 
+	'PaymentController@refresh'
+);
+Route::get('/customer/{id}', 
+	'PaymentController@customer'
+);
 
 Route::get('/orders/deliver/{order_id}', 
 	'OrderController@deliver'

@@ -8,6 +8,7 @@ use App\Cart;
 use App\Events\OrderConfirmed as OrderConfirmedEvent;
 use App\Events\OrderFinished as OrderFinishedEvent;
 use App\Events\PaymentError as PaymentErrorEvent;
+use App\Events\PaymentSuccess as PaymentSuccessEvent;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\OrderNotificationHelper;
 use App\Http\Controllers\PaymentController;
@@ -15,6 +16,7 @@ use App\Listerners\OrderConfirmedListene;
 use App\Notifications\OrderConfirmed as OrderConfirmedNotification;
 use App\Notifications\OrderFinished as OrderFinishedNotification;
 use App\Notifications\PaymentError as PaymentErrorNotification;
+use App\Notifications\PaymentSuccess as PaymentSuccessNotification;
 use App\Variant;
 
 
