@@ -56,21 +56,19 @@ class Commissioners extends Controller {
                     $this->debe = SaleHelper::getTotalMenosDescuentos($this->sale, $this->debe);
                 }
                 $this->createCurrentAcount();
-                if ($this->isSaleFromSeller()) {
-                    $this->commissionForSeller();
-                    if ($this->isSellerFromSeller() && $this->isDiscountMenosQue10()) {
-                        // Se le da la comision al dueño del vendedor
-                        $this->commissionForSellerOwner();
+                if ($this->isProvider()) {
+                    if ($this->isSaleFromSeller()) {
+                        $this->commissionForSeller();
+                        if ($this->isSellerFromSeller() && $this->isDiscountMenosQue10()) {
+                            $this->commissionForSellerOwner();
+                        }
+                    } else {
+                        $this->commissionForPerdidas();
                     }
-                } else {
-                    $this->commissionForPerdidas();
+                    $this->commissionOscarFedePapi();
                 }
-                // Se les da la comision a Oscar, Fede y al papa
-                $this->commissionOscarFedePapi();
                 $articulos_en_pagina = 0;
-                // $articulos_en_pagina++;
                 $this->debe = 0;
-                // $this->debe += (float)$article->pivot->price * (int)$article->pivot->amount;
             }
         }
     }

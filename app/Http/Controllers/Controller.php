@@ -21,6 +21,14 @@ class Controller extends BaseController
         }
     }
 
+    function isProvider() {
+        $user = Auth()->user();
+        if ($user->hasRole('provider')) {
+            return true;
+        }
+        return false;
+    }
+
     // static function userId() {
     //     $user = Auth()->user();
     //     if (is_null($user->owner_id)) {

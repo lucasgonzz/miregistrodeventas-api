@@ -22,6 +22,7 @@ class CreateOrdersTable extends Migration
             $table->boolean('deliver');
             $table->string('address')->nullable();
             $table->string('address_number')->nullable();
+            $table->string('description')->nullable();
             $table->enum('payment_method', ['efectivo', 'tarjeta']);
 
             $table->timestamps();

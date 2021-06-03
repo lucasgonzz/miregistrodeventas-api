@@ -348,6 +348,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/current-acounts/update-debe', 
 		'CurrentAcountController@updateDebe'
 	);
+	Route::delete('/current-acounts/{id}', 
+		'CurrentAcountController@delete'
+	);
 	Route::get('/clients/check-saldos/{client_id}', 
 		'ClientController@checkSaldos'
 	);

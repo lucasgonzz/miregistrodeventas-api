@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Client;
 use App\CurrentAcount;
+use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
@@ -76,7 +77,7 @@ class ClientController extends Controller
     function saldoInicial(Request $request) {
         $current_acount = CurrentAcount::create([
             'detalle' => 'Saldo inicial',
-            'status'  => 'saldo_inicial',
+            'status'  => 'sin_pagar',
             'client_id' => $request->client_id,
             'debe'    => $request->is_for_debe ? $request->saldo_inicial : null,
             'haber'   => !$request->is_for_debe ? $request->saldo_inicial : null,
@@ -110,6 +111,8 @@ class ClientController extends Controller
             // echo "----------------------------------------------------------------</br>";
             $current_acount->save();
         }
+        $current_acount_controller = new CurrentAcountController();
+        $current_acount_controller->checkPagos($client_id);
         return response(null, 200);
     }
 

@@ -99,7 +99,7 @@ class OrderController extends Controller
         SaleHelper::attachArticlesFromOrder($sale, $order->articles);
         $sale = Sale::where('id', $sale->id)
                     ->with('client')
-                    // ->with('buyer')
+                    ->with('buyer')
                     ->with('articles')
                     ->with('impressions')
                     ->with('specialPrice')

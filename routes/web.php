@@ -31,9 +31,20 @@ Route::get('/slugs', function() {
 	}
 	echo "listo";
 });
+Route::get('/check-pagos', function() {
+	$clients = App\Client::where('user_id', 2)->get();
+	foreach ($clients as $client) {
+		$controller = new CurrentAcountController();
+		$controller->checkPagos($client->id);
+	}
+	echo "listo";
+});
 
 Route::get('/clients/check-saldos/{client_id}', 
 	'ClientController@checkSaldos'
+);
+Route::get('/clients/check-pagos/{client_id}', 
+	'CurrentAcountController@checkPagos'
 );
 Route::get('/refresh', 
 	'PaymentController@refresh'

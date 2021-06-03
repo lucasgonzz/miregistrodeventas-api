@@ -63,7 +63,7 @@ class CommissionController extends Controller
         ]);
         return response(null, 201);
     }
-
+    
     function delete($sale) {
         $commissions_to_delete = Commission::where('sale_id', $sale->id)
                                         ->get();

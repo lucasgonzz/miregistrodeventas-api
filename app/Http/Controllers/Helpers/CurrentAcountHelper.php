@@ -26,13 +26,11 @@ class CurrentAcountHelper {
         }
     }
 
-    static function getCurrentAcountsSinceMonths($client_id, $months_ago) {
-        $months_ago = Carbon::now()->subMonths($months_ago);
-        $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        ->whereDate('created_at', '>=', $months_ago)
-                                        ->orderBy('created_at', 'ASC')
-                                        ->get();
-        return $current_acounts;
+    static function isSaldoInicial($current_acount) {
+        if (is_null($current_acount->sale_id)) {
+            return true;
+        }
+        return false;
     }
 
     static function getDescription($sale, $total = null) {
@@ -40,7 +38,7 @@ class CurrentAcountHelper {
             if (!is_null($total)) {
                 $description = '$'.Numbers::price($total);
             } else {
-                $description = '$'.Numbers::price(SaleHelper::getTotalSale($sale, false));
+                $description = '$'.Numbers::price(SaleHelper::getTotalSale($sale));
             }
             foreach ($sale->discounts as $discount) {
                 $description .= '(-'.$discount->pivot->percentage . '% '. substr($discount->name, 0, 3) .')';
@@ -49,6 +47,15 @@ class CurrentAcountHelper {
         } else {
             return null;
         }
+    }
+
+    static function getCurrentAcountsSinceMonths($client_id, $months_ago) {
+        $months_ago = Carbon::now()->subMonths($months_ago);
+        $current_acounts = CurrentAcount::where('client_id', $client_id)
+                                        ->whereDate('created_at', '>=', $months_ago)
+                                        ->orderBy('id', 'ASC')
+                                        ->get();
+        return $current_acounts;
     }
 
 }

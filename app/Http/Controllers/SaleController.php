@@ -163,7 +163,7 @@ class SaleController extends Controller
         $sales = Sale::where('user_id', $this->userId())
                         ->where('created_at', '>=', Carbon::today())
                         ->with('client')
-                        // ->with('buyer')
+                        ->with('buyer')
                         ->with('articles')
                         ->with('impressions')
                         ->with('specialPrice')
@@ -380,7 +380,7 @@ class SaleController extends Controller
             $sale = Sale::find($sale_id);
             if (auth()->user()->hasRole('provider')) {
                 $current_acount = new CurrentAcountController();
-                $current_acount->delete($sale);
+                $current_acount->deleteFromSale($sale);
                 $commission = new CommissionController();
                 $commission->delete($sale);
             }
@@ -432,10 +432,6 @@ class SaleController extends Controller
     function store(Request $request) {
         $with_card = (bool)$request->with_card;
         $special_price_id = null;
-        $client_id = $request->client_id;
-        if ($client_id == -1) {
-            $client_id == null;
-        }
         if ($request->special_price_id != 0) {
             $special_price_id = $request->special_price_id;
         }
@@ -447,12 +443,12 @@ class SaleController extends Controller
             'num_sale' => $num_sale,
             'debt' => $request->debt,
             'percentage_card' => $percentage_card,
-            'client_id' => $client_id,
+            'client_id' => $request->client_id,
             'special_price_id' => $special_price_id,
             'sale_type_id' => !is_null($request->sale_type) ? $request->sale_type : null,
         ]);
         SaleHelper::attachArticles($sale, $request->articles);
-        if (Auth()->user()->hasRole('provider')) {
+        if ($request->client_id) {
             $discounts = DiscountHelper::getDiscountsFromDiscountsId($request->discounts);
             SaleHelper::attachDiscounts($sale, $discounts);
             $helper = new SaleHelper_Commissioners($sale, $discounts);

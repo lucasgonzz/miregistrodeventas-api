@@ -68,7 +68,6 @@ class OrderHelper {
                 $article_->save();
             }
         }
-
     }
 
     static function sendOrderConfrimedNotification($order) {

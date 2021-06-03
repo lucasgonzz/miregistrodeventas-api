@@ -31,9 +31,13 @@ class SaleHelper extends Controller {
     }
 
     static function getNumSaleFromSaleId($sale_id) {
-        return Sale::where('id', $sale_id)
+        $sale = Sale::where('id', $sale_id)
                     ->select('num_sale')
-                    ->first()->num_sale;
+                    ->first();
+        if ($sale) {
+            return $sale->num_sale;
+        }
+        return null;
     }
 
     static function attachDiscounts($sale, $discounts) {
