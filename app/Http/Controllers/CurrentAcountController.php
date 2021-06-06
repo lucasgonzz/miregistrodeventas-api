@@ -15,6 +15,7 @@ use App\Sale;
 use App\Seller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class CurrentAcountController extends Controller
 {
@@ -351,16 +352,19 @@ class CurrentAcountController extends Controller
 
     function deleteFromSale($sale) {
         $current_acounts_to_delete = CurrentAcount::where('sale_id', $sale->id)
-                                        ->get();
-        $ultima_a_eliminar = $current_acounts_to_delete[count($current_acounts_to_delete)-1];
-        $current_acounts_que_siguen = CurrentAcount::where('client_id', $sale->client_id)
-                                                ->where('id', '>', $ultima_a_eliminar->id)
-                                                ->orderBy('created_at', 'ASC')
-                                                ->get();
-        foreach ($current_acounts_to_delete as $current_acount_to_delete) {
-            $current_acount_to_delete->delete();
+                                                    ->get();
+
+        if (count($current_acounts_to_delete) >= 1) {
+            $ultima_a_eliminar = $current_acounts_to_delete[count($current_acounts_to_delete)-1];
+            $current_acounts_que_siguen = CurrentAcount::where('client_id', $sale->client_id)
+                                                    ->where('id', '>', $ultima_a_eliminar->id)
+                                                    ->orderBy('created_at', 'ASC')
+                                                    ->get();
+            foreach ($current_acounts_to_delete as $current_acount_to_delete) {
+                $current_acount_to_delete->delete();
+            }
+            $this->updateSaldo($sale->client_id, $current_acounts_que_siguen);
         }
-        $this->updateSaldo($sale->client_id, $current_acounts_que_siguen);
     }
 
     // function getDetalleForUpdated($sale, $page, $index) {

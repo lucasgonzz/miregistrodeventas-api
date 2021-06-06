@@ -4,6 +4,7 @@ use App\Article;
 use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
+use App\Http\Controllers\SaleController;
 use App\Notifications\OrderConfirmed;
 use App\Sale;
 use Illuminate\Http\Request;
@@ -36,6 +37,18 @@ Route::get('/check-pagos', function() {
 	foreach ($clients as $client) {
 		$controller = new CurrentAcountController();
 		$controller->checkPagos($client->id);
+	}
+	echo "listo";
+});
+
+// Se usa para eliminar las cuentas corrientes y volver a hacerlas
+Route::get('/check-sales', function() {
+	$sales = App\Sale::where('user_id', 2)
+						->where('created_at', '>', Carbon\Carbon::now()->subWeek())
+						->get();
+	foreach ($sales as $sale) {
+		$controller = new SaleController();
+		$controller->updateCurrentAcountsAndCommissions($sale);
 	}
 	echo "listo";
 });

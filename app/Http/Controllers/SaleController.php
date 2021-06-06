@@ -410,15 +410,20 @@ class SaleController extends Controller
         $sale->save();
         $sale = Sale::where('id', $sale->id)
                         ->with('client')
-                        // ->with('buyer')
+                        ->with('buyer')
                         ->with('impressions')
                         ->with('articles')
                         ->with('commissions')
                         ->with('discounts')
                         ->first();
+        $this->updateCurrentAcountsAndCommissions($sale);
+        return response()->json(['sale' => $sale], 200);
+    }
+
+    function updateCurrentAcountsAndCommissions($sale) {
         // Se eliminan las cuentas corrientes y se actualizan los saldos se las siguientes
         $current_acount = new CurrentAcountController();
-        $current_acount->delete($sale);
+        $current_acount->deleteFromSale($sale);
 
         // Se eliminan las comisiones y se actualizan los saldos se las siguientes
         $commission = new CommissionController();
@@ -426,7 +431,6 @@ class SaleController extends Controller
 
         $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
         $helper->attachCommissionsAndCurrentAcounts();
-        return response()->json(['sale' => $sale], 200);
     }
 
     function store(Request $request) {
