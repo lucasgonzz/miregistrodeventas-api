@@ -38,39 +38,37 @@ class ArticlesTableSeeder extends Seeder
                     'created_at'   => Carbon::now()->subDays($i),
                     'featured' => $i < 8 ? $i : null
                 ]);
-                if ($user_id == 2) {
-                    $images = [
-                        'v1616079010/articles/ztaa7kyj1cfqoj8fmsjp.jpg', 
-                        'v1616538802/articles/kboz26romcgmiswoocjw.jpg', 
-                        'v1615988247/articles/cumc9e2hifffpr498nz6.jpg', 
-                        'v1615989993/articles/ofzfakuwnre6qy6plzw0.jpg',
-                        'v1615988968/articles/b6gcidfseqa3f59zyjr1.jpg',
-                        'v1616507853/articles/guuyxregqgje3nhmmefj.jpg',
-                        'v1616506825/articles/kcjbnqtkphlyacfc3bks.jpg'
-                    ];
-                    for ($j=0; $j < 2; $j++) { 
-                        Image::create([
-                            'article_id' => $article->id,
-                            'url'        => $images[$j],
+                $images = [
+                    'v1616079010/articles/ztaa7kyj1cfqoj8fmsjp.jpg', 
+                    'v1616538802/articles/kboz26romcgmiswoocjw.jpg', 
+                    'v1615988247/articles/cumc9e2hifffpr498nz6.jpg', 
+                    'v1615989993/articles/ofzfakuwnre6qy6plzw0.jpg',
+                    'v1615988968/articles/b6gcidfseqa3f59zyjr1.jpg',
+                    'v1616507853/articles/guuyxregqgje3nhmmefj.jpg',
+                    'v1616506825/articles/kcjbnqtkphlyacfc3bks.jpg'
+                ];
+                for ($j=0; $j < 2; $j++) { 
+                    Image::create([
+                        'article_id' => $article->id,
+                        'url'        => $images[$j],
+                    ]);
+                }
+                $providers = Provider::where('user_id', $user_id)->get();
+                foreach ($providers as $provider) {
+                    $article->providers()->attach($provider->id, [
+                                                    'cost' => $article->cost,
+                                                    'price' => $article->price,
+                                                    'amount' => 15,
+                                                ]);
+                }
+                if ($i < 10) {
+                    for ($j=0; $j < 7; $j++) { 
+                        Variant::create([
+                            'description' => 'Modelo '.$j,
+                            'stock'       => 7,
+                            'article_id'  => $article->id,
+                            'url'         => $images[$j],
                         ]);
-                    }
-                    $providers = Provider::where('user_id', $user_id)->get();
-                    foreach ($providers as $provider) {
-                        $article->providers()->attach($provider->id, [
-                                                        'cost' => $article->cost,
-                                                        'price' => $article->price,
-                                                        'amount' => 15,
-                                                    ]);
-                    }
-                    if ($i < 10) {
-                        for ($j=0; $j < 7; $j++) { 
-                            Variant::create([
-                                'description' => 'Modelo '.$j,
-                                'stock'       => 7,
-                                'article_id'  => $article->id,
-                                'url'         => $images[$j],
-                            ]);
-                        }
                     }
                 }
             }

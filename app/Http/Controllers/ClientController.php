@@ -94,7 +94,7 @@ class ClientController extends Controller
 
     function checkSaldos($client_id) {
         $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        ->orderBy('created_at', 'ASC')
+                                        ->orderBy('id', 'ASC')
                                         ->get();
         foreach ($current_acounts as $current_acount) {
             // echo "detalle: ".$current_acount->detalle."</br>";

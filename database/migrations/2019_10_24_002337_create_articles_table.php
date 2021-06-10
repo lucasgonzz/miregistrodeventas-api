@@ -17,7 +17,7 @@ class CreateArticlesTable extends Migration
             $table->bigIncrements('id');
             $table->string('bar_code', 128)->nullable();
             $table->string('name', 128);
-            $table->string('slug')->unique();
+            $table->string('slug');
             $table->decimal('cost', 8, 2)->nullable();
             $table->decimal('price', 8, 2);
             $table->decimal('previus_price', 8, 2)->nullable();

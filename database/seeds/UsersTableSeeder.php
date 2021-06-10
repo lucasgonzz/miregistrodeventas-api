@@ -14,18 +14,6 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
         
-        $lucas = User::create([
-            'name' => 'Lucas',
-        	'company_name' => 'Lucas',
-            'status' => 'in_use',
-        	'password' => bcrypt('1234'),
-            // 'admin_id' => $admin->id,
-            'created_at' => Carbon::now(),
-            'expire' => Carbon::now()->addWeeks(4),
-        ]);
-        $lucas->roles()->sync([1,2]);
-        // $lucas->permissions()->sync([9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
-
         $commerce = User::create([
             'name'            => 'Mi Negocio',
             'online'          => 'http://localhost:8080',
@@ -40,7 +28,17 @@ class UsersTableSeeder extends Seeder
             'expire'          => Carbon::now()->subDay(),
         ]);
         $commerce->roles()->sync([1,3]);
-        // $commerce->permissions()->sync([10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
+        
+        $lucas = User::create([
+            'name' => 'Lucas',
+        	'company_name' => 'Lucas',
+            'status' => 'in_use',
+        	'password' => bcrypt('1234'),
+            // 'admin_id' => $admin->id,
+            'created_at' => Carbon::now(),
+            'expire' => Carbon::now()->addWeeks(4),
+        ]);
+        $lucas->roles()->sync([1,2]);
 
         $commerce = User::create([
             'name' => 'Fran',

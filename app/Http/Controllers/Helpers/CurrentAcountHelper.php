@@ -21,7 +21,6 @@ class CurrentAcountHelper {
         if (is_null($last_current_acount)) {
             return 0;
         } else {
-            // echo "Se esta devolviendo el saldo del current_acount de: ".$last_current_acount->detalle."</br>";
             return $last_current_acount->saldo;
         }
     }

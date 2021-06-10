@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use App\Client;
+use App\User;
+use Illuminate\Database\Seeder;
 
 class ClientsTableSeeder extends Seeder
 {
@@ -12,7 +13,8 @@ class ClientsTableSeeder extends Seeder
      */
     public function run()
     {
-        for ($user_id=1; $user_id <= 2 ; $user_id++) { 
+        $provider = User::where('name', 'Lucas')->first();
+        for ($user_id=2; $user_id <= 2 ; $user_id++) { 
             for ($i=1; $i < 40; $i++) { 
                 Client::create([
                     'name' => 'Mio '.$i,
@@ -23,32 +25,32 @@ class ClientsTableSeeder extends Seeder
                     'surname' => 'apellido de juan '.$i,
                     'address' => 'calle 123 al 7'.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == 1 ? 1 : null
+                    'seller_id' => $user_id == $provider->id ? $provider->id : null
                 ]);
                 Client::create([
                     'name' => 'Marcos '.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == 1 ? 1 : null
+                    'seller_id' => $user_id == $provider->id ? $provider->id : null
                 ]);
                 Client::create([
                     'name' => 'Lucas '.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == 1 ? 1 : null
+                    'seller_id' => $user_id == $provider->id ? $provider->id : null
                 ]);
                 Client::create([
                     'name' => 'Luquis '.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == 1 ? 2 : null
+                    'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
                 Client::create([
                     'name' => 'Marta '.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == 1 ? 2 : null
+                    'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
                 Client::create([
                     'name' => 'Juana '.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == 1 ? 2 : null
+                    'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
             }
         }

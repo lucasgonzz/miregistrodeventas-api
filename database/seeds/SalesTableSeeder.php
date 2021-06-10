@@ -26,14 +26,14 @@ class SalesTableSeeder extends Seeder
             // for ($j=0; $j < 5; $j++) { 
                 $num_sale = SaleHelper::numSale(1);
                 $sale = Sale::create([
-                    'user_id' => 1,
+                    'user_id' => 2,
                     'num_sale' => $num_sale,
                     'percentage_card' => null,
                     'client_id' => 2,
                     'sale_type_id' => 1,
                     'created_at' => Carbon::now()->subDays($total_ventas-$i),
                 ]);
-                $articles = Article::where('user_id', 1)
+                $articles = Article::where('user_id', 2)
                                     ->take(30)
                                     ->get();
                 foreach ($articles as $article) {
@@ -54,7 +54,7 @@ class SalesTableSeeder extends Seeder
     public function getClient($user_id) {
         $with_client = (bool)rand(0,1);
         if ($with_client) {
-            if ($user_id == 1) {
+            if ($user_id == 2) {
                 return rand(1, 60);
             } else {
                 return rand(60, 120);
