@@ -147,7 +147,7 @@ class ClientController extends Controller
     function setClientsSaldo($clients) {
         foreach ($clients as $client) {
             $last_current_acount = CurrentAcount::where('client_id', $client->id)
-                                                ->orderBy('created_at', 'DESC')
+                                                ->orderBy('id', 'DESC')
                                                 ->first();
             if (!is_null($last_current_acount)) {
                 $client->saldo = $last_current_acount->saldo;
