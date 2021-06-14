@@ -1,6 +1,7 @@
 <?php
 
 use App\Article;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
@@ -32,11 +33,11 @@ Route::get('/slugs', function() {
 	}
 	echo "listo";
 });
-Route::get('/check-pagos', function() {
+Route::get('/check-saldos', function() {
 	$clients = App\Client::where('user_id', 2)->get();
 	foreach ($clients as $client) {
-		$controller = new CurrentAcountController();
-		$controller->checkPagos($client->id);
+		$controller = new ClientController();
+		$controller->checkSaldos($client->id);
 	}
 	echo "listo";
 });

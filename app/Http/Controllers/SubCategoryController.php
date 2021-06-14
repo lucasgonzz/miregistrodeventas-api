@@ -16,6 +16,24 @@ class SubCategoryController extends Controller
     	return response()->json(['sub_categories' => $sub_categories], 200);
     }
 
+    function mostViewed($weeks_ago) {
+        $sub_categories = SubCategory::where('user_id', $this->userId())
+                                ->where('status', 'active')
+                                // ->with(['views' => function($q) use($weeks_ago) {
+                                //     $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
+                                // }])
+                                // ->withCount('articles')
+                                // ->with('views')
+                                // ->with('views.buyer')
+                                // ->withCount('views')
+                                ->get();  
+        $sub_categories = SubCategory::where('user_id', $this->userId())
+                                    ->where('status', 'active')
+                                    ->with('category')
+                                    ->get();
+        return response()->json(['sub_categories' => $sub_categories], 200);
+    }
+
     function store(Request $request) {
     	$sub_category = SubCategory::create([
     		'name' 		  => StringHelper::modelName($request->name),

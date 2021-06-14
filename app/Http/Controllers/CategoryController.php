@@ -10,17 +10,6 @@ use Illuminate\Http\Request;
 class CategoryController extends Controller
 {
 
-    function mostView($weeks_ago) {
-        $categories = Category::where('user_id', $this->userId())
-                                ->where('status', 'active')
-                                ->with(['views' => function($q) use($weeks_ago) {
-                                    $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
-                                }])
-                                ->withCount('articles')
-                                ->get();
-        return response()->json(['categories' => $categories], 200);
-    }
-
     function index() {
     	$categories = Category::where('user_id', $this->userId())
                                 ->where('status', 'active')

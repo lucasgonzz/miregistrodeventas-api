@@ -458,11 +458,11 @@ Route::middleware('auth:sanctum')->group(function () {
 		'OrderController@deliver'
 	);
 	// Examine
-	Route::get('/online/articles/most-view/{weeks_ago}', 
-		'ArticleController@mostView'
+	Route::get('/articles/most-viewed/{weeks_ago}', 
+		'ArticleController@mostViewed'
 	);
-	Route::get('/online/categories/most-view/{weeks_ago}', 
-		'CategoryController@mostView'
+	Route::get('/sub-categories/most-viewed/{weeks_ago}', 
+		'SubCategoryController@mostViewed'
 	);
 	// Title
 	Route::get('/online/titles', 

@@ -82,14 +82,20 @@ class ArticleController extends Controller
             ];
     }
 
-    function mostView($weeks_ago) {
+    function mostViewed($weeks_ago) {
         $articles = Article::where('user_id', $this->userId())
                             ->with(['views' => function($q) use($weeks_ago) {
                                 $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
                             }])
                             ->with('images')
+                            ->with('views.buyer')
                             ->take(50)
-                            ->get();
+                            ->withCount('views')
+                            ->get()
+                            ->where('views_count', '>=', 1)
+                            ->sortBy(function($q) {
+                                return $q->views_count;
+                            });
         return response()->json(['articles' => $articles], 200);
     }
 
