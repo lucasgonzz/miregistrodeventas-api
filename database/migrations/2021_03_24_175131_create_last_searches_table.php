@@ -17,7 +17,7 @@ class CreateLastSearchesTable extends Migration
             $table->id();
 
             $table->string('body');
-            $table->unsignedBigInteger('buyer_id');
+            $table->unsignedBigInteger('buyer_id')->nullable();
 
             $table->foreign('buyer_id')->references('id')->on('buyers');
 

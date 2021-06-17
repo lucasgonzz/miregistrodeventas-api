@@ -67,7 +67,6 @@ class OrderDelivered extends Notification
      */
     public function toArray($notifiable)
     {
-        
         return [
             'order_id' => $this->order->id,
             'message'  => OrderNotificationHelper::getDeliveredMessage($this->order),

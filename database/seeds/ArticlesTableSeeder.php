@@ -22,9 +22,9 @@ class ArticlesTableSeeder extends Seeder
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
        
         for ($user_id=1; $user_id < 3; $user_id++) { 
-            for ($i=0;  $i < 200; $i++) { 
+            for ($i=0;  $i < 40; $i++) { 
                 $cost = rand(50, 3000);
-                $name = 'Articulo '.$i;
+                $name = $names[$i];
                 $bar_code = rand(1000000000000, 9999999999999);
                 $article = Article::create([
                     'bar_code'     => $bar_code,
