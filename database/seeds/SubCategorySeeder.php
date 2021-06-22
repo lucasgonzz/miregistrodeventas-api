@@ -22,7 +22,7 @@ class SubCategorySeeder extends Seeder
 				$sub_category = SubCategory::create([
 					'name' 		  => $category->name.' sub '.$i,
                     'category_id' => $category->id,
-					'user_id' => 2,
+					'user_id' => $user->id,
 				]);        	
         	}
         }

@@ -21,7 +21,7 @@ class BuyerSeeder extends Seeder
             'phone' => '+5493444622139',
             // 'email' => 'Lucas@gmail.com',
             'password' => bcrypt('1234'),
-            'user_id' => 2,
+            'user_id' => 1,
         ]);
         Buyer::create([
             'name' => 'Marcos',
@@ -32,7 +32,7 @@ class BuyerSeeder extends Seeder
             'phone' => '+5493444622138',
             // 'email' => 'Lucas@gmail.com',
             'password' => bcrypt('1234'),
-            'user_id' => 2,
+            'user_id' => 1,
         ]);
     }
 }
