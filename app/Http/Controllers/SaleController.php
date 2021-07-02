@@ -364,6 +364,7 @@ class SaleController extends Controller
                 ->with('articles')
                 ->with('impressions')
                 ->with('client')
+                ->with('buyer')
                 ->with('specialPrice')
                 ->with('commissions')
                 ->with('discounts')
@@ -464,6 +465,7 @@ class SaleController extends Controller
                         ->with('articles')
                         ->with('impressions')
                         ->with('discounts')
+                        ->with('buyer')
                         ->with('commissions')
                         ->first();
         return response()->json(['sale' => $sale], 201);

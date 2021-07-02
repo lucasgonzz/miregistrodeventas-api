@@ -10,5 +10,9 @@ class StringHelper {
 		}
 		return ucfirst(strtolower($name));
 	}
+
+	static function onlyFirstWordUpperCase($string) {
+		return ucfirst(strtolower($string));
+	}
 	
 }

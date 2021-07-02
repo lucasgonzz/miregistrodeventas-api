@@ -12,27 +12,29 @@ class BuyerSeeder extends Seeder
      */
     public function run()
     {
-        Buyer::create([
-            'name' => 'Lucas',
-            'surname' => 'Gonzalez',
-            'city' => 'Gualeguay',
-            'address' => 'Pellegrini',
-            'address_number' => '876',
-            'phone' => '+5493444622139',
-            // 'email' => 'Lucas@gmail.com',
-            'password' => bcrypt('1234'),
-            'user_id' => 1,
-        ]);
-        Buyer::create([
-            'name' => 'Marcos',
-            'surname' => 'Gonzalez',
-            'city' => 'Gualeguay',
-            'address' => 'Pellegrini',
-            'address_number' => '876',
-            'phone' => '+5493444622138',
-            // 'email' => 'Lucas@gmail.com',
-            'password' => bcrypt('1234'),
-            'user_id' => 1,
-        ]);
+        for ($i=0; $i < 20; $i++) { 
+            Buyer::create([
+                'name' => 'Lucas '.$i,
+                'surname' => 'Gonzalez',
+                'city' => 'Gualeguay',
+                'address' => 'Pellegrini',
+                'address_number' => '876',
+                'phone' => '+549344462213'.$i,
+                'email' => 'Lucas@gmail.com',
+                'password' => bcrypt('1234'),
+                'user_id' => 1,
+            ]);
+            Buyer::create([
+                'name' => 'Marcos '.$i,
+                'surname' => 'Gonzalez',
+                'city' => 'Gualeguay',
+                'address' => 'Pellegrini',
+                'address_number' => '876',
+                'phone' => '+549344461213'.$i,
+                'email' => 'Lucas@gmail.com',
+                'password' => bcrypt('1234'),
+                'user_id' => 1,
+            ]);
+        }
     }
 }

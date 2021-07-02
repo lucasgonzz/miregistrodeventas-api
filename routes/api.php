@@ -11,7 +11,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	Route::get('/user', function(Request $request) {
 		$user = Auth::user();
-		$user = App\User::where('id', $user->id)->with('permissions')->with('roles')->first();
+		$user = App\User::where('id', $user->id)
+						->with('permissions')
+						->with('roles')
+						->with('schedules')
+						->first();
 		return response()->json(['user' => $user], 200);
 	});
 
@@ -433,6 +437,20 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::delete('/questions/{id}', 
 		'QuestionController@delete'
+	);
+	// Buyers
+	Route::get('/buyers', 
+		'BuyerController@index'
+	);
+	// Messages
+	Route::get('/messages/{buyer_id}', 
+		'MessageController@fromBuyer'
+	);
+	Route::get('/messages/set-read/{buyer_id}', 
+		'MessageController@setRead'
+	);
+	Route::post('/messages', 
+		'MessageController@store'
 	);
 	// Answers
 	Route::post('/answers', 

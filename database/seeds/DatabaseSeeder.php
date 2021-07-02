@@ -29,5 +29,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SaleTypeSeeder::class);
         $this->call(CurrentAcountSeeder::class);
         $this->call(SalesTableSeeder::class);
+        $this->call(ScheduleSeeder::class);
+        $this->call(MessageSeeder::class);
     }
 }

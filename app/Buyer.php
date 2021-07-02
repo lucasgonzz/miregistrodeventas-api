@@ -18,4 +18,8 @@ class Buyer extends Model
 	{
 		return $this->phone;
 	}
+
+    public function messages() {
+        return $this->hasMany('App\Message');
+    }
 }

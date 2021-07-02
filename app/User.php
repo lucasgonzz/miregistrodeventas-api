@@ -19,10 +19,7 @@ class User extends Authenticatable
      */
     public $timestamps = false;
     
-    protected $fillable = [
-        'name', 'email', 'password', 'owner_id', 'admin_id', 'company_name', 'expire', 'created_at', 'status'
-    ];
-
+    protected $guarded = [];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -52,6 +49,10 @@ class User extends Authenticatable
 
     public function employees() {
         return $this->hasMany('App\User', 'owner_id');
+    }
+
+    public function schedules() {
+        return $this->hasMany('App\Schedule');
     }
 
     public function collections() {
