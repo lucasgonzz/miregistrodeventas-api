@@ -23,6 +23,7 @@ class UsersTableSeeder extends Seeder
             'password'        => bcrypt('1234'),
             'percentage_card' => 20,
             'deliver_amount'  => 70,
+            'online' => 'http://kioscoverde.local:8080',
             // 'admin_id'      => $admin->id,
             'created_at'      => Carbon::now()->subMonths(2),
             'expire'          => Carbon::now()->subDay(),

@@ -111,6 +111,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/articles', 
 			'ArticleController@store'
 		);
+		Route::post('/articles/new-article', 
+			'ArticleController@newArticle'
+		);
 		Route::get('/articles/get-by-bar-code/{bar_code}', 
 			'ArticleController@getByBarCode'
 		);
@@ -181,6 +184,13 @@ Route::middleware('auth:sanctum')->group(function () {
 		);
 		Route::delete('special-prices/{id}', 
 			'SpecialPriceController@delete'
+		);
+		// Tags
+		Route::get('tags', 
+			'TagController@index'
+		);
+		Route::post('tags', 
+			'TagController@store'
 		);
 
 	// --------------------------------------------------------------------------------------
@@ -476,6 +486,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		'OrderController@deliver'
 	);
 	// Examine
+	// Route::get('/google-analytics', 
+	// 	'GoogleAnalyticsController@getAnalyticsSummary'
+	// );
 	Route::get('/articles/most-viewed/{weeks_ago}', 
 		'ArticleController@mostViewed'
 	);

@@ -32,6 +32,7 @@ class ArticleController extends Controller
                                 ->with('images')
                                 ->with('sub_category')
                                 ->with('variants')
+                                ->with('tags')
                                 ->with('specialPrices')
                                 ->with(['providers' => function($q) {
                                     $q->orderBy('cost', 'asc');
@@ -41,6 +42,7 @@ class ArticleController extends Controller
             $articles = Article::where('user_id',$this->userId())
                                 ->orderBy('id', 'DESC')
                                 ->with('images')
+                                ->with('tags')
                                 ->with('sub_category')
                                 ->get();
         }
@@ -125,6 +127,7 @@ class ArticleController extends Controller
             $article->stock = null;
         }
         $article->save();
+        ArticleHelper::setTags($article, $request->tags);
         if ($request->new_stock != 0) {
             $article->providers()
                             ->attach(
@@ -341,6 +344,7 @@ class ArticleController extends Controller
         }
         $article->user_id = $user->id;
         $article->save();
+        ArticleHelper::setTags($article, $request->tags);
         if ($user->hasRole('commerce')) {
             $article->providers()->attach($request->provider_id, [
                                             'amount' => $request->stock,
@@ -364,6 +368,17 @@ class ArticleController extends Controller
         }
 
         $article = ArticleHelper::getFullArticle($article->id);
+        return response()->json(['article' => $article], 201);
+    }
+
+    function newArticle(Request $request) {
+        $user = Auth()->user();
+        $article = new Article();
+        $article->price = $request->price;
+        if ($request->bar_code != '') {
+            $article->bar_code = $request->bar_code;
+        }
+        $article->save();
         return response()->json(['article' => $article], 201);
     }
 

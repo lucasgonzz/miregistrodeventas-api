@@ -41,7 +41,6 @@ Route::get('/check-saldos', function() {
 	}
 	echo "listo";
 });
-
 // Se usa para eliminar las cuentas corrientes y volver a hacerlas
 Route::get('/check-sales', function() {
 	$sales = App\Sale::where('user_id', 2)
@@ -54,6 +53,12 @@ Route::get('/check-sales', function() {
 	echo "listo";
 });
 
+Route::get('/emails/{ids}', 
+	'MailController@articles'
+);
+Route::get('/view/{ids}', 
+	'MailController@articles'
+);
 Route::get('/clients/check-saldos/{client_id}', 
 	'ClientController@checkSaldos'
 );

@@ -8,6 +8,12 @@ use Illuminate\Support\Str;
 
 class ArticleHelper {
 
+    static function setTags($article, $tags) {
+        foreach ($tags as $tag) {
+            $article->tags()->attach($tag['id']);
+        }
+    }
+
     static function deleteVariants($article) {
         foreach ($article->variants as $variant) {
             $variant->delete();
@@ -49,6 +55,7 @@ class ArticleHelper {
                             ->with('sub_category')
                             ->with('variants')
                             ->with('specialPrices')
+                            ->with('tags')
                             ->with(['providers' => function($q) {
                                 $q->orderBy('cost', 'asc');
                             }])

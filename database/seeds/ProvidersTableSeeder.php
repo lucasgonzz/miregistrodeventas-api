@@ -1,9 +1,10 @@
 <?php
 
-use Illuminate\Database\Seeder;
-use App\Provider;
 use App\Article;
+use App\Provider;
+use App\User;
 use Carbon\Carbon;
+use Illuminate\Database\Seeder;
 
 
 class ProvidersTableSeeder extends Seeder
@@ -27,15 +28,15 @@ class ProvidersTableSeeder extends Seeder
     		'La Pampa',
     		'Gualeguay',
     	];
-
+        $user = User::where('name', 'Mi negocio')->first();
     	foreach ($providers as $provider) {
 	        Provider::create([
 	        	'name' => $provider,
-	        	'user_id' => 2,
+	        	'user_id' => $user->id,
 	        ]);
     	}
 
-    	$articles = Article::where('user_id', 2)->get();
+    	$articles = Article::where('user_id', $user->id)->get();
     	foreach ($articles as $article) {
             $amount = $article->stock;
             $cost = $article->cost;
