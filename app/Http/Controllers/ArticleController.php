@@ -108,14 +108,16 @@ class ArticleController extends Controller
 
     function update(Request $request) {
         $article = Article::find($request->id);
+        $article->timestamps = false;
         $article->bar_code = $request->bar_code;
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
         if ($article->price != $request->price) {
             $article->previus_price = $article->price;
+            $article->timestamps = true;
         }
-        if (!$request->act_fecha) {
-            $article->timestamps = false;
-        } 
+        // if (!$request->act_fecha) {
+        //     $article->timestamps = false;
+        // } 
         $article->name = ucwords($request->name);
         $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
