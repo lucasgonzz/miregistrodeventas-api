@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Buyer;
+use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\StringHelper;
 use App\Http\Controllers\Helpers\TwilioHelper;
 use App\Message;
@@ -14,6 +15,8 @@ class MessageController extends Controller
 
     function fromBuyer($buyer_id) {
         $messages = Message::where('buyer_id', $buyer_id)
+                            ->with('article.images')
+                            ->with('article.variants')
                             ->get();
         return response()->json(['messages' => $messages], 200);
     }
@@ -35,7 +38,9 @@ class MessageController extends Controller
             'user_id' => $this->userId(),
             'buyer_id' => $request->buyer_id,
             'text' => StringHelper::onlyFirstWordUpperCase($request->text),
+            'article_id' => $request->article_id,
         ]);
+        $message = MessageHelper::getFullMessage($message->id);
         $buyer = Buyer::find($request->buyer_id);
         $buyer->notify(new MessageSend($message));
         $title = 'Nuevo mensaje';

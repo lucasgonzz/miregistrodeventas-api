@@ -12,15 +12,17 @@ class MessageSend extends Notification
 {
     use Queueable;
     private $message;
+    private $for_commerce;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($message)
+    public function __construct($message, $for_commerce = false)
     {
         $this->message = $message;
+        $this->for_commerce = $for_commerce;
     }
 
     /**
@@ -36,7 +38,11 @@ class MessageSend extends Notification
 
     public function broadcastOn()
     {
-        return 'message.from_commerce.'.$this->message->buyer_id;
+        if (!$this->for_commerce) {
+            return 'message.from_commerce.'.$this->message->buyer_id;
+        } else {
+            return 'message.from_buyer.'.$this->message->user_id;
+        }
     }
 
 

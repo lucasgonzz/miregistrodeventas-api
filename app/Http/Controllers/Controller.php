@@ -22,9 +22,7 @@ class Controller extends BaseController
     }
 
     function isProvider() {
-        if (env('APP_ENV') == 'local') {
-            return true;
-        }
+        return true;
         if (auth()->user()->hasRole('provider')) {
             return true;
         }

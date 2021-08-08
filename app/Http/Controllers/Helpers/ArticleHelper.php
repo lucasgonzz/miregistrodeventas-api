@@ -28,12 +28,18 @@ class ArticleHelper {
     }
 
     static function slug($name) {
+        $index = 1;
         $slug = Str::slug($name);
         $repeated_article = Article::where('user_id', UserHelper::userId())
                                     ->where('slug', $slug)
                                     ->first();
-        if (!is_null($repeated_article)) {
-            $slug .= '_';
+        while (!is_null($repeated_article)) {
+            $slug = substr($slug, 0, strlen($name));
+            $slug .= '-'.$index;
+            $repeated_article = Article::where('user_id', UserHelper::userId())
+                                        ->where('slug', $slug)
+                                        ->first();
+            $index++;
         }
         return $slug;
     }

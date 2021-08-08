@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Buyer;
 use App\Events\OrderCanceled as OrderCanceledEvent;
-use App\Events\OrderDelivered as OrderDeliveredEvent;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\CartHelper;
+use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\OrderHelper;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Notifications\OrderCanceled as OrderCanceledNotification;
-use App\Notifications\OrderDelivered as OrderDeliveredNotification;
+use App\Notifications\OrderDelivered;
+use App\Notifications\OrderFinished;
 use App\Order;
 use App\Sale;
 use Illuminate\Http\Request;
@@ -23,6 +24,7 @@ class OrderController extends Controller
                         ->with('articles.images')
                         ->with('articles.variants')
                         ->with('buyer')
+                        ->with('address')
                         ->get();
         $orders = OrderHelper::setArticlesKey($orders);
         return response()->json(['orders' => $orders], 200);
@@ -35,6 +37,7 @@ class OrderController extends Controller
                         ->with('articles.images')
                         ->with('articles.variants')
                         ->with('buyer')
+                        ->with('address')
                         ->with('payment')
                         ->get();
         $orders = OrderHelper::setArticlesKey($orders);
@@ -46,7 +49,8 @@ class OrderController extends Controller
         $order->status = 'confirmed';
         $order->save();
         OrderHelper::procesarPago($order);
-        OrderHelper::sendOrderConfrimedNotification($order);
+        MessageHelper::sendOrderConfirmedMessage($order);
+        OrderHelper::checkPaymentMethodError($order);
         OrderHelper::discountArticleStock($order->articles);
         return response(null, 200);
     }
@@ -57,10 +61,11 @@ class OrderController extends Controller
         $order->save();
         $order->articles = ArticleHelper::setArticlesKey($order->articles);
         CartHelper::detachArticulosFaltantes($request->articulos_faltantes, $order);
-        $buyer = Buyer::find($order->buyer_id);
-        $message = OrderHelper::getCanceledDescription($request->articulos_faltantes, $request->order);
-        $buyer->notify(new OrderCanceledNotification($order, $message));
-        event(new OrderCanceledEvent($order, $message));
+        MessageHelper::sendOrderCanceledMessage($request->articulos_faltantes, $order);
+        // $buyer = Buyer::find($order->buyer_id);
+        // $message = OrderHelper::getCanceledDescription($request->articulos_faltantes, $request->order);
+        // $buyer->notify(new OrderCanceledNotification($order, $message));
+        // event(new OrderCanceledEvent($order, $message));
         return response(null, 200);
     }
 
@@ -69,7 +74,10 @@ class OrderController extends Controller
         $order->status = 'finished';
         $order->save();
         OrderHelper::deleteCartOrder($order);
-        OrderHelper::sendOrderFinishedNotification($order);
+        MessageHelper::sendOrderFinishedMessage($order);
+        // $buyer = Buyer::find($order->buyer_id);
+        // $buyer->notify(new OrderFinished($order));
+        // OrderHelper::sendOrderFinishedNotification($order);
         return response(null, 200);
     }
 
@@ -79,11 +87,10 @@ class OrderController extends Controller
                         ->first();
         $order->status = 'delivered';
         $order->save();
-
-        // Notification
-        $buyer = Buyer::find($order->buyer_id);
-        $buyer->notify(new OrderDeliveredNotification($order));
-        event(new OrderDeliveredEvent($order));
+        MessageHelper::sendOrderDeliveredMessage($order);
+        // $buyer = Buyer::find($order->buyer_id);
+        // $buyer->notify(new OrderDelivered($order));
+        // event(new OrderDeliveredEvent($order));
 
         $sale = $this->saveSale($order);
         return response()->json(['sale' => $sale], 201);

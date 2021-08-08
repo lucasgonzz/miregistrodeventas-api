@@ -20,8 +20,7 @@ class CreateOrdersTable extends Migration
             $table->integer('user_id')->unsigned();
             $table->enum('status', ['unconfirmed', 'canceled', 'confirmed', 'finished', 'delivered']);
             $table->boolean('deliver');
-            $table->string('address')->nullable();
-            $table->string('address_number')->nullable();
+            $table->integer('address_id')->unsigned()->nullable();
             $table->string('description')->nullable();
             $table->enum('payment_method', ['efectivo', 'tarjeta']);
 

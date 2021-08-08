@@ -27,6 +27,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/slugs', function() {
 	$articles = Article::where('user_id', 1)->get();
 	foreach ($articles as $article) {
+		$article->slug = '';
+		$article->save();
+	}
+
+	foreach ($articles as $article) {
 		$article->slug = ArticleHelper::slug($article->name);
 		$article->save();
 		echo $article->slug.'</br>';

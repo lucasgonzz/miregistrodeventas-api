@@ -13,12 +13,10 @@ class BuyerSeeder extends Seeder
     public function run()
     {
         for ($i=0; $i < 20; $i++) { 
-            Buyer::create([
+            $lucas = Buyer::create([
                 'name' => 'Lucas '.$i,
                 'surname' => 'Gonzalez',
                 'city' => 'Gualeguay',
-                'address' => 'Pellegrini',
-                'address_number' => '876',
                 'phone' => '+549344462213'.$i,
                 'email' => 'lucasgonzalez5500@gmail.com',
                 'password' => bcrypt('1234'),
@@ -28,8 +26,6 @@ class BuyerSeeder extends Seeder
                 'name' => 'Marcos '.$i,
                 'surname' => 'Gonzalez',
                 'city' => 'Gualeguay',
-                'address' => 'Pellegrini',
-                'address_number' => '876',
                 'phone' => '+549344461213'.$i,
                 'email' => 'Lucas@gmail.com',
                 'password' => bcrypt('1234'),

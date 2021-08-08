@@ -10,6 +10,7 @@ use App\Events\OrderFinished as OrderFinishedEvent;
 use App\Events\PaymentError as PaymentErrorEvent;
 use App\Events\PaymentSuccess as PaymentSuccessEvent;
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\OrderNotificationHelper;
 use App\Http\Controllers\PaymentController;
 use App\Listerners\OrderConfirmedListene;
@@ -70,7 +71,7 @@ class OrderHelper {
         }
     }
 
-    static function sendOrderConfrimedNotification($order) {
+    static function sendOrderConfirmedNotification($order) {
         $buyer = Buyer::find($order->buyer_id);
         $buyer->notify(new OrderConfirmedNotification($order));
         event(new OrderConfirmedEvent($order));
@@ -83,15 +84,17 @@ class OrderHelper {
         event(new OrderFinishedEvent($order));
     }
 
-    static function checkPaymentMethodError($order, $buyer) {
+    static function checkPaymentMethodError($order) {
         if ($order->payment_method == 'tarjeta' && $order->payment->status != '') {
             $check_payment_status = OrderNotificationHelper::checkPaymentStatus($order);
             if ($check_payment_status) {
-                $buyer->notify(new PaymentSuccessNotification($order));
-                event(new PaymentSuccessEvent($order));
+                MessageHelper::sendPaymentSuccessMessage($order);
+                // $order->buyer->notify(new PaymentSuccessNotification($order));
+                // event(new PaymentSuccessEvent($order));
             } else {
-                $buyer->notify(new PaymentErrorNotification($order));
-                event(new PaymentErrorEvent($order));
+                MessageHelper::sendPaymentErrorMessage($order);
+                // $order->buyer->notify(new PaymentErrorNotification($order));
+                // event(new PaymentErrorEvent($order));
             }
         }
     }
@@ -110,7 +113,7 @@ class OrderHelper {
             $message .= '.';
             return $message;
         } else {
-            return $order['description'];
+            return StringHelper::onlyFirstWordUpperCase($order['cancel_description']);
         }
     }
 

@@ -13,10 +13,18 @@ class Order extends Model
     }
 
     function buyer() {
-    	return $this->belongsTo('App\Buyer');
+        return $this->belongsTo('App\Buyer');
+    }
+
+    function user() {
+        return $this->belongsTo('App\User');
     }
 
     function payment() {
-    	return $this->hasOne('App\Payment');
+        return $this->hasOne('App\Payment');
+    }
+
+    function address() {
+        return $this->belongsTo('App\Address');
     }
 }

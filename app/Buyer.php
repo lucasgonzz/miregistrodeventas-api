@@ -22,4 +22,8 @@ class Buyer extends Model
     public function messages() {
         return $this->hasMany('App\Message');
     }
+
+    function addresses() {
+        return $this->hasMany('App\Address');
+    }
 }

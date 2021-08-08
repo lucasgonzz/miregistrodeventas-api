@@ -8,24 +8,32 @@ use Carbon\Carbon;
 
 class OrderNotificationHelper {
 
-	static function getConfirmedMessage($order) {
-        $message = 'Tu pedido fue aprobado. ';
+    static function getCreatedMessage($order) {
+        $message = 'Ya recibimos tu pedido. Te vamos a avisar cuando lo aprobemos.';
+        if ($order->payment_method == 'tarjeta') {
+            $message .= ' Y una vez aprobado procesamos el pago.';
+        }
+        return $message;
+    }
+
+    static function getConfirmedMessage($order) {
+        $message = $order->buyer->name.', tu pedido fue aprobado 👌. ';
         if ($order->deliver) {
             $message .= 'Te avisamos cuando lo enviemos.';
         } else {
             $message .= 'Te avisamos cuando puedas retirarlo.';
         }
         return $message;
-	}
+    }
 
     static function getCanceledMessage($description) {
         return 'Tuvimos que cancelar tu pedido por la siguiente razon: '.$description;
     }
 
     static function getFinishedMessage($order) {
-        $message = 'Tu pedido ya esta listo. ';
+        $message = '¡'.$order->buyer->name.'! Tu pedido ya esta listo 😁. ';
         if ($order->deliver) {
-            $message .= '¡El repartidor va en camino!';
+            $message .= '¡El repartidor va en camino!🛵';
         } else {
             $message .= '¡Podes retirarlo cuando quieras!';
         }
@@ -38,7 +46,7 @@ class OrderNotificationHelper {
         } else {
             $message = "Buscaste tu pedido";
         }
-        $message .= ". ¡Gracias por tu compra!";
+        $message .= ". ¡Muchas gracias por tu compra!👍👍";
         return $message;
     }
 

@@ -374,13 +374,14 @@ class ArticleController extends Controller
     }
 
     function newArticle(Request $request) {
-        $user = Auth()->user();
         $article = new Article();
+        $article->user_id = $this->userId();
         $article->price = $request->price;
         if ($request->bar_code != '') {
             $article->bar_code = $request->bar_code;
         }
         $article->save();
+        $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 201);
     }
 
