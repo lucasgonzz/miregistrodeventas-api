@@ -41,6 +41,7 @@ class ArticleController extends Controller
         } else {
             $articles = Article::where('user_id',$this->userId())
                                 ->orderBy('id', 'DESC')
+                                ->where('status', 'active')
                                 ->with('images')
                                 ->with('tags')
                                 ->with('sub_category')
