@@ -131,6 +131,9 @@ class MessageHelper {
         return Message::where('id', $id)
                             ->with('article.images')
                             ->with('article.variants')
+                            ->with(['article.questions' => function($query) {
+                                $query->whereHas('answer')->with('answer');
+                            }])
                             ->first();
     }
 

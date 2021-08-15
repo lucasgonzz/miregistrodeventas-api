@@ -50,7 +50,7 @@ class Article extends Model
     }
 
     public function specialPrices() {
-        return $this->belongsToMany('App\SpecialPrice')->withPivot('price');;
+        return $this->belongsToMany('App\SpecialPrice')->withPivot('price');
     }
     
     public function providers(){
@@ -58,5 +58,9 @@ class Article extends Model
                                                     ->withPivot('amount', 'cost', 'price')
                                                     ->withTimestamps()
                                                     ->orderBy('id', 'DESC');
+    }
+
+    public function questions() {
+        return $this->hasMany('App\Question');
     }
 }

@@ -29,6 +29,13 @@ class OrderHelper {
 		return $orders;
 	}
 
+    static function setArticlesKeyAndVariant($orders) {
+        foreach ($orders as $order) {
+            $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
+        }
+        return $orders;
+    }
+
     static function deleteCartOrder($order) {
         $cart = Cart::where('order_id', $order->id)
                     ->first();

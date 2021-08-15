@@ -9,7 +9,8 @@ class Question extends Model
     protected $guarded = [];
 
     public function article() {
-    	return $this->belongsTo('App\Article');
+        return $this->belongsTo('App\Article');
+    	// return $this->belongsTo('App\Article')->withPivot('variant_id');
     }
 
     public function buyer() {

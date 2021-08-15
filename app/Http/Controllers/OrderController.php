@@ -26,7 +26,7 @@ class OrderController extends Controller
                         ->with('buyer')
                         ->with('address')
                         ->get();
-        $orders = OrderHelper::setArticlesKey($orders);
+        $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         return response()->json(['orders' => $orders], 200);
     }
     
@@ -40,7 +40,7 @@ class OrderController extends Controller
                         ->with('address')
                         ->with('payment')
                         ->get();
-        $orders = OrderHelper::setArticlesKey($orders);
+        $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         return response()->json(['orders' => $orders], 200);
     }
 
@@ -48,6 +48,7 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'confirmed';
         $order->save();
+        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
         OrderHelper::procesarPago($order);
         MessageHelper::sendOrderConfirmedMessage($order);
         OrderHelper::checkPaymentMethodError($order);
@@ -59,7 +60,7 @@ class OrderController extends Controller
         $order = Order::find($request->order['id']);
         $order->status = 'canceled';
         $order->save();
-        $order->articles = ArticleHelper::setArticlesKey($order->articles);
+        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
         CartHelper::detachArticulosFaltantes($request->articulos_faltantes, $order);
         MessageHelper::sendOrderCanceledMessage($request->articulos_faltantes, $order);
         // $buyer = Buyer::find($order->buyer_id);
@@ -73,6 +74,7 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'finished';
         $order->save();
+        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
         OrderHelper::deleteCartOrder($order);
         MessageHelper::sendOrderFinishedMessage($order);
         // $buyer = Buyer::find($order->buyer_id);
@@ -87,6 +89,7 @@ class OrderController extends Controller
                         ->first();
         $order->status = 'delivered';
         $order->save();
+        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
         MessageHelper::sendOrderDeliveredMessage($order);
         // $buyer = Buyer::find($order->buyer_id);
         // $buyer->notify(new OrderDelivered($order));

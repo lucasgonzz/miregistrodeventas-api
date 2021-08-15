@@ -9,7 +9,8 @@ class QuestionController extends Controller
 {
     function index() {
     	$questions = Question::where('user_id', $this->userId())
-    							->with('article.images')
+                                ->with('article.images')
+    							->with('article.variants')
     							->with('buyer')
     							->doesnthave('answer')
     							->get();

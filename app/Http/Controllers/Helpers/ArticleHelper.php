@@ -55,6 +55,22 @@ class ArticleHelper {
         return $articles;
     }
 
+    static function setArticlesKeyAndVariant($articles) {
+        foreach ($articles as $article) {
+            if (isset($article->pivot) && $article->pivot->variant_id) {
+                foreach ($article->variants as $variant) {
+                    if ($variant->id == $article->pivot->variant_id) {
+                        $article->variant = $variant;
+                    }
+                }
+                $article->key = $article->id . '-' . $article->pivot->variant_id;
+            } else {
+                $article->key = $article->id;
+            }
+        }
+        return $articles;
+    }
+
 	static function getFullArticle($article_id) {
 		$article = Article::where('id', $article_id)
                             ->with('images')
