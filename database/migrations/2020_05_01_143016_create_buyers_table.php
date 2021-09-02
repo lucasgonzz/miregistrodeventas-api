@@ -32,6 +32,8 @@ class CreateBuyersTable extends Migration
             $table->string('password', 128)->nullable();
             $table->string('remember_token', 128)->nullable();
             $table->integer('user_id')->unsigned();
+            $table->string('customer_id')->nullable();
+            $table->string('cards')->nullable();
             
             $table->timestamps();
         });

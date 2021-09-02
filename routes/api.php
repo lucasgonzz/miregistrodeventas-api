@@ -15,6 +15,7 @@ Route::middleware('auth:sanctum')->group(function () {
 						->with('permissions')
 						->with('roles')
 						->with('schedules')
+						// ->with('workdays')
 						->first();
 		return response()->json(['user' => $user], 200);
 	});

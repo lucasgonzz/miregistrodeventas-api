@@ -19,7 +19,7 @@ class CreateMessagesTable extends Migration
             $table->string('type')->nullable();
             $table->integer('article_id')->unsigned()->nullable();
             $table->integer('order_id')->unsigned()->nullable();
-            $table->integer('user_id')->unsigned();
+            $table->integer('user_id')->unsigned()->nullable();
             $table->integer('buyer_id')->unsigned();
             $table->boolean('read')->default(false);
             $table->boolean('from_buyer')->default(false);

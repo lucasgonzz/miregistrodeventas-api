@@ -58,6 +58,9 @@ Route::get('/check-sales', function() {
 	echo "listo";
 });
 
+Route::get('/email', 
+	'MailController@order'
+);
 Route::get('/emails/{ids}', 
 	'MailController@articles'
 );

@@ -123,12 +123,14 @@ class ArticleController extends Controller
         $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
+        $article->description = $request->description;
         if (!$request->stock_null && $request->stock != '') {
             $article->stock = $request->stock;
             $article->stock += $request->new_stock;
         } else {
             $article->stock = null;
         }
+        ArticleHelper::checkAdvises($article);
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
         if ($request->new_stock != 0) {
@@ -342,6 +344,7 @@ class ArticleController extends Controller
         $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
+        $article->description = $request->description;
         if ($request->stock != '') {
             $article->stock = $request->stock;
         }

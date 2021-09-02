@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             // $table->integer('admin_id')->nullable()->unsigned();
             $table->integer('percentage_card')->nullable();
             $table->decimal('deliver_amount')->nullable();
+            $table->enum('online_prices', ['all', 'only_registered'])->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('expire')->nullable();
             $table->string('online')->nullable();

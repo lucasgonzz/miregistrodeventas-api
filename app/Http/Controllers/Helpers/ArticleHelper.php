@@ -3,10 +3,24 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Article;
+use App\Advise;
 use App\Http\Controllers\Helpers\UserHelper;
+use App\Mail\ArticleAdvise;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ArticleHelper {
+
+    static function checkAdvises($article) {
+        $advises = Advise::where('article_id', $article->id)
+                            ->get();
+        if (count($advises) >= 1) {
+            foreach ($adivses as $advise) {
+                Mail::to($advise->buyer)->send(new ArticleAdvise($advise->buyer, $advise->article));
+                $advise->delete();
+            }
+        }
+    }
 
     static function setTags($article, $tags) {
         foreach ($tags as $tag) {

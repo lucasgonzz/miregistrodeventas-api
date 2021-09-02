@@ -40,6 +40,7 @@ class UserController extends Controller
         $user = User::where('id', $this->userId())->with('employees')->first();
         $user->name = StringHelper::modelName($request->name, true);
         $user->deliver_amount = StringHelper::modelName($request->deliver_amount, true);
+        $user->online_prices = $request->online_prices;
         $user->save();
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {

@@ -5,12 +5,21 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Buyer;
 use App\Mail\ArticulosNuevos;
+use App\Mail\OrderConfirmed;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 
 class MailController extends Controller
 {
+
+    function order() {
+        $buyer = Buyer::find(1);
+        $commerce = User::find(1);
+        Mail::to($buyer)->send(new OrderConfirmed($buyer, $commerce));
+        echo "enviado";
+    }
+
     function articles($ids) {
         $ids = explode('-', $ids);
         $articles = [];
@@ -30,4 +39,5 @@ class MailController extends Controller
         }
         echo "enviado";
     }
+
 }

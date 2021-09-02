@@ -32,11 +32,12 @@ class ArticlesTableSeeder extends Seeder
                     'slug'         => ArticleHelper::slug($name),
                     'cost'         => 5,
                     'price'        => 10,
-                    'stock'        => 14,
+                    'stock'        => $i < 10 ? 0 : 14,
                     'user_id'      => $user_id,
                     'sub_category_id'  => rand(1,40),
                     'created_at'   => Carbon::now()->subDays($i),
-                    'featured' => $i < 8 ? $i : null
+                    'featured' => $i < 8 ? $i : null,
+                    'description' => 'Este es un producto muy lindo y tiene varias cosas para poder ver como son las funcionalidades que tiene para acemejarse acualquier otro producto que exista en el mundo y todas las cosas que eso conlleva. EL precio es todo lo que esta bien'
                 ]);
                 $images = [
                     'v1616079010/articles/ztaa7kyj1cfqoj8fmsjp.jpg', 
@@ -50,7 +51,7 @@ class ArticlesTableSeeder extends Seeder
                 for ($j=0; $j < 2; $j++) { 
                     Image::create([
                         'article_id' => $article->id,
-                        'url'        => $images[$j],
+                        'url'        => $images[rand(0,6)],
                     ]);
                 }
                 $providers = Provider::where('user_id', $user_id)->get();
