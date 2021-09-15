@@ -16,14 +16,18 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 128)->nullable();
+            $table->string('city', 128)->nullable();
             $table->string('email')->nullable()->unique();
             $table->string('company_name', 128)->nullable();
             $table->string('password', 128);
             $table->integer('owner_id')->nullable()->unsigned();
             // $table->integer('admin_id')->nullable()->unsigned();
             $table->integer('percentage_card')->nullable();
-            $table->decimal('deliver_amount')->nullable();
+            $table->boolean('has_delivery')->default(1);
+            $table->decimal('delivery_price')->nullable();
             $table->enum('online_prices', ['all', 'only_registered'])->nullable();
+            $table->string('order_description')->nullable();
+            $table->boolean('with_dolar')->default(0);
             $table->timestamp('created_at')->nullable();
             $table->timestamp('expire')->nullable();
             $table->string('online')->nullable();

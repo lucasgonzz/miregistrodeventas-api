@@ -94,7 +94,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 
 	// Tarjeta
-	Route::get('/set-percentage-card/{percetane_card}', 
+	Route::put('/users/set-percentage-card', 
 		'UserController@setPercentageCard'
 	);
 	

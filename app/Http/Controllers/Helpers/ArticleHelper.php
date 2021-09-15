@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers\Helpers;
 
-use App\Article;
 use App\Advise;
+use App\Article;
+use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Mail\ArticleAdvise;
 use Illuminate\Support\Facades\Mail;
@@ -15,8 +16,9 @@ class ArticleHelper {
         $advises = Advise::where('article_id', $article->id)
                             ->get();
         if (count($advises) >= 1) {
-            foreach ($adivses as $advise) {
+            foreach ($advises as $advise) {
                 Mail::to($advise->buyer)->send(new ArticleAdvise($advise->buyer, $advise->article));
+                MessageHelper::sendArticleAdviseMessage($advise);
                 $advise->delete();
             }
         }

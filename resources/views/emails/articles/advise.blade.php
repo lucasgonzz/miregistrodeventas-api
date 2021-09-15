@@ -1,13 +1,13 @@
 @component('mail::message')
-# Introduction
+# Hola {{ $buyer->name }}!
 
-Hola {{ $buyer->name }}!
+
 En {{ $article->user->company_name }} ya ingreso {{ $article->name }} 
 
-@component('mail::button', ['url' => ''])
-Button Text
+@component('mail::button', ['url' => $url])
+Ver {{ $article->name }} 
 @endcomponent
 
-Thanks,<br>
+Gracias,<br>
 {{ config('app.name') }}
 @endcomponent

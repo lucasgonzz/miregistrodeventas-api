@@ -127,6 +127,24 @@ class MessageHelper {
         TwilioHelper::sendNotification($question->buyer_id, $title, $question_message);
     }
 
+    static function sendArticleAdviseMessage($advise) {
+        $advise_message = "Hola {$advise->buyer->name}! Ya ingreso {$advise->article->name}";
+        $message = Message::create([
+            'user_id' => UserHelper::userId(),
+            'buyer_id' => $advise->buyer_id,
+            'text' => $advise_message,
+            'type' => 'article_advise',
+            'article_id' => $advise->article->id,
+        ]);
+        $message = Self::getFullMessage($message->id);
+        // Broadcast
+        $advise->buyer->notify(new MessageSend($message));
+        $advise->buyer->user->notify(new MessageSend($message, true));
+        // Notification
+        $title = "Ingreso {$advise->article->name}";
+        TwilioHelper::sendNotification($advise->buyer_id, $title, $advise_message);
+    }
+
     static function getFullMessage($id) {
         return Message::where('id', $id)
                             ->with('article.images')

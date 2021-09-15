@@ -39,8 +39,11 @@ class UserController extends Controller
     function update(Request $request) {
         $user = User::where('id', $this->userId())->with('employees')->first();
         $user->name = StringHelper::modelName($request->name, true);
-        $user->deliver_amount = StringHelper::modelName($request->deliver_amount, true);
+        $user->has_delivery = $request->has_delivery;
+        $user->delivery_price = $this->getDeliveryPirce($request->delivery_price);
         $user->online_prices = $request->online_prices;
+        $user->with_dolar = $request->with_dolar;
+        $user->order_description = $request->order_description;
         $user->save();
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {
@@ -64,6 +67,13 @@ class UserController extends Controller
             return false;
         }
         return true;
+    }
+
+    function getDeliveryPirce($delivery_price) {
+        if ($delivery_price != 0 || $delivery_price != '') {
+            return $delivery_price;
+        }
+        return null;
     }
 
     function updateImage(Request $request) {
@@ -130,13 +140,13 @@ class UserController extends Controller
         return Auth()->user()->percentage_card;
     }
 
-    function setPercentageCard($percentage_card) {
+    function setPercentageCard(Request $request) {
         $user_id = Auth()->user()->id;
         $user = User::find($user_id);
-        $user->percentage_card = $percentage_card;
+        $user->percentage_card = $request->percentage_card;
         $user->save();
         foreach ($user->employees as $employee) {
-            $employee->percentage_card = $percentage_card;
+            $employee->percentage_card = $request->percentage_card;
             $employee->save();
         }
     }

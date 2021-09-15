@@ -13,6 +13,7 @@ class ArticleAdvise extends Mailable
 
     public $buyer;
     public $article;
+    public $url;
 
     /**
      * Create a new message instance.
@@ -23,6 +24,7 @@ class ArticleAdvise extends Mailable
     {
         $this->buyer = $buyer;
         $this->article = $article;
+        $this->url = 'https://'.$article->user->online.'/articulos/'.$article->slug;
     }
 
     /**

@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Database\Seeder;
 use App\Category;
+use App\User;
+use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
 {
@@ -45,5 +46,13 @@ class CategorySeeder extends Seeder
             'name'    => 'Calzado',
             'user_id' => $marcos->id,
         ]);
+        $user = User::where('company_name', 'Fiushh')->first();
+        $categories = ['Celulares', 'Cargadores', 'Auriculares'];
+        foreach ($categories as $category) {
+            Category::create([
+                'name'    => $category,
+                'user_id' => $user->id,
+            ]);
+        }
     }
 }

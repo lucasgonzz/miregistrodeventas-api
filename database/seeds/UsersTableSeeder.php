@@ -16,16 +16,19 @@ class UsersTableSeeder extends Seeder
         
         $commerce = User::create([
             'name'            => 'Mi Negocio',
+            'city'            => 'Gualeguay',
             'online'          => 'http://localhost:8080',
             'email'           => 'marcos@gmail.com',
             'company_name'    => 'Mi Negocio',
             'status'          => 'trial',
             'password'        => bcrypt('1234'),
             'percentage_card' => 20,
-            'deliver_amount'  => 70,
+            'has_delivery' => 1,
+            'delivery_price'  => 70,
             'online_prices'  => 'all',
             'online' => 'http://kioscoverde.local:8080',
             'online_prices' => 'only_registered',
+            'order_description' => '¿Hay que envolver algo?',
             // 'admin_id'      => $admin->id,
             'created_at'      => Carbon::now()->subMonths(2),
             'expire'          => Carbon::now()->subDay(),
@@ -42,6 +45,27 @@ class UsersTableSeeder extends Seeder
             'expire' => Carbon::now()->addWeeks(4),
         ]);
         $lucas->roles()->sync([1,2]);
+
+        $commerce = User::create([
+            'name'            => 'Lucas',
+            'city'            => 'Rosario',
+            'online'          => 'http://localhost:8080',
+            'email'           => 'marcos2@gmail.com',
+            'company_name'    => 'Fiushh',
+            'status'          => 'trial',
+            'password'        => bcrypt('1234'),
+            'percentage_card' => 20,
+            'has_delivery' => 1,
+            'delivery_price'  => 70,
+            'online_prices'  => 'all',
+            'online' => 'http://kioscoverde.local:8080',
+            'order_description' => 'Observaciones',
+            'with_dolar' => 1,
+            // 'admin_id'      => $admin->id,
+            'created_at'      => Carbon::now()->subMonths(2),
+            'expire'          => Carbon::now()->subDay(),
+        ]);
+        $commerce->roles()->sync([1,3]);
 
         $commerce = User::create([
             'name' => 'Fran',

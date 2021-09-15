@@ -23,7 +23,7 @@ class CreateBuyersTable extends Migration
             $table->string('city', 128)->nullable();
             // $table->string('address', 128)->nullable();
             // $table->string('address_number', 128)->nullable();
-            $table->string('phone', 128)->unique()->nullable();
+            $table->string('phone', 128)->nullable();
             $table->string('email', 128)->nullable();
             $table->string('provider_id', 128)->nullable();
             $table->dateTime('last_login')->nullable();
@@ -31,7 +31,7 @@ class CreateBuyersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 128)->nullable();
             $table->string('remember_token', 128)->nullable();
-            $table->integer('user_id')->unsigned();
+            $table->integer('user_id')->unsigned()->nullable();
             $table->string('customer_id')->nullable();
             $table->string('cards')->nullable();
             
