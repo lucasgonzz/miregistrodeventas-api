@@ -28,7 +28,7 @@ class ProvidersTableSeeder extends Seeder
     		'La Pampa',
     		'Gualeguay',
     	];
-        $user = User::where('name', 'Mi negocio')->first();
+        $user = User::where('company_name', 'Fiushh')->first();
     	foreach ($providers as $provider) {
 	        Provider::create([
 	        	'name' => $provider,

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Advise;
 use App\Article;
+use App\Description;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Mail\ArticleAdvise;
@@ -25,8 +26,33 @@ class ArticleHelper {
     }
 
     static function setTags($article, $tags) {
+        $article->tags()->sync([]);
         foreach ($tags as $tag) {
             $article->tags()->attach($tag['id']);
+        }
+    }
+
+    static function setDescriptions($article, $descriptions) {
+        $article_descriptions = Description::where('article_id', $article->id)
+                                            ->get();
+        foreach ($article_descriptions as $article_description) {
+            $article_description->delete();
+        }
+        foreach ($descriptions as $description) {
+            if (isset($description['content']) && !is_null($description['content'])) {
+                Description::create([
+                    'title'      => isset($description['title']) ? StringHelper::onlyFirstWordUpperCase($description['title']) : null,
+                    'content'    => $description['content'],
+                    'article_id' => $article->id,
+                ]);
+            }
+        }
+    }
+
+    static function setColors($article, $colors) {
+        $article->colors()->sync([]);
+        foreach ($colors as $color) {
+            $article->colors()->attach($color['id']);
         }
     }
 
@@ -90,6 +116,8 @@ class ArticleHelper {
 	static function getFullArticle($article_id) {
 		$article = Article::where('id', $article_id)
                             ->with('images')
+                            ->with('descriptions')
+                            ->with('colors')
                             ->with('sub_category')
                             ->with('variants')
                             ->with('specialPrices')

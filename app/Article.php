@@ -13,8 +13,16 @@ class Article extends Model
         return $this->morphMany('App\View', 'viewable');
     }
 
+    function descriptions() {
+        return $this->hasMany('App\Description');
+    }
+
     function tags() {
         return $this->belongsToMany('App\Tag');
+    }
+
+    function colors() {
+        return $this->belongsToMany('App\Color');
     }
 
     function variants() {

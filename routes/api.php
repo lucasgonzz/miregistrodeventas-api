@@ -14,6 +14,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		$user = App\User::where('id', $user->id)
 						->with('permissions')
 						->with('roles')
+						->with('addresses')
 						->with('schedules')
 						// ->with('workdays')
 						->first();
@@ -29,6 +30,12 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::get('/user/trial/contratar-servicio', 
 		'UserController@contratarServicio'
+	);
+	Route::post('/addresses', 
+		'AddressController@store'
+	);
+	Route::delete('/addresses/{id}', 
+		'AddressController@delete'
 	);
 
 	// -----------------------SUPER--------------------------------------------------
@@ -192,6 +199,10 @@ Route::middleware('auth:sanctum')->group(function () {
 		);
 		Route::post('tags', 
 			'TagController@store'
+		);
+		// Colors
+		Route::get('colors', 
+			'ColorController@index'
 		);
 
 	// --------------------------------------------------------------------------------------

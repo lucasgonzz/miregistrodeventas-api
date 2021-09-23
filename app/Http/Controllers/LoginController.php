@@ -66,6 +66,7 @@ class LoginController extends Controller
                 $user = User::where('id', Auth::user()->id)
                                 ->with('roles')
                                 ->with('permissions')
+                                ->with('addresses')
                                 ->first();
                 return response()->json([
                     'login' => true,

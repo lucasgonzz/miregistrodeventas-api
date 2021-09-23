@@ -29,7 +29,6 @@ class CreateArticlesTable extends Migration
             // $table->boolean('uncontable')->default(0);
             // $table->enum('measurement', ['gramo', 'kilo'])->nullable();
             $table->integer('featured')->nullable();
-            $table->text('description')->nullable();
 
             $table->foreign('user_id')
                     ->references('id')->on('users');

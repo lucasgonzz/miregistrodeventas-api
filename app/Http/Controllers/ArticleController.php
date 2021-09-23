@@ -30,6 +30,8 @@ class ArticleController extends Controller
                                 ->where('status', 'active')
                                 ->orderBy('created_at', 'DESC')
                                 ->with('images')
+                                ->with('colors')
+                                ->with('descriptions')
                                 ->with('sub_category')
                                 ->with('variants')
                                 ->with('tags')
@@ -50,40 +52,40 @@ class ArticleController extends Controller
         return response()->json(['articles' => $articles], 200);
     }
 
-    function paginated() {
-        $user = Auth()->user();
-        if ($user->hasRole('commerce')) {
-        	$articles = Article::where('user_id',$this->userId())
-                                ->orderBy('id', 'DESC')
-                                ->with('marker')
-                                ->with('images')
-                                ->with('sub_category')
-                                ->with('variants')
-                                ->with('specialPrices')
-                                ->with(['providers' => function($q) {
-                                    $q->orderBy('cost', 'asc');
-                                }])
-                                ->paginate(10);
-        } else {
-            $articles = Article::where('user_id',$this->userId())
-                                ->orderBy('id', 'DESC')
-                                ->with('marker')
-                                ->with('images')
-                                ->with('sub_category')
-                                ->paginate(10);
-        }
-    	return [
-                'pagination' => [
-                    'total' => $articles->total(),
-                    'current_page' => $articles->currentPage(),
-                    'per_page' => $articles->perPage(),
-                    'last_page' => $articles->lastPage(),
-                    'from' => $articles->firstItem(),
-                    'to' => $articles->lastPage(),
-                ],
-                'articles' => $articles 
-            ];
-    }
+    // function paginated() {
+    //     $user = Auth()->user();
+    //     if ($user->hasRole('commerce')) {
+    //     	$articles = Article::where('user_id',$this->userId())
+    //                             ->orderBy('id', 'DESC')
+    //                             ->with('marker')
+    //                             ->with('images')
+    //                             ->with('sub_category')
+    //                             ->with('variants')
+    //                             ->with('specialPrices')
+    //                             ->with(['providers' => function($q) {
+    //                                 $q->orderBy('cost', 'asc');
+    //                             }])
+    //                             ->paginate(10);
+    //     } else {
+    //         $articles = Article::where('user_id',$this->userId())
+    //                             ->orderBy('id', 'DESC')
+    //                             ->with('marker')
+    //                             ->with('images')
+    //                             ->with('sub_category')
+    //                             ->paginate(10);
+    //     }
+    // 	return [
+    //             'pagination' => [
+    //                 'total' => $articles->total(),
+    //                 'current_page' => $articles->currentPage(),
+    //                 'per_page' => $articles->perPage(),
+    //                 'last_page' => $articles->lastPage(),
+    //                 'from' => $articles->firstItem(),
+    //                 'to' => $articles->lastPage(),
+    //             ],
+    //             'articles' => $articles 
+    //         ];
+    // }
 
     function mostViewed($weeks_ago) {
         $articles = Article::where('user_id', $this->userId())
@@ -91,6 +93,7 @@ class ArticleController extends Controller
                                 $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
                             }])
                             ->with('images')
+                            ->with('colors')
                             ->with('views.buyer')
                             ->take(50)
                             ->withCount('views')
@@ -133,6 +136,8 @@ class ArticleController extends Controller
         ArticleHelper::checkAdvises($article);
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
+        ArticleHelper::setDescriptions($article, $request->descriptions);
+        ArticleHelper::setColors($article, $request->colors);
         if ($request->new_stock != 0) {
             $article->providers()
                             ->attach(
@@ -351,6 +356,8 @@ class ArticleController extends Controller
         $article->user_id = $user->id;
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
+        ArticleHelper::setDescriptions($article, $request->descriptions);
+        ArticleHelper::setColors($article, $request->colors);
         if ($user->hasRole('commerce')) {
             $article->providers()->attach($request->provider_id, [
                                             'amount' => $request->stock,
@@ -410,84 +417,84 @@ class ArticleController extends Controller
         $article->save();
     }
 
-    function filter(Request $request) {
-        $user = Auth()->user();
-        $mostrar = $request->mostrar;
-        $type = $request->type;
-        // $ordenar = $request->ordenar;
-        $precio_entre = $request->precio_entre;
-        $precio_minimo = (float)$request->precio_entre['min'];
-        $precio_maximo = (float)$request->precio_entre['max'];
-        $fecha_minimo = $request->fecha_entre['min'];
-        $fecha_maximo = $request->fecha_entre['max'];
+    // function filter(Request $request) {
+    //     $user = Auth()->user();
+    //     $mostrar = $request->mostrar;
+    //     $type = $request->type;
+    //     // $ordenar = $request->ordenar;
+    //     $precio_entre = $request->precio_entre;
+    //     $precio_minimo = (float)$request->precio_entre['min'];
+    //     $precio_maximo = (float)$request->precio_entre['max'];
+    //     $fecha_minimo = $request->fecha_entre['min'];
+    //     $fecha_maximo = $request->fecha_entre['max'];
 
-        $articles = Article::where('user_id', $this->userId());
+    //     $articles = Article::where('user_id', $this->userId());
 
-        // Ordenar
-        // if ($ordenar == 'nuevos-viejos') {
-        //     $articles = $articles->orderBy('created_at', 'DESC');
-        // }
-        // if ($ordenar == 'viejos-nuevos') {
-        //     $articles = $articles->orderBy('created_at', 'ASC');
-        // }
-        // if ($ordenar == 'caros-baratos') {
-        //     $articles = $articles->orderBy('price', 'DESC');
-        // }
-        // if ($ordenar == 'baratos-caros') {
-        //     $articles = $articles->orderBy('price', 'ASC');
-        // }
+    //     // Ordenar
+    //     // if ($ordenar == 'nuevos-viejos') {
+    //     //     $articles = $articles->orderBy('created_at', 'DESC');
+    //     // }
+    //     // if ($ordenar == 'viejos-nuevos') {
+    //     //     $articles = $articles->orderBy('created_at', 'ASC');
+    //     // }
+    //     // if ($ordenar == 'caros-baratos') {
+    //     //     $articles = $articles->orderBy('price', 'DESC');
+    //     // }
+    //     // if ($ordenar == 'baratos-caros') {
+    //     //     $articles = $articles->orderBy('price', 'ASC');
+    //     // }
 
-        // Type
-        if ($type === 'markers') {
-            $articles = $articles->whereHas('marker');
-        } else if ($type === 'featured') {
-            $articles = $articles->whereNotNull('featured');
-        }
+    //     // Type
+    //     if ($type === 'markers') {
+    //         $articles = $articles->whereHas('marker');
+    //     } else if ($type === 'featured') {
+    //         $articles = $articles->whereNotNull('featured');
+    //     }
 
-        if ($user->hasRole('commerce')) {
-            $articles = $articles->with('providers');
-            // $provider = $request->provider;
-            // if ($provider != 0) {
-            //     $articles = $articles->whereHas('providers', function(Builder $q) use ($provider) {
-            //         $q->where('provider_id', $provider);
-            //     });
-            // }
-        }
+    //     if ($user->hasRole('commerce')) {
+    //         $articles = $articles->with('providers');
+    //         // $provider = $request->provider;
+    //         // if ($provider != 0) {
+    //         //     $articles = $articles->whereHas('providers', function(Builder $q) use ($provider) {
+    //         //         $q->where('provider_id', $provider);
+    //         //     });
+    //         // }
+    //     }
 
-        // Categorias
-        $category = $request->category;
-        if ($category != 0) {
-            $articles = $articles->where('category_id', $category);
-        }
+    //     // Categorias
+    //     $category = $request->category;
+    //     if ($category != 0) {
+    //         $articles = $articles->where('category_id', $category);
+    //     }
 
-        // Proveedores
-        // $provider = $request->provider;
-        // if ($provider != 0) {
-        //     $articles = $articles->whereHas('providers', function(Builder $q) use($provider) {
-        //         $q->where('provider_id', $provider);
-        //     });
-        // }
+    //     // Proveedores
+    //     // $provider = $request->provider;
+    //     // if ($provider != 0) {
+    //     //     $articles = $articles->whereHas('providers', function(Builder $q) use($provider) {
+    //     //         $q->where('provider_id', $provider);
+    //     //     });
+    //     // }
 
-        if ($precio_minimo != '' && $precio_maximo != '') {
-            $articles = $articles->whereBetween('offer_price', 
-                                                    [$precio_minimo, $precio_maximo]
-                                                )->orWhereBetween('price', 
-                                                    [$precio_minimo, $precio_maximo]
-                                                );
-        }
+    //     if ($precio_minimo != '' && $precio_maximo != '') {
+    //         $articles = $articles->whereBetween('offer_price', 
+    //                                                 [$precio_minimo, $precio_maximo]
+    //                                             )->orWhereBetween('price', 
+    //                                                 [$precio_minimo, $precio_maximo]
+    //                                             );
+    //     }
 
-        if ($fecha_minimo != '' && $fecha_maximo != '') {
-            $fecha_maximo = new Carbon($fecha_maximo);
-            $fecha_maximo->addDay();
-            $articles = $articles->whereBetween('created_at', 
-                                                    [$fecha_minimo, $fecha_maximo]
-                                                );
-        }
+    //     if ($fecha_minimo != '' && $fecha_maximo != '') {
+    //         $fecha_maximo = new Carbon($fecha_maximo);
+    //         $fecha_maximo->addDay();
+    //         $articles = $articles->whereBetween('created_at', 
+    //                                                 [$fecha_minimo, $fecha_maximo]
+    //                                             );
+    //     }
 
-        $articles->with('images');
-        $articles = $articles->get();
-        return response()->json(['articles' => $articles], 200);
-    }
+    //     $articles->with('images');
+    //     $articles = $articles->get();
+    //     return response()->json(['articles' => $articles], 200);
+    // }
 
     function export() {
         return Excel::download(new ArticlesExport, 'miregistrodeventas-articulos.xlsx');

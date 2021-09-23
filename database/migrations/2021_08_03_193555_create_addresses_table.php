@@ -19,9 +19,10 @@ class CreateAddressesTable extends Migration
             $table->string('street_number');
             $table->string('lat');
             $table->string('lng');
-            $table->integer('buyer_id')->unsigned();
             $table->string('depto')->nullable();
             $table->string('description')->nullable();
+            $table->integer('buyer_id')->unsigned()->nullable();
+            $table->integer('user_id')->unsigned()->nullable();
             $table->timestamps();
         });
     }

@@ -1,6 +1,7 @@
 <?php
 
 use App\Article;
+use App\Description;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Image;
 use App\Provider;
@@ -64,8 +65,26 @@ class ArticlesTableSeeder extends Seeder
                     'sub_category_id'  => $this->subcategoryId($user_id, $i),
                     'created_at'   => Carbon::now()->subDays($i),
                     'featured' => $i < 8 ? $i : null,
-                    'description' => 'Este es un producto muy lindo y tiene varias cosas para poder ver como son las funcionalidades que tiene para acemejarse acualquier otro producto que exista en el mundo y todas las cosas que eso conlleva. EL precio es todo lo que esta bien'
                 ]);
+                Description::create([
+                    'title'      => 'Almacentamiento',
+                    'content'    => 'Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal. Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal. Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal',
+                    'article_id' => $article->id,
+                ]);
+                Description::create([
+                    'title'      => 'Pantalla',
+                    'content'    => 'Tiene una pantalla muy linda y bueno nada esta todo re bien viste mas que bien',
+                    'article_id' => $article->id,
+                ]);
+                Description::create([
+                    'title'      => 'Bateria',
+                    'content'    => 'La bateria se la re aguanta mal mal mal La bateria se la re aguanta mal mal mal La bateria se la re aguanta mal mal mal ',
+                    'article_id' => $article->id,
+                ]);
+                $article->colors()->attach([1,2,3,4,rand(5,12)]);
+                // for ($i=0; $i < 2; $i++) { 
+                //     $article->colors()->attach(rand(1, 12));
+                // }
                 for ($j=0; $j < 1; $j++) { 
                     Image::create([
                         'article_id' => $article->id,

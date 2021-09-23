@@ -43,6 +43,10 @@ class User extends Authenticatable
         return $this->hasMany('App\Article');
     }
 
+    public function addresses() {
+        return $this->hasMany('App\Address');
+    }
+
     public function articles_sub_user() {
         return $this->hasMany('App\Article', 'sub_user_id');
     }
