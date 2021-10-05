@@ -204,6 +204,10 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::get('colors', 
 			'ColorController@index'
 		);
+		// Conditions
+		Route::get('conditions', 
+			'ConditionController@index'
+		);
 
 	// --------------------------------------------------------------------------------------
 

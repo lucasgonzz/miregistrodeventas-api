@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Helpers;
 use App\Article;
 use App\Buyer;
 use App\Cart;
+use App\Color;
 use App\Events\OrderConfirmed as OrderConfirmedEvent;
 use App\Events\OrderFinished as OrderFinishedEvent;
 use App\Events\PaymentError as PaymentErrorEvent;
@@ -32,6 +33,22 @@ class OrderHelper {
     static function setArticlesKeyAndVariant($orders) {
         foreach ($orders as $order) {
             $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
+        }
+        return $orders;
+    }
+
+    static function setArticlesColor($orders) {
+        $colors = Color::all();
+        foreach ($orders as $order) {
+            foreach ($order->articles as $article) {
+                if (isset($article->pivot) && $article->pivot->color_id) {
+                    foreach ($colors as $color) {
+                        if ($color->id == $article->pivot->color_id) {
+                            $article->color = $color;
+                        }
+                    }
+                } 
+            }
         }
         return $orders;
     }

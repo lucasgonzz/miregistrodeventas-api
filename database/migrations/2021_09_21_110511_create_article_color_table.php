@@ -17,10 +17,10 @@ class CreateArticleColorTable extends Migration
             $table->id();
             $table->bigInteger('article_id')->unsigned();
             $table->bigInteger('color_id')->unsigned();
-            $table->foreign('article_id')
-                    ->references('id')->on('articles');
-            $table->foreign('color_id')
-                    ->references('id')->on('colors');
+            // $table->foreign('article_id')
+            //         ->references('id')->on('articles');
+            // $table->foreign('color_id')
+            //         ->references('id')->on('colors');
             $table->timestamps();
         });
     }

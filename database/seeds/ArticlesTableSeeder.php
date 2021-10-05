@@ -44,7 +44,7 @@ class ArticlesTableSeeder extends Seeder
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
         $iphones = ['Iphone 7', 'Iphone 7 plus', 'Iphone 8', 'Iphone 8 plus', 'Iphone 9', 'Iphone 9 plus', 'Iphone 10', 'Iphone 10 plus', 'Iphone 11', 'Iphone 11 plus', 'Cargador comun', 'Cabezal', 'Cargador comun', 'Cabezal', 'Auricular Bluetooth', 'Auricular con cable', 'Auricular Bluetooth', 'Auricular con cable'];
        
-        for ($user_id=1; $user_id < 4; $user_id++) { 
+        for ($user_id=1; $user_id < 3; $user_id++) { 
             if ($user_id < 3) {
                 $limit = count($names);
             } else {
@@ -56,7 +56,7 @@ class ArticlesTableSeeder extends Seeder
                 $bar_code = rand(1000000000000, 9999999999999);
                 $article = Article::create([
                     'bar_code'     => $bar_code,
-                    'name'         => $name,
+                    'name'         => $name.' '.$i,
                     'slug'         => ArticleHelper::slug($name),
                     'cost'         => 5,
                     'price'        => 10,
@@ -66,26 +66,9 @@ class ArticlesTableSeeder extends Seeder
                     'created_at'   => Carbon::now()->subDays($i),
                     'featured' => $i < 8 ? $i : null,
                 ]);
-                Description::create([
-                    'title'      => 'Almacentamiento',
-                    'content'    => 'Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal. Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal. Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal',
-                    'article_id' => $article->id,
-                ]);
-                Description::create([
-                    'title'      => 'Pantalla',
-                    'content'    => 'Tiene una pantalla muy linda y bueno nada esta todo re bien viste mas que bien',
-                    'article_id' => $article->id,
-                ]);
-                Description::create([
-                    'title'      => 'Bateria',
-                    'content'    => 'La bateria se la re aguanta mal mal mal La bateria se la re aguanta mal mal mal La bateria se la re aguanta mal mal mal ',
-                    'article_id' => $article->id,
-                ]);
+                $this->createDescriptions($article);
                 $article->colors()->attach([1,2,3,4,rand(5,12)]);
-                // for ($i=0; $i < 2; $i++) { 
-                //     $article->colors()->attach(rand(1, 12));
-                // }
-                for ($j=0; $j < 1; $j++) { 
+                for ($j=0; $j < 4; $j++) { 
                     Image::create([
                         'article_id' => $article->id,
                         'url'        => $this->imageUrl($user_id, $i, $j),
@@ -99,7 +82,7 @@ class ArticlesTableSeeder extends Seeder
                                                     'amount' => 15,
                                                 ]);
                 }
-                if ($user_id < 3 && $i < 10) {
+                if ($user_id < 4 && $i < 10) {
                     for ($j=0; $j < 7; $j++) { 
                         Variant::create([
                             'description' => 'Modelo '.$j,
@@ -129,6 +112,24 @@ class ArticlesTableSeeder extends Seeder
                 'url'        => $this->images[0],
             ]);
         }
+    }
+
+    function createDescriptions($article) {
+        Description::create([
+        'title'      => 'Almacentamiento',
+        'content'    => 'Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal. Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal. Este modelo nos entrega una importante capacidad de almacenamiento loco mal esta re zarpada pero mal mal mal',
+        'article_id' => $article->id,
+    ]);
+    Description::create([
+        'title'      => 'Pantalla',
+        'content'    => 'Tiene una pantalla muy linda y bueno nada esta todo re bien viste mas que bien',
+        'article_id' => $article->id,
+    ]);
+    Description::create([
+        'title'      => 'Bateria',
+        'content'    => 'La bateria se la re aguanta mal mal mal La bateria se la re aguanta mal mal mal La bateria se la re aguanta mal mal mal ',
+        'article_id' => $article->id,
+    ]);
     }
 
     function subcategoryId($user_id, $i) {

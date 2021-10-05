@@ -34,5 +34,6 @@ class DatabaseSeeder extends Seeder
         $this->call(MessageSeeder::class);
         $this->call(AddressSeeder::class);
         $this->call(WorkdaySeeder::class);
+        $this->call(ConditionSeeder::class);
     }
 }

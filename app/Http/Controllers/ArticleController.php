@@ -31,6 +31,7 @@ class ArticleController extends Controller
                                 ->orderBy('created_at', 'DESC')
                                 ->with('images')
                                 ->with('colors')
+                                ->with('condition')
                                 ->with('descriptions')
                                 ->with('sub_category')
                                 ->with('variants')
@@ -45,6 +46,9 @@ class ArticleController extends Controller
                                 ->orderBy('id', 'DESC')
                                 ->where('status', 'active')
                                 ->with('images')
+                                ->with('colors')
+                                ->with('condition')
+                                ->with('descriptions')
                                 ->with('tags')
                                 ->with('sub_category')
                                 ->get();
@@ -94,6 +98,7 @@ class ArticleController extends Controller
                             }])
                             ->with('images')
                             ->with('colors')
+                            ->with('condition')
                             ->with('views.buyer')
                             ->take(50)
                             ->withCount('views')
@@ -126,7 +131,6 @@ class ArticleController extends Controller
         $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
-        $article->description = $request->description;
         if (!$request->stock_null && $request->stock != '') {
             $article->stock = $request->stock;
             $article->stock += $request->new_stock;
@@ -138,6 +142,7 @@ class ArticleController extends Controller
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDescriptions($article, $request->descriptions);
         ArticleHelper::setColors($article, $request->colors);
+        ArticleHelper::setCondition($article, $request->condition_id);
         if ($request->new_stock != 0) {
             $article->providers()
                             ->attach(
@@ -349,7 +354,6 @@ class ArticleController extends Controller
         $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
-        $article->description = $request->description;
         if ($request->stock != '') {
             $article->stock = $request->stock;
         }
@@ -358,6 +362,7 @@ class ArticleController extends Controller
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDescriptions($article, $request->descriptions);
         ArticleHelper::setColors($article, $request->colors);
+        ArticleHelper::setCondition($article, $request->condition_id);
         if ($user->hasRole('commerce')) {
             $article->providers()->attach($request->provider_id, [
                                             'amount' => $request->stock,

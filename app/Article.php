@@ -25,6 +25,10 @@ class Article extends Model
         return $this->belongsToMany('App\Color');
     }
 
+    function condition() {
+        return $this->belongsTo('App\Condition');
+    }
+
     function variants() {
         return $this->hasMany('App\Variant');
     }

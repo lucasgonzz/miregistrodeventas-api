@@ -38,21 +38,32 @@ class ArticleHelper {
         foreach ($article_descriptions as $article_description) {
             $article_description->delete();
         }
-        foreach ($descriptions as $description) {
-            if (isset($description['content']) && !is_null($description['content'])) {
-                Description::create([
-                    'title'      => isset($description['title']) ? StringHelper::onlyFirstWordUpperCase($description['title']) : null,
-                    'content'    => $description['content'],
-                    'article_id' => $article->id,
-                ]);
+        if ($descriptions) {
+            foreach ($descriptions as $description) {
+                if (isset($description['content']) && !is_null($description['content'])) {
+                    Description::create([
+                        'title'      => isset($description['title']) ? StringHelper::onlyFirstWordUpperCase($description['title']) : null,
+                        'content'    => $description['content'],
+                        'article_id' => $article->id,
+                    ]);
+                }
             }
         }
     }
 
     static function setColors($article, $colors) {
         $article->colors()->sync([]);
-        foreach ($colors as $color) {
-            $article->colors()->attach($color['id']);
+        if ($colors) {
+            foreach ($colors as $color) {
+                $article->colors()->attach($color['id']);
+            }
+        }
+    }
+
+    static function setCondition($article, $condition_id) {
+        if ($condition_id) {
+            $article->condition_id = $condition_id;
+            $article->save();
         }
     }
 
@@ -118,6 +129,7 @@ class ArticleHelper {
                             ->with('images')
                             ->with('descriptions')
                             ->with('colors')
+                            ->with('condition')
                             ->with('sub_category')
                             ->with('variants')
                             ->with('specialPrices')

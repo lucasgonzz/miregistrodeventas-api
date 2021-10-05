@@ -23,10 +23,12 @@ class OrderController extends Controller
                         ->where('status', 'unconfirmed')
                         ->with('articles.images')
                         ->with('articles.variants')
+                        ->with('articles.colors')
                         ->with('buyer')
                         ->with('address')
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
+        $orders = OrderHelper::setArticlesColor($orders);
         return response()->json(['orders' => $orders], 200);
     }
     
@@ -36,11 +38,13 @@ class OrderController extends Controller
                         ->orWhere('status', 'finished')
                         ->with('articles.images')
                         ->with('articles.variants')
+                        ->with('articles.colors')
                         ->with('buyer')
                         ->with('address')
                         ->with('payment')
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
+        $orders = OrderHelper::setArticlesColor($orders);
         return response()->json(['orders' => $orders], 200);
     }
 
@@ -48,7 +52,9 @@ class OrderController extends Controller
         $order = Order::find($order_id);
         $order->status = 'confirmed';
         $order->save();
-        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
+        // $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
+        $orders = OrderHelper::setArticlesKeyAndVariant($orders);
+        $orders = OrderHelper::setArticlesColor($orders);
         OrderHelper::procesarPago($order);
         MessageHelper::sendOrderConfirmedMessage($order);
         OrderHelper::checkPaymentMethodError($order);

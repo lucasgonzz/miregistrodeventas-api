@@ -18,6 +18,7 @@ class ColorSeeder extends Seeder
             ['name' => 'Azul', 'value' => '#0000FF'],
             ['name' => 'Rosado', 'value' => '#e83e8c'],
             ['name' => 'Naranja', 'value' => '#fd7e14'],
+            ['name' => 'Coral', 'value' => '#ff7f50'],
             ['name' => 'Amarillo', 'value' => '#ffc107'],
             ['name' => 'Dorado', 'value' => '#EABE3F'],
             ['name' => 'Blanco', 'value' => '#ffffff'],
@@ -25,6 +26,7 @@ class ColorSeeder extends Seeder
             ['name' => 'Grafito', 'value' => '#464545'],
             ['name' => 'Silver', 'value' => '#C0C0C0'],
             ['name' => 'Verde', 'value' => '#28a745'],
+
         ];
         foreach ($colors as $color) {
             Color::create([

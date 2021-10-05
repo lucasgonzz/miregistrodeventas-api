@@ -12,8 +12,8 @@ class BuyerSeeder extends Seeder
      */
     public function run()
     {
-        for ($user_id=1; $user_id < 4; $user_id++) { 
-            for ($i=0; $i < 20; $i++) { 
+        for ($user_id=1; $user_id < 3; $user_id++) { 
+            for ($i=0; $i < 10; $i++) { 
                 $lucas = Buyer::create([
                     'name' => 'Lucas '.$i,
                     'surname' => 'Gonzalez',
@@ -23,15 +23,15 @@ class BuyerSeeder extends Seeder
                     'password' => bcrypt('1234'),
                     'user_id' => $user_id,
                 ]);
-                Buyer::create([
-                    'name' => 'Marcos '.$i,
-                    'surname' => 'Gonzalez',
-                    'city' => 'Gualeguay',
-                    'phone' => '+549344461213'.$i,
-                    'email' => 'Lucas@gmail.com',
-                    'password' => bcrypt('1234'),
-                    'user_id' => $user_id,
-                ]);
+                // Buyer::create([
+                //     'name' => 'Marcos '.$i,
+                //     'surname' => 'Gonzalez',
+                //     'city' => 'Gualeguay',
+                //     'phone' => '+549344461213'.$i,
+                //     'email' => 'Lucas@gmail.com',
+                //     'password' => bcrypt('1234'),
+                //     'user_id' => $user_id,
+                // ]);
             }
         }
     }
