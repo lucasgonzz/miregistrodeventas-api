@@ -26,6 +26,7 @@ class OrderController extends Controller
                         ->with('articles.colors')
                         ->with('buyer')
                         ->with('address')
+                        ->with('cupons')
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         $orders = OrderHelper::setArticlesColor($orders);
@@ -42,6 +43,7 @@ class OrderController extends Controller
                         ->with('buyer')
                         ->with('address')
                         ->with('payment')
+                        ->with('cupons')
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         $orders = OrderHelper::setArticlesColor($orders);
@@ -53,8 +55,8 @@ class OrderController extends Controller
         $order->status = 'confirmed';
         $order->save();
         // $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
-        $orders = OrderHelper::setArticlesKeyAndVariant($orders);
-        $orders = OrderHelper::setArticlesColor($orders);
+        $orders = OrderHelper::setArticlesKeyAndVariant([$order]);
+        $orders = OrderHelper::setArticlesColor([$order]);
         OrderHelper::procesarPago($order);
         MessageHelper::sendOrderConfirmedMessage($order);
         OrderHelper::checkPaymentMethodError($order);
@@ -92,6 +94,7 @@ class OrderController extends Controller
     function deliver($order_id) {
         $order = Order::where('id', $order_id)
                         ->with('articles')
+                        ->with('cupons')
                         ->first();
         $order->status = 'delivered';
         $order->save();

@@ -23,6 +23,7 @@ class CreateOrdersTable extends Migration
             $table->integer('address_id')->unsigned()->nullable();
             $table->string('description')->nullable();
             $table->enum('payment_method', ['efectivo', 'tarjeta']);
+            $table->decimal('percentage_card', 8, 2)->nullable();
 
             $table->timestamps();
         });

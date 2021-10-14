@@ -457,6 +457,16 @@ Route::middleware('auth:sanctum')->group(function () {
 	// --------------------------------------------------------------------------------------
 
 	// ONLINE
+	// Cupons
+	Route::get('cupons', 
+		'CuponController@index',
+	);
+	Route::post('cupons', 
+		'CuponController@store',
+	);
+	Route::delete('cupons/{id}', 
+		'CuponController@delete',
+	);
 	// Questions
 	Route::get('/questions', 
 		'QuestionController@index'

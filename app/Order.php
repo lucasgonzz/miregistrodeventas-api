@@ -16,6 +16,10 @@ class Order extends Model
         return $this->belongsTo('App\Buyer');
     }
 
+    function cupons() {
+        return $this->hasMany('App\Cupon');
+    }
+
     function user() {
         return $this->belongsTo('App\User');
     }
