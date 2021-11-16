@@ -252,12 +252,14 @@ class PdfController extends Controller
     	$user = Auth()->user();
     	if ($articles_ids_string == 'todos') {
     		$articles = Article::where('user_id', $this->userId())
+    							->where('status', 'active')
     							->orderBy('id', 'DESC')
     							->get();
     	} else {
     		$articles_ids = explode('-', $articles_ids_string);
 	    	foreach ($articles_ids as $id_article) {
 	    		$articles[] = Article::where('user_id', $this->userId())
+    									->where('status', 'active')
 	    								->where('id', $id_article)
 	    								->first();
 	    	}

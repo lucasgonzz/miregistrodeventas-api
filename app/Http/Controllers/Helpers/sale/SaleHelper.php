@@ -30,6 +30,18 @@ class SaleHelper extends Controller {
         }
     }
 
+    static function getPercentageCard($request) {
+        return (bool)$request->with_card ? Auth()->user()->percentage_card : null;
+    }
+
+    static function getSpecialPriceId($request) {
+            return $request->special_price_id != 0 ? $request->special_price_id : null;
+    }
+
+    static function getSaleType($request) {
+        return !is_null($request->sale_type) ? $request->sale_type : null;
+    }
+
     static function getNumSaleFromSaleId($sale_id) {
         $sale = Sale::where('id', $sale_id)
                     ->select('num_sale')
@@ -61,6 +73,18 @@ class SaleHelper extends Controller {
         return $pag;
     }
 
+    static function getArticleSalePrice($sale, $article) {
+        $price = (float)$article['price'];
+        if (!is_null($sale->special_price_id)) {
+            foreach ($article['special_prices'] as $special_price) {
+                if ($special_price['id'] == $sale->special_price_id) {
+                    $price = (float)$special_price['pivot']['price'];
+                }
+            }
+        }
+        return $price;
+    }
+
     static function attachArticles($sale, $articles) {
         foreach ($articles as $article) {
             $price = 0;
@@ -69,7 +93,7 @@ class SaleHelper extends Controller {
                                                         'cost' => isset($article['cost'])
                                                                     ? (float)$article['cost']
                                                                     : null,
-                                                        'price' => (float)$article['price'],
+                                                        'price' => Self::getArticleSalePrice($sale, $article),
                                                     ]);
             $article_ = Article::find($article['id']);
             if (isset($article['selected_variant_id'])) {

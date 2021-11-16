@@ -141,7 +141,7 @@ class MessageHelper {
         $advise->buyer->notify(new MessageSend($message));
         $advise->buyer->user->notify(new MessageSend($message, true));
         // Notification
-        $title = "Ingreso {$advise->article->name}";
+        $title = "Nuevo stock para {$advise->article->name}";
         TwilioHelper::sendNotification($advise->buyer_id, $title, $advise_message);
     }
 

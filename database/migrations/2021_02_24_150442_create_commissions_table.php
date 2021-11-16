@@ -20,7 +20,7 @@ class CreateCommissionsTable extends Migration
             $table->integer('page')->nullable();
             $table->integer('percentage')->nullable();
             $table->decimal('monto');
-            $table->decimal('saldo')->nullable();
+            $table->decimal('saldo', 10, 2)->nullable();
             $table->string('detalle')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->boolean('is_seller')->default(false);

@@ -8,6 +8,7 @@ use App\Description;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Mail\ArticleAdvise;
+use App\SpecialPrice;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
@@ -16,11 +17,27 @@ class ArticleHelper {
     static function checkAdvises($article) {
         $advises = Advise::where('article_id', $article->id)
                             ->get();
-        if (count($advises) >= 1) {
+        if ($article->stock >= 1 && count($advises) >= 1) {
             foreach ($advises as $advise) {
                 Mail::to($advise->buyer)->send(new ArticleAdvise($advise->buyer, $advise->article));
                 MessageHelper::sendArticleAdviseMessage($advise);
                 $advise->delete();
+            }
+        }
+    }
+
+    static function setSpecialPrices($article, $request) {
+        $special_prices = SpecialPrice::where('user_id', UserHelper::userId())->get();
+        if ($special_prices) {
+            $article->specialPrices()->sync([]);
+            foreach ($special_prices as $special_price) {
+                if ($request->{$special_price->name} != '') {
+                    $article->specialPrices()
+                    ->attach(
+                        $special_price->id, 
+                        ['price' => (double)$request->{$special_price->name}]
+                    );
+                }
             }
         }
     }

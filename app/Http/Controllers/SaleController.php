@@ -139,7 +139,7 @@ class SaleController extends Controller
         $sale = Sale::where('id', $sale->id)
                     ->with('articles')
                     ->with('client')
-                    ->with('specialPrice')
+                    ->with('special_price')
                     ->first();
         return response()->json(['sale' => $sale], 200);
     }
@@ -166,7 +166,7 @@ class SaleController extends Controller
                         ->with('buyer')
                         ->with('articles')
                         ->with('impressions')
-                        ->with('specialPrice')
+                        ->with('special_price')
                         ->with('commissions')
                         ->with('discounts')
                         ->orderBy('created_at', 'DESC')
@@ -207,7 +207,7 @@ class SaleController extends Controller
                         ->where('created_at', '<', $to)
                         ->with('articles')
                         ->with('impressions')
-                        ->with('specialPrice')
+                        ->with('special_price')
                         ->orderBy('id', 'DESC')
                         ->get();
     }
@@ -344,7 +344,7 @@ class SaleController extends Controller
                 ->with('articles')
                 ->with('impressions')
                 ->with('client')
-                ->with('specialPrice')
+                ->with('special_price')
                 ->with('commissions')
                 ->with('discounts')
                 ->orderBy('created_at', 'DESC')
@@ -365,7 +365,7 @@ class SaleController extends Controller
                 ->with('impressions')
                 ->with('client')
                 ->with('buyer')
-                ->with('specialPrice')
+                ->with('special_price')
                 ->with('commissions')
                 ->with('discounts')
                 ->orderBy('created_at', 'DESC')
@@ -435,22 +435,14 @@ class SaleController extends Controller
     }
 
     function store(Request $request) {
-        $with_card = (bool)$request->with_card;
-        $special_price_id = null;
-        if ($request->special_price_id != 0) {
-            $special_price_id = $request->special_price_id;
-        }
-        $user = Auth()->user();
-        $num_sale = SaleHelper::numSale($this->userId());
-        $percentage_card = $with_card ? $user->percentage_card : null;
         $sale = Sale::create([
-            'user_id' => $this->userId(),
-            'num_sale' => $num_sale,
-            'debt' => $request->debt,
-            'percentage_card' => $percentage_card,
-            'client_id' => $request->client_id,
-            'special_price_id' => $special_price_id,
-            'sale_type_id' => !is_null($request->sale_type) ? $request->sale_type : null,
+            'user_id'           => $this->userId(),
+            'num_sale'          => SaleHelper::numSale($this->userId()),
+            'debt'              => $request->debt,
+            'percentage_card'   => SaleHelper::getPercentageCard($request),
+            'client_id'         => $request->client_id,
+            'special_price_id'  => SaleHelper::getSpecialPriceId($request),
+            'sale_type_id'      => SaleHelper::getSaleType($request),
         ]);
         SaleHelper::attachArticles($sale, $request->articles);
         if ($request->client_id) {
@@ -461,7 +453,7 @@ class SaleController extends Controller
         }
         $sale = Sale::where('id', $sale->id)
                         ->with('client')
-                        ->with('specialPrice')
+                        ->with('special_price')
                         ->with('articles')
                         ->with('impressions')
                         ->with('discounts')
@@ -471,97 +463,10 @@ class SaleController extends Controller
         return response()->json(['sale' => $sale], 201);
     }
 
-    function pdf($sales_id, $company_name, $articles_cost, $articles_subtotal_cost, $articles_total_price, 
-                            $articles_total_cost, $borders) {
+    function pdf($sales_id, $for_commerce) {
         $sales_id = explode('-', $sales_id);
-        $pdf = new PdfPrintSale(
-                                    $sales_id, 
-                                    (bool)$company_name, 
-                                    (bool)$articles_cost, 
-                                    (bool)$articles_subtotal_cost, 
-                                    (bool)$articles_total_price, 
-                                    (bool)$articles_total_cost, 
-                                    (bool)$borders
-                                );
+        $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce);
         $pdf->printSales();
-        // $print_article = new PdfPrintArticle();
-        
     }
-    // function previusNext($index, $direction, $only_one_date = null) {
-    //     $user = Auth()->user();
-    //     if (is_null($only_one_date)) {
-    //         $carbon = Carbon::now('America/Argentina/Buenos_Aires');
-    //         $date = $carbon->subDays($index);
-    //     } else {
-    //         $carbon = Carbon::create($only_one_date);
-    //         if ($direction == 'previus') {
-    //             $date = $carbon->subDays($index);
-    //         } else {
-    //             $date = $carbon->addDays($index);
-    //         }
-    //     }
-    //     $sales = [];
-
-    //     // Se obtine la fecha de la primer compra para saber cuando dejar de buscar
-    //     $limit_sale = Sale::where('user_id', $this->userId())
-    //                         ->orderBy('id', 'ASC')
-    //                         ->first();
-    //     $limit_date = $limit_sale->created_at;
-
-    //     while (count($sales) == 0 && $date >= $limit_date && $date <= date('Y-m-d')) {
-    //         if ($user->hasRole('provider')) {
-    //             $sales = Sale::where('user_id', $this->userId())
-    //                                 ->whereDate('created_at', $date)
-    //                                 ->orderBy('id', 'DESC')
-    //                                 ->with('client')
-    //                                 ->with('articles')
-    //                                 ->orderBy('created_at', 'DESC')
-    //                                 ->get();
-    //         } else {
-    //             $sales = Sale::where('user_id', $this->userId())
-    //                                 ->whereDate('created_at', $date)
-    //                                 ->orderBy('id', 'DESC')
-    //                                 ->with('articles')
-    //                                 ->orderBy('created_at', 'DESC')
-    //                                 ->get();
-    //         }
-    //         if (count($sales) == 0) {
-    //             // echo "No tenia en: " . $index;
-    //             if ($index != 0) {
-    //                 if (is_null($only_one_date)) {
-    //                     if ($direction == 'previus') {
-    //                         $index++;
-    //                     } else {
-    //                         $index--;
-    //                     }
-    //                 } else {
-    //                     if ($direction == 'previus') {
-    //                         $index--;
-    //                     } else {
-    //                         $index++;
-    //                     }
-    //                 }
-    //             }
-    //             if (is_null($only_one_date)) {
-    //                 $carbon = Carbon::now('America/Argentina/Buenos_Aires');
-    //             } else {
-    //                 $carbon = Carbon::create($only_one_date);
-    //             }
-    //             if ($index == 0) {
-    //                 $date = date('Y-m-d');
-    //             } else {
-    //                 if ($direction == 'previus') {
-    //                     $date = $carbon->subDays($index);
-    //                 } else {
-    //                     $date = $carbon->addDays($index);
-    //                 }
-    //             }
-    //         }
-    //     }
-    //     return [
-    //         'index' => $index,
-    //         'sales' => $sales
-    //     ];
-    // }
     
 }

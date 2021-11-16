@@ -17,7 +17,7 @@ class CreateSellersTable extends Migration
             $table->id();
             $table->string('name');
             $table->string('surname')->nullable();
-            $table->double('commission');
+            $table->double('commission')->nullable();
             $table->integer('user_id')->unsigned();
             $table->integer('seller_id')->nullable()->unsigned();
 

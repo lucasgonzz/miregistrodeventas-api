@@ -8,21 +8,20 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
 
-class MessageSend extends Notification
+class UpdatedArticle extends Notification
 {
     use Queueable;
-    private $message;
-    private $for_commerce;
+
+    public $article;
 
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($message, $for_commerce = false)
+    public function __construct($article)
     {
-        $this->message = $message;
-        $this->for_commerce = $for_commerce;
+        $this->article = $article;
     }
 
     /**
@@ -38,17 +37,13 @@ class MessageSend extends Notification
 
     public function broadcastOn()
     {
-        if (!$this->for_commerce) {
-            return 'message.from_commerce.'.$this->message->buyer_id;
-        } else {
-            return 'message.from_buyer.'.$this->message->user_id;
-        }
+        return 'updated_article.'.$this->article->user_id;
     }
 
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'message' => $this->message,
+            'article' => $this->article,
         ]);
     }
 }

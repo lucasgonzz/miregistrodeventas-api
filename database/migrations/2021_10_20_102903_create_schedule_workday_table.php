@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateVariantsTable extends Migration
+class CreateScheduleWorkdayTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,10 @@ class CreateVariantsTable extends Migration
      */
     public function up()
     {
-        Schema::create('variants', function (Blueprint $table) {
+        Schema::create('schedule_workday', function (Blueprint $table) {
             $table->id();
-            $table->string('description');
-            $table->string('url');
-            $table->integer('stock')->nullable();
-            $table->unsignedBigInteger('article_id');
-            $table->foreign('article_id')->references('id')->on('articles');
+            $table->integer('schedule_id')->unsigned();
+            $table->integer('workday_id')->unsigned();
             $table->timestamps();
         });
     }
@@ -31,6 +28,6 @@ class CreateVariantsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('variants');
+        Schema::dropIfExists('schedule_workday');
     }
 }

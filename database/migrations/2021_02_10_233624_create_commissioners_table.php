@@ -19,6 +19,7 @@ class CreateCommissionersTable extends Migration
             $table->double('percentage')->nullable();
             $table->bigInteger('seller_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned();
+            
             $table->foreign('seller_id')
                     ->references('id')->on('sellers');
             $table->foreign('user_id')

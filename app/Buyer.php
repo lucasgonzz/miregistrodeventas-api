@@ -26,4 +26,8 @@ class Buyer extends Model
     function addresses() {
         return $this->hasMany('App\Address');
     }
+
+    function user() {
+        return $this->belongsTo('App\User');
+    }
 }

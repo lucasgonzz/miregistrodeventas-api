@@ -14,6 +14,10 @@ class CuponHelper {
 		return null;
 	}
 
+	static function isForNewBuyers($request) {
+		return $request['for_new_buyers'] == true;
+	}
+
 	static function getPercentage($request) {
 		if ($request['amount'] == '') {
 			return $request['percentage'];
@@ -24,6 +28,20 @@ class CuponHelper {
 	static function getExpirationDate($request) {
 		if ($request['expiration_date'] != '') {
 			return $request['expiration_date'];
+		}
+		return null;
+	}
+
+	static function getExpirationDays($request) {
+		if ($request['expiration_days'] != '') {
+			return $request['expiration_days'];
+		}
+		return null;
+	}
+
+	static function getMinAmount($request) {
+		if ($request['min_amount'] != '') {
+			return $request['min_amount'];
 		}
 		return null;
 	}

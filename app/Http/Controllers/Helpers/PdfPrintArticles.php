@@ -76,19 +76,19 @@ class PdfPrintArticles extends fpdf {
 				if ($column=='created_at' || $column=='updated_at') {
 					$this->Cell($w,10,date_format($article->{$column}, 'd/m/y'),'B',0,'C');
 				} else {
-					$align = 'L';
 					if ($column=='stock') {
 						$align = 'R';
-						$this->Cell($w,10,$this->stock($article),'B',0,$align);
+						$this->Cell($w,10,$this->stock($article),'B',0,'C');
 					} else {
 						if ($column=='name') {
+							$align = 'L';
 							if (strlen($article->{$column}) > 19) {
 								$article->{$column} = substr($article->{$column}, 0, 19) . '..';
 							}
 						}
 						if ($column=='price' || $column=='cost' || $column=='previus_price') {
-							$align = 'R';
-							$article->{$column} = $this->price($article->{$column});
+							$align = 'L';
+							$article->{$column} = '$'.$this->price($article->{$column});
 						}
 						$this->Cell($w,10,$article->{$column},'B',0,$align);
 					}
@@ -103,7 +103,8 @@ class PdfPrintArticles extends fpdf {
 			return '-';
 		} else {
 			if ($article->uncontable == 0) {
-				return substr($article->stock, 0, -3);
+				return $article->stock;
+				// return substr($article->stock, 0, -3);
 			} else {
 				if ($article->measurement == 'gramo') {
 					$measurement= 'gr';

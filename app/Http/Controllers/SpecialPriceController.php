@@ -9,6 +9,7 @@ class SpecialPriceController extends Controller
 {
     public function index() {
     	$special_prices = SpecialPrice::where('user_id', $this->userId())
+                            ->where('status', 'active')
     						->get();
         return response()->json(['special_prices' => $special_prices], 200);
     }
@@ -23,6 +24,8 @@ class SpecialPriceController extends Controller
 
     public function delete($id) {
     	$special_price = SpecialPrice::find($id);
-    	$special_price->delete();
+    	$special_price->status = 'inactive';
+        $special_price->save();
+        return response(null, 200);
     }
 }

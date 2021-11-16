@@ -36,6 +36,11 @@ class PermissionsTableSeeder extends Seeder
         Permission::create([
             'name' => 'Ver ventas',
         ]);
+
+        // Online
+        Permission::create([
+            'name' => 'Online',
+        ]);
         
     }
 }

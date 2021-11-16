@@ -14,22 +14,13 @@ require(__DIR__.'/../fpdf/fpdf.php');
 
 class PdfPrintSale extends fpdf {
 
-	function __construct($sales_id, $company_name, $articles_cost, $articles_subtotal_cost, $articles_total_price, $articles_total_cost, $borders) {
+	function __construct($sales_id, $for_commerce) {
 		parent::__construct();
 		$this->SetAutoPageBreak(true, 1);
-		// $this->client = $client;
 		$this->sales = [];
-		$this->company_name = $company_name;
-		$this->articles_cost = $articles_cost;
-		$this->articles_subtotal_cost = $articles_subtotal_cost;
-		$this->articles_total_price = $articles_total_price;
-		$this->articles_total_cost = $articles_total_cost;
+		$this->for_commerce = $for_commerce;
 		$this->initSales($sales_id);
-        if ($borders) {
-            $this->borders = 1;
-        } else {
-            $this->borders = 'B';
-        }
+		$this->borders = 'B';
 
 		/*
 			* Se fijan los valores dependiendo los campos que se quieran mostrar
@@ -37,18 +28,17 @@ class PdfPrintSale extends fpdf {
 		*/
 		$widths = [];
 		$widths['bar_code'] = 45;
-		$widths['name'] = 55;
-		$widths['price'] = 25;
+		$widths['name'] = 60;
+		$widths['price'] = 35;
 		$widths['amount'] = 25;
-		$widths['sub_total'] = 30;
+		$widths['sub_total'] = 35;
 		// 180
 
-		if($this->articles_cost) {
+		if($this->for_commerce) {
+			$widths['name'] = 55;
 			$widths['cost'] = 20;
 			$widths['price'] = 20;
 			$widths['amount'] = 20;
-		}
-		if ($this->articles_subtotal_cost) {
 			$widths['sub_total_cost'] = 20;
 			$widths['sub_total'] = 20;
 		}
@@ -71,6 +61,7 @@ class PdfPrintSale extends fpdf {
         $this->cantidad_articulos_de_esta_venta = 0;
 
 		$this->num_page = 0;
+		$this->Y = 220;
 	}
 
 	function initSales($sales_id) {
@@ -82,9 +73,10 @@ class PdfPrintSale extends fpdf {
             			// ->with('commissioners.seller')
             			->with('commissions')
             			->with('sale_type')
+            			->with('special_price')
             			->first();
             $this->sales[] = $sale;
-	        $this->articles_total_cost ? $type = 'commerce' : $type = 'client';
+	        $this->for_commerce ? $type = 'commerce' : $type = 'client';
         	Impression::create([
         		'sale_id' => $sale_id,
         		'type'    => $type,
@@ -109,50 +101,44 @@ class PdfPrintSale extends fpdf {
                 $this->SetArticleConf();	
                 if ($this->articulos_en_esta_pagina < $this->articulos_por_pagina 
                 	&& $this->articulos_en_esta_venta < $this->cantidad_articulos_de_esta_venta) {
-                	$this->sumarCostosYPrecios($article);
-                	$this->sumarCantidadDeArticulos();
-                    $this->printArticle($article);
+                	$this->addArticle($article);
                 } else {
 	                $this->num_page++;
-		            $this->printInfoPagina();
-			        $this->printArticulosInfo();
-		            $this->printPreciosPagina();
-            		$this->printPreciosPaginaConDescuento();
-            		$this->printComisiones();
-
+					$this->printPieDePagina();
+        			$this->Y = 220;
                     if ($this->articulos_en_esta_venta < $this->cantidad_articulos_de_esta_venta) {
-	                    // $this->suma_costos_venta += $this->suma_costos_pagina;
-	                    // $this->suma_precios_venta += $this->suma_precios_pagina;
-	                    $this->suma_costos_pagina = 0;
-	                    $this->suma_precios_pagina = 0;
-	                    $this->articulos_en_esta_pagina = 0;
-	                    $this->suma_costos_pagina += $article->pivot->cost * $article->pivot->amount;
-	                    $this->suma_precios_pagina += $article->pivot->price * $article->pivot->amount;
-	                    // $this->suma_precios_venta += $article->pivot->price * $article->pivot->amount;
-                		$this->sumarCantidadDeArticulos();
+	                    $this->resetPage();
                     	$this->AddPage();
                     	$this->__Header();
-                    	$this->SetArticleConf();
-	                    $this->printArticle($article);
+                		$this->addArticle($article);
                     }
                 }	# Termina if 
             }	# Termina for
 
             $this->num_page++;
-			// $this->SetLineWidth(.4);
-	        // $this->suma_costos_venta += $this->suma_costos_pagina;
-	        // $this->suma_precios_venta += $this->suma_precios_pagina;
-            $this->printInfoPagina();
-	        $this->printArticulosInfo();
-            $this->printPreciosPagina();
-            $this->printPreciosVenta();
-            $this->printPreciosPaginaConDescuento();
-            $this->printComisiones();
+			$this->printPieDePagina();
             $this->reset();
         }
         // dd($a);
         $this->Output();
         exit;
+	}
+
+	function addArticle($article) {
+		$this->sumarCostosYPrecios($article);
+		$this->sumarCantidadDeArticulos();
+        $this->printArticle($article);
+	}
+
+	function printPieDePagina() {
+		$this->printBorder();
+        $this->printInfoPagina();
+        $this->printPreciosCostosPagina();
+        $this->printPreciosCostosVenta();
+        $this->printPreciosConDescuento();
+        $this->printSaleTypeSaleDiscounts();
+        $this->printSpecialPrice();
+        $this->printComisiones();
 	}
 
 	function reset() {
@@ -164,6 +150,12 @@ class PdfPrintSale extends fpdf {
         // $this->suma_precios_venta = 0;
         $this->suma_costos_pagina = 0;
         $this->suma_precios_pagina = 0;
+	}
+
+	function resetPage() {
+		$this->suma_costos_pagina = 0;
+        $this->suma_precios_pagina = 0;
+        $this->articulos_en_esta_pagina = 0;
 	}
 
 	function setTotalPaginas() {
@@ -178,11 +170,20 @@ class PdfPrintSale extends fpdf {
 		}
 	}
 
+	function printBorder() {
+		$this->SetLineWidth(.6);
+		$this->Line(5,$this->Y,205,$this->Y);
+		// $this->Y += 5;
+	}
+
 	function printInfoPagina() {
-		$this->SetY(225);
+		$this->SetY($this->Y);
         $this->SetX(5);
         $this->SetFont('Arial', '', 10);
-        $this->Cell(100,5,'Página '.$this->num_page.' de '.$this->total_pages,0,0,'L');
+		$this->SetLineWidth(.2);
+        $this->Cell(100,5,'Página '.$this->num_page.' de '.$this->total_pages,'B',0,'L');
+		$this->Y += 5;
+		$this->printArticulosInfo();
 	}
 
 	function printArticulosInfo() {
@@ -191,59 +192,86 @@ class PdfPrintSale extends fpdf {
         } else {
         	$oracion = ' arículos en esta página';
         }
-        $this->Cell(100,5,$this->articulos_en_esta_pagina.$oracion,0,0,'L');
+        $this->Cell(100,5,$this->articulos_en_esta_pagina.$oracion,'B',0,'L');
 	}
 
-	function printPreciosPagina() {
-		$this->SetY(230);
-        $this->SetX(5);
-        $this->Cell(100,5,'Precios de esta página: $'.Numbers::price($this->suma_precios_pagina),0,0,'L');
-        if ($this->articles_total_cost) {
-	        // Ver la funcion price para hacerla global
-            $this->Cell(100,5,'Costos de esta página: $'.Numbers::price($this->suma_costos_pagina),0,0,'L');
-        }
-	}
-
-	function printPreciosVenta() {
-		$this->SetY(235);
-        $this->SetX(5);
-    	$this->Cell(100,5,'Precios de esta venta: $'.Numbers::price(SaleHelper::getTotalSale($this->sale, false)),0,0,'L');
-        if ($this->articles_total_cost) {
-        	$this->Cell(100,5,'Costos de esta venta: $'.Numbers::price(SaleHelper::getTotalCostSale($this->sale)),0,0,'L');
-        } 
-        if ($this->saleHasDiscounts()) {
-			$this->SetY(240);
+	function printPreciosCostosPagina() {
+		if ($this->total_pages > 1) {
+			$this->SetY($this->Y);
+			$this->Y += 5;
 	        $this->SetX(5);
-	    	$this->Cell(100,5,'Precios de esta venta con descuento: $'.Numbers::price(SaleHelper::getTotalSale($this->sale)),0,0,'L');
+	        $this->Cell(100,5,'Precios de esta página: $'.Numbers::price($this->suma_precios_pagina),'B',0,'L');
+	        if ($this->for_commerce) {
+		        // Ver la funcion price para hacerla global
+	            $this->Cell(100,5,'Costos de esta página: $'.Numbers::price($this->suma_costos_pagina),'B',0,'L');
+	        }
+		}
+	}
+
+	function printPreciosCostosVenta() {
+		$this->SetY($this->Y);
+		$this->Y += 5;
+        $this->SetX(5);
+    	$this->Cell(100,5,'Precios de esta venta: $'.Numbers::price(SaleHelper::getTotalSale($this->sale, false)),'B',0,'L');
+        if ($this->for_commerce) {
+        	$this->Cell(100,5,'Costos de esta venta: $'.Numbers::price(SaleHelper::getTotalCostSale($this->sale)),'B',0,'L');
+        } 
+	}
+
+	function printPreciosConDescuento() {
+        if ($this->saleHasDiscounts()) {
+			$this->SetY($this->Y);
+	        $this->SetX(5);
+	    	$this->Cell(100,5,'Precios venta con descuento: $'.Numbers::price(SaleHelper::getTotalSale($this->sale)),'B',0,'L');
+
+			if ($this->total_pages > 1) {
+				$precio_con_descuento = SaleHelper::getTotalMenosDescuentos($this->sale, $this->suma_precios_pagina);
+		 		$this->SetY($this->Y);
+				// $this->Y += 5;
+		    	$this->SetX(5);
+		    	$this->Cell(100,5,'Precio página con descuento: $'.Numbers::price($precio_con_descuento),'B',0,'L');
+				$this->Y += 5;
+			}
         }
 	}
 
-	function printPreciosPaginaConDescuento() {
-		if ($this->saleHasDiscounts()) {
+	function printSpecialPrice() {
+		if ($this->hasSaleSpecialPrice()) {
 			// $discount = DiscountHelper::getTotalDiscountsPercentage($this->sale->discounts, true);
 			$precio_con_descuento = SaleHelper::getTotalMenosDescuentos($this->sale, $this->suma_precios_pagina);
-	    	$Y = 245;
-	 		$this->SetY($Y);
+	 		$this->SetY($this->Y);
+			$this->Y += 5;
 	    	$this->SetX(5);
-	    	$this->Cell(100,5,'Precio página con descuento: $'.Numbers::price($precio_con_descuento),0,0,'L');
+	    	$this->Cell(100,5,'Precio para '.$this->sale->special_price->name,'B',0,'L');
 		}
-		$Y = 245;
- 		$this->SetY($Y);
-    	$this->SetX(105);
-    	$this->Cell(100,5,'Tipo venta: '.$this->sale->sale_type->name,0,0,'L');
+	}
+
+	function printSaleTypeSaleDiscounts() {
+	 	$this->SetY($this->Y);
+    	$this->SetX(5);
+    	if ($this->hasUserSaleTypes()) {
+	    	$this->Cell(100,5,'Tipo venta: '.$this->sale->sale_type->name,'B',0,'L');
+			$this->Y += 5;
+    	}
+    	$this->printSaleDiscounts();
+	}
+
+	function printSaleDiscounts() {
     	if ($this->saleHasDiscounts()) {
-	    	$Y += 5;
-	 		$this->SetY($Y);
+	 		$this->SetY($this->Y);
+			$this->Y += 5;
 	    	$this->SetX(105);
-	    	$this->Cell(100,5,'Descuentos: ',0,0,'L');
+	    	$this->Cell(100,5,'Descuentos: ','L',0,'L');
 	    	foreach ($this->sale->discounts as $discount) {
-		 		$Y += 5;
-		 		$this->SetY($Y);
+	 			$this->SetY($this->Y);
 		    	$this->SetX(105);
-	    		$this->Cell(100,5,$discount->name . ' ' . $discount->percentage . '%',0,0,'L');
+	    		$this->Cell(100,5,$discount->name . ' ' . $discount->percentage . '%','LB',0,'L');
 	    	}
     	}
-    	// $this->Cell(100,5,'Precios con descuento: '.Numbers::percentage($discount),0,0,'L');
+	}
+
+	function hasUserSaleTypes() {
+		return count(Auth()->user()->sale_types) >= 1;
 	}
 
 	function saleHasDiscounts() {
@@ -254,31 +282,37 @@ class PdfPrintSale extends fpdf {
 	}
 
 	function printComisiones() {
-		if ($this->articles_total_cost) {
+		if ($this->for_commerce && $this->hasSaleCommissions()) {
 			if ($this->saleHasDiscounts()) {
-				$Y = 250;
-			} else {
-				$Y = 245;
-			}
-	 		$this->SetY($Y);
+				$this->Y += 5;
+			} 
+	 		$this->SetY($this->Y);
 	    	$this->SetX(5);
-	    	$this->Cell(100,5,'Comisiones: ',0,0,'L');
+	    	$this->Cell(100,5,'Comisiones: ','B',0,'L');
 	    	// $commissioners = $this->getCommission();
 	    	// dd($commissioners);
 	    	$commissions = $this->getCommissions();
 	    	foreach ($commissions as $commission) {
-	    		$Y += 5;
-		 		$this->SetY($Y);
+				$this->Y += 5;
+	 			$this->SetY($this->Y);
 		    	$this->SetX(5);
-		    	$this->Cell(50,5,$commission->commissioner->name . ' ' . $commission->percentage . '%' ,0,0,'L');
-		    	$this->Cell(50,5, '$'.Numbers::price($commission->monto) ,0,0,'L');
+		    	$this->Cell(50,5,$commission->commissioner->name . ' ' . $commission->percentage . '%' ,'B',0,'L');
+		    	$this->Cell(50,5, '$'.Numbers::price($commission->monto) ,'B',0,'L');
 	    	}
-			$Y += 5;
-	 		$this->SetY($Y);
+			$this->Y += 5;
+ 			$this->SetY($this->Y);
 	    	$this->SetX(5);
-		    	$this->Cell(50,5, 'Total: ',0,0,'L');
-		    $this->Cell(50,5, '$'.$this->getTotalMenosComisiones() ,0,0,'L');
+		    	$this->Cell(50,5, 'Total: ','B',0,'L');
+		    $this->Cell(50,5, '$'.$this->getTotalMenosComisiones() ,'B',0,'L');
 		}
+	}
+
+	function hasSaleCommissions() {
+		return count($this->sale->commissions) >= 1;
+	}
+
+	function hasSaleSpecialPrice() {
+		return !is_null($this->sale->special_price_id);
 	}
 
 	function getCommissions() {
@@ -376,20 +410,19 @@ class PdfPrintSale extends fpdf {
 	}
 	
 	function printArticle($article) {
-		$this->SetLineWidth(.4);
-		$this->SetDrawColor(51,51,51);
+    	$this->SetArticleConf();
         $this->Cell($this->widths['bar_code'],6,$article->bar_code,$this->borders,0,'L');
         $name = $article->name;
         if (strlen($name) > 20) {
             $name = substr($article->name, 0, 20) . ' ..';
         }
         $this->Cell($this->widths['name'],6,$name,$this->borders,0,'L');
-        if ($this->articles_cost) {
+        if ($this->for_commerce) {
         	$this->Cell($this->widths['cost'],6,'$'.Numbers::price($article->pivot->cost),$this->borders,0,'L');
         }
         $this->Cell($this->widths['price'],6,'$'.Numbers::price($article->pivot->price),$this->borders,0,'L');
         $this->Cell($this->widths['amount'],6,PdfArticleHelper::amount($article),$this->borders,0,'L');
-        if ($this->articles_subtotal_cost) {
+        if ($this->for_commerce) {
             $this->Cell($this->widths['sub_total_cost'],6,'$'.Numbers::price(PdfArticleHelper::getSubTotalCost($article)),$this->borders,0,'L');
         }
         $this->Cell($this->widths['sub_total'],6,'$'.Numbers::price(PdfArticleHelper::getSubTotalPrice($article)),$this->borders,0,'L');
@@ -403,43 +436,41 @@ class PdfPrintSale extends fpdf {
 
 		// Si el nombre del negocio es verdaderop se escribe
 		// y se pone el cursor 1cm mas abajo
-		if ($this->company_name) {
-			$this->SetFont('Arial', 'B', 18, 'C');
-			$this->Cell(100,5,Auth()->user()->company_name,0,0,'L');
-			$this->SetY(35);
-		}
+		$this->SetFont('Arial', 'B', 18, 'C');
+		$this->Cell(100,5,Auth()->user()->company_name,0,0,'L');
+		$this->SetY(35);
 
 		// Se escribe la fecha
-		$this->SetXY(100, 10);
+		$this->SetXY(100, 5);
 		$this->SetFont('Arial', '', 11, 'C');
-		$this->Cell(50,5,'Venta n°: '.$this->sale->num_sale,0,0,'R');
-		if ($user->hasRole('provider')) {
-			$this->Cell(50,5,'Cliente: '.$this->client->name,0,0,'R');
+		$this->Cell(50,5,'Venta n°: '.$this->sale->num_sale,0,0,'L');
+		if ($this->sale->client_id) {
+			$this->Cell(50,5,'Cliente: '.$this->client->name,0,0,'L');
 		}
 		$this->Ln();
 		$this->SetX(100);
-		$this->Cell(50,5,'Fecha: '.date_format($this->sale->created_at, 'd/m/y'),0,0,'R');
-		$this->Cell(50,5,'Hora: '.date_format($this->sale->created_at, 'H:m'),0,0,'R');
+		$this->Cell(50,5,'Fecha: '.date_format($this->sale->created_at, 'd/m/y'),0,0,'L');
+		$this->Cell(50,5,'Hora: '.date_format($this->sale->created_at, 'H:m'),0,0,'L');
 		$this->Ln();
 		$this->SetX(100);
-		$this->Cell(50,5,'Artículos vendidos: '.count($this->sale->articles),0,0,'R');
+		$this->Cell(50,5,'Artículos vendidos: '.count($this->sale->articles),0,0,'L');
 		$this->SetLineWidth(.6);
-		$this->Line(5,27,205,27);
+		$this->Line(5,25,205,25);
 
 		// Se baja 1cm abajo
-		$this->SetY(32);
+		$this->SetY(27);
 
 		// Se empieza a escribir la cabecera
 		$this->SetX($this->margins);
 		$this->SetFont('Arial', 'B', 14, 'L');
 		$this->Cell($this->widths['bar_code'], 5, 'Codigo', 0, 0, 'L');
 		$this->Cell($this->widths['name'], 5, 'Artículo', 0, 0, 'L');
-		if ($this->articles_cost) {
+		if ($this->for_commerce) {
 			$this->Cell($this->widths['cost'], 5, 'Costo', 0, 0, 'L');
 		}
 		$this->Cell($this->widths['price'], 5, 'Precio', 0, 0, 'L');
 		$this->Cell($this->widths['amount'], 5, 'Cant', 0, 0, 'L');
-		if ($this->articles_subtotal_cost) {
+		if ($this->for_commerce) {
 			$this->Cell($this->widths['sub_total_cost'], 5, 'Sub C', 0, 0, 'L');
 		}
 		$this->Cell($this->widths['sub_total'], 5, 'Sub P', 0, 0, 'L');
@@ -447,9 +478,9 @@ class PdfPrintSale extends fpdf {
 		// Se dibuja la linea celeste que separa el thead del tbody
 		$this->SetLineWidth(.6);
 		// $this->SetDrawColor(100, 174, 238);
-		$this->Line($this->margins, 40, $this->margins+array_sum($this->widths), 40);
+		$this->Line($this->margins, 34, $this->margins+array_sum($this->widths), 34);
 
-		$this->SetY(42);
+		$this->SetY(34);
 	}
 
 	function __Footer() {

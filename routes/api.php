@@ -15,8 +15,6 @@ Route::middleware('auth:sanctum')->group(function () {
 						->with('permissions')
 						->with('roles')
 						->with('addresses')
-						->with('schedules')
-						// ->with('workdays')
 						->first();
 		return response()->json(['user' => $user], 200);
 	});
@@ -36,6 +34,26 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::delete('/addresses/{id}', 
 		'AddressController@delete'
+	);
+	// Workdays
+	Route::get('/workdays', 
+		'WorkdayController@index'
+	);
+	Route::put('/workdays/remove-schedule', 
+		'WorkdayController@removeSchedule'
+	);
+	Route::put('/workdays/add-schedule', 
+		'WorkdayController@addSchedule'
+	);
+	// Schedules
+	Route::get('/schedules', 
+		'ScheduleController@index'
+	);
+	Route::post('/schedules', 
+		'ScheduleController@store'
+	);
+	Route::put('/schedules', 
+		'ScheduleController@update'
 	);
 
 	// -----------------------SUPER--------------------------------------------------
@@ -334,6 +352,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	// Vendedores
 	Route::get('/sellers', 
 		'SellerController@index'
+	);
+	Route::post('/sellers', 
+		'SellerController@store'
 	);
 	// Devuelve las comisiones de las ventas que le corresponden al vendedor
 	Route::get('/commissions/from-commissioner/{commissioner_id}/{weeks_ago}', 

@@ -18,4 +18,17 @@ class UserHelper {
 	        }
         }
     }
+
+	static function isOscar() {
+        $user = Auth()->user();
+        if (is_null($user)) {
+        	return false;
+        } else {
+        	if (env('APP_ENV') == 'local') {
+	        	return $user->id == 3;
+        	} else {
+	        	return $user->id == 2;
+        	}
+        }
+    }
 }

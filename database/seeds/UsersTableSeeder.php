@@ -47,7 +47,7 @@ class UsersTableSeeder extends Seeder
             'online_prices'    => 'all',
             'online'            => 'http://kioscoverde.local:8080',
             'order_description' => 'Observaciones',
-            'with_dolar' => 1,
+            'with_dolar' => 0,
             // 'admin_id'      => $admin->id,
             'created_at'      => Carbon::now()->subMonths(2),
             'expire'          => Carbon::now()->subDay(),

@@ -17,23 +17,38 @@ class ProvidersTableSeeder extends Seeder
     public function run()
     {
     	$providers = [
-    		'Buenos Aires',
-    		'Rosario',
-    		'Victoria',
-    		'Galarza',
-    		'Cordoba',
-    		'Brazil',
-    		'Tucuman',
-    		'Santa Cruz',
-    		'La Pampa',
-    		'Gualeguay',
-    	];
+            'Buenos Aires',
+            'Rosario',
+            'Victoria',
+            'Galarza',
+            'Cordoba',
+            'Brazil',
+            'Tucuman',
+            'Santa Cruz',
+            'La Pampa',
+            'Gualeguay',
+        ];
+        $addresses = [
+            'San antonio 45',
+            'Cruz Migue 100',
+            '25 de mayo 50',
+            'Galarza 557',
+            'Cordoba 35',
+            'Vicotira 110',
+            'San Martin 1020',
+            'Maipu 695',
+            'Carmen Gadea 787',
+            'Pellegrini 1876',
+        ];
         $user = User::where('company_name', 'Fiushh')->first();
+        $index = 0;
     	foreach ($providers as $provider) {
 	        Provider::create([
 	        	'name' => $provider,
+                'address' => $addresses[$index],
 	        	'user_id' => $user->id,
 	        ]);
+            $index++;
     	}
 
     	$articles = Article::where('user_id', $user->id)->get();

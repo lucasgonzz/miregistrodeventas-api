@@ -8,6 +8,8 @@ use App\Exports\ArticlesExport;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Image;
 use App\Imports\ArticlesImport;
+use App\Notifications\CreatedArticle;
+use App\Notifications\UpdatedArticle;
 use App\SpecialPrice;
 use App\User;
 use App\Variant;
@@ -25,71 +27,23 @@ class ArticleController extends Controller
 
     function index() {
         $user = Auth()->user();
-        if ($user->hasRole('commerce')) {
-            $articles = Article::where('user_id',$this->userId())
-                                ->where('status', 'active')
-                                ->orderBy('created_at', 'DESC')
-                                ->with('images')
-                                ->with('colors')
-                                ->with('condition')
-                                ->with('descriptions')
-                                ->with('sub_category')
-                                ->with('variants')
-                                ->with('tags')
-                                ->with('specialPrices')
-                                ->with(['providers' => function($q) {
-                                    $q->orderBy('cost', 'asc');
-                                }])
-                                ->get();
-        } else {
-            $articles = Article::where('user_id',$this->userId())
-                                ->orderBy('id', 'DESC')
-                                ->where('status', 'active')
-                                ->with('images')
-                                ->with('colors')
-                                ->with('condition')
-                                ->with('descriptions')
-                                ->with('tags')
-                                ->with('sub_category')
-                                ->get();
-        }
+        $articles = Article::where('user_id',$this->userId())
+                            ->where('status', 'active')
+                            ->orderBy('created_at', 'DESC')
+                            ->with('images')
+                            ->with('colors')
+                            ->with('condition')
+                            ->with('descriptions')
+                            ->with('sub_category')
+                            ->with('variants')
+                            ->with('tags')
+                            ->with('specialPrices')
+                            ->with(['providers' => function($q) {
+                                $q->orderBy('cost', 'asc');
+                            }])
+                            ->get();
         return response()->json(['articles' => $articles], 200);
     }
-
-    // function paginated() {
-    //     $user = Auth()->user();
-    //     if ($user->hasRole('commerce')) {
-    //     	$articles = Article::where('user_id',$this->userId())
-    //                             ->orderBy('id', 'DESC')
-    //                             ->with('marker')
-    //                             ->with('images')
-    //                             ->with('sub_category')
-    //                             ->with('variants')
-    //                             ->with('specialPrices')
-    //                             ->with(['providers' => function($q) {
-    //                                 $q->orderBy('cost', 'asc');
-    //                             }])
-    //                             ->paginate(10);
-    //     } else {
-    //         $articles = Article::where('user_id',$this->userId())
-    //                             ->orderBy('id', 'DESC')
-    //                             ->with('marker')
-    //                             ->with('images')
-    //                             ->with('sub_category')
-    //                             ->paginate(10);
-    //     }
-    // 	return [
-    //             'pagination' => [
-    //                 'total' => $articles->total(),
-    //                 'current_page' => $articles->currentPage(),
-    //                 'per_page' => $articles->perPage(),
-    //                 'last_page' => $articles->lastPage(),
-    //                 'from' => $articles->firstItem(),
-    //                 'to' => $articles->lastPage(),
-    //             ],
-    //             'articles' => $articles 
-    //         ];
-    // }
 
     function mostViewed($weeks_ago) {
         $articles = Article::where('user_id', $this->userId())
@@ -123,14 +77,13 @@ class ArticleController extends Controller
         if ($article->price != $request->price) {
             $article->previus_price = $article->price;
             $article->timestamps = true;
+            $article->price = $request->price;
         }
-        // if (!$request->act_fecha) {
-        //     $article->timestamps = false;
-        // } 
-        $article->name = ucwords($request->name);
-        $article->slug = ArticleHelper::slug($request->name);
+        if (strtolower($article->name) != strtolower($request->name)) {
+            $article->name = ucfirst($request->name);
+            $article->slug = ArticleHelper::slug($request->name);
+        }
         $article->cost = $request->cost;
-        $article->price = $request->price;
         if (!$request->stock_null && $request->stock != '') {
             $article->stock = $request->stock;
             $article->stock += $request->new_stock;
@@ -153,20 +106,9 @@ class ArticleController extends Controller
                                     'price' => $request->price,
                                 ]);
         }
-        $special_prices = SpecialPrice::where('user_id', $this->userId())->get();
-        if ($special_prices) {
-            $article->specialPrices()->sync([]);
-            foreach ($special_prices as $special_price) {
-                if ($request->{$special_price->name} != '') {
-                    $article->specialPrices()
-                    ->attach(
-                        $special_price->id, 
-                        ['price' => (double)$request->{$special_price->name}]
-                    );
-                }
-            }
-        }
+        ArticleHelper::setSpecialPrices($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
+        $article->user->notify(new UpdatedArticle($article));
         return response()->json(['article' => $article], 200);
     }
 
@@ -350,7 +292,7 @@ class ArticleController extends Controller
         if ($request->sub_category_id != 0) {
             $article->sub_category_id = $request->sub_category_id;
         }
-        $article->name = ucfirst(strtolower($request->name));
+        $article->name = ucfirst($request->name);
         $article->slug = ArticleHelper::slug($request->name);
         $article->cost = $request->cost;
         $article->price = $request->price;
@@ -363,29 +305,16 @@ class ArticleController extends Controller
         ArticleHelper::setDescriptions($article, $request->descriptions);
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
-        if ($user->hasRole('commerce')) {
+        if ($request->provider_id != 0) {
             $article->providers()->attach($request->provider_id, [
                                             'amount' => $request->stock,
                                             'cost' => $request->cost,
                                             'price' => $request->price
                                         ]);
         }
-        $special_prices = SpecialPrice::where('user_id', $user->id)->get();
-        if ($special_prices) {
-            foreach ($special_prices as $special_price) {
-                if (isset($request->{$special_price->name})) {
-                    $article->specialPrices()
-                    ->attach(
-                        $special_price->id, 
-                        [
-                            'price' => (double)$request->{$special_price->name}
-                        ]
-                    );
-                }
-            }
-        }
-
+        ArticleHelper::setSpecialPrices($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
+        $article->user->notify(new CreatedArticle($article));
         return response()->json(['article' => $article], 201);
     }
 
@@ -502,7 +431,7 @@ class ArticleController extends Controller
     // }
 
     function export() {
-        return Excel::download(new ArticlesExport, 'miregistrodeventas-articulos.xlsx');
+        return Excel::download(new ArticlesExport, 'comerciocity-articulos.xlsx');
     }
 
     function import(Request $request) {

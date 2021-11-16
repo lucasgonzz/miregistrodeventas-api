@@ -17,8 +17,10 @@ class CreateCuponsTable extends Migration
             $table->id();
             $table->decimal('amount', 8, 2)->nullable();
             $table->decimal('percentage', 8, 2)->nullable();
+            $table->decimal('min_amount', 8, 2)->nullable();
             $table->dateTime('expiration_date')->nullable();
-            // $table->enum('status', ['used', ''])
+            $table->integer('expiration_days')->nullable();
+            $table->enum('type', ['normal', 'for_new_buyers'])->default('normal');
             $table->integer('cart_id')->unsigned()->nullable();
             $table->integer('order_id')->unsigned()->nullable();
             $table->integer('sale_id')->unsigned()->nullable();

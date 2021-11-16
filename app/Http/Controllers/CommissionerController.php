@@ -18,6 +18,7 @@ class CommissionerController extends Controller
     public function index()
     {
         $commissioners = Commissioner::where('user_id', $this->userId())
+                                    ->with('seller')
                                     ->get();
         return response()->json(['commissioners' => $commissioners], 200);
     }

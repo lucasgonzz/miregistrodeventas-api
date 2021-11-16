@@ -218,20 +218,22 @@ class Commissioners extends Controller {
     }
 
     function commissionForPerdidas() {
-        $perdidas_commissioner = Commissioner::where('user_id', UserHelper::userId())
-                                                ->where('name', 'Perdidas')
-                                                ->first();
-        $commission = Commission::create([
-            'commissioner_id' => $perdidas_commissioner->id,
-            'sale_id'         => $this->sale->id,
-            'detalle'         => $this->getDetalle(),
-            'saldo'           => CommissionHelper::getCommissionerSaldo($perdidas_commissioner) + $this->getPerdidaMonto(),
-            'page'            => $this->page,
-            'percentage'      => $this->getPerdidaPercentage(),
-            'monto'           => $this->getPerdidaMonto(),
-            'updated_at'      => null,
-            'created_at' => $this->getCreatedAt(),
-        ]);
+        if (UserHelper::isOscar()) {
+            $perdidas_commissioner = Commissioner::where('user_id', UserHelper::userId())
+                                                    ->where('name', 'Perdidas')
+                                                    ->first();
+            $commission = Commission::create([
+                'commissioner_id' => $perdidas_commissioner->id,
+                'sale_id'         => $this->sale->id,
+                'detalle'         => $this->getDetalle(),
+                'saldo'           => CommissionHelper::getCommissionerSaldo($perdidas_commissioner) + $this->getPerdidaMonto(),
+                'page'            => $this->page,
+                'percentage'      => $this->getPerdidaPercentage(),
+                'monto'           => $this->getPerdidaMonto(),
+                'updated_at'      => null,
+                'created_at' => $this->getCreatedAt(),
+            ]);
+        }
     }
 
     function getPerdidaPercentage() {
@@ -249,24 +251,23 @@ class Commissioners extends Controller {
     }
 
     function commissionOscarFedePapi() {
-        $commissioners = Commissioner::where('user_id', UserHelper::userId())
-                                    ->whereNull('seller_id')
-                                    ->get();
-        foreach ($commissioners as $commissioner) {
-            $commission = Commission::create([
-                'commissioner_id' => $commissioner->id,
-                'sale_id'         => $this->sale->id,
-                'saldo'           => CommissionHelper::getCommissionerSaldo($commissioner) + $this->getMontoForOscarFedePapi($commissioner),
-                'detalle'         => $this->getDetalle(),
-                'page'            => $this->page,
-                'percentage'      => $commissioner->percentage,
-                'monto'           => $this->getMontoForOscarFedePapi($commissioner),
-                'updated_at'      => null,
-                'created_at' => $this->getCreatedAt(),
-            ]);
-            // $this->sale->commissioners()->attach($commissioner->id, [
-            //     'percentage' => $commissioner->percentage
-            // ]);
+        if (UserHelper::isOscar()) {
+            $commissioners = Commissioner::where('user_id', UserHelper::userId())
+                                        ->whereNull('seller_id')
+                                        ->get();
+            foreach ($commissioners as $commissioner) {
+                $commission = Commission::create([
+                    'commissioner_id' => $commissioner->id,
+                    'sale_id'         => $this->sale->id,
+                    'saldo'           => CommissionHelper::getCommissionerSaldo($commissioner) + $this->getMontoForOscarFedePapi($commissioner),
+                    'detalle'         => $this->getDetalle(),
+                    'page'            => $this->page,
+                    'percentage'      => $commissioner->percentage,
+                    'monto'           => $this->getMontoForOscarFedePapi($commissioner),
+                    'updated_at'      => null,
+                    'created_at' => $this->getCreatedAt(),
+                ]);
+            }
         }
     }
 

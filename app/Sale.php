@@ -45,7 +45,7 @@ class Sale extends Model
         return $this->belongsTo('App\Buyer');
     }
 
-    public function specialPrice() {
+    public function special_price() {
         return $this->belongsTo('App\SpecialPrice');
     }
 }

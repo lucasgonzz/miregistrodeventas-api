@@ -16,7 +16,7 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        //
+        'App\Console\Commands\CuponsCheck'
     ];
 
     /**
@@ -27,32 +27,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $schedule->call(function () {
-            $cupons = Cupon::where('expiration_date', '>=', Carbon::now())
-                            ->where('valid', 1)
-                            ->get();
-            foreach ($cupons as $cupon) {
-                $cupon->valid = 0;
-                $cupon->save();
-            }
-            $cupons = Cupon::where('expiration_date', '>=', Carbon::now()->addDays(2))
-                            ->where('valid', 1)
-                            ->get();
-
-            foreach ($cupons as $cupon) {
-                $diff = Carbon::createFromDate($cupon->exporation_date)->diffForHumans();
-                $message = 'Tu cupon vence en '.$diff;
-                $title = 'Usa tu cupon de ';
-                if (!is_null($cupon->amount)) {
-                    $title .= '$'.$cupon->amount;
-                } else {
-                    $title .= $cupon->percentage.'%';
-                }
-                $title .= ' de descuento';
-                TwilioHelper::sendNotification($cupon->buyer_id, $title, $message);
-            }
-
-        })->dailyAt('13:43');
+        $schedule->command('cupons:check')->everyMinute();
+        // })->dailyAt('15:01');
     }
 
     /**

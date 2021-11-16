@@ -24,7 +24,7 @@ class ArticleAdvise extends Mailable
     {
         $this->buyer = $buyer;
         $this->article = $article;
-        $this->url = 'https://'.$article->user->online.'/articulos/'.$article->slug;
+        $this->url = $article->user->online.'/articulos/'.$article->slug;
     }
 
     /**

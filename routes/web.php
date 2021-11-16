@@ -95,7 +95,11 @@ Route::post('logout', 'Auth\LoginController@logout');
 
 Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
 Route::get('/current-acounts/pdf/{client_id}/{months_ago}', 'CurrentAcountController@pdf');
-Route::get('/sales/pdf/{sales_id}/{company_name}/{articles_cost}/{articles_subtotal_cost}/{articles_total_price}/{articles_total_cost}/{borders}', 'SaleController@pdf');
+Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
+
+// Exel
+Route::get('/articles/exel', 'ArticleController@export');
+
 // Imprimir articulos
 Route::get('/pdf/{columns}/{articles_ids}/{orientation}/{header?}', 'PdfController@articles');
 

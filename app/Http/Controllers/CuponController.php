@@ -18,20 +18,33 @@ class CuponController extends Controller
 
     function store(Request $request) {
         $cupons = [];
-        foreach ($request['buyers'] as $buyer) {
+        if (CuponHelper::isForNewBuyers($request)) {
             $cupon = Cupon::create([
                 'amount'            => CuponHelper::getAmount($request),
                 'percentage'        => CuponHelper::getPercentage($request),
-                'expiration_date'   => CuponHelper::getExpirationDate($request),
-                'buyer_id'          => $buyer['id'],
+                'min_amount'        => CuponHelper::getMinAmount($request),
+                'expiration_days'   => CuponHelper::getExpirationDays($request),
                 'user_id'           => $this->userId(),
+                'type'              => 'for_new_buyers',
             ]);
+            return response()->json(['cupons' => [$cupon]], 201);
+        } else {
+            foreach ($request['buyers'] as $buyer) {
+                $cupon = Cupon::create([
+                    'amount'            => CuponHelper::getAmount($request),
+                    'percentage'        => CuponHelper::getPercentage($request),
+                    'min_amount'        => CuponHelper::getMinAmount($request),
+                    'expiration_date'   => CuponHelper::getExpirationDate($request),
+                    'buyer_id'          => $buyer['id'],
+                    'user_id'           => $this->userId(),
+                ]);
 
-            CuponHelper::sendCuponNotification($cupon);
+                CuponHelper::sendCuponNotification($cupon);
 
-            $cupons[] = Cupon::where('id', $cupon->id)
-                            ->with('buyer')
-                            ->first();
+                $cupons[] = Cupon::where('id', $cupon->id)
+                                ->with('buyer')
+                                ->first();
+            }
         }
         return response()->json(['cupons' => $cupons], 201);
     }

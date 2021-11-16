@@ -71,6 +71,7 @@ class OrderController extends Controller
         $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
         CartHelper::detachArticulosFaltantes($request->articulos_faltantes, $order);
         MessageHelper::sendOrderCanceledMessage($request->articulos_faltantes, $order);
+        OrderHelper::updateCuponsStatus($order);
         // $buyer = Buyer::find($order->buyer_id);
         // $message = OrderHelper::getCanceledDescription($request->articulos_faltantes, $request->order);
         // $buyer->notify(new OrderCanceledNotification($order, $message));

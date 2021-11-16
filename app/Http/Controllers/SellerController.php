@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Commissioner;
 use App\CurrentAcount;
+use App\Http\Controllers\Helpers\StringHelper;
 use App\Seller;
 use Illuminate\Http\Request;
 
@@ -15,13 +16,20 @@ class SellerController extends Controller
     	return response()->json(['sellers' => $sellers], 200);
     }
 
-    // function currentAcounts($commissioner_id) {
-    //     $seller_id = Commissioner::find($commissioner_id)->seller_id;
-    //     $current_acounts = CurrentAcount::where('status', 'pagado')
-    //                                     ->where('seller_id', $seller_id)
-    //                                     ->with('sale.commissioners')
-    //                                     ->with('client')
-    //                                     ->get();
-    //     return response()->json(['current_acounts' => $current_acounts], 200);
-    // }
+    function store(Request $request) {
+        $seller = Seller::create([
+            'name' => StringHelper::onlyFirstWordUpperCase($request->name),
+            'surname' => StringHelper::onlyFirstWordUpperCase($request->surname),
+            'user_id' => $this->userId(),
+            // 'percentage' => $request->percentage,
+        ]);
+        $commissioner = Commissioner::create([
+            'seller_id' => $seller->id,
+            'user_id' => $this->userId(),
+        ]);
+        $commissioner = Commissioner::where('id', $commissioner->id)
+                                    ->with('seller')
+                                    ->first();
+        return response()->json(['seller' => $seller, 'commissioner' => $commissioner], 201);
+    }
 }

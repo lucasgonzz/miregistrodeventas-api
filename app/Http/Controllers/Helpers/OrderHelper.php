@@ -62,6 +62,15 @@ class OrderHelper {
         }
     }
 
+    static function updateCuponsStatus($order) {
+        foreach ($order->cupons as $cupon) {
+            $cupon->valid = 1;
+            $cupon->order_id = null;
+            $cupon->cart_id = null;
+            $cupon->save();
+        }
+    }
+
     static function procesarPago($order) {
         if ($order->payment_method == 'tarjeta') {
             $payment_controller = new PaymentController();
