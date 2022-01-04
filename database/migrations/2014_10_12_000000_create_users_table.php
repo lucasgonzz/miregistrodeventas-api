@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->integer('owner_id')->nullable()->unsigned();
             // $table->integer('admin_id')->nullable()->unsigned();
             $table->integer('percentage_card')->nullable();
+            $table->string('iva')->nullable();
             $table->boolean('has_delivery')->default(1);
             $table->decimal('delivery_price')->nullable();
             $table->enum('online_prices', ['all', 'only_registered'])->nullable();

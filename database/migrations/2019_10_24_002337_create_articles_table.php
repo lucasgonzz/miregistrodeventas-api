@@ -22,6 +22,7 @@ class CreateArticlesTable extends Migration
             $table->decimal('price', 8, 2);
             $table->decimal('previus_price', 8, 2)->nullable();
             $table->integer('stock')->nullable();
+            $table->boolean('online')->default(1);
             $table->integer('user_id')->unsigned();
             $table->bigInteger('sub_category_id')->nullable()->unsigned();
             $table->enum('status', ['active', 'inactive'])->default('active');

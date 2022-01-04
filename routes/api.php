@@ -259,6 +259,14 @@ Route::middleware('auth:sanctum')->group(function () {
 		'ArticleController@delete'
 	);
 
+	// Prices List
+	Route::get('/prices-lists', 
+		'PricesListController@index'
+	);
+	Route::post('/prices-lists', 
+		'PricesListController@store'
+	);
+
 	// Variants
 	Route::post('/articles/variants/{article_id}', 
 		'ArticleController@setVariants'
@@ -322,10 +330,13 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/marker-groups/add-marker-to-group/{marker_group_id}/{article_id}', 
 		'MarkerGroupController@addMarkerToGroup'
 	);
-
 	// Featured
 	Route::get('/articles/set-featured/{article_id}',
 		'ArticleController@setFeatured'
+	);
+	// Online
+	Route::get('/articles/set-online/{article_id}',
+		'ArticleController@setOnline'
 	);
 
 	// --------------------------------------------------------------------------------------

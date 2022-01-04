@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<loginTicketResponse version="1.0">
+    <header>
+        <source>CN=wsaahomo, O=AFIP, C=AR, SERIALNUMBER=CUIT 33693450239</source>
+        <destination>SERIALNUMBER=CUIT 20423548984, CN=lucasdn</destination>
+        <uniqueId>1054002044</uniqueId>
+        <generationTime>2021-12-14T14:27:06.932-03:00</generationTime>
+        <expirationTime>2021-12-15T02:27:06.932-03:00</expirationTime>
+    </header>
+    <credentials>
+        <token>PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8c3NvIHZlcnNpb249IjIuMCI+CiAgICA8aWQgc3JjPSJDTj13c2FhaG9tbywgTz1BRklQLCBDPUFSLCBTRVJJQUxOVU1CRVI9Q1VJVCAzMzY5MzQ1MDIzOSIgZHN0PSJDTj13c2ZlLCBPPUFGSVAsIEM9QVIiIHVuaXF1ZV9pZD0iMzM0MTU2NDQwIiBnZW5fdGltZT0iMTYzOTUwMjc2NiIgZXhwX3RpbWU9IjE2Mzk1NDYwMjYiLz4KICAgIDxvcGVyYXRpb24gdHlwZT0ibG9naW4iIHZhbHVlPSJncmFudGVkIj4KICAgICAgICA8bG9naW4gZW50aXR5PSIzMzY5MzQ1MDIzOSIgc2VydmljZT0id3NmZSIgdWlkPSJTRVJJQUxOVU1CRVI9Q1VJVCAyMDQyMzU0ODk4NCwgQ049bHVjYXNkbiIgYXV0aG1ldGhvZD0iY21zIiByZWdtZXRob2Q9IjIyIj4KICAgICAgICAgICAgPHJlbGF0aW9ucz4KICAgICAgICAgICAgICAgIDxyZWxhdGlvbiBrZXk9IjIwNDIzNTQ4OTg0IiByZWx0eXBlPSI0Ii8+CiAgICAgICAgICAgIDwvcmVsYXRpb25zPgogICAgICAgIDwvbG9naW4+CiAgICA8L29wZXJhdGlvbj4KPC9zc28+Cg==</token>
+        <sign>k09rwfMSG+vM0Axt5VJTwMgQ8RwOK13sHZYhMlmVkPgwu0CBQWS5C24sOdAHXsPlBsURLILKkUG5CPAHIDJDB+Ym4v76kRer+xoUPp+B6j6OxxpprbzmI9mX0GBJBu386+GfljA8BhuKM5nufbZ297bqQmQS4oDW/1bSl4xeLBM=</sign>
+    </credentials>
+</loginTicketResponse>

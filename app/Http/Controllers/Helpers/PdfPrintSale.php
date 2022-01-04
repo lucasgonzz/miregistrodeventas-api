@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Article;
 use App\Client;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintArticles;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
@@ -412,10 +413,7 @@ class PdfPrintSale extends fpdf {
 	function printArticle($article) {
     	$this->SetArticleConf();
         $this->Cell($this->widths['bar_code'],6,$article->bar_code,$this->borders,0,'L');
-        $name = $article->name;
-        if (strlen($name) > 20) {
-            $name = substr($article->name, 0, 20) . ' ..';
-        }
+        $name = ArticleHelper::getShortName($article->name, 20);
         $this->Cell($this->widths['name'],6,$name,$this->borders,0,'L');
         if ($this->for_commerce) {
         	$this->Cell($this->widths['cost'],6,'$'.Numbers::price($article->pivot->cost),$this->borders,0,'L');

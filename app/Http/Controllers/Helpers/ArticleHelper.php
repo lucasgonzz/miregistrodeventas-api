@@ -26,6 +26,13 @@ class ArticleHelper {
         }
     }
 
+    static function getShortName($name, $length) {
+        if (strlen($name) > $length) {
+            $name = substr($name, 0, $length) . '..';
+        }
+        return $name;
+    }
+
     static function setSpecialPrices($article, $request) {
         $special_prices = SpecialPrice::where('user_id', UserHelper::userId())->get();
         if ($special_prices) {
@@ -156,5 +163,35 @@ class ArticleHelper {
                             }])
                             ->first();
         return $article;
+    }
+
+    static function price($price) {
+        $pos = strpos($price, '.');
+        if ($pos != false) {
+            $centavos = explode('.', $price)[1];
+            $new_price = explode('.', $price)[0];
+            if ($centavos != '00') {
+                $new_price += ".$centavos";
+                return '$'.number_format($new_price, 2, ',', '.');
+            } else {
+                return '$'.number_format($new_price, 0, '', '.');           
+            }
+        } else {
+            return '$'.number_format($price, 0, '', '.');
+        }
+    }
+
+    static function getFirstImage($article) {
+        if (count($article->images) >= 1) {
+            $first_image = $article->images[0]->url;
+            foreach ($article->images as $image) {
+                if ($image->first != 0) {
+                    $first_image = $image->url;
+                }
+            }
+            return 'https://res.cloudinary.com/lucas-cn/image/upload/r_50/c_crop,co_rgb:6F6F6F,e_shadow:50,x_-15,y_15/'.$first_image;
+        }
+        return null;
+
     }
 }

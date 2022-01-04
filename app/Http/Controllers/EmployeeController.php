@@ -48,7 +48,8 @@ class EmployeeController extends Controller
         		'company_name' => $user->company_name,
         		'password' => Hash::make($request->password),
                 'owner_id' => $user->id,
-        		'percentage_card' => $user->percentage_card,
+                'percentage_card' => $user->percentage_card,
+        		'online' => $user->online,
                 'created_at' => Carbon::now(),
         	]);
 

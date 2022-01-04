@@ -13,6 +13,10 @@ class Article extends Model
         return $this->morphMany('App\View', 'viewable');
     }
 
+    function prices_lists() {
+        return $this->belongsToMany('App\PricesList');
+    }
+
     function descriptions() {
         return $this->hasMany('App\Description');
     }

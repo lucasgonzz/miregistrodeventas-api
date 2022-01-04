@@ -122,7 +122,7 @@ class OrderController extends Controller
                     ->with('buyer')
                     ->with('articles')
                     ->with('impressions')
-                    ->with('specialPrice')
+                    ->with('special_price')
                     ->with('discounts')
                     ->with('commissions')
                     ->first();

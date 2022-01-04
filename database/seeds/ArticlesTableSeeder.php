@@ -210,7 +210,7 @@ class ArticlesTableSeeder extends Seeder
             ],
         ];
        
-        for ($user_id=1; $user_id <= 3; $user_id++) { 
+        for ($user_id=2; $user_id <= 2; $user_id++) { 
             foreach ($iphones as $iphone) {
                 $bar_code = rand(1000000000000, 9999999999999);
                 $article = Article::create([

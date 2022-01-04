@@ -21,6 +21,10 @@ class Controller extends BaseController
         }
     }
 
+    function user() {
+        return Auth()->user();
+    }
+
     function isProvider() {
         return true;
         if (auth()->user()->hasRole('provider')) {

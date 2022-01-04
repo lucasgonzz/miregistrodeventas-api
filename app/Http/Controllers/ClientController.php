@@ -29,6 +29,7 @@ class ClientController extends Controller
         $client->name = ucwords($request->client['name']);
         $client->surname = ucwords($request->client['surname']);
         $client->address = ucwords($request->client['address']);
+        $client->cuit = $request->client['cuit'];
         $client->seller_id = $request->client['seller_id'] != 0 ? $request->client['seller_id'] : null;
         $client->save();
         return response()->json(['client' => $client], 200);
@@ -66,9 +67,11 @@ class ClientController extends Controller
     function store(Request $request) {
         $seller_id = $request->client['seller_id'] == 0 ? null : $request->client['seller_id'];
     	$client = Client::create([
-            'name' => ucwords($request->client['name']),
-    		'surname' => ucwords($request->client['surname']),
-            'user_id' => $this->userId(),
+            'name'      => ucwords($request->client['name']),
+            'surname'   => ucwords($request->client['surname']),
+            'address'   => ucwords($request->client['address']),
+    		'cuit'      => $request->client['cuit'],
+            'user_id'   => $this->userId(),
     		'seller_id' => $seller_id,
     	]);
         return response()->json(['client' => $client], 201);

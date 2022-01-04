@@ -1,0 +1,5 @@
+FchServDesde 
+	Fecha de inicio del abono para el
+	servicio a facturar. Dato obligatorio para
+	concepto 2 o 3 (Servicios / Productos y
+	Servicios). Formato yyyymmdd

@@ -267,14 +267,15 @@ class ArticleController extends Controller
     }
 
     function setOnline($articles_id) {
-        foreach (explode('-', $articles_id) as $id) {
-            $article = Article::find($id);
-            if (is_null($article->online_price)) {
-                $article->online_price = $article->price;
-            }
+        $article = Article::find($articles_id);
+        if ($article->online) {
+            $article->online = 0;
+        } else {
             $article->online = 1;
-            $article->save();
         }
+        $article->save();
+        $article = ArticleHelper::getFullArticle($article->id);
+        return response()->json(['article' => $article], 200);
     }
 
     function removeOnline($articles_id) {

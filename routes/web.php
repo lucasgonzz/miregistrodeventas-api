@@ -22,6 +22,13 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
+// Route::get('/afipp', function() {
+// 	dd('1123');
+// });
+Route::get('/afip/{sale_id}', 'AfipWsController@init');
+
+Route::get('/articles/pdf', 'ArticleController@pdf');
+
 
 // Devuelve las comisiones de las ventas que le corresponden al vendedor
 Route::get('/slugs', function() {
@@ -58,6 +65,9 @@ Route::get('/check-sales', function() {
 	echo "listo";
 });
 
+Route::get('/entrada', 
+	'EntradaController@entrada'
+);
 Route::get('/email', 
 	'MailController@order'
 );
@@ -102,6 +112,7 @@ Route::get('/articles/exel', 'ArticleController@export');
 
 // Imprimir articulos
 Route::get('/pdf/{columns}/{articles_ids}/{orientation}/{header?}', 'PdfController@articles');
+Route::get('/prices-lists/{id}', 'PricesListController@pdf');
 
 Route::get('/sales/cliente/{company_name}/{borders}/{sale_id}', 'PdfController@sale_client');
 Route::get('/sales/comercio/{company_name}/{borders}/{sale_id}', 'PdfController@sale_commerce');
