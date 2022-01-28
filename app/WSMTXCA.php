@@ -34,7 +34,7 @@ class WSMTXCA extends WSN
         if (!isset($config['ws_url'])) {
             $config['ws_url']           = $this->testing ? 'https://fwshomo.afip.gov.ar/wsmtxca/services/MTXCAService' : 'https://serviciosjava.afip.gob.ar/wsmtxca/services/MTXCAService';
         }
-
+        
         if (!isset($config['wsdl_cache_file'])) {
             $config['wsdl_cache_file']  = $this->testing ? public_path().'/afip/wsmtxcahomo_wsdl.xml' : public_path().'/afip/wsmtxca_wsdl.xml';
         }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Client;
+use App\CurrentAcount;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintArticles;
@@ -13,11 +14,13 @@ require(__DIR__.'/../fpdf/fpdf.php');
 
 class PdfPrintCurrentAcounts extends fpdf {
 
-	function __construct($client_id, $months_ago) {
+	function __construct($ids = null, $client_id = null, $months_ago = null) {
 		parent::__construct();
 		$this->SetAutoPageBreak(true, 1);
+		$this->current_acounts = [];
+		$this->ids = $ids;
 		$this->client_id = $client_id;
-		$this->client = Client::find($client_id);
+		// $this->client = Client::find($client_id);
 		$this->months_ago = $months_ago;
 		$this->current_acount_por_pagina = 40;
 		$this->current_acount_impresos = 0;
@@ -43,8 +46,16 @@ class PdfPrintCurrentAcounts extends fpdf {
 	}
 
 	function initCurrentAcounts() {
-        $this->current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths(
-        								$this->client_id, $this->months_ago);
+		if (!is_null($this->client_id)) {
+			$this->client = Client::find($this->client_id);
+	        $this->current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths(
+	        								$this->client_id, $this->months_ago);
+		} else {
+			foreach ($this->ids as $current_acount_id) {
+				$this->current_acounts[] = CurrentAcount::find($current_acount_id);
+			}
+			$this->client = Client::find($this->current_acounts[0]->client_id);
+		}
 		$this->cantidad_current_acounts = count($this->current_acounts);
 		$this->current_acounts_en_esta_pagina = 0;
 	}

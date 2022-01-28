@@ -17,6 +17,9 @@ class CreateCategoriesTable extends Migration
             $table->id();
 
             $table->string('name', 128);
+            $table->string('title', 128)->nullable();
+            $table->integer('icon_id')->unsigned()->nullable();
+            $table->string('image_url', 128)->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->integer('user_id')->unsigned();
 

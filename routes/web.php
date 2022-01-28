@@ -104,7 +104,8 @@ Route::post('register', 'Auth\RegisterController@registerCommerce');
 Route::post('logout', 'Auth\LoginController@logout');
 
 Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
-Route::get('/current-acounts/pdf/{client_id}/{months_ago}', 'CurrentAcountController@pdf');
+Route::get('/current-acounts/pdf/{client_id}/{months_ago}', 'CurrentAcountController@pdfFromClient');
+Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 
 // Exel

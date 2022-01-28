@@ -9,6 +9,7 @@ class DiscountController extends Controller
 {
     public function index() {
     	$discounts = Discount::where('user_id', $this->userId())
+                                ->with('client')
     							->get();
     	return response()->json(['discounts' => $discounts], 200);
     }
@@ -23,10 +24,14 @@ class DiscountController extends Controller
 
     function store(Request $request) {
     	$discount = Discount::create([
-    		'name' => ucfirst($request->name),
-    		'percentage' => $request->percentage,
-    		'user_id' => $this->userId(),
+    		'name'        => ucfirst($request->name),
+            'percentage'  => $request->percentage,
+    		'client_id'   => $request->client_id,
+    		'user_id'     => $this->userId(),
     	]);
+        $discounts = Discount::where('id', $discount->id)
+                                ->with('client')
+                                ->first();
     	return response()->json(['discount' => $discount], 201);
     }
 }

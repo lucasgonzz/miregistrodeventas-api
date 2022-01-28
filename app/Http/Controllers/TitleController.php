@@ -23,11 +23,19 @@ class TitleController extends Controller
     	return $title;
     }
 
+    function updateImage(Request $request) {
+        $title = Title::where('user_id', $this->userId())
+                        ->first();
+        $title->image_url = $request->image_url;
+        $title->save();
+        return response()->json(['title' => $title], 200); 
+    }
+
     function update(Request $request) {
     	$title = Title::find($request->id);
     	$title->header = !empty($request->header) ? ucfirst($request->header) : null;
     	$title->lead = !empty($request->lead) ? ucfirst($request->lead) : null;
     	$title->save();
-    	return response(null, 200);
+        return response()->json(['title' => $title], 200); 
     }
 }

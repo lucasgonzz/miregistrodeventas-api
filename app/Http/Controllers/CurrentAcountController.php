@@ -53,8 +53,13 @@ class CurrentAcountController extends Controller
         $client_controller->checkSaldos($current_acount->client_id);
     }
 
-    function pdf($client_id, $months_ago) {
-        $pdf = new PdfPrintCurrentAcounts($client_id, $months_ago);
+    function pdfFromClient($client_id, $months_ago) {
+        $pdf = new PdfPrintCurrentAcounts(null, $client_id, $months_ago);
+        $pdf->printCurrentAcounts();
+    }
+
+    function pdf($ids) {
+        $pdf = new PdfPrintCurrentAcounts(explode('-', $ids));
         $pdf->printCurrentAcounts();
     }
 

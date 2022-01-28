@@ -1254,7 +1254,7 @@
 </wsdl:binding>
 <wsdl:service name="MTXCAService">
 <wsdl:port name="MTXCAServiceHttpSoap11Endpoint" binding="tns:MTXCAServiceSoap11Binding">
-<soap:address location="https://fwshomo.afip.gov.ar/wsmtxca/services/MTXCAService"/>
+<soap:address location="https://serviciosjava.afip.gob.ar/wsmtxca/services/MTXCAService"/>
 </wsdl:port>
 </wsdl:service>
 </wsdl:definitions>

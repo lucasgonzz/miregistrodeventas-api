@@ -8,5 +8,9 @@ class Category extends Model
 {
 	public $timestamps = false;
 
-	protected $fillable = ['name', 'user_id'];	
+	protected $fillable = ['name', 'user_id', 'icon_id'];	
+
+	function icon() {
+		return $this->belongsTo('App\Icon');
+	}
 }

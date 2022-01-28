@@ -18,6 +18,7 @@ class CreateDiscountsTable extends Migration
             $table->string('name');
             $table->double('percentage');
             $table->integer('user_id')->unsigned();
+            $table->integer('client_id')->unsigned()->nullable();
             $table->timestamps();
         });
     }

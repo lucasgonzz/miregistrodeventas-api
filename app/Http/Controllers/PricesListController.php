@@ -31,6 +31,12 @@ class PricesListController extends Controller
         return response()->json(['prices_list' => $prices_list], 200);
     }
 
+    function delete($id) {
+        $prices_list = PricesList::find($id);
+        $prices_list->delete();
+        return response(null, 200);
+    }
+
     function pdf($id) {
         $prices_list = PricesList::where('id', $id)
                                     ->with('articles.images')

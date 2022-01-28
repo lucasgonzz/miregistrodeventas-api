@@ -48,11 +48,14 @@ class CategorySeeder extends Seeder
         ]);
         $user = User::where('company_name', 'Fiushh')->first();
         $categories = ['Celulares', 'Cargadores', 'Auriculares'];
+        $icon_id = 1;
         foreach ($categories as $category) {
             Category::create([
                 'name'    => $category,
+                'icon_id' => $icon_id,
                 'user_id' => $user->id,
             ]);
+            $icon_id++;
         }
     }
 }

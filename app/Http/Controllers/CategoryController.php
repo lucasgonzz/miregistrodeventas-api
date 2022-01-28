@@ -14,6 +14,7 @@ class CategoryController extends Controller
     	$categories = Category::where('user_id', $this->userId())
                                 ->where('status', 'active')
                                 ->orderBy('name', 'ASC')
+                                ->with('icon')
     					       ->get();
         return response()->json(['categories' => $categories], 200);
     }
@@ -21,8 +22,12 @@ class CategoryController extends Controller
     function store(Request $request) {
         $category = Category::create([
             'name'    => ucfirst($request->name),
+            'icon_id' => $request->icon_id,
             'user_id' => $this->userId(),
         ]);
+        $category = Category::where('id', $category->id)
+                                ->with('icon')
+                                ->first();
         return response()->json(['category' => $category], 201);
     }
 

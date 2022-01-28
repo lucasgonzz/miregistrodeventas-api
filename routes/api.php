@@ -162,6 +162,10 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::delete('/providers/{id}', 
 			'ProviderController@delete'
 		);
+		// Icons
+		Route::get('/icons', 
+			'IconController@index'
+		);
 		// Categorias
 		Route::get('/categories', 
 			'CategoryController@index'
@@ -266,6 +270,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/prices-lists', 
 		'PricesListController@store'
 	);
+	Route::delete('/prices-lists/{id}', 
+		'PricesListController@delete'
+	);
 
 	// Variants
 	Route::post('/articles/variants/{article_id}', 
@@ -348,6 +355,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/sales/{sales_id}', 
 		'SaleController@deleteSales'
 	);
+
+	// Afip
+	Route::get('/afip/importes/{sale_id}', 'AfipWsController@getImportes');
 
 	// Descuentos
 	Route::get('/discounts', 
@@ -554,10 +564,13 @@ Route::middleware('auth:sanctum')->group(function () {
 		'SubCategoryController@mostViewed'
 	);
 	// Title
-	Route::get('/online/titles', 
+	Route::get('/titles', 
 		'TitleController@index'
 	);
-	Route::put('/online/titles', 
+	Route::put('/titles/image', 
+		'TitleController@updateImage'
+	);
+	Route::put('/titles', 
 		'TitleController@update'
 	);
 });

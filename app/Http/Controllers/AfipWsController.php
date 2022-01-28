@@ -9,45 +9,48 @@ use App\WSMTXCA;
 use Illuminate\Http\Request;
 use phpWsAfip\WS\WSAA;
 use phpWsAfip\WS\WSN;
+use phpWsAfip\WS\WSFE;
 
 class AfipWsController extends Controller
 {
 
     function __construct() {
-        # WSDL correspondiente al WSAA
-        define ('WSDL_WSAA', public_path().'/afip/wsaa.wsdl'); 
-        # Certificado usado para firmar
+        // Testing
+        // define ('WSDL_WSAA', public_path().'/afip/wsaahomo.wsdl'); 
         // define ('CERT', 'file://'.realpath(public_path().'/afip/MiCertificado.pem') ); 
-        define ('CERT', 'file://'.realpath(public_path().'/afip/comerciocity-alias_1775a2484a464aa3.crt')); 
-        # Clave privada del certificado
         // define ('PRIVATEKEY', 'file://'.realpath(public_path().'/afip/MiClavePrivada.key')); 
+        // define ("URL_WSAA", "https://wsaahomo.afip.gov.ar/ws/services/LoginCms");
+
+        // Produccion
+        define ('WSDL_WSAA', public_path().'/afip/wsaa.wsdl'); 
+        define ('CERT', 'file://'.realpath(public_path().'/afip/comerciocity-alias_1775a2484a464aa3.crt')); 
         define ('PRIVATEKEY', 'file://'.realpath(public_path().'/afip/privada.key')); 
+        define ("URL_WSAA", "https://wsaa.afip.gov.ar/ws/services/LoginCms");
         define ('TRA_xml', public_path().'/afip/TRA.xml'); 
         define ('TRA_tmp', public_path().'/afip/TRA.tmp'); 
         define ('TA_file', public_path().'/afip/ta.xml'); 
-        // define ("URL_WSAA", "https://wsaahomo.afip.gov.ar/ws/services/LoginCms");
-        define ("URL_WSAA", "https://wsaa.afip.gov.ar/ws/services/LoginCms");
     }
 
     function init($sale_id) {
+        // $service = 'wsfe';
         $service = 'wsmtxca';
         if (file_exists(TA_file)) {
             $ta = new \SimpleXMLElement(file_get_contents(TA_file));
             if (!isset($ta->header->expirationTime) || !isset($ta->credentials->token) || !isset($ta->credentials->sign) || strtotime($ta->header->expirationTime) < time()) {
                 print_r('El TA esta vencido, se va a crear de nuevo </br>');
-                $this->wsaa('wsmtxca');
+                $this->wsaa($service);
             }
         } else {
             print_r('El TA no esta creado, se va a crear uno nuevo </br>');
-            $this->wsaa('wsmtxca');
+            $this->wsaa($service);
         }
+        // $this->wsfe($sale_id);
         $this->wsmtxca($sale_id);
     }
 
     function wsaa($service) {
         $this->createTRA($service);
         $cms = $this->signTRA();
-        // print_r($cms."</br>");
         $ta = $this->callWSAA($cms);
         file_put_contents(TA_file, $ta);
     }
@@ -106,60 +109,26 @@ class AfipWsController extends Controller
 
     function wsmtxca($sale_id) {
         $punto_venta = 4;
+        // $cuit_negocio = '20423548984';
         $cuit_negocio = '20175018841';
         $cuit_cliente = '20242112025';
         $cbte_tipo = 1;
         $wsmtxca = new WSMTXCA(['testing'=> false, 'cuit_representada' => $cuit_negocio]);
         // $wsmtxca = new WSMTXCA(['testing'=> false, 'cuit_representada' => $this->user()->cuit]);
         $wsmtxca->setXmlTa(file_get_contents(TA_file));
-        // $pto_vta = [
-        //     'consultaUltimoComprobanteAutorizadoRequest' => [
-        //         'numeroPuntoVenta'    => $punto_venta,
-        //         'codigoTipoComprobante'  => $cbte_tipo    
-        //     ]
-        // ];
-        // $result = $wsmtxca->consultarUltimoComprobanteAutorizado($pto_vta);
-        // $cbte_nro = $result->numeroComprobante + 1;
-        // print_r('Numero comprobante: '.$cbte_nro.'</br>');
-        $doc_type = [
-            'Cuit' => 80,
-            'Cuil' => 86,
-            'CDI' => 87,
-            'LE' => 89,
-            'LC' => 90,
-            'CI Extranjera' => 91,
-            'en trámite' => 92,
-            'Acta Nacimiento' => 93,
-            'CI Bs. As. RNP' => 95,
-            'DNI' => 96,
+        print_r('Va por aca </br>');
+        $pto_vta = [
+            'consultaUltimoComprobanteAutorizadoRequest' => [
+                'numeroPuntoVenta'    => $punto_venta,
+                'codigoTipoComprobante'  => $cbte_tipo    
+            ]
         ];
-
-        $items = [];
+        $result = $wsmtxca->consultarUltimoComprobanteAutorizado($pto_vta);
+        dd($result);
+        $cbte_nro = $result->numeroComprobante + 1;
+        print_r('Numero comprobante: '.$cbte_nro.'</br>');
         $sale = Sale::where('id', $sale_id)->with('articles')->first();
-        $importe_gravado = 0;
-        $importe_iva = 0;
-        $importe_total = 0;
-        foreach ($sale->articles as $article) {
-            $item = [
-                'codigo' => !is_null($article->bar_code) ? $article->bar_code : substr($article->name, 0,3),
-                'descripcion'           => $article->name,
-                'cantidad'              => $article->pivot->amount,
-                'codigoUnidadMedida'    => 7,
-                'precioUnitario'        => $article->pivot->price,
-                'importeBonificacion'   => 0,
-                'codigoCondicionIVA'    => 5,
-                'importeItem'           => AfipHelper::getImporteItem($article),
-                'importeIVA'            => AfipHelper::getImporteIva($article),
-            ];
-            // Checke que sea factura A para discriminar el IVA
-            // if (AfipHelper::getTipoComprobante($sale) == 1) {
-            //     $item['importeIVA'] = AfipHelper::getImporteIva($article);
-            // }
-            $importe_gravado    += AfipHelper::getImporteGravado($article);
-            $importe_iva        += AfipHelper::getImporteIva($article);
-            $importe_total      += AfipHelper::getImporteItem($article);
-        }
-
+        $importes = AfipHelper::getImportes($sale);
         $invoice = [
             'comprobanteCAERequest' => [
                 'codigoTipoComprobante'     => 1,                    
@@ -169,28 +138,28 @@ class AfipWsController extends Controller
                 'numeroComprobante'         => 1,
                 // 'numeroComprobante'         => $cbte_nro,
                 'fechaEmision'              => date('c'),
-                'codigoTipoAutorizacion'    => 'E',
-                'codigoTipoDocumento'       => $doc_type['Cuit'],
+                // 'codigoTipoAutorizacion'    => 'E',
+                'codigoTipoDocumento'       => AfipHelper::getDocType('Cuit'),
                 'numeroDocumento'           => $cuit_cliente,
                 // 'numeroDocumento'           => $sale->client->cuit,
-                'importeGravado'            => $importe_gravado,
+                'importeGravado'            => $importes['importe_gravado'],
                 'importeNoGravado'          => 0,
                 'importeExento'             => 0,
-                'importeSubtotal'           => $importe_total,
-                'importeOtrosTributos'      => 0,
-                'importeTotal'              => $importe_total, 
+                'importeSubtotal'           => $importes['importe_subtotal'],
+                // 'importeOtrosTributos'      => 0,
+                'importeTotal'              => $importes['importe_total'], 
                 'codigoMoneda'              => 'PES',
                 'cotizacionMoneda'          => 1,
                 'observaciones'             => '',
                 'codigoConcepto'            => 1,  #Productos
-                'arrayOtrosTributos' => [
+                // 'arrayOtrosTributos' => [
                     // 'otroTributo' => [
                     //     'codigo' => 99,
                     //     'descripcion' => 'Otro Tributo',
                     //     'baseImponible' => 100.00,
                     //     'importe' => 1.00,
                     // ],
-                ],
+                // ],
                 // 'arrayItems' => [
                 //     'item' => [
                 //         'unidadesMtx' => 123456,
@@ -209,7 +178,7 @@ class AfipWsController extends Controller
                 'arraySubtotalesIVA' => [
                     'subtotalIVA' => [
                         'codigo' => 5,
-                        'importe' => $importe_iva,
+                        'importe' => $importes['importe_iva'],
                     ],
                 ],
             ],
@@ -221,6 +190,69 @@ class AfipWsController extends Controller
         $result = $wsmtxca->autorizarComprobante($invoice);
         file_put_contents(public_path().'/afip/result.xml', $result);
         dd($result);
+    }
+
+    function wsfe($sale_id) {
+        $cuit_negocio = '20175018841';
+        $cuit_cliente = '20242112025';
+        $cbte_tipo = 1;
+        $punto_venta = 4;
+        $wsfe = new WSFE(['testing' => false, 'cuit_representada' => $cuit_negocio, 'for_wsfe' => true]);
+        $wsfe->setXmlTa(file_get_contents(TA_file));
+        $cbte_nro = AfipHelper::getNumeroComprobante($wsfe, $punto_venta, $cbte_tipo);
+        print_r('Numero de comprobante: '.$cbte_nro.'</br>');
+        $today = date('Ymd');
+
+        $sale = Sale::where('id', $sale_id)->with('articles')->first();
+        $importes = AfipHelper::getImportes($sale);
+
+        $invoice = array(
+            'FeCAEReq' => array(
+                'FeCabReq' => array(
+                    'CantReg'      => 1,
+                    'CbteTipo'     => $cbte_tipo,                   
+                    'PtoVta'       => $punto_venta,
+                ),
+                'FeDetReq' => array(
+                    'FECAEDetRequest' => array(
+                        'Concepto'     => 1,                
+                        'DocTipo'      => AfipHelper::getDocType('Cuit'),           
+                        'DocNro'       => $cuit_cliente,
+                        'CbteDesde'    => $cbte_nro,
+                        'CbteHasta'    => $cbte_nro,
+                        'CbteFch'      => $today,
+                        'ImpTotal'     => $importes['importe_total'],
+                        'ImpTotConc'   => 0,
+                        'ImpNeto'      => $importes['importe_gravado'],
+                        'ImpOpEx'      => 0,
+                        'ImpIVA'       => $importes['importe_iva'],
+                        'ImpTrib'      => 0,
+                        // 'FchServDesde' => $today,
+                        // 'FchServHasta' => $today,
+                        // 'FchVtoPago'   => $today,
+                        'MonId'        => 'PES',
+                        'MonCotiz'     => 1,
+                        'Iva'          => array(
+                            'AlicIva' => array(
+                                'Id'        => 5,
+                                'BaseImp'   => $importes['importe_gravado'],
+                                'Importe'   => $importes['importe_iva']
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        // Se visualiza el resultado con el CAE correspondiente al comprobante.
+        $result = $wsfe->FECAESolicitar($invoice);
+        dd($result);
+    }
+
+    function getImportes($sale_id) {
+        $sale = Sale::find($sale_id);
+        $importes = AfipHelper::getImportes($sale);
+        return response()->json(['importes' => $importes], 200);
     }
 
 }
