@@ -3,12 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Article;
+use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticle;
 use App\Http\Controllers\Helpers\PdfPrintSale;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
+use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Sale;
 use App\SaleTime;
 use Carbon\Carbon;
@@ -432,6 +433,9 @@ class SaleController extends Controller
 
         $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
         $helper->attachCommissionsAndCurrentAcounts();
+
+        // $client_controller = new ClientController();
+        // $client_controller->checkSaldos($sale->client_id);
     }
 
     function store(Request $request) {

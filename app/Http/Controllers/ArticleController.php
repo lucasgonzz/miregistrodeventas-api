@@ -37,6 +37,7 @@ class ArticleController extends Controller
                             ->with('sub_category')
                             ->with('variants')
                             ->with('tags')
+                            ->with('brand')
                             ->with('specialPrices')
                             ->with(['providers' => function($q) {
                                 $q->orderBy('cost', 'asc');
@@ -74,6 +75,7 @@ class ArticleController extends Controller
         $article->timestamps = false;
         $article->bar_code = $request->bar_code;
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
+        $article->brand_id = $request->brand_id != 0 ? $request->brand_id : null;
         if ($article->price != $request->price) {
             $article->previus_price = $article->price;
             $article->timestamps = true;
@@ -139,6 +141,17 @@ class ArticleController extends Controller
         foreach ($request->articles_ids as $id) {
             $article = Article::find($id);
             $article->sub_category_id = $request->sub_category_id;
+            $article->save();
+            $articles[] = ArticleHelper::getFullArticle($article->id);
+        }
+        return response()->json(['articles' => $articles], 200);
+    }
+
+    function updateBrand(Request $request) {
+        $articles = [];
+        foreach ($request->articles_ids as $id) {
+            $article = Article::find($id);
+            $article->brand_id = $request->brand_id;
             $article->save();
             $articles[] = ArticleHelper::getFullArticle($article->id);
         }
@@ -292,6 +305,9 @@ class ArticleController extends Controller
         $article->bar_code = $request->bar_code;
         if ($request->sub_category_id != 0) {
             $article->sub_category_id = $request->sub_category_id;
+        }
+        if ($request->brand_id != 0) {
+            $article->brand_id = $request->brand_id;
         }
         $article->name = ucfirst($request->name);
         $article->slug = ArticleHelper::slug($request->name);

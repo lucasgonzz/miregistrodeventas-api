@@ -19,6 +19,9 @@ class DiscountController extends Controller
     	$discount->name = ucfirst($request->name);
     	$discount->percentage = $request->percentage;
     	$discount->save();
+        $discounts = Discount::where('id', $discount->id)
+                                ->with('client')
+                                ->first();
     	return response()->json(['discount' => $discount], 200);
     }
 
@@ -29,7 +32,7 @@ class DiscountController extends Controller
     		'client_id'   => $request->client_id,
     		'user_id'     => $this->userId(),
     	]);
-        $discounts = Discount::where('id', $discount->id)
+        $discount = Discount::where('id', $discount->id)
                                 ->with('client')
                                 ->first();
     	return response()->json(['discount' => $discount], 201);

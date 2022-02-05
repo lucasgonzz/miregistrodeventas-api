@@ -573,6 +573,19 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::put('/titles', 
 		'TitleController@update'
 	);
+	// Brands
+	Route::get('/brands', 
+		'BrandController@index'
+	);
+	Route::put('/brands', 
+		'BrandController@update'
+	);
+	Route::post('/brands', 
+		'BrandController@store'
+	);
+	Route::post('/articles/brand', 
+		'ArticleController@updateBrand'
+	);
 });
 
 

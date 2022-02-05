@@ -158,6 +158,7 @@ class ArticleHelper {
                             ->with('variants')
                             ->with('specialPrices')
                             ->with('tags')
+                            ->with('brand')
                             ->with(['providers' => function($q) {
                                 $q->orderBy('cost', 'asc');
                             }])

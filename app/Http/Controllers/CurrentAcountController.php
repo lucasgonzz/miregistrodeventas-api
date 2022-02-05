@@ -127,6 +127,47 @@ class CurrentAcountController extends Controller
         return $detalle;
     }
 
+    // public function saldarPagandose($pago, $client_id, $until_pago) {
+    //     $detalle = '';
+    //     $query = CurrentAcount::where('client_id', $client_id)
+    //                             ->where('status', 'pagandose')
+    //                             ->orderBy('sale_id', 'ASC');
+    //     if (!is_null($until_pago)) {
+    //         $pagandose = $query->where('id', '<', $until_pago->id)
+    //                                                 ->first();
+    //     } else {
+    //         $pagandose = $query->first();
+    //     }
+    //     if (!is_null($pagandose)) {
+    //         echo "Se estaba pagando la cuenta corriente: ".$pagandose->detalle."</br>";
+    //         $pago += $pagandose->pagandose;
+    //         if ($pago >= $pagandose->debe) {
+    //             $pago -= $pagandose->debe;
+    //             $pagandose->status = 'pagado';
+    //             $commission_controller = new CommissionController();
+    //             $commission_controller->updateToActive($pagandose);
+    //             if (CurrentAcountHelper::isSaldoInicial($pagandose)) {
+    //                 $detalle .= 'A cta saldo saldo inicial ';
+    //             } else {
+    //                 $detalle = 'A cta Saldo Rto '.SaleHelper::getNumSaleFromSaleId($pagandose->sale_id).' pag '.$pagandose->page.' ';
+    //             }
+    //         } else {
+    //             $pagandose->pagandose += $pago;
+    //             if (CurrentAcountHelper::isSaldoInicial($pagandose)) {
+    //                 $detalle .= 'A cta saldo inicial ($'.Numbers::price($pago).')';
+    //             } else {
+    //                 $detalle = 'A cta Rto '.SaleHelper::getNumSaleFromSaleId($pagandose->sale_id).' pag '.$pagandose->page.' ($'.Numbers::price($pago).') ';
+    //             }
+    //             $pago = 0;
+    //         }
+    //         $pagandose->save();
+    //     }
+    //     return [
+    //         'pago'    => $pago,
+    //         'detalle' => $detalle,
+    //     ];
+    // }
+
     public function saldarPagandose($pago, $client_id, $until_pago) {
         $detalle = '';
         $query = CurrentAcount::where('client_id', $client_id)
@@ -168,6 +209,19 @@ class CurrentAcountController extends Controller
         ];
     }
 
+    // public function getFirstCurrentAcountSinPagar($client_id, $until_pago) {
+    //     $query = CurrentAcount::where('client_id', $client_id)
+    //                                 ->where('status', 'sin_pagar')
+    //                                 ->orderBy('sale_id', 'ASC');
+    //     if (!is_null($until_pago)) {
+    //         $first_current_acount_sin_pagar = $query->where('id', '<', $until_pago->id)
+    //                                                 ->first();
+    //     } else {
+    //         $first_current_acount_sin_pagar = $query->first();
+    //     }
+    //     return $first_current_acount_sin_pagar;
+    // }
+
     public function getFirstCurrentAcountSinPagar($client_id, $until_pago) {
         $query = CurrentAcount::where('client_id', $client_id)
                                     ->where('status', 'sin_pagar')
@@ -180,6 +234,23 @@ class CurrentAcountController extends Controller
         }
         return $first_current_acount_sin_pagar;
     }
+
+    // function deleteFromSale($sale) {
+    //     $current_acounts_to_delete = CurrentAcount::where('sale_id', $sale->id)
+    //                                                 ->get();
+
+    //     if (count($current_acounts_to_delete) >= 1) {
+    //         $ultima_a_eliminar = $current_acounts_to_delete[count($current_acounts_to_delete)-1];
+    //         $current_acounts_que_siguen = CurrentAcount::where('client_id', $sale->client_id)
+    //                                                 ->where('sale_id', '>', $ultima_a_eliminar->sale_id)
+    //                                                 ->orderBy('sale_id', 'ASC')
+    //                                                 ->get();
+    //         foreach ($current_acounts_to_delete as $current_acount_to_delete) {
+    //             $current_acount_to_delete->delete();
+    //         }
+    //         $this->updateSaldo($sale->client_id, $current_acounts_que_siguen);
+    //     }
+    // }
 
     function deleteFromSale($sale) {
         $current_acounts_to_delete = CurrentAcount::where('sale_id', $sale->id)

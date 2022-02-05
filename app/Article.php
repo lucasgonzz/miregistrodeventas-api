@@ -17,6 +17,10 @@ class Article extends Model
         return $this->belongsToMany('App\PricesList');
     }
 
+    function brand() {
+        return $this->belongsTo('App\Brand');
+    }
+
     function descriptions() {
         return $this->hasMany('App\Description');
     }

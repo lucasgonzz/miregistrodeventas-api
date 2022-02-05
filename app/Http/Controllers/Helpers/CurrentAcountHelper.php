@@ -9,7 +9,23 @@ use Carbon\Carbon;
 
 class CurrentAcountHelper {
 
-	static function getSaldo($client_id, $until_current_acount = null) {
+    // static function getSaldo($client_id, $until_current_acount = null) {
+    //     $query = CurrentAcount::where('client_id', $client_id)
+    //                             ->orderBy('sale_id', 'DESC');
+    //     if (!is_null($until_current_acount)) {
+    //         $last_current_acount = $query->where('sale_id', '<', $until_current_acount->sale_id)
+    //                     ->first();
+    //     } else {
+    //         $last_current_acount = $query->first();
+    //     }
+    //     if (is_null($last_current_acount)) {
+    //         return 0;
+    //     } else {
+    //         return $last_current_acount->saldo;
+    //     }
+    // }
+
+    static function getSaldo($client_id, $until_current_acount = null) {
         $query = CurrentAcount::where('client_id', $client_id)
                                 ->orderBy('id', 'DESC');
         if (!is_null($until_current_acount)) {
@@ -56,5 +72,14 @@ class CurrentAcountHelper {
                                         ->get();
         return $current_acounts;
     }
+
+    // static function getCurrentAcountsSinceMonths($client_id, $months_ago) {
+    //     $months_ago = Carbon::now()->subMonths($months_ago);
+    //     $current_acounts = CurrentAcount::where('client_id', $client_id)
+    //                                     ->whereDate('created_at', '>=', $months_ago)
+    //                                     ->orderBy('sale_id', 'ASC')
+    //                                     ->get();
+    //     return $current_acounts;
+    // }
 
 }

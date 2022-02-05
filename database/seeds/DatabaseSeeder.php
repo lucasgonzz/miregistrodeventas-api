@@ -36,5 +36,7 @@ class DatabaseSeeder extends Seeder
         $this->call(AddressSeeder::class);
         $this->call(WorkdaySeeder::class);
         $this->call(ConditionSeeder::class);
+        $this->call(TitleSeeder::class);
+        $this->call(BrandSeeder::class);
     }
 }

@@ -50,6 +50,7 @@ class ArticlesTableSeeder extends Seeder
         $iphones = [
             [
                 'name'              => 'Iphone 7',
+                'brand_id'          => 1,
                 'cost'              => 45000,
                 'price'             => 60000,
                 'stock'             => rand(4,7),
@@ -61,6 +62,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Iphone 7 Plus',
+                'brand_id'          => 1,
                 'cost'              => 55000,
                 'price'             => 70000,
                 'stock'             => rand(4,7),
@@ -72,6 +74,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Iphone Xr',
+                'brand_id'          => 1,
                 'cost'              => 70000,
                 'price'             => 90000,
                 'stock'             => rand(4,7),
@@ -84,6 +87,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Iphone Se',
+                'brand_id'          => 1,
                 'cost'              => 60000,
                 'price'             => 85000,
                 'stock'             => rand(4,7),
@@ -95,6 +99,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Iphone 11',
+                'brand_id'          => 1,
                 'cost'              => 90000,
                 'price'             => 105000,
                 'stock'             => rand(4,7),
@@ -107,6 +112,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Iphone 11 Pro',
+                'brand_id'          => 1,
                 'cost'              => 100000,
                 'price'             => 110000,
                 'stock'             => rand(4,7),
@@ -118,6 +124,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Iphone 12',
+                'brand_id'          => 1,
                 'cost'              => 110000,
                 'price'             => 130000,
                 'stock'             => rand(4,7),
@@ -130,6 +137,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Iphone 12 Pro',
+                'brand_id'          => 1,
                 'cost'              => 120000,
                 'price'             => 140000,
                 'stock'             => rand(4,7),
@@ -141,6 +149,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Cargador con cable',
+                'brand_id'           => 2,
                 'cost'              => 1000,
                 'price'             => 1500,
                 'stock'             => rand(4,7),
@@ -153,6 +162,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Cargador cabezal',
+                'brand_id'           => 2,
                 'cost'              => 700,
                 'price'             => 1000,
                 'stock'             => rand(4,7),
@@ -164,6 +174,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Cargador con cable',
+                'brand_id'           => 2,
                 'cost'              => 1000,
                 'price'             => 1500,
                 'stock'             => rand(4,7),
@@ -176,6 +187,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Cargador cabezal',
+                'brand_id'           => 2,
                 'cost'              => 700,
                 'price'             => 1000,
                 'stock'             => rand(4,7),
@@ -187,6 +199,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Auricular Bluetooth',
+                'brand_id'          => 2,
                 'cost'              => 2000,
                 'price'             => 3000,
                 'stock'             => rand(4,7),
@@ -199,6 +212,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Auricular con cable',
+                'brand_id'          => 2,
                 'cost'              => 1900,
                 'price'             => 2400,
                 'stock'             => rand(4,7),
@@ -216,6 +230,7 @@ class ArticlesTableSeeder extends Seeder
                 $article = Article::create([
                     'bar_code'          => $bar_code,
                     'name'              => $iphone['name'],
+                    'brand_id'              => $iphone['brand_id'],
                     'slug'              => ArticleHelper::slug($iphone['name']),
                     'cost'              => $iphone['cost'],
                     'price'             => $iphone['price'],

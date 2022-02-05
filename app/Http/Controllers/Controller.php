@@ -26,11 +26,15 @@ class Controller extends BaseController
     }
 
     function isProvider() {
-        return true;
-        if (auth()->user()->hasRole('provider')) {
+        $user = auth()->user();
+        if (!is_null($user)) {
+            if ($user->hasRole('provider')) {
+                return true;
+            }
+            return false;
+        } else {
             return true;
         }
-        return false;
     }
 
     // static function userId() {
