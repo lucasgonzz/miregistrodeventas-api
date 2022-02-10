@@ -173,6 +173,7 @@ class PdfPrintSale extends fpdf {
 
 	function printBorder() {
 		$this->SetLineWidth(.6);
+		$this->Y += 10;
 		$this->Line(5,$this->Y,205,$this->Y);
 		// $this->Y += 5;
 	}
@@ -261,13 +262,17 @@ class PdfPrintSale extends fpdf {
     	if ($this->saleHasDiscounts()) {
 	 		$this->SetY($this->Y);
 			$this->Y += 5;
+			$y = 5;
 	    	$this->SetX(105);
 	    	$this->Cell(100,5,'Descuentos: ','L',0,'L');
 	    	foreach ($this->sale->discounts as $discount) {
 	 			$this->SetY($this->Y);
 		    	$this->SetX(105);
 	    		$this->Cell(100,5,$discount->name . ' ' . $discount->percentage . '%','LB',0,'L');
+	    		$y += 5;
+	    		$this->Y += 5;
 	    	}
+	    	$this->Y -= $y;
     	}
 	}
 
@@ -297,8 +302,8 @@ class PdfPrintSale extends fpdf {
 				$this->Y += 5;
 	 			$this->SetY($this->Y);
 		    	$this->SetX(5);
-		    	$this->Cell(50,5,$commission->commissioner->name . ' ' . $commission->percentage . '%' ,'B',0,'L');
-		    	$this->Cell(50,5, '$'.Numbers::price($commission->monto) ,'B',0,'L');
+		    	$this->Cell(25,5,$commission->commissioner->name . ' ' . $commission->percentage . '%' , 1,0,'L');
+		    	$this->Cell(25,5, '$'.Numbers::price($commission->monto) , 1,0,'L');
 	    	}
 			$this->Y += 5;
  			$this->SetY($this->Y);
