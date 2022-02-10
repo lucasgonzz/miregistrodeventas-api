@@ -225,70 +225,44 @@ class ArticlesTableSeeder extends Seeder
         ];
        
         for ($user_id=2; $user_id <= 2; $user_id++) { 
-            foreach ($iphones as $iphone) {
-                $bar_code = rand(1000000000000, 9999999999999);
-                $article = Article::create([
-                    'bar_code'          => $bar_code,
-                    'name'              => $iphone['name'],
-                    'brand_id'              => $iphone['brand_id'],
-                    'slug'              => ArticleHelper::slug($iphone['name']),
-                    'cost'              => $iphone['cost'],
-                    'price'             => $iphone['price'],
-                    'stock'             => $iphone['stock'],
-                    'user_id'           => $user_id,
-                    'sub_category_id'   => $iphone['sub_category_id'],
-                    'featured'          => isset($iphone['featured']) ? $iphone['featured'] : null,
-                ]);
-                $this->createDescriptions($article);
-                $article->colors()->attach([1,2,3,4,rand(5,12)]);
-                foreach ($iphone['images'] as $url) { 
-                    Image::create([
-                        'article_id' => $article->id,
-                        'url'        => $url,
+            for ($h=1; $h < 4; $h++) { 
+                foreach ($iphones as $iphone) {
+                    $bar_code = rand(1000000000000, 9999999999999);
+                    $article = Article::create([
+                        'bar_code'          => $bar_code,
+                        'name'              => $iphone['name'].' '.count($iphones). ' de '.$h,
+                        'brand_id'              => $iphone['brand_id'],
+                        'slug'              => ArticleHelper::slug($iphone['name']),
+                        'cost'              => $iphone['cost'],
+                        'price'             => $iphone['price'],
+                        'stock'             => $iphone['stock'],
+                        'user_id'           => $user_id,
+                        'sub_category_id'   => $iphone['sub_category_id'],
+                        'featured'          => isset($iphone['featured']) ? $iphone['featured'] : null,
                     ]);
+                    $this->createDescriptions($article);
+                    $article->colors()->attach([1,2,3,4,rand(5,12)]);
+                    foreach ($iphone['images'] as $url) { 
+                        Image::create([
+                            'article_id' => $article->id,
+                            'url'        => $url,
+                        ]);
+                    }
+                    for ($j=0; $j < 4; $j++) {
+                    }
+                    $providers = Provider::where('user_id', $user_id)
+                                            ->take(3)
+                                            ->get();
+                    foreach ($providers as $provider) {
+                        $article->providers()->attach($provider->id, [
+                                                        'cost' => $article->cost,
+                                                        'price' => $article->price,
+                                                        'amount' => rand(1,4),
+                                                    ]);
+                    }
                 }
-                for ($j=0; $j < 4; $j++) {
-                }
-                $providers = Provider::where('user_id', $user_id)
-                                        ->take(3)
-                                        ->get();
-                foreach ($providers as $provider) {
-                    $article->providers()->attach($provider->id, [
-                                                    'cost' => $article->cost,
-                                                    'price' => $article->price,
-                                                    'amount' => rand(1,4),
-                                                ]);
-                }
-                // if ($user_id < 4 && $i < 10) {
-                //     for ($j=0; $j < 7; $j++) { 
-                //         Variant::create([
-                //             'description' => 'Modelo '.$j,
-                //             'stock'       => 7,
-                //             'article_id'  => $article->id,
-                //             'url'         => $this->images[$j],
-                //         ]);
-                //     }
-                // }
             }
         }
-        // for ($i=1; $i < 4; $i++) { 
-        //     $article = Article::create([
-        //         'bar_code'     => 111,
-        //         'name'         => 'Hola '.$i,
-        //         'slug'         => ArticleHelper::slug('Hola '.$i),
-        //         'cost'         => 500,
-        //         'price'        => 1000,
-        //         'stock'        => null,
-        //         'user_id'      => 2,
-        //         'sub_category_id'  => null,
-        //         'created_at'   => Carbon::now()->subDays(1),
-        //         'featured' => null,
-        //     ]);
-        //     Image::create([
-        //         'article_id' => $article->id,
-        //         'url'        => $this->images[0],
-        //     ]);
-        // }
     }
 
     function createDescriptions($article) {

@@ -34,7 +34,7 @@ class SalesTableSeeder extends Seeder
                     'created_at' => Carbon::now()->subDays($total_ventas-$i),
                 ]);
                 $articles = Article::where('user_id', 2)
-                                    ->take(30)
+                                    ->take(33)
                                     ->get();
                 foreach ($articles as $article) {
                     $sale->articles()->attach($article->id, [

@@ -229,7 +229,7 @@ class PdfPrintSale extends fpdf {
 				$precio_con_descuento = SaleHelper::getTotalMenosDescuentos($this->sale, $this->suma_precios_pagina);
 		 		$this->SetY($this->Y);
 				// $this->Y += 5;
-		    	$this->SetX(5);
+		    	$this->SetX(105);
 		    	$this->Cell(100,5,'Precio página con descuento: $'.Numbers::price($precio_con_descuento),'B',0,'L');
 				$this->Y += 5;
 			}

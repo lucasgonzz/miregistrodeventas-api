@@ -308,6 +308,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/articles/delete-image/{image_id}', 
 		'ArticleController@deleteImage'
 	);
+	// Copiar imagenes
+	Route::put('/articles/images-copy', 
+		'ArticleController@imagesCopy'
+	);
 
 	// Marcadores
 	Route::get('/markers', 

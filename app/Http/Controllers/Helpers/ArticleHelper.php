@@ -64,6 +64,7 @@ class ArticleHelper {
         }
         if ($descriptions) {
             foreach ($descriptions as $description) {
+                // $description = (array) $description;
                 if (isset($description['content']) && !is_null($description['content'])) {
                     Description::create([
                         'title'      => isset($description['title']) ? StringHelper::onlyFirstWordUpperCase($description['title']) : null,

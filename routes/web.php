@@ -97,11 +97,11 @@ Route::get('/orders/deliver/{order_id}',
 Route::post('/payment-notification', 'PaymentController@notification');
 
 Route::post('/login', 'LoginController@login');
+Route::post('/logout', 'LoginController@logout');
 // Route::post('/login-owner', 'LoginController@loginOwner');
-Route::post('login-employee', 'Auth\LoginController@loginEmployee');
-Route::post('login-admin', 'Auth\LoginController@loginAdmin');
-Route::post('register', 'Auth\RegisterController@registerCommerce');
-Route::post('logout', 'Auth\LoginController@logout');
+// Route::post('login-employee', 'Auth\LoginController@loginEmployee');
+// Route::post('login-admin', 'Auth\LoginController@loginAdmin');
+// Route::post('register', 'Auth\RegisterController@registerCommerce');
 
 Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
 Route::get('/current-acounts/pdf/{client_id}/{months_ago}', 'CurrentAcountController@pdfFromClient');

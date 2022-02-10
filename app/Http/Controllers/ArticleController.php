@@ -178,11 +178,29 @@ class ArticleController extends Controller
         }
     }
 
-    function deleteImage($image_id) {
-        $image = Image::find($image_id);
-        $path = 'articles/'.$this->userId().'/'.$image->url;
-        Storage::delete($path);
-        $image->delete();
+    // function deleteImage($image_id) {
+    //     $image = Image::find($image_id);
+    //     $path = 'articles/'.$this->userId().'/'.$image->url;
+    //     Storage::delete($path);
+    //     $image->delete();
+    // }
+
+    function imagesCopy(Request $request) {
+        $article_from = Article::where('id', $request->from)
+                                ->with('descriptions')
+                                ->first();
+        $article_to = Article::find($request->to);
+        foreach ($article_from->images as $image) {
+            Image::create([
+                'article_id' => $article_to->id,
+                'url'        => $image->url,
+            ]);
+        }
+        if ($request->copy_descriptions) {
+            ArticleHelper::setDescriptions($article_to, $article_from->descriptions);
+        }
+        $article = ArticleHelper::getFullArticle($article_to->id);
+        return response()->json(['article' => $article], 200);
     }
 
     // Eliminar el archivo tambien aca arriba

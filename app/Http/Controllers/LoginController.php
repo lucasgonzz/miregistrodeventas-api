@@ -59,7 +59,7 @@ class LoginController extends Controller
     }
 
     public function login(Request $request) {
-        if ($request->name == '') {
+        if ($request->dni == '') {
             if (Auth::attempt(['company_name' => $request->company_name, 
                                 'password' => $request->password,
                                 'owner_id' => null], $request->remember)) {
@@ -77,8 +77,7 @@ class LoginController extends Controller
             }
         } else {
             if (Auth::attempt([
-                                'company_name' => $request->company_name, 
-                                'name' => $request->name, 
+                                'dni' => $request->dni, 
                                 'password' => $request->password, 
                             ], $request->remember)) {
                 $user = User::where('id', Auth::user()->id)

@@ -38,13 +38,14 @@ class EmployeeController extends Controller
     function store(Request $request) {
     	$user = auth()->user();
         $employee = User::where('owner_id', $this->userId())
-                            ->where('name', $request->name)
+                            ->where('dni', $request->dni)
                             ->first();
 
 
         if (is_null($employee)) {
         	$employee = User::create([
-                'name' => ucwords($request->name),
+                'name' => ucfirst($request->name),
+                'dni' => $request->dni,
         		'company_name' => $user->company_name,
         		'password' => Hash::make($request->password),
                 'owner_id' => $user->id,
