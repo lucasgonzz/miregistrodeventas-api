@@ -230,7 +230,7 @@ class ArticlesTableSeeder extends Seeder
                     $bar_code = rand(1000000000000, 9999999999999);
                     $article = Article::create([
                         'bar_code'          => $bar_code,
-                        'name'              => $iphone['name'].' '.count($iphones). ' de '.$h,
+                        'name'              => $iphone['name'],
                         'brand_id'              => $iphone['brand_id'],
                         'slug'              => ArticleHelper::slug($iphone['name']),
                         'cost'              => $iphone['cost'],
@@ -241,12 +241,15 @@ class ArticlesTableSeeder extends Seeder
                         'featured'          => isset($iphone['featured']) ? $iphone['featured'] : null,
                     ]);
                     $this->createDescriptions($article);
-                    $article->colors()->attach([1,2,3,4,rand(5,12)]);
+                    $article->colors()->attach([1,2]);
+                    $color_id = 1;
                     foreach ($iphone['images'] as $url) { 
                         Image::create([
                             'article_id' => $article->id,
                             'url'        => $url,
+                            'color_id'   => $color_id,
                         ]);
+                        $color_id++;
                     }
                     for ($j=0; $j < 4; $j++) {
                     }

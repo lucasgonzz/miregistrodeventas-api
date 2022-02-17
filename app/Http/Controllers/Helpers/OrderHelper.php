@@ -19,6 +19,7 @@ use App\Notifications\OrderConfirmed as OrderConfirmedNotification;
 use App\Notifications\OrderFinished as OrderFinishedNotification;
 use App\Notifications\PaymentError as PaymentErrorNotification;
 use App\Notifications\PaymentSuccess as PaymentSuccessNotification;
+use App\Size;
 use App\Variant;
 
 
@@ -45,6 +46,22 @@ class OrderHelper {
                     foreach ($colors as $color) {
                         if ($color->id == $article->pivot->color_id) {
                             $article->color = $color;
+                        }
+                    }
+                } 
+            }
+        }
+        return $orders;
+    }
+
+    static function setArticlesSize($orders) {
+        $sizes = Size::all();
+        foreach ($orders as $order) {
+            foreach ($order->articles as $article) {
+                if (isset($article->pivot) && $article->pivot->size_id) {
+                    foreach ($sizes as $size) {
+                        if ($size->id == $article->pivot->size_id) {
+                            $article->size = $size;
                         }
                     }
                 } 

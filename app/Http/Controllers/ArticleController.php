@@ -30,7 +30,8 @@ class ArticleController extends Controller
         $articles = Article::where('user_id',$this->userId())
                             ->where('status', 'active')
                             ->orderBy('created_at', 'DESC')
-                            ->with('images')
+                            ->with('images.color')
+                            ->with('sizes')
                             ->with('colors')
                             ->with('condition')
                             ->with('descriptions')
@@ -51,7 +52,8 @@ class ArticleController extends Controller
                             ->with(['views' => function($q) use($weeks_ago) {
                                 $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
                             }])
-                            ->with('images')
+                            ->with('images.color')
+                            ->with('sizes')
                             ->with('colors')
                             ->with('condition')
                             ->with('views.buyer')
@@ -76,6 +78,7 @@ class ArticleController extends Controller
         $article->bar_code = $request->bar_code;
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
         $article->brand_id = $request->brand_id != 0 ? $request->brand_id : null;
+        $article->with_dolar = $request->with_dolar;
         if ($article->price != $request->price) {
             $article->previus_price = $article->price;
             $article->timestamps = true;
@@ -96,6 +99,7 @@ class ArticleController extends Controller
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDescriptions($article, $request->descriptions);
+        ArticleHelper::setSizes($article, $request->sizes_id);
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
         if ($request->new_stock != 0) {
@@ -338,6 +342,7 @@ class ArticleController extends Controller
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDescriptions($article, $request->descriptions);
+        ArticleHelper::setSizes($article, $request->sizes_id);
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
         if ($request->provider_id != 0) {

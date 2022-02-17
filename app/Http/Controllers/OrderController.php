@@ -24,12 +24,14 @@ class OrderController extends Controller
                         ->with('articles.images')
                         ->with('articles.variants')
                         ->with('articles.colors')
+                        ->with('articles.sizes')
                         ->with('buyer')
                         ->with('address')
                         ->with('cupons')
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         $orders = OrderHelper::setArticlesColor($orders);
+        $orders = OrderHelper::setArticlesSize($orders);
         return response()->json(['orders' => $orders], 200);
     }
     
@@ -40,6 +42,7 @@ class OrderController extends Controller
                         ->with('articles.images')
                         ->with('articles.variants')
                         ->with('articles.colors')
+                        ->with('articles.sizes')
                         ->with('buyer')
                         ->with('address')
                         ->with('payment')
@@ -47,6 +50,7 @@ class OrderController extends Controller
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         $orders = OrderHelper::setArticlesColor($orders);
+        $orders = OrderHelper::setArticlesSize($orders);
         return response()->json(['orders' => $orders], 200);
     }
 
@@ -57,6 +61,7 @@ class OrderController extends Controller
         // $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
         $orders = OrderHelper::setArticlesKeyAndVariant([$order]);
         $orders = OrderHelper::setArticlesColor([$order]);
+        $orders = OrderHelper::setArticlesSize([$order]);
         OrderHelper::procesarPago($order);
         MessageHelper::sendOrderConfirmedMessage($order);
         OrderHelper::checkPaymentMethodError($order);

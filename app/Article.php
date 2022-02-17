@@ -29,6 +29,10 @@ class Article extends Model
         return $this->belongsToMany('App\Tag');
     }
 
+    function sizes() {
+        return $this->belongsToMany('App\Size');
+    }
+
     function colors() {
         return $this->belongsToMany('App\Color');
     }

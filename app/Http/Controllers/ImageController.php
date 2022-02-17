@@ -18,6 +18,14 @@ class ImageController extends Controller
     	return response()->json(['article' => $article], 200);
     }
 
+    function setColor(Request $request) {
+        $image = Image::find($request->id);
+        $image->color_id = $request->color_id;
+        $image->save();
+        $article = ArticleHelper::getFullArticle($image->article_id);
+        return response()->json(['article' => $article], 200);
+    }
+
     function deleteVariant($image) {
         $variant = Variant::where('url', $image->url)->first();
         if ($variant) {

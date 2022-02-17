@@ -17,6 +17,7 @@ class TitleSeeder extends Seeder
         Title::create([
             'user_id'   => $user->id,
             'header'    => 'Actualízate hoy',
+            'color'     => '#f7f0fe'
             'image_url' => 'v1643308728/articles/zzur3sccerk7f7vndkjn.png'
         ]);
     }

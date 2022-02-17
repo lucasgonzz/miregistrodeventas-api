@@ -226,6 +226,10 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::get('colors', 
 			'ColorController@index'
 		);
+		// Sizes
+		Route::get('sizes', 
+			'SizeController@index'
+		);
 		// Conditions
 		Route::get('conditions', 
 			'ConditionController@index'
@@ -295,6 +299,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	// Imagenes
 	Route::delete('/images/{image_id}', 
 		'ImageController@delete'
+	);
+	Route::put('/images/set-color', 
+		'ImageController@setColor'
 	);
 	Route::get('/articles/set-first-image/{image_id}', 
 		'ArticleController@setFirstImage'

@@ -76,6 +76,15 @@ class ArticleHelper {
         }
     }
 
+    static function setSizes($article, $sizes_id) {
+        $article->sizes()->sync([]);
+        if ($sizes_id) {
+            foreach ($sizes_id as $size_id) {
+                $article->sizes()->attach($size_id);
+            }
+        }
+    }
+
     static function setColors($article, $colors) {
         $article->colors()->sync([]);
         if ($colors) {
@@ -151,8 +160,9 @@ class ArticleHelper {
 
     static function getFullArticle($article_id) {
         $article = Article::where('id', $article_id)
-                            ->with('images')
+                            ->with('images.color')
                             ->with('descriptions')
+                            ->with('sizes')
                             ->with('colors')
                             ->with('condition')
                             ->with('sub_category')

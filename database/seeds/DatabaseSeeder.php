@@ -38,5 +38,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ConditionSeeder::class);
         $this->call(TitleSeeder::class);
         $this->call(BrandSeeder::class);
+        $this->call(SizeSeeder::class);
     }
 }

@@ -15,15 +15,15 @@ class ConditionSeeder extends Seeder
         $conditions = [
             [
                 'name' => 'Nuevo',
-                'description' => 'Equipo nuevo sellado de fabrica',
+                'description' => 'Equipo nuevo sellado de fabrica.',
             ],
             [
                 'name' => 'Seminuevo',
-                'description' => 'Equipo reacondicionado por Apple, con bateria +80%',
+                'description' => 'Equipo reacondicionado por Apple, con bateria +80%.',
             ],
             [
                 'name' => 'Usado',
-                'description' => 'Equipo usado',
+                'description' => 'Equipo usado.',
             ],
         ];
         foreach ($conditions as $condition) {

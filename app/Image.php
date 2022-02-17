@@ -7,5 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 class Image extends Model
 {
 	public $timestamps = false;
-    public $fillable = ['article_id', 'url'];
+    public $guarded = [];
+
+    function color() {
+    	return $this->belongsTo('App\Color');
+    }
 }
