@@ -9,15 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 Route::middleware('auth:sanctum')->group(function () {
 
-	Route::get('/user', function(Request $request) {
-		$user = Auth::user();
-		$user = App\User::where('id', $user->id)
-						->with('permissions')
-						->with('roles')
-						->with('addresses')
-						->first();
-		return response()->json(['user' => $user], 200);
-	});
+	Route::get('/user', 'UserController@user');
 
 	// -----------------------CONFIGURACION------------------------------------------
 	Route::put('/user/password', 
@@ -59,6 +51,21 @@ Route::middleware('auth:sanctum')->group(function () {
 	// -----------------------SUPER--------------------------------------------------
 	Route::get('super/admins', 
 		'SuperController@admins'
+	);
+	Route::get('super/commerces', 
+		'SuperController@commerces'
+	);
+	Route::put('super/commerces', 
+		'SuperController@updateCommerce'
+	);
+	Route::get('super/plans', 
+		'SuperController@plans'
+	);
+	Route::put('super/plans', 
+		'SuperController@updatePlan'
+	);
+	Route::get('super/permissions', 
+		'SuperController@permissions'
 	);
 	// Registrar de comercios y administradores
 	Route::post('super/commerce', 

@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateImpressionsTable extends Migration
+class CreatePermissionUserTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,10 @@ class CreateImpressionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('impressions', function (Blueprint $table) {
+        Schema::create('permission_user', function (Blueprint $table) {
             $table->id();
-            $table->bigInteger('sale_id')->unsigned();
-            // $table->foreign('sale_id')->references('id')->on('sales');
-            $table->enum('type', ['client', 'commerce']);
+            $table->integer('permission_id')->unsigned();
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
     }
@@ -29,6 +28,6 @@ class CreateImpressionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('impressions');
+        Schema::dropIfExists('permission_user');
     }
 }

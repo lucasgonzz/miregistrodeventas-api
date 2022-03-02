@@ -97,7 +97,9 @@ Route::get('/orders/deliver/{order_id}',
 Route::post('/payment-notification', 'PaymentController@notification');
 
 Route::post('/login', 'LoginController@login');
+Route::post('/login-super', 'LoginController@loginSuper');
 Route::post('/logout', 'LoginController@logout');
+Route::post('/users', 'UserController@store');
 // Route::post('/login-owner', 'LoginController@loginOwner');
 // Route::post('login-employee', 'Auth\LoginController@loginEmployee');
 // Route::post('login-admin', 'Auth\LoginController@loginAdmin');

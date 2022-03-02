@@ -44,21 +44,16 @@ class EmployeeController extends Controller
 
         if (is_null($employee)) {
         	$employee = User::create([
-                'name' => ucfirst($request->name),
-                'dni' => $request->dni,
-        		'company_name' => $user->company_name,
-        		'password' => Hash::make($request->password),
-                'owner_id' => $user->id,
-                'percentage_card' => $user->percentage_card,
-        		'online' => $user->online,
-                'created_at' => Carbon::now(),
+                'name'              => ucfirst($request->name),
+                'dni'               => $request->dni,
+        		'company_name'      => $user->company_name,
+        		'password'          => Hash::make($request->password),
+                'owner_id'          => $user->id,
+                'percentage_card'   => $user->percentage_card,
+        		'type'              => $user->type,
+                'created_at'        => Carbon::now(),
         	]);
 
-        	if ($user->hasRole('provider')) {
-                $employee->syncRoles('provider');
-        	} else {
-                $employee->syncRoles('commerce');
-        	}
         	$employee->permissions()->attach($request->permissions_id);
             $employee = User::where('id', $employee->id)
                                 ->with('permissions')

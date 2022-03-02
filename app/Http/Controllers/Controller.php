@@ -28,10 +28,7 @@ class Controller extends BaseController
     function isProvider() {
         $user = auth()->user();
         if (!is_null($user)) {
-            if ($user->hasRole('provider')) {
-                return true;
-            }
-            return false;
+            return $user->type == 'provider';
         } else {
             return true;
         }

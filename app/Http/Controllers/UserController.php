@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Collection;
 use App\Http\Controllers\Helpers\StringHelper;
+use App\Http\Controllers\Helpers\UserHelper;
 use App\Recommendation;
 use App\User;
 use Carbon\Carbon;
@@ -30,9 +31,39 @@ class UserController extends Controller
         ];  
     }
 
-    function collections() {
-        return Collection::where('commerce_id', Auth()->user()->id)
-                        ->get();
+    function user() {
+        $auth_user = Auth()->user();
+        if (is_null($auth_user->owner_id)) {
+            $user = User::where('id', $auth_user->id)
+                            ->with('plan.permissions')
+                            ->with('addresses')
+                            ->first();
+        } else {
+            $user = User::where('id', $auth_user->id)
+                            ->with('permissions')
+                            ->with('addresses')
+                            ->first();
+        }
+        return response()->json(['user' => $user], 200);
+    }
+
+    function store(Request $request) {
+        $user = User::create([
+            'name'              => $request->name,
+            'city'              => 'Gualeguay',
+            'email'             => $request->email,
+            'company_name'      => $request->company_name,
+            'status'            => 'commerce',
+            'plan_id'           => 2,
+            'type'              => $request->type,
+            'password'          => bcrypt($request->password),
+            // 'iva'            => 'Responsable inscripto',
+            'has_delivery'      => 1,
+            'delivery_price'    => 0,
+            'online_prices'     => 'all',
+            'order_description' => '¿Hay que envolver algo?',
+            'expire_at'         =>  Carbon::now()->addWeek(),
+        ]);
     }
 
     // Confirguracion - Editar
@@ -69,62 +100,6 @@ class UserController extends Controller
         return true;
     }
 
-    function getDeliveryPirce($delivery_price) {
-        if ($delivery_price != 0 || $delivery_price != '') {
-            return $delivery_price;
-        }
-        return null;
-    }
-
-    function updateImage(Request $request) {
-        $user = Auth()->user();
-        $upload_path = public_path('images/users/'.$user->id);
-        $time = time();
-        $extension = $request->image->getClientOriginalExtension();
-        $generated_new_name = $time . '.' . $extension;
-        $request->image->move($upload_path, $generated_new_name);
-        $user->image = $generated_new_name;
-        $user->save();
-    }
-
-    function ownerByCompanyName($company_name) {
-        return User::where('company_name', str_replace('-', ' ', $company_name))
-                    ->first();
-    }
-
-    function admin($admin_id) {
-        return User::where('status', 'admin')
-                    ->where('id', $admin_id)
-                    ->first();
-    }
-
-    function index($id = null) {
-        if (is_null($id)) {
-            return User::where('id', Auth()->user()->id)
-                        ->with('permissions')
-                        ->with('roles')
-                        ->first();
-        } else {
-            return User::where('id', $id)
-                        ->with('permissions')
-                        ->with('roles')
-                        ->first();
-        }
-    }
-
-    function contratarServicio() {
-        $user = Auth()->user();
-        $user->status = 'in_use';
-        $user->created_at = Carbon::now();
-        // $expire = new Carbon($user->expire);
-        // $user->expire = $expire->addMonth();
-        $user->save();
-    }
-
-    function getCompanyName() {
-        return Auth()->user()->company_name;
-    }
-
     function setCompanyName($company_name) {
         $user_id = Auth()->user()->id;
         $user = User::find($user_id);
@@ -136,10 +111,6 @@ class UserController extends Controller
         }
     }
 
-    function getPercentageCard() {
-        return Auth()->user()->percentage_card;
-    }
-
     function setPercentageCard(Request $request) {
         $user_id = Auth()->user()->id;
         $user = User::find($user_id);
@@ -149,10 +120,6 @@ class UserController extends Controller
             $employee->percentage_card = $request->percentage_card;
             $employee->save();
         }
-    }
-
-    public function password() {
-        return view('auth.password');
     }
 
     public function updatePassword(Request $request) {

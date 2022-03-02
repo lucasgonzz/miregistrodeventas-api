@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Helpers;
 use App\User;
 
 class UserHelper {
+
 	static function userId() {
         $user = Auth()->user();
         if (is_null($user)) {

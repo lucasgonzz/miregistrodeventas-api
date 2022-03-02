@@ -19,7 +19,9 @@ class UsersTableSeeder extends Seeder
             'city'            => 'Gualeguay',
             'email'           => 'marcos@gmail.com',
             'company_name'    => 'Mi Negocio',
-            'status'          => 'trial',
+            'status'          => 'commerce',
+            'plan_id'         => 1,
+            'type'            => 'provider',
             'password'        => bcrypt('1234'),
             'percentage_card' => 20,
             'iva'             => 'Responsable inscripto',
@@ -31,16 +33,16 @@ class UsersTableSeeder extends Seeder
             'order_description' => '¿Hay que envolver algo?',
             // 'admin_id'      => $admin->id,
             'created_at'      => Carbon::now()->subMonths(2),
-            'expire'          => Carbon::now()->subDay(),
         ]);
-        $commerce->roles()->sync([1,3]);
 
         $commerce = User::create([
             'name'            => 'Lucas',
             'city'            => 'Rosario',
             'email'           => 'lucasgonzalez5500@gmail.com',
             'company_name'    => 'Fiushh',
-            'status'          => 'trial',
+            'status'          => 'commerce',
+            'plan_id'         => 2,
+            'type'            => 'commerce',
             'password'        => bcrypt('1234'),
             'percentage_card' => 20,
             'iva'             => 'Responsable inscripto',
@@ -52,67 +54,36 @@ class UsersTableSeeder extends Seeder
             'with_dolar' => 0,
             // 'admin_id'      => $admin->id,
             'created_at'      => Carbon::now()->subMonths(2),
-            'expire'          => Carbon::now()->subDay(),
+            'expire_at'       => Carbon::now()->addDays(3),
         ]);
-        $commerce->roles()->sync([1,3]);
         
         $lucas = User::create([
             'name' => 'Lucas',
         	'company_name' => 'Lucas',
-            'status' => 'in_use',
+            'status' => 'commerce',
+            'plan_id'         => 3,
+            'type'     => 'provider',
         	'password' => bcrypt('1234'),
             // 'admin_id' => $admin->id,
             'created_at' => Carbon::now(),
-            'expire' => Carbon::now()->addWeeks(4),
+            'expire_at' => Carbon::now()->addWeek(),
         ]);
-        $lucas->roles()->sync([1,2]);
 
         $commerce = User::create([
             'name' => 'Fran',
             'company_name' => 'Lo de Fran',
-            'status' => 'trial',
+            'status' => 'commerce',
+            'plan_id'         => 2,
             'password' => bcrypt('1234'),
             // 'admin_id' => $admin->id,
             'created_at' => Carbon::now(),
-            'expire' => Carbon::now(),
+            'expire_at' => Carbon::now(),
         ]);
-        $commerce->roles()->sync([1,3]);
-        // $commerce->permissions()->sync([9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
 
-        // $commerce = User::create([
-        //     'name' => 'Juan',
-        //     'company_name' => 'Lo de Juan',
-        //     'status' => 'trial',
-        //     'password' => bcrypt('1234'),
-        //     'admin_id' => $admin->id,
-        //     'created_at' => Carbon::now()->subWeeks(2),
-        //     'expire' => Carbon::now()->subDay(),
-        // ]);
-        // $commerce->roles()->sync([1,3]);
-        // $commerce->permissions()->sync([9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
-
-        // for ($user_id=1; $user_id <= 8; $user_id++) { 
-        //     $commerce = User::create([
-        //         'company_name' => 'Negocio '.$user_id,
-        //         'status' => 'for_trial',
-        //         'password' => bcrypt('1234'),
-        //         'admin_id' => $admin->id,
-        //         'created_at' => Carbon::now(),
-        //     ]);
-        //     $commerce->roles()->sync([1,3]);
-        //     $commerce->permissions()->sync([9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]);
-        // }
-
-        // $super = User::create([
-        //     'name' => 'Lucas',
-        //     'status' => 'super',
-        //     'password' => bcrypt('1234'),
-        // ]);
-
-        // $admin = User::create([
-        //     'name' => 'Admin',
-        //     'status' => 'admin',
-        //     'password' => bcrypt('1234'),
-        // ]);
+        $super = User::create([
+            'name' => 'Lucas super',
+            'status' => 'super',
+            'password' => bcrypt('1234'),
+        ]);
     }
 }

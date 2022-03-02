@@ -18,9 +18,12 @@ class CreateUsersTable extends Migration
             $table->string('name', 128)->nullable();
             $table->string('city', 128)->nullable();
             $table->string('email')->nullable()->unique();
+            $table->string('phone')->nullable()->unique();
             $table->string('company_name', 128)->nullable();
+            $table->enum('type', ['commerce', 'provider'])->default('commerce');
             $table->string('password', 128);
             $table->integer('owner_id')->nullable()->unsigned();
+            $table->integer('plan_id')->unsigned()->nullable();
             // $table->integer('admin_id')->nullable()->unsigned();
             $table->integer('percentage_card')->nullable();
             $table->string('iva')->nullable();
@@ -32,11 +35,11 @@ class CreateUsersTable extends Migration
             $table->string('order_description')->nullable();
             $table->boolean('with_dolar')->default(0);
             $table->timestamp('created_at')->nullable();
-            $table->timestamp('expire')->nullable();
+            $table->timestamp('expire_at')->nullable();
             $table->string('online')->nullable();
             $table->rememberToken();
 
-            $table->enum('status', ['for_trial', 'trial', 'in_use', 'admin', 'super', 'recommended']);
+            $table->enum('status', ['commerce', 'admin', 'super']);
 
             // $table->foreign('owner_id')->references('id')->on('users');
             // $table->foreign('admin_id')->references('id')->on('users');

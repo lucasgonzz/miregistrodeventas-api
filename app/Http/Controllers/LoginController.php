@@ -3,11 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Helpers\UserHelper;
 use App\Providers\RouteServiceProvider;
+use App\User;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\User;
 
 class LoginController extends Controller
 {
@@ -62,10 +63,9 @@ class LoginController extends Controller
         if ($request->dni == '') {
             if (Auth::attempt(['company_name' => $request->company_name, 
                                 'password' => $request->password,
-                                'owner_id' => null], $request->remember)) {
+                                'status' => 'commerce'], $request->remember)) {
                 $user = User::where('id', Auth::user()->id)
-                                ->with('roles')
-                                ->with('permissions')
+                                ->with('plan.permissions')
                                 ->with('addresses')
                                 ->first();
                 return response()->json([
@@ -73,7 +73,9 @@ class LoginController extends Controller
                     'user'  => $user
                 ], 200);
             } else {
-                return response()->json(['login' => false], 200);
+                return response()->json([
+                    'login' => false,
+                ], 200);
             }
         } else {
             if (Auth::attempt([
@@ -81,18 +83,31 @@ class LoginController extends Controller
                                 'password' => $request->password, 
                             ], $request->remember)) {
                 $user = User::where('id', Auth::user()->id)
-                                ->with('roles')
                                 ->with('permissions')
                                 ->first();
-                return [
+                return response()->json([
                     'login' => true,
                     'user'  => $user
-                ];
+                ]);
             } else {
-                return [
+                return response()->json([
                     'login' => false
-                ];
+                ]);
             }
+        }
+    }
+
+    public function loginSuper(Request $request) {
+        if (Auth::attempt(['name' => $request->company_name, 
+                            'password' => $request->password,
+                            'status' => 'super'], $request->remember)) {
+            $user = User::find(Auth::user()->id);
+            return response()->json([
+                'login' => true,
+                'user'  => $user,
+            ], 200);
+        } else {
+            return response()->json(['login' => false], 200);
         }
     }
 

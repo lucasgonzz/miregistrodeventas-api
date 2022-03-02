@@ -124,7 +124,10 @@ class SaleController extends Controller
                         ->orderBy('id', 'DESC')
                         ->take($index)
                         ->get();
-        return response()->json(['sale' => $sales[count($sales)-1]]);
+        if (count($sales) >= 1) {
+            return response()->json(['sale' => $sales[count($sales)-1]]);
+        }
+        return response()->json(['sale' => null]);
     }
 
     function pagarDeuda($sale_id, $debt) {
@@ -380,7 +383,7 @@ class SaleController extends Controller
     function deleteSales($sales_id) {
         foreach (explode('-', $sales_id) as $sale_id) {
             $sale = Sale::find($sale_id);
-            if (auth()->user()->hasRole('provider')) {
+            if ($this->isProvider()) {
                 $current_acount = new CurrentAcountController();
                 $current_acount->deleteFromSale($sale);
                 $commission = new CommissionController();

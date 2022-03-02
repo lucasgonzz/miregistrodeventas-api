@@ -4,33 +4,61 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\User;
+use App\Permission;
+use App\Plan;
 use App\Collection;
 use Carbon\Carbon;
-use Caffeinated\Shinobi\Models\Permission;
 
 class SuperController extends Controller
 {
-    function admins() {
-    	return User::where('status', 'admin')
-    				->with('commerces')
-    				->get();
+    // function admins() {
+    //     return User::where('status', 'admin')
+    //                 ->with('commerces')
+    //                 ->get();
+    // }
+
+    function commerces() {
+        $commerces = User::where('status', 'commerce')
+                    ->whereNull('owner_id')
+                    ->with('plan.permissions')
+                    ->get();
+        return response()->json(['commerces' => $commerces], 200);
     }
 
-    function registerCommerce(Request $request) {
-        $commerce = User::create([
-            'name' => 'Comercio',
-            'company_name' => ucwords($request->company_name),
-            'admin_id' => $request->admin_id,
-            'status' => 'for_trial',
-            'password' => bcrypt($request->password),
-        ]);
-        // 1 es el rol de owner, 3 el de comercio
-        $commerce->roles()->sync([1, 3]);
-        $permissions_can_use = Permission::where('user_id', 0)
-                                            ->get();
-        foreach ($permissions_can_use as $permission) {
-            $commerce->permissions()->attach($permission->id);
-        }
+    function plans() {
+        $plans = Plan::with('permissions')
+                        ->get();
+        return response()->json(['plans' => $plans], 200);
+    }
+
+    function permissions() {
+        $permissions = Permission::all();
+        return response()->json(['permissions' => $permissions], 200);
+    }
+
+    function updateCommerce(Request $request) {
+        $commerce = User::find($request->id);
+        $commerce->name = $request->name;
+        $commerce->company_name = $request->company_name;
+        $commerce->phone = $request->phone;
+        $commerce->email = $request->email;
+        $commerce->plan_id = $request->plan_id;
+        $commerce->save();
+        $commerce = User::where('id', $commerce->id)
+                        ->with('plan.permissions')
+                        ->with('addresses')
+                        ->first();
+        return response()->json(['commerce' => $commerce], 200);
+    }
+
+    function updatePlan(Request $request) {
+        $plan = Plan::find($request->id);
+        $permissions = [];
+        $plan->permissions()->sync($request->permissions_id);
+        $plan = Plan::where('id', $plan->id)
+                        ->with('permissions')
+                        ->first();
+        return response()->json(['plan' => $plan], 200);
     }
 
     function registerAdmin(Request $request) {
