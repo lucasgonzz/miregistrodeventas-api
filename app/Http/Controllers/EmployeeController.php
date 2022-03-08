@@ -22,7 +22,7 @@ class EmployeeController extends Controller
         $employee = User::where('id', $request->id)
                         ->first();
 
-        $employee->syncPermissions($request->permissions_id);
+        $employee->permissions()->sync($request->permissions_id);
 
         $employee = User::where('id', $request->id)
         				->with('permissions')
@@ -50,7 +50,8 @@ class EmployeeController extends Controller
         		'password'          => Hash::make($request->password),
                 'owner_id'          => $user->id,
                 'percentage_card'   => $user->percentage_card,
-        		'type'              => $user->type,
+                'type'              => $user->type,
+        		'status'            => 'commerce',
                 'created_at'        => Carbon::now(),
         	]);
 

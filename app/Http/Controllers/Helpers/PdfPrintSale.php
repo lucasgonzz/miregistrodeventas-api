@@ -106,7 +106,7 @@ class PdfPrintSale extends fpdf {
                 } else {
 	                $this->num_page++;
 					$this->printPieDePagina();
-        			$this->Y = 220;
+        			// $this->Y = 220;
                     if ($this->articulos_en_esta_venta < $this->cantidad_articulos_de_esta_venta) {
 	                    $this->resetPage();
                     	$this->AddPage();
@@ -132,6 +132,7 @@ class PdfPrintSale extends fpdf {
 	}
 
 	function printPieDePagina() {
+        $this->Y = 220;
 		$this->printBorder();
         $this->printInfoPagina();
         $this->printPreciosCostosPagina();
@@ -232,8 +233,8 @@ class PdfPrintSale extends fpdf {
 				// $this->Y += 5;
 		    	$this->SetX(105);
 		    	$this->Cell(100,5,'Precio página con descuento: $'.Numbers::price($precio_con_descuento),'B',0,'L');
-				$this->Y += 5;
 			}
+			$this->Y += 5;
         }
 	}
 

@@ -36,7 +36,7 @@ class PlansSeeder extends Seeder
                                 ->orWhere('slug', 'sales.index')
                                 ->orWhere('slug', 'employees')
                                 ->orWhere('slug', 'discounts_sellers')
-                                ->orWhere('slug', 'clients.index')
+                                ->orWhere('slug', 'clients')
                                 ->pluck('id');
         $basico->permissions()->sync($permissions);
 
@@ -55,7 +55,7 @@ class PlansSeeder extends Seeder
                                 ->orWhere('slug', 'sales.index')
                                 ->orWhere('slug', 'employees')
                                 ->orWhere('slug', 'discounts_sellers')
-                                ->orWhere('slug', 'clients.index')
+                                ->orWhere('slug', 'clients')
                                 ->orWhere('slug', 'online.orders')
                                 ->orWhere('slug', 'online.questions')
                                 ->orWhere('slug', 'online.buyers')

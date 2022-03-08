@@ -11,6 +11,9 @@ use App\Sale;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
+use App\Exports\ArticlesExport;
+use Maatwebsite\Excel\Facades\Excel;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -111,7 +114,7 @@ Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 
 // Exel
-Route::get('/articles/exel', 'ArticleController@export');
+Route::get('/articles/ecxel', 'ArticleController@export');
 
 // Imprimir articulos
 Route::get('/pdf/{columns}/{articles_ids}/{orientation}/{header?}', 'PdfController@articles');

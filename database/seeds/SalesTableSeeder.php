@@ -21,19 +21,20 @@ class SalesTableSeeder extends Seeder
     {
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
         $now = Carbon::now();
-        $total_ventas = 20;
+        $total_ventas = 10;
+        $user_id = 3;
         for ($i=1; $i <= $total_ventas; $i++) { 
             // for ($j=0; $j < 5; $j++) { 
                 $num_sale = SaleHelper::numSale(1);
                 $sale = Sale::create([
-                    'user_id' => 2,
+                    'user_id' => $user_id,
                     'num_sale' => $num_sale,
                     'percentage_card' => null,
                     'client_id' => 2,
                     'sale_type_id' => 1,
                     'created_at' => Carbon::now()->subDays($total_ventas-$i),
                 ]);
-                $articles = Article::where('user_id', 2)
+                $articles = Article::where('user_id', $user_id)
                                     ->take(33)
                                     ->get();
                 foreach ($articles as $article) {

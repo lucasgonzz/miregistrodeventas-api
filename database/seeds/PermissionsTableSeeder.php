@@ -90,7 +90,7 @@ class PermissionsTableSeeder extends Seeder
         // Clientes
         Permission::create([
             'name' => 'Ver clientes',
-            'slug' => 'clients.index',
+            'slug' => 'clients',
         ]);
 
         // Empleados
