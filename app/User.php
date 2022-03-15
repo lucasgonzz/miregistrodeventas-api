@@ -16,8 +16,8 @@ class User extends Authenticatable
      * @var array
      */
     public $timestamps = false;
-    
     protected $guarded = [];
+    protected $dates = ['expired_at'];
 
     /**
      * The attributes that should be hidden for arrays.
@@ -55,6 +55,10 @@ class User extends Authenticatable
 
     public function addresses() {
         return $this->hasMany('App\Address');
+    }
+
+    public function subscription() {
+        return $this->hasOne('App\Subscription');
     }
 
     public function articles_sub_user() {

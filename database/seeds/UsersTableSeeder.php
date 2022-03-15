@@ -41,7 +41,7 @@ class UsersTableSeeder extends Seeder
             'email'           => 'lucasgonzalez5500@gmail.com',
             'company_name'    => 'Fiushh',
             'status'          => 'commerce',
-            'plan_id'         => 2,
+            'plan_id'         => 3,
             'type'            => 'commerce',
             'password'        => bcrypt('1234'),
             'percentage_card' => 20,
@@ -54,7 +54,7 @@ class UsersTableSeeder extends Seeder
             'with_dolar' => 0,
             // 'admin_id'      => $admin->id,
             'created_at'      => Carbon::now()->subMonths(2),
-            'expire_at'       => Carbon::now()->addDays(3),
+            // 'expired_at'       => Carbon::now(),
         ]);
         
         $lucas = User::create([
@@ -66,7 +66,7 @@ class UsersTableSeeder extends Seeder
         	'password' => bcrypt('1234'),
             // 'admin_id' => $admin->id,
             'created_at' => Carbon::now(),
-            'expire_at' => Carbon::now()->addWeek(),
+            'expired_at' => Carbon::now()->addWeek(),
         ]);
 
         $commerce = User::create([
@@ -77,7 +77,7 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('1234'),
             // 'admin_id' => $admin->id,
             'created_at' => Carbon::now(),
-            'expire_at' => Carbon::now(),
+            'expired_at' => Carbon::now(),
         ]);
 
         $super = User::create([

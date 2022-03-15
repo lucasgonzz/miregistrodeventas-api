@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\User;
+use Carbon\Carbon;
 
 class UserHelper {
 
@@ -18,6 +19,16 @@ class UserHelper {
 	            return $user->owner_id;
 	        }
         }
+    }
+
+    static function setUserTrial($user) {
+    	$expired_at = $user->expired_at;
+    	if (!is_null($expired_at) && $expired_at->lte(Carbon::now())) {
+    		$user->trial_expired = true;
+    	} else {
+    		$user->trial_expired = false;
+    	}
+    	return $user;
     }
 
 	static function isOscar() {

@@ -53,6 +53,7 @@ class EmployeeController extends Controller
                 'type'              => $user->type,
         		'status'            => 'commerce',
                 'created_at'        => Carbon::now(),
+                'expired_at'        => $user->expired_at,
         	]);
 
         	$employee->permissions()->attach($request->permissions_id);

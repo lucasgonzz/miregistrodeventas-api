@@ -16,20 +16,24 @@ class ConditionSeeder extends Seeder
             [
                 'name' => 'Nuevo',
                 'description' => 'Equipo nuevo sellado de fabrica.',
+                'user_id' => 2
             ],
             [
                 'name' => 'Seminuevo',
                 'description' => 'Equipo reacondicionado por Apple, con bateria +80%.',
+                'user_id' => 2
             ],
             [
                 'name' => 'Usado',
                 'description' => 'Equipo usado.',
+                'user_id' => 2
             ],
         ];
         foreach ($conditions as $condition) {
             Condition::create([
                 'name' => $condition['name'],
                 'description' => $condition['description'],
+                'user_id' => $condition['user_id'],
             ]);
         }
     }

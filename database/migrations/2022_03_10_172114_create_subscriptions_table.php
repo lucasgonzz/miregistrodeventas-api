@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateConditionsTable extends Migration
+class CreateSubscriptionsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,12 @@ class CreateConditionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('conditions', function (Blueprint $table) {
+        Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('preapproval_id', 128);
+            $table->string('preapproval_plan_id', 128);
+            $table->string('status', 128);
+            $table->string('payer_email', 128);
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
@@ -29,6 +31,6 @@ class CreateConditionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('conditions');
+        Schema::dropIfExists('subscriptions');
     }
 }

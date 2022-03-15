@@ -16,6 +16,9 @@ class CreatePlansTable extends Migration
         Schema::create('plans', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('preapproval_plan_id', 128)->nullable();
+            $table->double('price', 6,2);
+            $table->text('modules');
             $table->timestamps();
         });
     }

@@ -36,6 +36,7 @@ class UserController extends Controller
         if (is_null($auth_user->owner_id)) {
             $user = User::where('id', $auth_user->id)
                             ->with('plan.permissions')
+                            ->with('plan.features')
                             ->with('addresses')
                             ->first();
         } else {
@@ -44,6 +45,7 @@ class UserController extends Controller
                             ->with('addresses')
                             ->first();
         }
+        $user = UserHelper::setUserTrial($user);
         return response()->json(['user' => $user], 200);
     }
 
@@ -62,7 +64,7 @@ class UserController extends Controller
             'delivery_price'    => 0,
             'online_prices'     => 'all',
             'order_description' => '¿Hay que envolver algo?',
-            'expire_at'         =>  Carbon::now()->addWeek(),
+            'expired_at'         =>  Carbon::now()->addWeek(),
         ]);
     }
 

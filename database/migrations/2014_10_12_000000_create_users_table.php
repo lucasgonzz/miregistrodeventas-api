@@ -35,7 +35,7 @@ class CreateUsersTable extends Migration
             $table->string('order_description')->nullable();
             $table->boolean('with_dolar')->default(0);
             $table->timestamp('created_at')->nullable();
-            $table->timestamp('expire_at')->nullable();
+            $table->timestamp('expired_at')->nullable();
             $table->string('online')->nullable();
             $table->rememberToken();
 

@@ -21,7 +21,7 @@ class CategoryController extends Controller
 
     function store(Request $request) {
         $category = Category::create([
-            'name'    => ucfirst($request->name),
+            'name'    => $request->name,
             'icon_id' => $request->icon_id,
             'user_id' => $this->userId(),
         ]);
@@ -33,7 +33,7 @@ class CategoryController extends Controller
 
     function update(Request $request) {
         $category = Category::find($request->id);
-        $category->name = StringHelper::modelName($request->name);
+        $category->name = $request->name;
         $category->icon_id = $request->icon_id;
         $category->save();
         $category = Category::where('id', $category->id)

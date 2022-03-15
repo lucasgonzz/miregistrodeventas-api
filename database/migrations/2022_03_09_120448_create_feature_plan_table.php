@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateConditionsTable extends Migration
+class CreateFeaturePlanTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateConditionsTable extends Migration
      */
     public function up()
     {
-        Schema::create('conditions', function (Blueprint $table) {
+        Schema::create('feature_plan', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('description')->nullable();
-            $table->integer('user_id')->unsigned();
+            $table->integer('feature_id');
+            $table->integer('plan_id');
+            $table->boolean('active');
             $table->timestamps();
         });
     }
@@ -29,6 +29,6 @@ class CreateConditionsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('conditions');
+        Schema::dropIfExists('feature_plan');
     }
 }

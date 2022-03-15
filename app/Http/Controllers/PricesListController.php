@@ -31,6 +31,32 @@ class PricesListController extends Controller
         return response()->json(['prices_list' => $prices_list], 200);
     }
 
+    function update($id, Request $request) {
+        $prices_list = PricesList::where('id', $id)
+                                    ->with('articles')
+                                    ->first();
+        foreach ($request->articles as $article) {
+            if (!$this->hasArticle($prices_list, $article)) {
+                $prices_list->articles()->attach($article['id']);
+            }
+        }
+        $prices_list = PricesList::where('id', $id)
+                                    ->with('articles')
+                                    ->first();
+        return response()->json(['prices_list' => $prices_list], 200);
+    }
+
+    function hasArticle($prices_list, $_article) {
+        $has_article = false;
+        foreach ($prices_list->articles as $article) {
+            if ($article->id == $_article['id']) {
+                $has_article = true;
+                break;
+            }
+        }
+        return $has_article;
+    }
+
     function delete($id) {
         $prices_list = PricesList::find($id);
         $prices_list->delete();

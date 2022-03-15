@@ -11,4 +11,8 @@ class Plan extends Model
     function permissions() {
         return $this->belongsToMany('App\Permission');
     }
+
+    function features() {
+        return $this->belongsToMany('App\Feature')->withPivot('active');
+    }
 }

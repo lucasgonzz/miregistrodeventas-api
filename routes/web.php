@@ -25,13 +25,12 @@ use Maatwebsite\Excel\Facades\Excel;
 |
 */
 
-// Route::get('/afipp', function() {
-// 	dd('1123');
-// });
+Route::get('/aaa', function() {
+	dd(strlen('dino goma pinchado , ver que en su rto no se desconto el 20 de la nc'));
+});
 Route::get('/afip/{sale_id}', 'AfipWsController@init');
 
 Route::get('/articles/pdf', 'ArticleController@pdf');
-
 
 // Devuelve las comisiones de las ventas que le corresponden al vendedor
 Route::get('/slugs', function() {

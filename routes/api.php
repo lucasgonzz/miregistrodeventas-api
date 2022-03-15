@@ -7,9 +7,15 @@ use Illuminate\Support\Facades\Auth;
 // 	'ClientController@index'
 // );
 
+// Home
+Route::get('/plans', 
+	'PlanController@index'
+);
+
 Route::middleware('auth:sanctum')->group(function () {
 
 	Route::get('/user', 'UserController@user');
+
 
 	// -----------------------CONFIGURACION------------------------------------------
 	Route::put('/user/password', 
@@ -116,6 +122,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::put('/permissions/{id}', 
 		'AdminController@updateUserPermissions'
+	);
+
+	// Subscriptions
+	Route::post('/subscriptions', 
+		'SubscriptionController@store'
 	);
 		
 	// -----------------------VENDER--------------------------------------------------
@@ -241,6 +252,12 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::get('conditions', 
 			'ConditionController@index'
 		);
+		Route::put('/conditions', 
+			'ConditionController@update'
+		);
+		Route::post('/conditions', 
+			'ConditionController@store'
+		);
 
 	// --------------------------------------------------------------------------------------
 
@@ -280,6 +297,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::post('/prices-lists', 
 		'PricesListController@store'
+	);
+	Route::put('/prices-lists/{id}', 
+		'PricesListController@update'
 	);
 	Route::delete('/prices-lists/{id}', 
 		'PricesListController@delete'

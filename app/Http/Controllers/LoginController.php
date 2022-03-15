@@ -66,8 +66,10 @@ class LoginController extends Controller
                                 'status' => 'commerce'], $request->remember)) {
                 $user = User::where('id', Auth::user()->id)
                                 ->with('plan.permissions')
+                                ->with('plan.features')
                                 ->with('addresses')
                                 ->first();
+                $user = UserHelper::setUserTrial($user);
                 return response()->json([
                     'login' => true,
                     'user'  => $user
@@ -85,6 +87,7 @@ class LoginController extends Controller
                 $user = User::where('id', Auth::user()->id)
                                 ->with('permissions')
                                 ->first();
+                $user = UserHelper::setUserTrial($user);
                 return response()->json([
                     'login' => true,
                     'user'  => $user
