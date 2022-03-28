@@ -16,17 +16,17 @@ class ConditionSeeder extends Seeder
             [
                 'name' => 'Nuevo',
                 'description' => 'Equipo nuevo sellado de fabrica.',
-                'user_id' => 2
+                'user_id' => 302
             ],
             [
                 'name' => 'Seminuevo',
                 'description' => 'Equipo reacondicionado por Apple, con bateria +80%.',
-                'user_id' => 2
+                'user_id' => 302
             ],
             [
                 'name' => 'Usado',
                 'description' => 'Equipo usado.',
-                'user_id' => 2
+                'user_id' => 302
             ],
         ];
         foreach ($conditions as $condition) {

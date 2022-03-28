@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Article;
 use App\BarCode;
+use App\Description;
 use App\Exports\ArticlesExport;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Image;
@@ -68,6 +69,14 @@ class ArticleController extends Controller
     }
 
     function show($id) {
+        $article = ArticleHelper::getFullArticle($article->id);
+        return response()->json(['article' => $article], 200);
+    }
+
+    function updatePrice(Request $request) {
+        $article = Article::find($request->id);
+        $article->price = $request->price;
+        $article->save();
         $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 200);
     }
@@ -182,12 +191,23 @@ class ArticleController extends Controller
         }
     }
 
-    // function deleteImage($image_id) {
-    //     $image = Image::find($image_id);
-    //     $path = 'articles/'.$this->userId().'/'.$image->url;
-    //     Storage::delete($path);
-    //     $image->delete();
-    // }
+    function descriptionsCopy(Request $request) {
+        $article_from = Article::where('id', $request->from['id'])
+                                ->with('descriptions')
+                                ->first();
+        $article_to = Article::find($request->to['id']);
+        foreach ($request->descriptions_id as $description_id) {
+            $description = Description::find($description_id);
+            Description::create([
+                'title'      => $description->title,
+                'content'    => $description->content,
+                'article_id' => $article_to->id,
+            ]);
+        }
+        $article = ArticleHelper::getFullArticle($article_to->id);
+        return response()->json(['article' => $article], 200);
+
+    }
 
     function imagesCopy(Request $request) {
         $article_from = Article::where('id', $request->from)
@@ -358,6 +378,10 @@ class ArticleController extends Controller
         return response()->json(['article' => $article], 201);
     }
 
+    function import(Request $request) {
+        Excel::import(new ArticlesImport, $request->file('articles'));
+    }
+
     function newArticle(Request $request) {
         $article = new Article();
         $article->user_id = $this->userId();
@@ -472,15 +496,5 @@ class ArticleController extends Controller
 
     function export() {
         return Excel::download(new ArticlesExport, 'comerciocity-articulos.xlsx');
-    }
-
-    function import(Request $request) {
-        (new ArticlesImport)->import($request->exel);
-        // Excel::import(new ArticlesImport, $request->exel);
-        if (Auth()->user()->hasRole('provider')) {
-            return redirect()->route('listado.provider')->with('success', 'Importacion realizada con exito');
-        } else {
-            return redirect()->route('listado.commerce')->with('success', 'Importacion realizada con exito');
-        }
     }
 }

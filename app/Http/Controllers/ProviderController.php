@@ -33,6 +33,14 @@ class ProviderController extends Controller
         return response()->json(['provider' => $provider], 201);
     }
 
+    function update(Request $request) {
+        $provider = Provider::find($request->id);
+        $provider->name = ucwords($request->name);
+        $provider->address = ucwords($request->address);
+        $provider->save();
+        return response()->json(['provider' => $provider], 200);
+    }
+
     function delete($id) {
     	$provider = Provider::find($id);
         $provider->update(['status' => 'inactive']);

@@ -21,7 +21,7 @@ class UserHelper {
         }
     }
 
-    static function setUserTrial($user) {
+    static function checkUserTrial($user) {
     	$expired_at = $user->expired_at;
     	if (!is_null($expired_at) && $expired_at->lte(Carbon::now())) {
     		$user->trial_expired = true;
@@ -37,7 +37,7 @@ class UserHelper {
         	return false;
         } else {
         	if (env('APP_ENV') == 'local') {
-	        	return $user->id == 3;
+	        	return $user->id == 303;
         	} else {
 	        	return $user->id == 2;
         	}

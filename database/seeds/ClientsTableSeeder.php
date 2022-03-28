@@ -14,7 +14,7 @@ class ClientsTableSeeder extends Seeder
     public function run()
     {
         $provider = User::where('name', 'Lucas')->first();
-        for ($user_id=2; $user_id <= 3 ; $user_id++) { 
+        for ($user_id=302; $user_id <= 303 ; $user_id++) { 
             for ($i=1; $i < 40; $i++) { 
                 Client::create([
                     'name' => 'Mio '.$i,
@@ -25,17 +25,17 @@ class ClientsTableSeeder extends Seeder
                     'surname' => 'apellido de juan '.$i,
                     'address' => 'calle 123 al 7'.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == $provider->id ? $provider->id : null
+                    'seller_id' => $user_id == $provider->id ? 1 : null
                 ]);
                 Client::create([
                     'name' => 'Marcos '.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == $provider->id ? $provider->id : null
+                    'seller_id' => $user_id == $provider->id ? 1 : null
                 ]);
                 Client::create([
                     'name' => 'Lucas '.$i,
                     'user_id' => $user_id,
-                    'seller_id' => $user_id == $provider->id ? $provider->id : null
+                    'seller_id' => $user_id == $provider->id ? 1 : null
                 ]);
                 Client::create([
                     'name' => 'Luquis '.$i,

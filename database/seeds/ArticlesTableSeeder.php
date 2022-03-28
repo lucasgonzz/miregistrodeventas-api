@@ -49,12 +49,13 @@ class ArticlesTableSeeder extends Seeder
 
         $iphones = [
             [
-                'name'              => 'Iphone 7',
+                'name'              => 'Iphone 7 pesos',
                 'brand_id'          => 1,
                 'cost'              => 45000,
                 'price'             => 60000,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
+                'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['iphone 7'],
                     $this->iphone_images['iphone 7'],
@@ -63,10 +64,11 @@ class ArticlesTableSeeder extends Seeder
             [
                 'name'              => 'Iphone 7 Plus',
                 'brand_id'          => 1,
-                'cost'              => 55000,
-                'price'             => 70000,
+                'cost'              => 400,
+                'price'             => 900,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
+                'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 7 plus'],
                     $this->iphone_images['iphone 7'],
@@ -75,10 +77,11 @@ class ArticlesTableSeeder extends Seeder
             [
                 'name'              => 'Iphone Xr',
                 'brand_id'          => 1,
-                'cost'              => 70000,
-                'price'             => 90000,
+                'cost'              => 500,
+                'price'             => 1000,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
+                'with_dolar'        => true,
                 'featured'          => 1,
                 'images'            => [
                     $this->iphone_images['iphone xr'],
@@ -88,10 +91,11 @@ class ArticlesTableSeeder extends Seeder
             [
                 'name'              => 'Iphone Se',
                 'brand_id'          => 1,
-                'cost'              => 60000,
-                'price'             => 85000,
+                'cost'              => 1000,
+                'price'             => 2000,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
+                'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone se'],
                     $this->iphone_images['iphone 7'],
@@ -100,11 +104,12 @@ class ArticlesTableSeeder extends Seeder
             [
                 'name'              => 'Iphone 11',
                 'brand_id'          => 1,
-                'cost'              => 90000,
-                'price'             => 105000,
+                'cost'              => 2000,
+                'price'             => 3000,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
                 'featured'          => 1,
+                'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 11'],
                     $this->iphone_images['iphone 7'],
@@ -113,10 +118,11 @@ class ArticlesTableSeeder extends Seeder
             [
                 'name'              => 'Iphone 11 Pro',
                 'brand_id'          => 1,
-                'cost'              => 100000,
-                'price'             => 110000,
+                'cost'              => 1100,
+                'price'             => 2100,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
+                'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 11'],
                     $this->iphone_images['iphone 7'],
@@ -125,11 +131,12 @@ class ArticlesTableSeeder extends Seeder
             [
                 'name'              => 'Iphone 12',
                 'brand_id'          => 1,
-                'cost'              => 110000,
-                'price'             => 130000,
+                'cost'              => 2000,
+                'price'             => 3000,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
                 'featured'          => 1,
+                'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 12'],
                     $this->iphone_images['iphone 7'],
@@ -138,10 +145,11 @@ class ArticlesTableSeeder extends Seeder
             [
                 'name'              => 'Iphone 12 Pro',
                 'brand_id'          => 1,
-                'cost'              => 120000,
-                'price'             => 140000,
+                'cost'              => 2100,
+                'price'             => 3100,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 1,
+                'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 12'],
                     $this->iphone_images['iphone 7'],
@@ -155,6 +163,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 2,
                 'featured'          => 1,
+                'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['cable'],
                     $this->iphone_images['cargador'],
@@ -167,6 +176,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 1000,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 2,
+                'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -180,6 +190,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 3,
                 'featured'          => 1,
+                'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['cable'],
                     $this->iphone_images['cargador'],
@@ -192,6 +203,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 1000,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 3,
+                'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -205,6 +217,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 4,
                 'featured'          => 1,
+                'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['auricular inalambrico'],
                     $this->iphone_images['auricular con cable'],
@@ -217,6 +230,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 2400,
                 'stock'             => rand(4,7),
                 'sub_category_id'   => 4,
+                'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['auricular con cable'],
                     $this->iphone_images['auricular inalambrico'],
@@ -224,7 +238,7 @@ class ArticlesTableSeeder extends Seeder
             ],
         ];
        
-        for ($user_id=2; $user_id <= 3; $user_id++) { 
+        for ($user_id=302; $user_id <= 303; $user_id++) { 
             for ($h=1; $h < 4; $h++) { 
                 foreach ($iphones as $iphone) {
                     $bar_code = rand(1000000000000, 9999999999999);
@@ -236,6 +250,7 @@ class ArticlesTableSeeder extends Seeder
                         'cost'              => $iphone['cost'],
                         'price'             => $iphone['price'],
                         'stock'             => $iphone['stock'],
+                        'with_dolar'        => $iphone['with_dolar'],
                         'user_id'           => $user_id,
                         'sub_category_id'   => $iphone['sub_category_id'],
                         'featured'          => isset($iphone['featured']) ? $iphone['featured'] : null,

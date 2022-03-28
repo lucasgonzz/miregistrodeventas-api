@@ -128,6 +128,12 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/subscriptions', 
 		'SubscriptionController@store'
 	);
+	Route::get('/subscriptions/from-plan/{id}', 
+		'SubscriptionController@subscriptionsFromPlan'
+	);
+	Route::delete('/subscriptions', 
+		'SubscriptionController@delete'
+	);
 		
 	// -----------------------VENDER--------------------------------------------------
 	
@@ -158,6 +164,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/articles/new-article', 
 			'ArticleController@newArticle'
 		);
+		Route::put('/articles/price', 
+			'ArticleController@updatePrice'
+		);
 		Route::get('/articles/get-by-bar-code/{bar_code}', 
 			'ArticleController@getByBarCode'
 		);
@@ -170,12 +179,20 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::get('/articles/previus-next/{index}', 
 			'ArticleController@previusNext'
 		);
+		Route::post('/articles/excel/import', 
+			'ArticleController@import'
+		);
+
+
 		// Provedores de comercios
 		Route::get('/providers', 
 			'ProviderController@index'
 		);
 		Route::post('/providers', 
 			'ProviderController@store'
+		);
+		Route::put('/providers', 
+			'ProviderController@update'
 		);
 		Route::delete('/providers/{id}', 
 			'ProviderController@delete'
@@ -258,6 +275,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::post('/conditions', 
 			'ConditionController@store'
 		);
+		Route::delete('/conditions/{id}', 
+			'ConditionController@delete'
+		);
 
 	// --------------------------------------------------------------------------------------
 
@@ -289,6 +309,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::delete('/articles/{ids}', 
 		'ArticleController@delete'
+	);
+	// Copiar descripciones
+	Route::put('/articles/descriptions-copy', 
+		'ArticleController@descriptionsCopy'
 	);
 
 	// Prices List
@@ -455,6 +479,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/clients/current-acounts/{id}/{months_ago}', 
 		'ClientController@currentAcounts'
 	);
+	Route::post('/clients/excel/import', 
+		'ClientController@import'
+	);
 	Route::post('/current-acounts/update-debe', 
 		'CurrentAcountController@updateDebe'
 	);
@@ -472,6 +499,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::post('/clients/nota-credito', 
 		'CurrentAcountController@notaCredito'
+	);
+	// Ivas
+	Route::get('/ivas', 
+		'IvaController@index'
 	);
 	// Ventas de un cliente
 	Route::get('/sales/client/{client_id}', 
@@ -605,7 +636,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/titles', 
 		'TitleController@index'
 	);
-	Route::put('/titles/image', 
+	Route::put('/titles/image/{id}', 
 		'TitleController@updateImage'
 	);
 	Route::put('/titles', 
@@ -620,6 +651,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::post('/brands', 
 		'BrandController@store'
+	);
+	Route::delete('/brands/{id}', 
+		'BrandController@delete'
 	);
 	Route::post('/articles/brand', 
 		'ArticleController@updateBrand'

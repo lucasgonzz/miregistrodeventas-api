@@ -23,6 +23,7 @@ class CreateArticleSaleTable extends Migration
             // $table->enum('measurement_original', ['gramo', 'kilo'])->nullable();
             $table->decimal('cost')->nullable();
             $table->decimal('price')->nullable();
+            $table->decimal('with_dolar')->nullable();
 
             $table->timestamps();
         });

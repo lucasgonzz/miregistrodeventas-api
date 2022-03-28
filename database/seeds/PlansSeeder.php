@@ -16,7 +16,7 @@ class PlansSeeder extends Seeder
     {
         $lite = Plan::create([
             'name' => 'Lite',
-            'preapproval_plan_id' => '2c9380847f73d1ae017f73f0d5fb000e',
+            'preapproval_plan_id' => '2c9380847f8a011d017f8fb6594200f4',
             'price' => 1000,
             'modules' => 'Ingresar, Vender y Ventas.',
         ]);
@@ -29,7 +29,7 @@ class PlansSeeder extends Seeder
 
         $basico = Plan::create([
             'name' => 'Basico',
-            'preapproval_plan_id' => '2c9380847f73d1ae017f73f0d5fb000e',
+            'preapproval_plan_id' => '2c9380847f8a00e7017f8fb8a26f00fc',
             'price' => 2000,
             'modules' => 'Ingresar, Listado, Vender, Ventas y Empleados.',
         ]);
@@ -50,14 +50,13 @@ class PlansSeeder extends Seeder
         $features = Feature::where('text', 'Proveedores, Categorias, Precios especiales y Fotos en los productos.')
                             ->orWhere('text', 'Factura electronica.')
                             ->orWhere('text', 'Clientes y Cuentas corrientes.')
-                            ->orWhere('text', 'Vendedores y Descuentos.')
-                            ->orWhere('text', 'Vendedores y Descuentos.')
+                            ->orWhere('text', 'Vendedores y Descuentos en las ventas.')
                             ->pluck('id');
         $basico->features()->sync($this->setFeatures($features));
 
         $premium = Plan::create([
             'name' => 'Premium',
-            'preapproval_plan_id' => '2c9380847f73d1ae017f73f0d5fb000e',
+            'preapproval_plan_id' => '2c9380847f8a011d017f8fbabc1200f5',
             'price' => 7000,
             'modules' => 'Ingresar, Listado, Vender, Ventas, Empleados y Online.',
         ]);
@@ -91,8 +90,7 @@ class PlansSeeder extends Seeder
         $features = Feature::where('text', 'Proveedores, Categorias, Precios especiales y Fotos en los productos.')
                             ->orWhere('text', 'Factura electronica.')
                             ->orWhere('text', 'Clientes y Cuentas corrientes.')
-                            ->orWhere('text', 'Vendedores y Descuentos.')
-                            ->orWhere('text', 'Vendedores y Descuentos.')
+                            ->orWhere('text', 'Vendedores y Descuentos en las ventas.')
                             ->orWhere('text', 'Tienda Online personalizada.')
                             ->pluck('id');
         $premium->features()->sync($this->setFeatures($features));

@@ -17,6 +17,10 @@ class Client extends Model
         return $this->belongsTo('App\Seller');
     }
     
+    public function iva() {
+        return $this->belongsTo('App\Iva');
+    }
+    
     public function current_acounts() {
         return $this->hasMany('App\CurrentAcount');
     }

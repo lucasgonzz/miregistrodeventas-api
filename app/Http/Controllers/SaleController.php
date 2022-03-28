@@ -400,6 +400,7 @@ class SaleController extends Controller
     }
 
     function update(Request $request, $id) {
+        // dd($request->articles);
         $user = Auth()->user();
         $sale = Sale::where('id', $id)
                         ->with('articles')
@@ -451,7 +452,7 @@ class SaleController extends Controller
             'special_price_id'  => SaleHelper::getSpecialPriceId($request),
             'sale_type_id'      => SaleHelper::getSaleType($request),
         ]);
-        SaleHelper::attachArticles($sale, $request->articles);
+        SaleHelper::attachArticles($sale, $request->articles, $request->dolar_blue);
         if ($request->client_id) {
             $discounts = DiscountHelper::getDiscountsFromDiscountsId($request->discounts);
             SaleHelper::attachDiscounts($sale, $discounts);

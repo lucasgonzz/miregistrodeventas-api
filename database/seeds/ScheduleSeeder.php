@@ -12,7 +12,7 @@ class ScheduleSeeder extends Seeder
      */
     public function run()
     {
-        for ($user_id=1; $user_id < 4; $user_id++) { 
+        for ($user_id=301; $user_id < 304; $user_id++) { 
             Schedule::create([
                 'user_id' => $user_id,
                 'name' => 'Mañana',

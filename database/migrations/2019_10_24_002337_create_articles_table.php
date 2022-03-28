@@ -17,7 +17,6 @@ class CreateArticlesTable extends Migration
             $table->bigIncrements('id');
             $table->string('bar_code', 128)->nullable();
             $table->string('name', 128)->nullable();
-            $table->string('brand', 128)->nullable();
             $table->string('slug')->nullable();
             $table->decimal('cost', 8, 2)->nullable();
             $table->decimal('price', 8, 2);
@@ -30,9 +29,6 @@ class CreateArticlesTable extends Migration
             $table->bigInteger('sub_category_id')->nullable()->unsigned();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->bigInteger('condition_id')->nullable()->unsigned();
-            // $table->decimal('offer_price', 8, 2)->nullable();
-            // $table->boolean('uncontable')->default(0);
-            // $table->enum('measurement', ['gramo', 'kilo'])->nullable();
             $table->integer('featured')->nullable();
 
             $table->foreign('user_id')

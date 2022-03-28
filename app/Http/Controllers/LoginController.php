@@ -67,9 +67,10 @@ class LoginController extends Controller
                 $user = User::where('id', Auth::user()->id)
                                 ->with('plan.permissions')
                                 ->with('plan.features')
+                                ->with('subscription')
                                 ->with('addresses')
                                 ->first();
-                $user = UserHelper::setUserTrial($user);
+                $user = UserHelper::checkUserTrial($user);
                 return response()->json([
                     'login' => true,
                     'user'  => $user

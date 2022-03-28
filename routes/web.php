@@ -25,9 +25,23 @@ use Maatwebsite\Excel\Facades\Excel;
 |
 */
 
-Route::get('/aaa', function() {
-	dd(strlen('dino goma pinchado , ver que en su rto no se desconto el 20 de la nc'));
+Route::get('/check-sale/{id}', function($id) {
+	$sale = Sale::find($id);
+	$ct = new SaleController();
+	$request = new \Illuminate\Http\Request();
+	$request->setMethod('PUT');
+	foreach ($sale->articles as $article) {
+		$article->amount = $article->pivot->amount;
+	}
+	$request->request->add(['articles' => $sale->articles]);
+	$request->request->add(['with_card' => $sale->with_card]);
+	// dd($request->articles);
+	$ct->update($request, $sale->id);
+	echo "Listo";
 });
+
+
+Route::get('/delete-subs', 'SubscriptionController@deleteAll');
 Route::get('/afip/{sale_id}', 'AfipWsController@init');
 
 Route::get('/articles/pdf', 'ArticleController@pdf');
@@ -113,7 +127,7 @@ Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 
 // Exel
-Route::get('/articles/ecxel', 'ArticleController@export');
+Route::get('/articles/excel/export', 'ArticleController@export');
 
 // Imprimir articulos
 Route::get('/pdf/{columns}/{articles_ids}/{orientation}/{header?}', 'PdfController@articles');

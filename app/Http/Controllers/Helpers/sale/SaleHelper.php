@@ -85,7 +85,7 @@ class SaleHelper extends Controller {
         return $price;
     }
 
-    static function attachArticles($sale, $articles) {
+    static function attachArticles($sale, $articles, $dolar_blue = null) {
         foreach ($articles as $article) {
             $price = 0;
             $sale->articles()->attach($article['id'], [
@@ -94,6 +94,7 @@ class SaleHelper extends Controller {
                                                                     ? (float)$article['cost']
                                                                     : null,
                                                         'price' => Self::getArticleSalePrice($sale, $article),
+                                                        'with_dolar' => Self::getDolar($article, $dolar_blue),
                                                     ]);
             $article_ = Article::find($article['id']);
             if (isset($article['selected_variant_id'])) {
@@ -117,6 +118,13 @@ class SaleHelper extends Controller {
                 $article_->save();
             }
         }
+    }
+
+    static function getDolar($article, $dolar_blue) {
+        if ($article['with_dolar']) {
+            return $dolar_blue;
+        }
+        return null;
     }
 
     static function attachArticlesFromOrder($order, $articles) {

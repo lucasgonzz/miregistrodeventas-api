@@ -22,7 +22,7 @@ class SalesTableSeeder extends Seeder
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
         $now = Carbon::now();
         $total_ventas = 30;
-        $user_id = 3;
+        $user_id = 303;
         for ($i=1; $i <= $total_ventas; $i++) { 
             // for ($j=0; $j < 5; $j++) { 
                 $num_sale = SaleHelper::numSale(1);

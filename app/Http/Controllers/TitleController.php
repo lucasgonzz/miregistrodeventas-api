@@ -8,24 +8,23 @@ use App\Title;
 class TitleController extends Controller
 {
     function index() {
-    	$title = Title::where('user_id', $this->userId())
-    					->first();
-    	if (is_null($title)) {
-    		$title = $this->createTitle();
+    	$titles = Title::where('user_id', $this->userId())
+    					->get();
+    	if (!count($titles) >= 1) {
+    		$titles = $this->createTitle();
     	}
-    	return response()->json(['title' => $title], 200);
+    	return response()->json(['titles' => $titles], 200);
     }
 
     function createTitle() {
     	$title = Title::create([
     		'user_id' => $this->userId()
     	]);
-    	return $title;
+    	return [$title];
     }
 
-    function updateImage(Request $request) {
-        $title = Title::where('user_id', $this->userId())
-                        ->first();
+    function updateImage($id, Request $request) {
+        $title = Title::find($id);
         $title->image_url = $request->image_url;
         $title->save();
         return response()->json(['title' => $title], 200); 

@@ -29,4 +29,10 @@ class BrandController extends Controller
         $brand->save();
         return response()->json(['brand' => $brand], 200); 
     }
+
+    function delete($id) {
+        $brand = Brand::find($id);
+        $brand->delete();
+        return response(null, 200);
+    }
 }

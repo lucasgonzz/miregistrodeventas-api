@@ -8,9 +8,11 @@ use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
+use App\Imports\ClientsImport;
 use App\Seller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ClientController extends Controller
 {
@@ -19,7 +21,9 @@ class ClientController extends Controller
     	$clients = Client::where('user_id', $this->userId())
                             ->where('status', 'active')
                             ->with('sales')
+                            ->with('iva')
                             ->withCount('current_acounts')
+                            ->orderBy('id', 'DESC')
                             ->get();
         return response()->json(['clients' => $this->setClientsSaldo($clients)], 200);
     }
@@ -31,6 +35,7 @@ class ClientController extends Controller
         $client->address = ucwords($request->client['address']);
         $client->cuit = $request->client['cuit'];
         $client->seller_id = $request->client['seller_id'] != 0 ? $request->client['seller_id'] : null;
+        $client->iva_id = $request->client['iva_id'] != 0 ? $request->client['iva_id'] : null;
         $client->save();
         return response()->json(['client' => $client], 200);
     }
@@ -159,5 +164,9 @@ class ClientController extends Controller
             }
         }
         return $clients;
+    }
+
+    function import(Request $request) {
+        Excel::import(new ClientsImport, $request->file('clients'));
     }
 }

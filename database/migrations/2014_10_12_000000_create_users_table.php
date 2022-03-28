@@ -33,7 +33,7 @@ class CreateUsersTable extends Migration
             $table->decimal('delivery_price')->nullable();
             $table->enum('online_prices', ['all', 'only_registered'])->nullable();
             $table->string('order_description')->nullable();
-            $table->boolean('with_dolar')->default(0);
+            $table->decimal('dolar_plus', 8,2)->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->string('online')->nullable();

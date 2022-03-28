@@ -30,4 +30,10 @@ class ConditionController extends Controller
         $condition->save();
         return response()->json(['condition' => $condition], 200); 
     }
+
+    function delete($id) {
+        $condition = Condition::find($id);
+        $condition->delete();
+        return response(null, 200);
+    }
 }

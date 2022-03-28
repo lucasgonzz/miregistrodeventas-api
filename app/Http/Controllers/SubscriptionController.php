@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Plan;
 use App\Subscription;
 use App\User;
 use Illuminate\Http\Request;
@@ -9,28 +10,27 @@ use Illuminate\Http\Request;
 class SubscriptionController extends Controller
 {
     function store(Request $request) {
-        $ACCESS_TOKEN="APP_USR-7160319402643293-031013-4359e62dcb943c73711d5b27a6a86b3c-1087431208"; 
+        $ACCESS_TOKEN="APP_USR-3668585670354328-100112-aaf8232034f567d14919bc3e1c9234f4-163250661"; 
         $curl = curl_init(); 
         $fields = [
             'preapproval_plan_id' => $request->preapproval_plan_id,
             'card_token_id' => $request->card_token_id,
             'payer_email' => $request->payer_email
         ];
-        $fields_string = json_encode($fields);
         curl_setopt($curl, CURLOPT_URL, 'https://api.mercadopago.com/preapproval');
         curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-Type: application/json',
             'Authorization: Bearer '.$ACCESS_TOKEN,
         ]);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
-        curl_setopt($curl, CURLOPT_POSTFIELDS, $fields_string);
+        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($fields));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_ENCODING, '');
         curl_setopt($curl, CURLOPT_TIMEOUT, 0);
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
-        $response = curl_exec($curl); //ejecutar CURL
+        $response = curl_exec($curl);
         $json_data = json_decode($response, true);
 
         $user = User::find($this->userId());
@@ -40,9 +40,12 @@ class SubscriptionController extends Controller
             $employee->expired_at = null;
             $employee->save();
         }
-        // return response()->json(['ok' => false, 'response' => $json_data], 200);
         $message = $this->checkPaymentStatus($json_data);
         if ($json_data['status'] == 'authorized') {
+            $actual_subscription = Subscription::where('user_id', $this->userId())->first();
+            if (!is_null($actual_subscription)) {
+                $this->cancelActualSubscription();
+            }
             $subscription = Subscription::create([
                 'preapproval_id' => $json_data['id'],
                 'preapproval_plan_id' => $json_data['preapproval_plan_id'],
@@ -50,10 +53,75 @@ class SubscriptionController extends Controller
                 'payer_email' => $json_data['payer_email'],
                 'user_id' => $this->userId(),
             ]);
+            $plan = Plan::where('preapproval_plan_id', $json_data['preapproval_plan_id'])->first();
+            $user->plan_id = $plan->id;
             return response()->json(['ok' => true, 'message' => $message, 'response' => $json_data, 'subscription' => $subscription], 200);
         } else {
             return response()->json(['ok' => false, 'message' => $message, 'response' => $json_data], 200);
         }
+    }
+
+    function deleteAll() {
+        $subscriptions = Subscription::all();
+        foreach ($subscriptions as $subscription) {
+            $this->cancelActualSubscription($subscription);
+        } 
+    }
+
+    function subscriptionsFromPlan($plan_id) {
+        $ACCESS_TOKEN="APP_USR-3668585670354328-100112-aaf8232034f567d14919bc3e1c9234f4-163250661"; 
+        $curl = curl_init(); 
+        $plan = Plan::find($plan_id);
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://api.mercadopago.com/preapproval/search?preapproval_plan_id='.$plan->preapproval_plan_id.'&sort=date_created:desc',
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Bearer '.$ACCESS_TOKEN,
+            ],
+            CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1
+        ]);
+        $response = curl_exec($curl); 
+        $json_data = json_decode($response, true);
+        return response()->json(['subscriptions' => $json_data['results']], 200);
+    }
+
+    function cancelActualSubscription($subscription = null) {
+        $ACCESS_TOKEN="APP_USR-3668585670354328-100112-aaf8232034f567d14919bc3e1c9234f4-163250661"; 
+        $curl = curl_init(); 
+        $fields = ['status' => 'cancelled'];
+        if (is_null($subscription)) {
+            $subscription = Subscription::where('user_id', $this->userId())->first();
+        }
+        $preapproval_id = $subscription->preapproval_id;
+        curl_setopt_array($curl, [
+            CURLOPT_URL => 'https://api.mercadopago.com/preapproval/'.$preapproval_id,
+            CURLOPT_HTTPHEADER => [
+                'Content-Type: application/json',
+                'Authorization: Bearer '.$ACCESS_TOKEN,
+            ],
+            CURLOPT_CUSTOMREQUEST => 'PUT',
+            CURLOPT_POSTFIELDS => json_encode($fields),
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1
+        ]);
+        $response = curl_exec($curl); 
+        $json_data = json_decode($response, true);
+        $subscription->delete();
+    }
+
+    function delete() {
+        $this->cancelActualSubscription();
+        $user = Auth()->user();
+        $user->delete();
+        return response(null, 200);
     }
 
     function checkPaymentStatus($data) {

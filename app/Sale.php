@@ -34,7 +34,7 @@ class Sale extends Model
     }
 
     public function articles() {
-        return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'price');
+        return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'price', 'with_dolar');
     }
 
     public function client() {

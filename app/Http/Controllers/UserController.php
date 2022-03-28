@@ -45,7 +45,7 @@ class UserController extends Controller
                             ->with('addresses')
                             ->first();
         }
-        $user = UserHelper::setUserTrial($user);
+        $user = UserHelper::checkUserTrial($user);
         return response()->json(['user' => $user], 200);
     }
 
@@ -73,9 +73,9 @@ class UserController extends Controller
         $user = User::where('id', $this->userId())->with('employees')->first();
         $user->name = StringHelper::modelName($request->name, true);
         $user->has_delivery = $request->has_delivery;
-        $user->delivery_price = $this->getDeliveryPirce($request->delivery_price);
+        $user->delivery_price = $request->delivery_price;
         $user->online_prices = $request->online_prices;
-        $user->with_dolar = $request->with_dolar;
+        $user->dolar_plus = $request->dolar_plus;
         $user->order_description = $request->order_description;
         $user->save();
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
