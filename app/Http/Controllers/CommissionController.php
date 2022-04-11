@@ -65,32 +65,36 @@ class CommissionController extends Controller
     }
     
     function delete($sale) {
-        $commissions_to_delete = Commission::where('sale_id', $sale->id)
-                                        ->get();
-        $commissioners_id = [];
-        $ultimas_a_eliminar = [];
-        foreach ($commissions_to_delete as $index => $commission_to_delete) {
-            if ($this->cambioElCommissioner($commission_to_delete, $commissioners_id)) {
-                $commissioners_id[] = $commission_to_delete->commissioner_id;
-                if ($index != 0) {
-                    $ultimas_a_eliminar[] = $commissions_to_delete[$index-1];
-                }
-            }
-            if ($index == count($commissions_to_delete)-1) {
-                $ultimas_a_eliminar[] = $commissions_to_delete[$index];
-            }
-        }
-        $commissions_que_siguen_of_all_commissioners = [];
-        foreach ($ultimas_a_eliminar as $index => $ultima_a_eliminar) {
-            $commissions_que_siguen_of_all_commissioners[] = Commission::where('commissioner_id', $commissioners_id[$index])
-                                                    ->where('id', '>', $ultima_a_eliminar->id)
-                                                    ->orderBy('created_at', 'ASC')
-                                                    ->get();
-        }
-        foreach ($commissions_to_delete as $commission_to_delete) {
-            $commission_to_delete->delete();
-        }
-        $this->updateSaldo($sale, $commissions_que_siguen_of_all_commissioners);
+        $commissions = Commission::where('sale_id', $sale->id)
+                                        ->pluck('id');
+        Commission::destroy($commissions);
+
+        // $commissions_to_delete = Commission::where('sale_id', $sale->id)
+        //                                 ->get();
+        // $commissioners_id = [];
+        // $ultimas_a_eliminar = [];
+        // foreach ($commissions_to_delete as $index => $commission_to_delete) {
+        //     if ($this->cambioElCommissioner($commission_to_delete, $commissioners_id)) {
+        //         $commissioners_id[] = $commission_to_delete->commissioner_id;
+        //         if ($index != 0) {
+        //             $ultimas_a_eliminar[] = $commissions_to_delete[$index-1];
+        //         }
+        //     }
+        //     if ($index == count($commissions_to_delete)-1) {
+        //         $ultimas_a_eliminar[] = $commissions_to_delete[$index];
+        //     }
+        // }
+        // $commissions_que_siguen_of_all_commissioners = [];
+        // foreach ($ultimas_a_eliminar as $index => $ultima_a_eliminar) {
+        //     $commissions_que_siguen_of_all_commissioners[] = Commission::where('commissioner_id', $commissioners_id[$index])
+        //                                             ->where('id', '>', $ultima_a_eliminar->id)
+        //                                             ->orderBy('created_at', 'ASC')
+        //                                             ->get();
+        // }
+        // foreach ($commissions_to_delete as $commission_to_delete) {
+        //     $commission_to_delete->delete();
+        // }
+        // $this->updateSaldo($sale, $commissions_que_siguen_of_all_commissioners);
     }
 
     function updateSaldo($sale, $commissions_que_siguen_of_all_commissioners) {

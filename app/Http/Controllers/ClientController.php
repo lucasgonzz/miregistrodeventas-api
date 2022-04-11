@@ -8,7 +8,11 @@ use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
+use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
+use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\SaleController;
 use App\Imports\ClientsImport;
+use App\Sale;
 use App\Seller;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -23,9 +27,20 @@ class ClientController extends Controller
                             ->with('sales')
                             ->with('iva')
                             ->withCount('current_acounts')
+                            ->with('errors')
                             ->orderBy('id', 'DESC')
                             ->get();
         return response()->json(['clients' => $this->setClientsSaldo($clients)], 200);
+    }
+
+    function show($id) {
+        $client = Client::where('id', $id)
+                        ->with('sales')
+                        ->with('iva')
+                        ->withCount('current_acounts')
+                        ->with('errors')
+                        ->first();
+        return response()->json(['client' => $this->setClientsSaldo([$client])[0]], 200);
     }
 
     function update(Request $request) {
@@ -84,44 +99,20 @@ class ClientController extends Controller
 
     function saldoInicial(Request $request) {
         $current_acount = CurrentAcount::create([
-            'detalle' => 'Saldo inicial',
-            'status'  => 'sin_pagar',
+            'detalle'   => 'Saldo inicial',
+            'status'    => $request->is_for_debe ? 'sin_pagar' : 'pago_from_client',
             'client_id' => $request->client_id,
-            'debe'    => $request->is_for_debe ? $request->saldo_inicial : null,
-            'haber'   => !$request->is_for_debe ? $request->saldo_inicial : null,
-            'saldo'   => $request->is_for_debe ? $request->saldo_inicial : -$request->saldo_inicial,
+            'debe'      => $request->is_for_debe ? $request->saldo_inicial : null,
+            'haber'     => !$request->is_for_debe ? $request->saldo_inicial : null,
+            'saldo'     => $request->is_for_debe ? $request->saldo_inicial : -$request->saldo_inicial,
         ]);
-        return response(null, 201);
+        return response()->json(['current_acount' => $current_acount], 201);
     }
 
     function currentAcounts($client_id, $months_ago) {
+        // $this->checkCurrentAcounts($client_id);
         $current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($client_id, $months_ago);
         return response()->json(['current_acounts' => $current_acounts], 200);
-    }
-
-
-    function checkSaldos($client_id) {
-        $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        ->orderBy('sale_id', 'ASC')
-                                        ->get();
-        foreach ($current_acounts as $current_acount) {
-            // echo "detalle: ".$current_acount->detalle."</br>";
-            if ($current_acount->debe) {
-                // echo "debe: ".Numbers::price($current_acount->debe)."</br>";
-                // echo "getSaldo = ".Numbers::price(CurrentAcountHelper::getSaldo($client_id, $current_acount))."</br>";
-                $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($client_id, $current_acount) + $current_acount->debe);
-            }
-            if ($current_acount->haber) {
-                // echo "haber: ".Numbers::price($current_acount->haber)."</br>";
-                $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($client_id, $current_acount) - $current_acount->haber);
-            }
-            // echo "nuevo saldo: ".Numbers::price($current_acount->saldo)."</br>";
-            // echo "----------------------------------------------------------------</br>";
-            $current_acount->save();
-        }
-        $current_acount_controller = new CurrentAcountController();
-        $current_acount_controller->checkPagos($client_id);
-        return response(null, 200);
     }
 
     function delete($id) {
@@ -155,12 +146,12 @@ class ClientController extends Controller
     function setClientsSaldo($clients) {
         foreach ($clients as $client) {
             $last_current_acount = CurrentAcount::where('client_id', $client->id)
-                                                ->orderBy('id', 'DESC')
+                                                ->orderBy('created_at', 'DESC')
                                                 ->first();
             if (!is_null($last_current_acount)) {
                 $client->saldo = $last_current_acount->saldo;
             } else {
-                // $client->saldo = '-';
+                $client->saldo = '-';
             }
         }
         return $clients;

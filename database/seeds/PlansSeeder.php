@@ -57,7 +57,7 @@ class PlansSeeder extends Seeder
         $premium = Plan::create([
             'name' => 'Premium',
             'preapproval_plan_id' => '2c9380847f8a011d017f8fbabc1200f5',
-            'price' => 7000,
+            'price' => 4000,
             'modules' => 'Ingresar, Listado, Vender, Ventas, Empleados y Online.',
         ]);
         $permissions = Permission::where('slug', 'articles.store')
@@ -78,6 +78,7 @@ class PlansSeeder extends Seeder
                                 ->orWhere('slug', 'online.buyers')
                                 ->orWhere('slug', 'online.messages')
                                 ->orWhere('slug', 'online.cupons')
+                                ->orWhere('slug', 'online.calls')
                                 ->orWhere('slug', 'tags')
                                 ->orWhere('slug', 'colors')
                                 ->orWhere('slug', 'sizes')

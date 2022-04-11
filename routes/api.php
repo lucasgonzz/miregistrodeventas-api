@@ -467,6 +467,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/clients', 
 		'ClientController@index'
 	);
+	Route::get('/clients/{id}', 
+		'ClientController@show'
+	);
 	Route::post('/clients', 
 		'ClientController@store'
 	);
@@ -488,8 +491,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/current-acounts/{id}', 
 		'CurrentAcountController@delete'
 	);
+	Route::post('/current-acounts/excel/import/{client_id}', 
+		'CurrentAcountController@import'
+	);
 	Route::get('/clients/check-saldos/{client_id}', 
-		'ClientController@checkSaldos'
+		'ClientController@checkCurrentAcounts'
 	);
 	Route::post('/clients/saldo-inicial', 
 		'ClientController@saldoInicial'
@@ -599,6 +605,13 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/messages', 
 		'MessageController@store'
 	);
+	// Calls
+	Route::get('/calls', 
+		'CallController@index'
+	);
+	Route::put('/calls', 
+		'CallController@realized'
+	);
 	// Answers
 	Route::post('/answers', 
 		'AnswerController@store'
@@ -641,6 +654,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::put('/titles', 
 		'TitleController@update'
+	);
+	Route::post('/titles', 
+		'TitleController@store'
 	);
 	// Brands
 	Route::get('/brands', 

@@ -6,10 +6,15 @@ use App\Article;
 use App\Client;
 use App\Commissioner;
 use App\Discount;
+use App\Http\Controllers\ClientController;
+use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
+use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
 use App\Http\Controllers\Helpers\UserHelper;
+use App\Http\Controllers\SaleController;
 use App\Sale;
 use App\SaleType;
 use App\Variant;
@@ -118,6 +123,27 @@ class SaleHelper extends Controller {
                 $article_->save();
             }
         }
+    }
+
+    static function updateCurrentAcountsAndCommissions($sale) {
+        // Se eliminan las cuentas corrientes y se actualizan los saldos se las siguientes
+        $current_acount_ct = new CurrentAcountController();
+        $current_acount_ct->deleteFromSale($sale);
+
+        // Se eliminan las comisiones y se actualizan los saldos se las siguientes
+        $commission_ct = new CommissionController();
+        $commission_ct->delete($sale);
+
+        $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
+        $helper->attachCommissionsAndCurrentAcounts();
+
+        // $client_controller = new ClientController();
+        // $current_acount_ct->checkSaldos($sale->client_id);
+    }
+
+    static function checkCommissions($id) {
+        $sale = Sale::find($id);
+        Self::updateCurrentAcountsAndCommissions($sale);
     }
 
     static function getDolar($article, $dolar_blue) {

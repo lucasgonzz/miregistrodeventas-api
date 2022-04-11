@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Title;
+use Illuminate\Support\Facades\Log;
 
 class TitleController extends Controller
 {
@@ -23,7 +24,14 @@ class TitleController extends Controller
     	return [$title];
     }
 
-    function updateImage($id, Request $request) {
+    function store() {
+        $title = $this->createTitle()[0];
+        return response()->json(['title' => $title], 200);
+    }
+
+    function updateImage(Request $request, $id) {
+        Log::info('asdasd: ');
+        Log::info('Id: '.$id);
         $title = Title::find($id);
         $title->image_url = $request->image_url;
         $title->save();

@@ -238,7 +238,7 @@ class ArticlesTableSeeder extends Seeder
             ],
         ];
        
-        for ($user_id=302; $user_id <= 303; $user_id++) { 
+        for ($user_id=302; $user_id <= 304; $user_id++) { 
             for ($h=1; $h < 4; $h++) { 
                 foreach ($iphones as $iphone) {
                     $bar_code = rand(1000000000000, 9999999999999);

@@ -135,6 +135,10 @@ class PermissionsTableSeeder extends Seeder
             'name' => 'Ver cupones en la Tienda Online',
             'slug' => 'online.cupons',
         ]);
+        Permission::create([
+            'name' => 'Recibir ordenes de llamada en la Tienda Online',
+            'slug' => 'online.calls',
+        ]);
         
     }
 }

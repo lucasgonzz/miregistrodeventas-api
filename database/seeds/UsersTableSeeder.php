@@ -58,9 +58,32 @@ class UsersTableSeeder extends Seeder
             'created_at'      => Carbon::now()->subMonths(2),
             // 'expired_at'       => Carbon::now(),
         ]);
+
+        $commerce = User::create([
+            'id'              => 303,
+            'name'            => 'Juliana',
+            'city'            => 'Baigorria',
+            'email'           => 'juliana5500@gmail.com',
+            'company_name'    => 'Pinocho',
+            'status'          => 'commerce',
+            'plan_id'         => 3,
+            'type'            => 'commerce',
+            'password'        => bcrypt('1234'),
+            'percentage_card' => 20,
+            'iva'             => 'Responsable inscripto',
+            'has_delivery'    => 1,
+            'delivery_price'  => 70,
+            'online_prices'    => 'all',
+            'online'            => 'http://kioscoverde.local:8080',
+            'order_description' => 'Observaciones',
+            'dolar_plus'        => 3,
+            // 'admin_id'      => $admin->id,
+            'created_at'      => Carbon::now()->subMonths(2),
+            // 'expired_at'       => Carbon::now(),
+        ]);
         
         $lucas = User::create([
-            'id'              => 303,
+            'id'              => 304,
             'name' => 'Lucas',
         	'company_name' => 'Lucas',
             'status' => 'commerce',
@@ -73,7 +96,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $commerce = User::create([
-            'id'              => 304,
+            'id'              => 305,
             'name' => 'Fran',
             'company_name' => 'Lo de Fran',
             'status' => 'commerce',
@@ -85,7 +108,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $super = User::create([
-            'id'              => 305,
+            'id'              => 306,
             'name' => 'Lucas super',
             'status' => 'super',
             'password' => bcrypt('1234'),

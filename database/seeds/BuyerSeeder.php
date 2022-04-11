@@ -12,7 +12,7 @@ class BuyerSeeder extends Seeder
      */
     public function run()
     {
-        for ($user_id=301; $user_id < 303; $user_id++) { 
+        for ($user_id=302; $user_id < 304; $user_id++) { 
             for ($i=0; $i < 10; $i++) { 
                 $lucas = Buyer::create([
                     'name' => 'Lucas '.$i,

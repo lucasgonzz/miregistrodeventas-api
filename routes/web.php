@@ -25,26 +25,14 @@ use Maatwebsite\Excel\Facades\Excel;
 |
 */
 
-Route::get('/check-sale/{id}', function($id) {
-	$sale = Sale::find($id);
-	$ct = new SaleController();
-	$request = new \Illuminate\Http\Request();
-	$request->setMethod('PUT');
-	foreach ($sale->articles as $article) {
-		$article->amount = $article->pivot->amount;
-	}
-	$request->request->add(['articles' => $sale->articles]);
-	$request->request->add(['with_card' => $sale->with_card]);
-	// dd($request->articles);
-	$ct->update($request, $sale->id);
-	echo "Listo";
-});
-
-
 Route::get('/delete-subs', 'SubscriptionController@deleteAll');
 Route::get('/afip/{sale_id}', 'AfipWsController@init');
 
 Route::get('/articles/pdf', 'ArticleController@pdf');
+
+Route::get('/clients/check-saldos/{client_id}', 
+	'ClientController@checkCurrentAcounts'
+);
 
 // Devuelve las comisiones de las ventas que le corresponden al vendedor
 Route::get('/slugs', function() {
@@ -92,9 +80,6 @@ Route::get('/emails/{ids}',
 );
 Route::get('/view/{ids}', 
 	'MailController@articles'
-);
-Route::get('/clients/check-saldos/{client_id}', 
-	'ClientController@checkSaldos'
 );
 Route::get('/clients/check-pagos/{client_id}', 
 	'CurrentAcountController@checkPagos'

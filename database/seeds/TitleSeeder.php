@@ -13,28 +13,52 @@ class TitleSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::where('company_name', 'Fiushh')->first();
+        $fiushh = User::where('company_name', 'Fiushh')->first();
+        $pinocho = User::where('company_name', 'Pinocho')->first();
         $titles = [
+            // Fisuhh
             [
-                'user_id'   => $user->id,
+                'user_id'   => $fiushh->id,
                 'header'    => 'Actualízate hoy',
                 'lead'      => null,
                 'color'     => '#f7f0fe',
                 'image_url' => 'v1643308728/articles/zzur3sccerk7f7vndkjn.png'
             ],
             [
-                'user_id'   => $user->id,
+                'user_id'   => $fiushh->id,
                 'header'    => 'Equipos usados',
                 'lead'      => 'Con la mejor condicion de bateria A+',
                 'color'     => '#f7f0fe',
                 'image_url' => 'v1643308728/articles/zzur3sccerk7f7vndkjn.png'
             ],
             [
-                'user_id'   => $user->id,
+                'user_id'   => $fiushh->id,
                 'header'    => 'Todas las marcas',
                 'lead'      => null,
                 'color'     => '#f7f0fe',
                 'image_url' => 'v1643308728/articles/zzur3sccerk7f7vndkjn.png',
+            ],
+            // Pinocho
+            [
+                'user_id'   => $pinocho->id,
+                'header'    => null,
+                'lead'      => null,
+                'color'     => '#f9b234',
+                'image_url' => 'v1649351573/articles/bofqeirvpjhiftewmx07.png'
+            ],
+            [
+                'user_id'   => $pinocho->id,
+                'header'    => null,
+                'lead'      => null,
+                'color'     => '#f9b234',
+                'image_url' => 'v1649351480/articles/dopmuvwafreurlxjbeim.png'
+            ],
+            [
+                'user_id'   => $pinocho->id,
+                'header'    => null,
+                'lead'      => null,
+                'color'     => '#f9b234',
+                'image_url' => 'v1649351459/articles/juzmron8lzikfagntdjh.png',
             ],
         ];
         foreach ($titles as $title) {

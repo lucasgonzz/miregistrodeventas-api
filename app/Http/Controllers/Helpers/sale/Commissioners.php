@@ -17,6 +17,7 @@ use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Sale;
+use Illuminate\Support\Facades\Log;
 use App\SaleType;
 
 class Commissioners extends Controller {
@@ -29,6 +30,9 @@ class Commissioners extends Controller {
             $this->index = $index;
         } else {
             $this->index = null;
+        }
+        if ($this->sale->num_sale == '8263') {
+            Log::info('siiiiiiiiiiiiiiiiii');
         }
     }
 
@@ -82,7 +86,6 @@ class Commissioners extends Controller {
             'detalle'     => 'Rto '.$this->sale->num_sale.' pag '.$this->page,
             'page'        => $this->page,
             'debe'        => $this->debe,
-            'saldo'       => $this->getCurrentAcountSaldo(),
             'status'      => 'sin_pagar',
             'client_id'   => $this->sale->client_id,
             'seller_id'   => $this->sale->client->seller_id,
@@ -90,10 +93,8 @@ class Commissioners extends Controller {
             'description' => CurrentAcountHelper::getDescription($this->sale, $this->debe_sin_descuentos),
             'created_at' => $this->getCreatedAt(),
         ]);
-    }
-
-    function getCurrentAcountSaldo() {
-        return Numbers::redondear(CurrentAcountHelper::getSaldo($this->sale->client_id) + $this->debe);
+        $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($this->sale->client_id, $current_acount) + $this->debe);
+        $current_acount->save();
     }
 
     function isSaleFromSeller() {
@@ -115,7 +116,7 @@ class Commissioners extends Controller {
             'detalle'         => $this->getDetalle(),
             'is_seller'       => 1,
             'updated_at'      => null,
-            'created_at' => $this->getCreatedAt(),
+            'created_at'      => $this->getCreatedAt(),
         ]);
     }
 
@@ -281,7 +282,11 @@ class Commissioners extends Controller {
     }
 
     function getCreatedAt() {
-        $created_at = Carbon::now();
+        // $created_at = Carbon::now();
+        $created_at = $this->sale->created_at;
+        if ($this->page > 1) {
+            $created_at = $this->sale->created_at->addSeconds($this->page);
+        }
         if ($this->index) {
             $created_at->subDays($this->index);
         }

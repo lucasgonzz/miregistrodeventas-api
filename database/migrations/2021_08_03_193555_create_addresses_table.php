@@ -17,6 +17,8 @@ class CreateAddressesTable extends Migration
             $table->id();
             $table->string('street');
             $table->string('street_number');
+            $table->string('city');
+            $table->string('province');
             $table->string('lat');
             $table->string('lng');
             $table->string('depto')->nullable();

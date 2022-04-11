@@ -78,10 +78,15 @@ class PdfPrintSale extends fpdf {
             			->first();
             $this->sales[] = $sale;
 	        $this->for_commerce ? $type = 'commerce' : $type = 'client';
-        	Impression::create([
-        		'sale_id' => $sale_id,
-        		'type'    => $type,
-        	]);
+	        $impression = Impression::where('sale_id', $sale_id)
+	        						->where('type', $type)
+	        						->first();
+	        if (is_null($impression)) {
+	        	Impression::create([
+	        		'sale_id' => $sale_id,
+	        		'type'    => $type,
+	        	]);
+	        }
 		}
 	}
 

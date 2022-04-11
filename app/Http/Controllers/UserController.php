@@ -56,7 +56,7 @@ class UserController extends Controller
             'email'             => $request->email,
             'company_name'      => $request->company_name,
             'status'            => 'commerce',
-            'plan_id'           => 2,
+            'plan_id'           => 3,
             'type'              => $request->type,
             'password'          => bcrypt($request->password),
             // 'iva'            => 'Responsable inscripto',

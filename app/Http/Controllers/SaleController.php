@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticle;
 use App\Http\Controllers\Helpers\PdfPrintSale;
@@ -383,11 +384,12 @@ class SaleController extends Controller
     function deleteSales($sales_id) {
         foreach (explode('-', $sales_id) as $sale_id) {
             $sale = Sale::find($sale_id);
-            if ($this->isProvider()) {
+            if ($sale->client_id) {
                 $current_acount = new CurrentAcountController();
                 $current_acount->deleteFromSale($sale);
                 $commission = new CommissionController();
                 $commission->delete($sale);
+                CurrentAcountHelper::restartCurrentAcounts($sale->client_id);
             }
             foreach ($sale->articles as $article) {
                 if (!is_null($article->stock)) {
@@ -396,11 +398,13 @@ class SaleController extends Controller
                 $article->save();
             }
             $sale->delete();
+            // if ($sale->client_id) {
+            //     CurrentAcountHelper::createCurrentAcountsFromSales($sale->client_id);
+            // }
         }
     }
 
     function update(Request $request, $id) {
-        // dd($request->articles);
         $user = Auth()->user();
         $sale = Sale::where('id', $id)
                         ->with('articles')
@@ -422,24 +426,8 @@ class SaleController extends Controller
                         ->with('commissions')
                         ->with('discounts')
                         ->first();
-        $this->updateCurrentAcountsAndCommissions($sale);
+        SaleHelper::updateCurrentAcountsAndCommissions($sale);
         return response()->json(['sale' => $sale], 200);
-    }
-
-    function updateCurrentAcountsAndCommissions($sale) {
-        // Se eliminan las cuentas corrientes y se actualizan los saldos se las siguientes
-        $current_acount = new CurrentAcountController();
-        $current_acount->deleteFromSale($sale);
-
-        // Se eliminan las comisiones y se actualizan los saldos se las siguientes
-        $commission = new CommissionController();
-        $commission->delete($sale);
-
-        $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
-        $helper->attachCommissionsAndCurrentAcounts();
-
-        // $client_controller = new ClientController();
-        // $client_controller->checkSaldos($sale->client_id);
     }
 
     function store(Request $request) {
@@ -473,6 +461,9 @@ class SaleController extends Controller
 
     function pdf($sales_id, $for_commerce) {
         $sales_id = explode('-', $sales_id);
+        foreach ($sales_id as $sale_id) {
+            SaleHelper::checkCommissions($sale_id);
+        }
         $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce);
         $pdf->printSales();
     }
