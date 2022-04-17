@@ -444,7 +444,7 @@ class SaleController extends Controller
         if ($request->client_id) {
             $discounts = DiscountHelper::getDiscountsFromDiscountsId($request->discounts);
             SaleHelper::attachDiscounts($sale, $discounts);
-            $helper = new SaleHelper_Commissioners($sale, $discounts);
+            $helper = new SaleHelper_Commissioners($sale, $discounts, false);
             $helper->attachCommissionsAndCurrentAcounts();
         }
         $sale = Sale::where('id', $sale->id)
@@ -461,8 +461,10 @@ class SaleController extends Controller
 
     function pdf($sales_id, $for_commerce) {
         $sales_id = explode('-', $sales_id);
-        foreach ($sales_id as $sale_id) {
-            SaleHelper::checkCommissions($sale_id);
+        if ($this->isProvider()) {
+            foreach ($sales_id as $sale_id) {
+                SaleHelper::checkCommissions($sale_id);
+            }
         }
         $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce);
         $pdf->printSales();

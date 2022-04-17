@@ -46,4 +46,10 @@ class TitleController extends Controller
     	$title->save();
         return response()->json(['title' => $title], 200); 
     }
+
+    function delete($id) {
+        $title = Title::find($id);
+        $title->delete();
+        return response(null, 200);
+    }
 }

@@ -46,7 +46,7 @@ class SalesTableSeeder extends Seeder
                 }
                 $discounts = DiscountHelper::getDiscountsFromDiscountsId([1]);
                 SaleHelper::attachDiscounts($sale, $discounts, $i);
-                $helper = new SaleHelper_Commissioners($sale, $discounts, $total_ventas-$i);
+                $helper = new SaleHelper_Commissioners($sale, $discounts, false, $total_ventas-$i);
                 $helper->attachCommissionsAndCurrentAcounts();
             // }
         }

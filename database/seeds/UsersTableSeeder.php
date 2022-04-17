@@ -83,16 +83,16 @@ class UsersTableSeeder extends Seeder
         ]);
         
         $lucas = User::create([
-            'id'              => 304,
-            'name' => 'Lucas',
-        	'company_name' => 'Lucas',
-            'status' => 'commerce',
-            'plan_id'         => 3,
-            'type'     => 'provider',
-        	'password' => bcrypt('1234'),
+            'id'            => 304,
+            'name'          => 'Lucas',
+        	'company_name'  => 'Lucas',
+            'status'        => 'commerce',
+            'plan_id'       => 3,
+            'type'          => 'provider',
+        	'password'      => bcrypt('1234'),
             // 'admin_id' => $admin->id,
-            'created_at' => Carbon::now(),
-            'expired_at' => Carbon::now()->addWeek(),
+            'created_at'    => Carbon::now(),
+            'expired_at'    => Carbon::now()->addWeek(),
         ]);
 
         $commerce = User::create([
@@ -104,7 +104,7 @@ class UsersTableSeeder extends Seeder
             'password' => bcrypt('1234'),
             // 'admin_id' => $admin->id,
             'created_at' => Carbon::now(),
-            'expired_at' => Carbon::now(),
+            'expired_at' => Carbon::now()->addMonth(),
         ]);
 
         $super = User::create([

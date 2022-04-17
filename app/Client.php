@@ -25,7 +25,7 @@ class Client extends Model
         return $this->hasMany('App\CurrentAcount');
     }
     
-    public function errors() {
-        return $this->hasMany('App\Hola');
-    }
+    // public function errors() {
+    //     return $this->hasMany('App\Hola');
+    // }
 }

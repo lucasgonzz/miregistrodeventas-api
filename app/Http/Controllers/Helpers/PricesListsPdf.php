@@ -70,7 +70,7 @@ class PricesListsPdf extends AlphaPDF {
 		$next_y = $this->getNextY();
 		if ($next_y < 290) {
 			$image = ArticleHelper::getFirstImage($this->article);
-			$image = null;
+			// $image = null;
 	        $this->setY($this->Y);
 			if (!is_null($image)) {
 	        	$this->Image($image, 10, $this->Y+5, 60);

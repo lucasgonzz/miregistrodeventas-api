@@ -125,16 +125,18 @@ class SaleHelper extends Controller {
         }
     }
 
-    static function updateCurrentAcountsAndCommissions($sale) {
+    static function updateCurrentAcountsAndCommissions($sale, $only_commissions = false) {
         // Se eliminan las cuentas corrientes y se actualizan los saldos se las siguientes
-        $current_acount_ct = new CurrentAcountController();
-        $current_acount_ct->deleteFromSale($sale);
+        if (!$only_commissions) {
+            $current_acount_ct = new CurrentAcountController();
+            $current_acount_ct->deleteFromSale($sale);
+        }
 
         // Se eliminan las comisiones y se actualizan los saldos se las siguientes
         $commission_ct = new CommissionController();
         $commission_ct->delete($sale);
 
-        $helper = new SaleHelper_Commissioners($sale, $sale->discounts);
+        $helper = new SaleHelper_Commissioners($sale, $sale->discounts, $only_commissions);
         $helper->attachCommissionsAndCurrentAcounts();
 
         // $client_controller = new ClientController();
@@ -143,7 +145,7 @@ class SaleHelper extends Controller {
 
     static function checkCommissions($id) {
         $sale = Sale::find($id);
-        Self::updateCurrentAcountsAndCommissions($sale);
+        Self::updateCurrentAcountsAndCommissions($sale, true);
     }
 
     static function getDolar($article, $dolar_blue) {

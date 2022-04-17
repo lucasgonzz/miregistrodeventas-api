@@ -658,6 +658,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/titles', 
 		'TitleController@store'
 	);
+	Route::delete('/titles/{id}', 
+		'TitleController@delete'
+	);
 	// Brands
 	Route::get('/brands', 
 		'BrandController@index'

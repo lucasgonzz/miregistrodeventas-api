@@ -201,7 +201,7 @@ class ArticleHelper {
                     $first_image = $image->url;
                 }
             }
-            return 'https://res.cloudinary.com/lucas-cn/image/upload/r_20/co_rgb:6F6F6F,e_shadow:50,x_-20,y_20/'.$first_image;
+            return 'https://res.cloudinary.com/lucas-cn/image/upload/c_crop,g_custom/r_20/co_rgb:6F6F6F,e_shadow:50,x_-20,y_20/'.$first_image;
         }
         return null;
     }

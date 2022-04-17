@@ -22,17 +22,15 @@ use App\SaleType;
 
 class Commissioners extends Controller {
 
-    function __construct($sale, $discounts, $index = null) {
+    function __construct($sale, $discounts, $only_commissions, $index = null) {
         $this->sale = $sale;
         $this->discounts = $discounts;
         $this->client = $sale->client;
+        $this->only_commissions = $only_commissions;
         if ($index) {
             $this->index = $index;
         } else {
             $this->index = null;
-        }
-        if ($this->sale->num_sale == '8263') {
-            Log::info('siiiiiiiiiiiiiiiiii');
         }
     }
 
@@ -82,19 +80,21 @@ class Commissioners extends Controller {
     }
 
     function createCurrentAcount() {
-        $current_acount = CurrentAcount::create([
-            'detalle'     => 'Rto '.$this->sale->num_sale.' pag '.$this->page,
-            'page'        => $this->page,
-            'debe'        => $this->debe,
-            'status'      => 'sin_pagar',
-            'client_id'   => $this->sale->client_id,
-            'seller_id'   => $this->sale->client->seller_id,
-            'sale_id'     => $this->sale->id,
-            'description' => CurrentAcountHelper::getDescription($this->sale, $this->debe_sin_descuentos),
-            'created_at' => $this->getCreatedAt(),
-        ]);
-        $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($this->sale->client_id, $current_acount) + $this->debe);
-        $current_acount->save();
+        if (!$this->only_commissions) {
+            $current_acount = CurrentAcount::create([
+                'detalle'     => 'Rto '.$this->sale->num_sale.' pag '.$this->page,
+                'page'        => $this->page,
+                'debe'        => $this->debe,
+                'status'      => 'sin_pagar',
+                'client_id'   => $this->sale->client_id,
+                'seller_id'   => $this->sale->client->seller_id,
+                'sale_id'     => $this->sale->id,
+                'description' => CurrentAcountHelper::getDescription($this->sale, $this->debe_sin_descuentos),
+                'created_at' => $this->getCreatedAt(),
+            ]);
+            $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($this->sale->client_id, $current_acount) + $this->debe);
+            $current_acount->save();
+        }
     }
 
     function isSaleFromSeller() {
@@ -254,6 +254,7 @@ class Commissioners extends Controller {
     function commissionOscarFedePapi() {
         if (UserHelper::isOscar()) {
             $commissioners = Commissioner::where('user_id', UserHelper::userId())
+                                        ->where('name', '!=', 'Perdidas')
                                         ->whereNull('seller_id')
                                         ->get();
             foreach ($commissioners as $commissioner) {

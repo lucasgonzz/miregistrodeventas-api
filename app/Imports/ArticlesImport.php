@@ -19,22 +19,24 @@ class ArticlesImport implements ToCollection, WithHeadingRow
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            if ($row['codigo_de_barras'] == '') {
-                $article = Article::where('user_id', UserHelper::userId())
-                                    ->whereNull('bar_code')
-                                    ->where('name', $row['nombre'])
-                                    ->where('status', 'active')
-                                    ->first();
-                if (!is_null($article)) {
-                    $this->saveArticle($row);
-                }
-            } else {
-                $article = Article::where('user_id', UserHelper::userId())
-                                    ->where('bar_code', $row['codigo_de_barras'])
-                                    ->where('status', 'active')
-                                    ->first();
-                if (is_null($article)) {
-                    $this->saveArticle($row);
+            if ($row['nombre'] != '' && $row['precio'] != '') {
+                if ($row['codigo_de_barras'] == '') {
+                    $article = Article::where('user_id', UserHelper::userId())
+                                        ->whereNull('bar_code')
+                                        ->where('name', $row['nombre'])
+                                        ->where('status', 'active')
+                                        ->first();
+                    if (!is_null($article)) {
+                        $this->saveArticle($row);
+                    }
+                } else {
+                    $article = Article::where('user_id', UserHelper::userId())
+                                        ->where('bar_code', $row['codigo_de_barras'])
+                                        ->where('status', 'active')
+                                        ->first();
+                    if (is_null($article)) {
+                        $this->saveArticle($row);
+                    }
                 }
             }
         }

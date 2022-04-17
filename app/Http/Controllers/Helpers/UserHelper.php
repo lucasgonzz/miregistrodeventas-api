@@ -37,7 +37,7 @@ class UserHelper {
         	return false;
         } else {
         	if (env('APP_ENV') == 'local') {
-	        	return $user->id == 2;
+	        	return $user->id == 304;
         	} else {
 	        	return $user->id == 2;
         	}

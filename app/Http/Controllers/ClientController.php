@@ -27,7 +27,7 @@ class ClientController extends Controller
                             ->with('sales')
                             ->with('iva')
                             ->withCount('current_acounts')
-                            ->with('errors')
+                            // ->with('errors')
                             ->orderBy('id', 'DESC')
                             ->get();
         return response()->json(['clients' => $this->setClientsSaldo($clients)], 200);
@@ -38,7 +38,7 @@ class ClientController extends Controller
                         ->with('sales')
                         ->with('iva')
                         ->withCount('current_acounts')
-                        ->with('errors')
+                        // ->with('errors')
                         ->first();
         return response()->json(['client' => $this->setClientsSaldo([$client])[0]], 200);
     }
@@ -151,7 +151,7 @@ class ClientController extends Controller
             if (!is_null($last_current_acount)) {
                 $client->saldo = $last_current_acount->saldo;
             } else {
-                $client->saldo = '-';
+                // $client->saldo = '-';
             }
         }
         return $clients;
