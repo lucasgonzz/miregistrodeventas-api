@@ -1,15 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body><loginCmsResponse xmlns="http://wsaa.view.sua.dvadac.desein.afip.gov"><loginCmsReturn>&lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;yes&quot;?&gt;
-&lt;loginTicketResponse version=&quot;1.0&quot;&gt;
-    &lt;header&gt;
-        &lt;source&gt;CN=wsaa, O=AFIP, C=AR, SERIALNUMBER=CUIT 33693450239&lt;/source&gt;
-        &lt;destination&gt;SERIALNUMBER=CUIT 20423548984, CN=comerciocity-alias&lt;/destination&gt;
-        &lt;uniqueId&gt;2226478842&lt;/uniqueId&gt;
-        &lt;generationTime&gt;2022-01-05T00:01:46.305-03:00&lt;/generationTime&gt;
-        &lt;expirationTime&gt;2022-01-05T12:01:46.305-03:00&lt;/expirationTime&gt;
-    &lt;/header&gt;
-    &lt;credentials&gt;
-        &lt;token&gt;PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8c3NvIHZlcnNpb249IjIuMCI+CiAgICA8aWQgc3JjPSJDTj13c2FhLCBPPUFGSVAsIEM9QVIsIFNFUklBTE5VTUJFUj1DVUlUIDMzNjkzNDUwMjM5IiB1bmlxdWVfaWQ9IjQ3ODQ2NDM2IiBnZW5fdGltZT0iMTY0MTM1MTY0NiIgZXhwX3RpbWU9IjE2NDEzOTQ5MDYiLz4KICAgIDxvcGVyYXRpb24gdHlwZT0ibG9naW4iIHZhbHVlPSJncmFudGVkIj4KICAgICAgICA8bG9naW4gZW50aXR5PSIzMzY5MzQ1MDIzOSIgc2VydmljZT0id3NtdHhjYSIgdWlkPSJTRVJJQUxOVU1CRVI9Q1VJVCAyMDQyMzU0ODk4NCwgQ049Y29tZXJjaW9jaXR5LWFsaWFzIiBhdXRobWV0aG9kPSJjbXMiIHJlZ21ldGhvZD0iMjIiPgogICAgICAgICAgICA8cmVsYXRpb25zPgogICAgICAgICAgICAgICAgPHJlbGF0aW9uIGtleT0iMjA0MjM1NDg5ODQiIHJlbHR5cGU9IjQiLz4KICAgICAgICAgICAgPC9yZWxhdGlvbnM+CiAgICAgICAgPC9sb2dpbj4KICAgIDwvb3BlcmF0aW9uPgo8L3Nzbz4K&lt;/token&gt;
-        &lt;sign&gt;ZLVDFSkW+EXUGj46QWXdbJFB55sYMFFpwNSLfWoxsBTqeW/e/r6ZsFc7b4gmTO9MnNAGal+eJXUvJYD3++LIIAI1+OMRZxwmQ4hm/hiw85UxzZvquhorux7z0SyfnsJKShHbBHUNRt7DzNKmI2MZvb8lUwsF4rN6Wm5hPdCvIh4=&lt;/sign&gt;
-    &lt;/credentials&gt;
-&lt;/loginTicketResponse&gt;
-</loginCmsReturn></loginCmsResponse></soapenv:Body></soapenv:Envelope>
+<?xml version="1.0" encoding="utf-8"?><soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><soapenv:Body><soapenv:Fault><faultcode xmlns:ns1="http://xml.apache.org/axis/">ns1:cms.cert.untrusted</faultcode><faultstring>Certificado no emitido por AC de confianza</faultstring><detail><ns2:exceptionName xmlns:ns2="http://xml.apache.org/axis/">gov.afip.desein.dvadac.sua.view.wsaa.LoginFault</ns2:exceptionName><ns3:hostname xmlns:ns3="http://xml.apache.org/axis/">wsaaext0.homo.afip.gov.ar</ns3:hostname></detail></soapenv:Fault></soapenv:Body></soapenv:Envelope>

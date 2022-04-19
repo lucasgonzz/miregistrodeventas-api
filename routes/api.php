@@ -420,6 +420,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// Afip
 	Route::get('/afip/importes/{sale_id}', 'AfipWsController@getImportes');
+	Route::post('/afip/{sale_id}', 'AfipWsController@init');
 
 	// Descuentos
 	Route::get('/discounts', 

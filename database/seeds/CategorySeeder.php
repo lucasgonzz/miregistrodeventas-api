@@ -46,16 +46,20 @@ class CategorySeeder extends Seeder
             'name'    => 'Calzado',
             'user_id' => $marcos->id,
         ]);
-        $user = User::where('company_name', 'Fiushh')->first();
+        $users = User::where('company_name', 'Fiushh')
+                    ->orWhere('company_name', 'Pinocho')
+                    ->get();
         $categories = ['Celulares', 'Cargadores', 'Auriculares'];
         $icon_id = 1;
-        foreach ($categories as $category) {
-            Category::create([
-                'name'    => $category,
-                'icon_id' => $icon_id,
-                'user_id' => $user->id,
-            ]);
-            $icon_id++;
+        foreach ($users as $user) {
+            foreach ($categories as $category) {
+                Category::create([
+                    'name'    => $category,
+                    // 'icon_id' => $icon_id,
+                    'user_id' => $user->id,
+                ]);
+                $icon_id++;
+            }
         }
     }
 }

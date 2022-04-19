@@ -84,14 +84,14 @@ class CurrentAcountHelper {
 
     static function notaCredito($haber, $description, $client_id) {
         $nota_credito = CurrentAcount::create([
-            'detalle'       => 'N.C. '.$detalle,
+            // 'detalle'       => 'N.C. '.$detalle,
             'description'   => $description,
             'haber'         => $haber,
             'status'        => 'nota_credito',
             'client_id'     => $client_id,
         ]);
         $nota_credito->saldo = Self::getSaldo($nota_credito->client_id, $nota_credito) - $haber;
-        $nota_credito->detalle = Self::procesarPago($nota_credito->haber, $nota_credito->client_id, $nota_credito);
+        $nota_credito->detalle = 'N.C '.Self::procesarPago($nota_credito->haber, $nota_credito->client_id, $nota_credito);
         $nota_credito->save();
         return $nota_credito;
     }
@@ -206,7 +206,6 @@ class CurrentAcountHelper {
 
     static function checkSaldos($client_id) {
         $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        ->where('detalle', '!=', 'Saldo inicial')
                                         ->orderBy('created_at', 'ASC')
                                         ->get();
         foreach ($current_acounts as $current_acount) {

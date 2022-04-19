@@ -14,24 +14,27 @@ class SubCategorySeeder extends Seeder
      */
     public function run()
     {
-
-        $user = User::where('company_name', 'Fiushh')->first();
-        $categories = Category::where('user_id', $user->id)
+        $users = User::where('company_name', 'Fiushh')
+                    ->orWhere('company_name', 'Pinocho')
+                    ->get();
+        $categories = Category::where('user_id', $users[0]->id)
                                 ->get();
-        foreach ($categories as $category) {
-            if ($category->name == 'Celulares') {
-                $names = ['Iphone'];
-            } else if ($category->name == 'Cargadores') {
-                $names = ['Iphone', 'Android'];
-            } else if ($category->name == 'Auriculares') {
-                $names = ['Casco', 'Comunes'];
-            } 
-            for ($i=0; $i < count($names); $i++) {
-                $sub_category = SubCategory::create([
-                    'name'        => $names[$i],
-                    'category_id' => $category->id,
-                    'user_id' => $user->id,
-                ]);         
+        foreach ($users as $user) {
+            foreach ($categories as $category) {
+                if ($category->name == 'Celulares') {
+                    $names = ['Iphone'];
+                } else if ($category->name == 'Cargadores') {
+                    $names = ['Iphone', 'Android'];
+                } else if ($category->name == 'Auriculares') {
+                    $names = ['Casco', 'Comunes'];
+                } 
+                for ($i=0; $i < count($names); $i++) {
+                    $sub_category = SubCategory::create([
+                        'name'        => $names[$i],
+                        'category_id' => $category->id,
+                        'user_id' => $user->id,
+                    ]);         
+                }
             }
         }
         

@@ -111,6 +111,7 @@ class ClientController extends Controller
 
     function currentAcounts($client_id, $months_ago) {
         // $this->checkCurrentAcounts($client_id);
+        CurrentAcountHelper::checkSaldos($client_id);
         $current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($client_id, $months_ago);
         return response()->json(['current_acounts' => $current_acounts], 200);
     }

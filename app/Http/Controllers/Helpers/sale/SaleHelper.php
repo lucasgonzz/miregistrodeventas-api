@@ -145,6 +145,7 @@ class SaleHelper extends Controller {
 
     static function checkCommissions($id) {
         $sale = Sale::find($id);
+        // Self::updateCurrentAcountsAndCommissions($sale, false);
         Self::updateCurrentAcountsAndCommissions($sale, true);
     }
 
