@@ -18,6 +18,7 @@ use App\Http\Controllers\SaleController;
 use App\Sale;
 use App\SaleType;
 use App\Variant;
+use Illuminate\Support\Facades\Log;
 
 class SaleHelper extends Controller {
 
@@ -33,6 +34,21 @@ class SaleHelper extends Controller {
             $last_num_sale++;
             return $last_num_sale;
         }
+    }
+
+    static function getFullModel($id) {
+        $sale = Sale::where('id', $id)
+                    ->with('client')
+                    ->with('buyer')
+                    ->with('articles')
+                    ->with('impressions')
+                    ->with('special_price')
+                    ->with('commissions')
+                    ->with('discounts')
+                    ->with('afip_ticket')
+                    ->first();
+        Log::info('SaleHelper getFullModel: '.$sale->id);
+        return $sale;
     }
 
     static function getPercentageCard($request) {

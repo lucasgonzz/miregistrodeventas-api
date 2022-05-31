@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Helpers\OrderNotificationHelper;
 use App\Http\Controllers\Helpers\QuestionNotificationHelper;
-use App\Http\Controllers\Helpers\TwilioHelper;
+// use App\Http\Controllers\Helpers\TwilioHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Message;
 use App\Notifications\MessageSend;
@@ -19,12 +19,13 @@ class MessageHelper {
             'text' => $confirmation_message,
             'type' => 'order_confirmed',
         ]);
-        // Message Broadcast
-        $order->buyer->notify(new MessageSend($message));
+
+        $title = 'Confirmamos tu pedido';
+        // Message Broadcast Mail
+        $order->buyer->notify(new MessageSend($message, false, $title));
         $order->user->notify(new MessageSend($message, true));
         // Push Notification
-        $title = 'Confirmamos tu pedido';
-        TwilioHelper::sendNotification($order->buyer_id, $title, $confirmation_message);
+        // TwilioHelper::sendNotification($order->buyer_id, $title, $confirmation_message);
     }
 
     static function sendOrderCanceledMessage($articulos_faltantes, $order) {
@@ -38,11 +39,11 @@ class MessageHelper {
             'order_id' => $order->id,
         ]);
         // Message Broadcast
-        $order->buyer->notify(new MessageSend($message));
+        $title = 'Cancelamos tu pedido';
+        $order->buyer->notify(new MessageSend($message, false, $title));
         $order->user->notify(new MessageSend($message, true));
         // Push Notification
-        $title = 'Cancelamos tu pedido';
-        TwilioHelper::sendNotification($order->buyer_id, $title, $canceled_message);
+        // TwilioHelper::sendNotification($order->buyer_id, $title, $canceled_message);
     }
 
     static function sendOrderFinishedMessage($order) {
@@ -54,11 +55,11 @@ class MessageHelper {
             'type' => 'order_finished',
         ]);
         // Broadcast
-        $order->buyer->notify(new MessageSend($message));
+        $title = 'Tu pedido esta listo';
+        $order->buyer->notify(new MessageSend($message, false, $title));
         $order->user->notify(new MessageSend($message, true));
         // Notification
-        $title = 'Tu pedido esta listo';
-        TwilioHelper::sendNotification($order->buyer_id, $title, $finish_message);
+        // TwilioHelper::sendNotification($order->buyer_id, $title, $finish_message);
     }
 
     static function sendOrderDeliveredMessage($order) {
@@ -70,11 +71,11 @@ class MessageHelper {
             'type' => 'order_delivered',
         ]);
         // Broadcast
-        $order->buyer->notify(new MessageSend($message));
+        $title = '¡Muchas gracias por tu compra!';
+        $order->buyer->notify(new MessageSend($message, false, $title));
         $order->user->notify(new MessageSend($message, true));
         // Notification
-        $title = '¡Muchas gracias por tu compra!';
-        TwilioHelper::sendNotification($order->buyer_id, $title, $delivered_message);
+        // TwilioHelper::sendNotification($order->buyer_id, $title, $delivered_message);
     }
 
     static function sendPaymentSuccessMessage($order) {
@@ -86,11 +87,11 @@ class MessageHelper {
             'type' => 'payment_success',
         ]);
         // Broadcast
-        $order->buyer->notify(new MessageSend($message));
+        $title = 'Se acredito tu pago';
+        $order->buyer->notify(new MessageSend($message, false, $title));
         $order->user->notify(new MessageSend($message, true));
         // Notification
-        $title = 'Se acredito tu pago';
-        TwilioHelper::sendNotification($order->buyer_id, $title, $payment_message);
+        // TwilioHelper::sendNotification($order->buyer_id, $title, $payment_message);
     }
 
     static function sendPaymentErrorMessage($order) {
@@ -102,11 +103,11 @@ class MessageHelper {
             'type' => 'payment_error',
         ]);
         // Broadcast
-        $order->buyer->notify(new MessageSend($message));
+        $title = 'Hubo un error con tu pago';
+        $order->buyer->notify(new MessageSend($message, false, $title));
         $order->user->notify(new MessageSend($message, true));
         // Notification
-        $title = 'Hubo un error con tu pago';
-        TwilioHelper::sendNotification($order->buyer_id, $title, $payment_message);
+        // TwilioHelper::sendNotification($order->buyer_id, $title, $payment_message);
     }
 
     static function sendQuestionAnsweredMessage($question) {
@@ -120,11 +121,11 @@ class MessageHelper {
         ]);
         $message = Self::getFullMessage($message->id);
         // Broadcast
-        $question->buyer->notify(new MessageSend($message));
+        $title = 'Respondimos a tu pregunta';
+        $question->buyer->notify(new MessageSend($message, false, $title));
         $question->user->notify(new MessageSend($message, true));
         // Notification
-        $title = 'Respondimos a tu pregunta';
-        TwilioHelper::sendNotification($question->buyer_id, $title, $question_message);
+        // TwilioHelper::sendNotification($question->buyer_id, $title, $question_message);
     }
 
     static function sendArticleAdviseMessage($advise) {
@@ -138,16 +139,19 @@ class MessageHelper {
         ]);
         $message = Self::getFullMessage($message->id);
         // Broadcast
-        $advise->buyer->notify(new MessageSend($message));
+        $title = "Ingreso nuevo stock para {$advise->article->name}";
+        $url = $advise->article->user->online.'/articulos/'.$advise->article->slug;
+        $advise->buyer->notify(new MessageSend($message, false, $title, $url));
         $advise->buyer->user->notify(new MessageSend($message, true));
         // Notification
-        $title = "Nuevo stock para {$advise->article->name}";
-        TwilioHelper::sendNotification($advise->buyer_id, $title, $advise_message);
+        // TwilioHelper::sendNotification($advise->buyer_id, $title, $advise_message);
     }
 
     static function getFullMessage($id) {
         return Message::where('id', $id)
                             ->with('article.images')
+                            ->with('article.sizes')
+                            ->with('article.colors')
                             ->with('article.variants')
                             ->with(['article.questions' => function($query) {
                                 $query->whereHas('answer')->with('answer');

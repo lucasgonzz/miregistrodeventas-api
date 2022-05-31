@@ -25,7 +25,7 @@ class ClientController extends Controller
     	$clients = Client::where('user_id', $this->userId())
                             ->where('status', 'active')
                             ->with('sales')
-                            ->with('iva')
+                            ->with('iva_condition')
                             ->withCount('current_acounts')
                             // ->with('errors')
                             ->orderBy('id', 'DESC')
@@ -36,7 +36,7 @@ class ClientController extends Controller
     function show($id) {
         $client = Client::where('id', $id)
                         ->with('sales')
-                        ->with('iva')
+                        ->with('iva_condition')
                         ->withCount('current_acounts')
                         // ->with('errors')
                         ->first();
@@ -49,8 +49,9 @@ class ClientController extends Controller
         $client->surname = ucwords($request->client['surname']);
         $client->address = ucwords($request->client['address']);
         $client->cuit = $request->client['cuit'];
+        $client->razon_social = $request->client['razon_social'];
         $client->seller_id = $request->client['seller_id'] != 0 ? $request->client['seller_id'] : null;
-        $client->iva_id = $request->client['iva_id'] != 0 ? $request->client['iva_id'] : null;
+        $client->iva_condition_id = $request->client['iva_condition_id'] != 0 ? $request->client['iva_condition_id'] : null;
         $client->save();
         return response()->json(['client' => $client], 200);
     }
@@ -87,12 +88,14 @@ class ClientController extends Controller
     function store(Request $request) {
         $seller_id = $request->client['seller_id'] == 0 ? null : $request->client['seller_id'];
     	$client = Client::create([
-            'name'      => ucwords($request->client['name']),
-            'surname'   => ucwords($request->client['surname']),
-            'address'   => ucwords($request->client['address']),
-    		'cuit'      => $request->client['cuit'],
-            'user_id'   => $this->userId(),
-    		'seller_id' => $seller_id,
+            'name'              => ucwords($request->client['name']),
+            'surname'           => ucwords($request->client['surname']),
+            'address'           => ucwords($request->client['address']),
+            'cuit'              => $request->client['cuit'],
+            'razon_social'      => $request->client['razon_social'],
+    		'iva_condition_id'  => $request->client['iva_condition_id'],
+            'user_id'           => $this->userId(),
+    		'seller_id'         => $seller_id,
     	]);
         return response()->json(['client' => $client], 201);
     }

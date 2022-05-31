@@ -17,6 +17,10 @@ class Sale extends Model
         return $this->belongsTo('App\SaleType');
     }
 
+    public function afip_ticket() {
+        return $this->hasOne('App\AfipTicket');
+    }
+
     public function commissioners() {
         return $this->belongsToMany('App\Commissioner')->withPivot('percentage', 'is_seller');
     }

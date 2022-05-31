@@ -12,10 +12,10 @@ class IvaSeeder extends Seeder
      */
     public function run()
     {
-        $ivas = ['Responsable inscripto', 'Monotributista', 'Consumidor final'];
-        foreach ($ivas as $iva) {
+        $percetages = ['27', '21', '10.5', '5', '2.5', '0', 'Exento', 'No Gravado'];
+        foreach ($percetages as $percetage) {
             Iva::create([
-                'name' => $iva,
+                'percentage' => $percetage,
             ]);
         }
     }

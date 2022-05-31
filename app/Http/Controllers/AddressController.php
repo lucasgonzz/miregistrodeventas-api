@@ -10,13 +10,15 @@ class AddressController extends Controller
 {
     function store(Request $request) {
         $address = Address::create([
-            'street' => StringHelper::modelName($request->street, true),
+            'street'        => $request->street,
             'street_number' => $request->street_number,
-            'lat' => $request->lat,
-            'lng' => $request->lng,
-            'user_id' => $this->userId(),
-            'depto' => $request->depto,
-            'description' => StringHelper::modelName($request->description),
+            'city'          => $request->city,
+            'province'      => $request->province,
+            'lat'           => $request->lat,
+            'lng'           => $request->lng,
+            'user_id'       => $this->userId(),
+            'depto'         => $request->depto,
+            'description'   => StringHelper::modelName($request->description),
         ]);
         return response()->json(['address' => $address], 201);
     }

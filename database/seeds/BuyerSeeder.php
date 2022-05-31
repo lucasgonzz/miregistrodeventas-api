@@ -19,7 +19,7 @@ class BuyerSeeder extends Seeder
                     'surname' => 'Gonzalez',
                     'city' => 'Gualeguay',
                     'phone' => '+549344462213'.$i,
-                    'email' => 'lucasgonzalez5500@gmail.com',
+                    'email' => 'lucasgonzalez210200@gmail.com',
                     'password' => bcrypt('1234'),
                     'user_id' => $user_id,
                 ]);

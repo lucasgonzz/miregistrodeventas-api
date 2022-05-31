@@ -21,6 +21,10 @@ class Article extends Model
         return $this->belongsTo('App\Brand');
     }
 
+    function iva() {
+        return $this->belongsTo('App\Iva');
+    }
+
     function descriptions() {
         return $this->hasMany('App\Description');
     }

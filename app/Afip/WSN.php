@@ -1,6 +1,6 @@
 <?php
 
-namespace phpWsAfip\WS;
+namespace App\Afip;
 
 use phpWsAfip\Exception\WsnException;
 
@@ -296,9 +296,9 @@ abstract class WSN extends WS
         }
 
 
-        print_r('Se le manda el token: '.$this->ta_token.'</br>');
-        print_r('Se le manda el sign: '.$this->ta_sign.'</br>');
-        print_r('Para la CUIT: '.$this->ta_cuit.'</br>');
+        // print_r('Se le manda el token: '.$this->ta_token.'</br>');
+        // print_r('Se le manda el sign: '.$this->ta_sign.'</br>');
+        // print_r('Para la CUIT: '.$this->ta_cuit.'</br>');
 
         if (isset($arguments[0])) {
             $datos += $arguments[0];

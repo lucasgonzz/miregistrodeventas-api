@@ -33,6 +33,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/addresses/{id}', 
 		'AddressController@delete'
 	);
+	// Afip Information
+	Route::put('/afip-information', 
+		'AfipInformationController@update'
+	);
 	// Workdays
 	Route::get('/workdays', 
 		'WorkdayController@index'
@@ -135,6 +139,45 @@ Route::middleware('auth:sanctum')->group(function () {
 		'SubscriptionController@delete'
 	);
 		
+	// -----------------------PRODUCCION--------------------------------------------------
+
+	// Budgets
+	Route::get('/budgets', 
+		'BudgetController@index'
+	);
+	Route::post('/budgets', 
+		'BudgetController@store'
+	);
+	Route::put('/budgets', 
+		'BudgetController@update'
+	);
+	Route::delete('/budgets/{id}', 
+		'BudgetController@delete'
+	);
+
+	// OrderProductions
+	Route::get('/order-productions', 
+		'OrderProductionController@index'
+	);
+	Route::post('/order-productions', 
+		'OrderProductionController@store'
+	);
+	Route::put('/order-productions', 
+		'OrderProductionController@update'
+	);
+	Route::post('/order-productions/pdf', 
+		'OrderProductionController@setPdf'
+	);
+	Route::delete('/order-productions/{id}', 
+		'OrderProductionController@delete'
+	);
+
+	// OrderProductionStatuses
+	Route::get('/order-production-statuses', 
+		'OrderProductionStatusController@index'
+	);
+
+
 	// -----------------------VENDER--------------------------------------------------
 	
 	// vender
@@ -304,10 +347,13 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::put('/articles', 
 		'ArticleController@update'
 	);
+	Route::put('/articles/{prop}', 
+		'ArticleController@updateProp'
+	);
 	Route::post('/articles/filter', 
 		'ArticleController@filter'
 	);
-	Route::delete('/articles/{ids}', 
+	Route::post('/articles/delete', 
 		'ArticleController@delete'
 	);
 	// Copiar descripciones
@@ -510,6 +556,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	// Ivas
 	Route::get('/ivas', 
 		'IvaController@index'
+	);
+	// Ivas Conditions
+	Route::get('/iva-conditions', 
+		'IvaConditionController@index'
 	);
 	// Ventas de un cliente
 	Route::get('/sales/client/{client_id}', 

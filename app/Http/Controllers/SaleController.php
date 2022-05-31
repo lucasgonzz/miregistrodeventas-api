@@ -9,6 +9,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticle;
 use App\Http\Controllers\Helpers\PdfPrintSale;
+use App\Http\Controllers\Helpers\Pdf\Sale\Index as SalePdf;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
 use App\Sale;
@@ -174,6 +175,7 @@ class SaleController extends Controller
                         ->with('special_price')
                         ->with('commissions')
                         ->with('discounts')
+                        ->with('afip_ticket')
                         ->orderBy('created_at', 'DESC')
                         ->get();
         return response()->json(['sales' => $sales], 200);
@@ -352,6 +354,7 @@ class SaleController extends Controller
                 ->with('special_price')
                 ->with('commissions')
                 ->with('discounts')
+                ->with('afip_ticket')
                 ->orderBy('created_at', 'DESC')
                 ->get();
         return response()->json(['sales' => $sales], 200);
@@ -373,6 +376,7 @@ class SaleController extends Controller
                 ->with('special_price')
                 ->with('commissions')
                 ->with('discounts')
+                ->with('afip_ticket')
                 ->orderBy('created_at', 'DESC')
                 ->get();          
         return response()->json(['sales' => $sales], 200);
@@ -425,6 +429,7 @@ class SaleController extends Controller
                         ->with('articles')
                         ->with('commissions')
                         ->with('discounts')
+                        ->with('afip_ticket')
                         ->first();
         SaleHelper::updateCurrentAcountsAndCommissions($sale);
         return response()->json(['sale' => $sale], 200);
@@ -453,20 +458,22 @@ class SaleController extends Controller
                         ->with('articles')
                         ->with('impressions')
                         ->with('discounts')
+                        ->with('afip_ticket')
                         ->with('buyer')
                         ->with('commissions')
                         ->first();
         return response()->json(['sale' => $sale], 201);
     }
 
-    function pdf($sales_id, $for_commerce) {
+    function pdf($sales_id, $for_commerce, $afip_ticket = false) {
         $sales_id = explode('-', $sales_id);
         if ($this->isProvider()) {
             foreach ($sales_id as $sale_id) {
                 SaleHelper::checkCommissions($sale_id);
             }
         }
-        $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce);
+        $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce, $afip_ticket);
+        // $pdf = new SalePdf($sales_id, (bool)$for_commerce, $afip_ticket);
         $pdf->printSales();
     }
     

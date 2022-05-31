@@ -19,6 +19,7 @@ class CreateArticleSaleTable extends Migration
             $table->integer('article_id');
             $table->integer('sale_id');
             $table->integer('amount');
+            $table->integer('iva_id')->nullable();
             // $table->enum('measurement', ['gramo', 'kilo'])->nullable();
             // $table->enum('measurement_original', ['gramo', 'kilo'])->nullable();
             $table->decimal('cost')->nullable();

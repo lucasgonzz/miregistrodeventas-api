@@ -7,6 +7,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Support\Facades\Log;
 
 class MessageSend extends Notification
 {
@@ -19,10 +20,12 @@ class MessageSend extends Notification
      *
      * @return void
      */
-    public function __construct($message, $for_commerce = false)
+    public function __construct($message, $for_commerce = false, $title = null, $url = null)
     {
         $this->message = $message;
         $this->for_commerce = $for_commerce;
+        $this->title = $title;
+        $this->url = $url;
     }
 
     /**
@@ -33,7 +36,10 @@ class MessageSend extends Notification
      */
     public function via($notifiable)
     {
-        return ['broadcast'];
+        if ($this->for_commerce) {
+            return ['broadcast'];
+        } 
+        return ['broadcast', 'mail'];
     }
 
     public function broadcastOn()
@@ -50,5 +56,27 @@ class MessageSend extends Notification
         return new BroadcastMessage([
             'message' => $this->message,
         ]);
+    }
+
+    public function toMail($notifiable)
+    {
+        Log::info('Enviando correo a '.$notifiable->email);
+        $mail_message = (new MailMessage)
+                    ->greeting('Hola '.$notifiable->name)
+                    ->from(Auth()->user()->email, Auth()->user()->company_name)
+                    ->subject($this->title)
+                    ->line($this->message->text)
+                    ->line('¡Muchas gracias por usar nuestros servicios!');
+        if (!is_null($this->url)) {
+            $mail_message->action('Ver producto en la tienda', $this->url);
+        }
+        return $mail_message;
+        // return (new MailMessage)
+        //             // ->theme('custom')
+        //             ->greeting('Hola '.$notifiable->name)
+        //             ->from(Auth()->user()->email, Auth()->user()->company_name)
+        //             ->subject($this->title)
+        //             ->line($this->message->text)
+        //             ->line('¡Muchas gracias por usar nuestros servicios!');
     }
 }

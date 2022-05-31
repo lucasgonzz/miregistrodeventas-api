@@ -11,15 +11,20 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 
 class ArticlesImport implements ToCollection, WithHeadingRow
 {
-    /**
-    * @param array $row
-    *
-    * @return \Illuminate\Database\Eloquent\Model|null
-    */
+    
+    public function __construct($percentage_for_prices, $provider_id) {
+        if ($percentage_for_prices != '') {
+            $this->percentage_for_prices = $percentage_for_prices;
+        } else {
+            $this->percentage_for_prices = null;
+        }
+        $this->provider_id = $provider_id;
+    }
+
     public function collection(Collection $rows)
     {
         foreach ($rows as $row) {
-            if ($row['nombre'] != '' && $row['precio'] != '') {
+            if ($row['nombre'] != '' && ($row['precio'] != '' || !is_null($this->percentage_for_prices))) {
                 if ($row['codigo_de_barras'] == '') {
                     $article = Article::where('user_id', UserHelper::userId())
                                         ->whereNull('bar_code')
@@ -43,14 +48,29 @@ class ArticlesImport implements ToCollection, WithHeadingRow
     }
 
     function saveArticle($row) {
-        Article::create([
+        $article = Article::create([
             'bar_code'  => $row['codigo_de_barras'],
             'name'      => $row['nombre'],
             'slug'      => ArticleHelper::slug($row['nombre']),
             'cost'      => $row['costo'],
-            'price'     => $row['precio'],
+            'price'     => $this->getPrice($row),
             'stock'     => $row['stock'],
             'user_id'   => UserHelper::userId(),
         ]);
+        if ($this->provider_id != 0) {
+            $article->providers()->attach($this->provider_id, [
+                                            'amount' => null,
+                                            'cost' => $row['costo'],
+                                            'price' => $this->getPrice($row)
+                                        ]);
+        }
+    }
+
+    function getPrice($row) {
+        if (!is_null($this->percentage_for_prices)) {
+            return $row['costo'] + ($row['costo'] * $this->percentage_for_prices / 100);
+        } else {
+            return $row['precio'];
+        }
     }
 }

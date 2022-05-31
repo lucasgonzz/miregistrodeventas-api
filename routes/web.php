@@ -25,10 +25,16 @@ use Maatwebsite\Excel\Facades\Excel;
 |
 */
 
+Route::get('/order-productions/pdf/{link}', function($link) {
+	return response()->file(storage_path().'/app/public/pdf/'.$link);
+});
+
 Route::get('/delete-subs', 'SubscriptionController@deleteAll');
 Route::get('/afip/{sale_id}', 'AfipWsController@init');
 
 Route::get('/articles/pdf', 'ArticleController@pdf');
+
+Route::get('/budgets/pdf/{id}', 'BudgetController@pdf');
 
 Route::get('/clients/check-saldos/{client_id}', 
 	'ClientController@checkCurrentAcounts'
@@ -110,6 +116,7 @@ Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
 Route::get('/current-acounts/pdf/{client_id}/{months_ago}', 'CurrentAcountController@pdfFromClient');
 Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
+Route::get('/sales/pdf/{sales_id}/{for_commerce}/{afip_ticket?}', 'SaleController@pdf');
 
 // Exel
 Route::get('/articles/excel/export', 'ArticleController@export');

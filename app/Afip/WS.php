@@ -140,8 +140,8 @@ abstract class WS
         }
         $result = $this->soap_client->$name($arguments[0]);
 
-        file_put_contents(public_path()."/afip/request-ws.xml",$this->soap_client->__getLastRequest());
-        file_put_contents(public_path()."/afip/response-ws.xml",$this->soap_client->__getLastResponse());
+        file_put_contents(public_path()."/afip/ws/request-ws.xml",$this->soap_client->__getLastRequest());
+        file_put_contents(public_path()."/afip/ws/response-ws.xml",$this->soap_client->__getLastResponse());
         
         return $result;
     }

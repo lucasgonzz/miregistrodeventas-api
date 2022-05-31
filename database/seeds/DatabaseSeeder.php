@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionsTableSeeder::class);
         $this->call(FeaturesSeeder::class);
         $this->call(PlansSeeder::class);
+        $this->call(ExtencionSeeder::class);
         // $this->call(RoleTableSeeder::class);
         $this->call(UsersTableSeeder::class);
         $this->call(IconsTableSeeder::class);
@@ -23,6 +24,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ProvidersTableSeeder::class);
         $this->call(ColorSeeder::class);
         $this->call(ArticlesTableSeeder::class);
+        $this->call(IvaConditionSeeder::class);
         $this->call(IvaSeeder::class);
         $this->call(ClientsTableSeeder::class);
         $this->call(BuyerSeeder::class);
@@ -33,9 +35,9 @@ class DatabaseSeeder extends Seeder
         $this->call(CommissionerSeeder::class);
         $this->call(SaleTypeSeeder::class);
         $this->call(CurrentAcountSeeder::class);
-        $this->call(SalesTableSeeder::class);
+        // $this->call(SalesTableSeeder::class);
         $this->call(ScheduleSeeder::class);
-        $this->call(MessageSeeder::class);
+        // $this->call(MessageSeeder::class);
         $this->call(AddressSeeder::class);
         $this->call(WorkdaySeeder::class);
         $this->call(ConditionSeeder::class);
@@ -43,5 +45,8 @@ class DatabaseSeeder extends Seeder
         $this->call(BrandSeeder::class);
         $this->call(SizeSeeder::class);
         $this->call(PricesListSeeder::class);
+        $this->call(PlateletSeeder::class);
+        $this->call(BudgetSeeder::class);
+        $this->call(OrderProductionStatusSeeder::class);
     }
 }

@@ -44,6 +44,7 @@ class PlansSeeder extends Seeder
                                 ->orWhere('slug', 'sales.index')
                                 ->orWhere('slug', 'employees')
                                 ->orWhere('slug', 'discounts_sellers')
+                                ->orWhere('slug', 'afip_tickets')
                                 ->orWhere('slug', 'clients')
                                 ->pluck('id');
         $basico->permissions()->sync($permissions);
@@ -72,6 +73,7 @@ class PlansSeeder extends Seeder
                                 ->orWhere('slug', 'sales.index')
                                 ->orWhere('slug', 'employees')
                                 ->orWhere('slug', 'discounts_sellers')
+                                ->orWhere('slug', 'afip_tickets')
                                 ->orWhere('slug', 'clients')
                                 ->orWhere('slug', 'online.orders')
                                 ->orWhere('slug', 'online.questions')
@@ -86,6 +88,8 @@ class PlansSeeder extends Seeder
                                 ->orWhere('slug', 'descriptions')
                                 ->orWhere('slug', 'conditions')
                                 ->orWhere('slug', 'articles.with_dolar')
+                                ->orWhere('slug', 'production.budgets')
+                                ->orWhere('slug', 'production.order_productions')
                                 ->pluck('id');
         $premium->permissions()->sync($permissions);
         $features = Feature::where('text', 'Proveedores, Categorias, Precios especiales y Fotos en los productos.')

@@ -6,6 +6,7 @@ use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Image;
 use App\Provider;
 use App\SubCategory;
+use App\User;
 use App\Variant;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -54,7 +55,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 45000,
                 'price'             => 60000,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['iphone 7'],
@@ -67,7 +68,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 400,
                 'price'             => 900,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 7 plus'],
@@ -80,7 +81,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 500,
                 'price'             => 1000,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'with_dolar'        => true,
                 'featured'          => 1,
                 'images'            => [
@@ -94,7 +95,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 1000,
                 'price'             => 2000,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone se'],
@@ -107,7 +108,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 2000,
                 'price'             => 3000,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'featured'          => 1,
                 'with_dolar'        => true,
                 'images'            => [
@@ -121,7 +122,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 1100,
                 'price'             => 2100,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 11'],
@@ -134,7 +135,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 2000,
                 'price'             => 3000,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'featured'          => 1,
                 'with_dolar'        => true,
                 'images'            => [
@@ -148,7 +149,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 2100,
                 'price'             => 3100,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 1,
+                'sub_category_id'   => 6,
                 'with_dolar'        => true,
                 'images'            => [
                     $this->iphone_images['iphone 12'],
@@ -161,7 +162,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 1000,
                 'price'             => 1500,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 2,
+                'sub_category_id'   => 7,
                 'featured'          => 1,
                 'with_dolar'        => false,
                 'images'            => [
@@ -175,34 +176,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 700,
                 'price'             => 1000,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 2,
-                'with_dolar'        => false,
-                'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
-                ]
-            ],
-            [
-                'name'              => 'Cargador con cable',
-                'brand_id'           => 2,
-                'cost'              => 1000,
-                'price'             => 1500,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 3,
-                'featured'          => 1,
-                'with_dolar'        => false,
-                'images'            => [
-                    $this->iphone_images['cable'],
-                    $this->iphone_images['cargador'],
-                ]
-            ],
-            [
-                'name'              => 'Cargador cabezal',
-                'brand_id'           => 2,
-                'cost'              => 700,
-                'price'             => 1000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 3,
+                'sub_category_id'   => 8,
                 'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['cargador'],
@@ -215,7 +189,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 2000,
                 'price'             => 3000,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 4,
+                'sub_category_id'   => 6,
                 'featured'          => 1,
                 'with_dolar'        => false,
                 'images'            => [
@@ -229,7 +203,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => 1900,
                 'price'             => 2400,
                 'stock'             => rand(4,7),
-                'sub_category_id'   => 4,
+                'sub_category_id'   => 6,
                 'with_dolar'        => false,
                 'images'            => [
                     $this->iphone_images['auricular con cable'],
@@ -237,23 +211,82 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
         ];
-       
-        for ($user_id=302; $user_id <= 304; $user_id++) { 
-            for ($h=1; $h < 4; $h++) { 
+
+        $articles_iva = [
+            [
+                'name' => 'Iva 27',
+                'price' => 100,
+                'iva_id' => 1,
+            ],
+            [
+                'name' => 'Iva 21',
+                'price' => 100,
+                'iva_id' => 2,
+            ],
+            [
+                'name' => 'Iva 10.5',
+                'price' => 100,
+                'iva_id' => 3,
+            ],
+            [
+                'name' => 'Iva 5',
+                'price' => 100,
+                'iva_id' => 4,
+            ],
+            [
+                'name' => 'Iva 2.5',
+                'price' => 100,
+                'iva_id' => 5,
+            ],
+
+            [
+                'name' => 'Iva 0',
+                'price' => 100,
+                'iva_id' => 6,
+            ],
+            [
+                'name' => 'Iva No Gravado',
+                'price' => 100,
+                'iva_id' => 7,
+            ],
+            [
+                'name' => 'Iva Exento',
+                'price' => 100,
+                'iva_id' => 8,
+            ],
+        ];
+
+        $fiushh = User::where('company_name', 'Fiushh')->first();
+        foreach ($articles_iva as $article) {
+            Article::create([
+                'name' => $article['name'],
+                'price' => $article['price'],
+                'iva_id' => $article['iva_id'],
+                'user_id' => $fiushh->id,
+            ]);        
+        }
+        // return;
+        $users = User::where('company_name', 'Fiushh')
+                    ->orWhere('company_name', 'Pinocho')
+                    ->get();
+        foreach ($users as $user) {
+            for ($vuelta=1; $vuelta < 4; $vuelta++) { 
                 foreach ($iphones as $iphone) {
                     $bar_code = rand(1000000000000, 9999999999999);
+                    $name = $iphone['name'].' mod.'.$vuelta;
                     $article = Article::create([
                         'bar_code'          => $bar_code,
-                        'name'              => $iphone['name'],
-                        'brand_id'              => $iphone['brand_id'],
-                        'slug'              => ArticleHelper::slug($iphone['name']),
+                        'name'              => $name,
+                        'brand_id'          => $iphone['brand_id'],
+                        'slug'              => ArticleHelper::slug($name),
                         'cost'              => $iphone['cost'],
                         'price'             => $iphone['price'],
                         'stock'             => $iphone['stock'],
                         'with_dolar'        => $iphone['with_dolar'],
-                        'user_id'           => $user_id,
+                        'user_id'           => $user->id,
                         'sub_category_id'   => $iphone['sub_category_id'],
                         'featured'          => isset($iphone['featured']) ? $iphone['featured'] : null,
+                        'created_at'        => Carbon::now()->subDays($vuelta),
                     ]);
                     $this->createDescriptions($article);
                     $article->colors()->attach([1,2]);
@@ -268,7 +301,7 @@ class ArticlesTableSeeder extends Seeder
                     }
                     for ($j=0; $j < 4; $j++) {
                     }
-                    $providers = Provider::where('user_id', $user_id)
+                    $providers = Provider::where('user_id', $user->id)
                                             ->take(3)
                                             ->get();
                     foreach ($providers as $provider) {

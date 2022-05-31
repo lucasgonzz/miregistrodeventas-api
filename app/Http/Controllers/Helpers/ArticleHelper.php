@@ -19,7 +19,7 @@ class ArticleHelper {
                             ->get();
         if ($article->stock >= 1 && count($advises) >= 1) {
             foreach ($advises as $advise) {
-                Mail::to($advise->buyer)->send(new ArticleAdvise($advise->buyer, $advise->article));
+                // Mail::to($advise->buyer)->send(new ArticleAdvise($advise->buyer, $advise->article));
                 MessageHelper::sendArticleAdviseMessage($advise);
                 $advise->delete();
             }

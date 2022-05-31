@@ -13,46 +13,71 @@ class ClientsTableSeeder extends Seeder
      */
     public function run()
     {
-        $provider = User::where('name', 'Lucas')->first();
-        for ($user_id=302; $user_id <= 303 ; $user_id++) { 
-            for ($i=1; $i < 40; $i++) { 
+        $provider = User::where('company_name', 'Lucas')->first();
+        for ($user_id=301; $user_id <= 304 ; $user_id++) { 
+            // for ($i=1; $i < 10; $i++) { 
+                // Client::create([
+                //     'name' => 'Mio',
+                //     'user_id' => $user_id,
+                // ]);
+                // Client::create([
+                //     'name' => 'Juan',
+                //     'surname' => 'apellido de juan',
+                //     'address' => 'calle 123 al 777',
+                //     'user_id' => $user_id,
+                //     'seller_id' => $user_id == $provider->id ? 1 : null
+                // ]);
                 Client::create([
-                    'name' => 'Mio '.$i,
-                    'user_id' => $user_id,
+                    'name'              => 'Marcos',
+                    'surname'           => 'Gonzalez',
+                    'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
+                    'cuit'              => '20242112025',
+                    'razon_social'      => 'MARCOS SRL', 
+                    'iva_condition_id'  => 1,
+                    'user_id'           => $user_id,
+                    'seller_id'         => $user_id == $provider->id ? 1 : null
                 ]);
                 Client::create([
-                    'name' => 'Juan con apellido '.$i,
-                    'surname' => 'apellido de juan '.$i,
-                    'address' => 'calle 123 al 7'.$i,
+                    'name' => 'Lucas',
+                    'surname'           => 'Gonzalez',
+                    'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
+                    'cuit'              => '20242112025',
+                    'razon_social'      => 'MARCOS SRL', 
+                    'iva_condition_id'  => 1,
                     'user_id' => $user_id,
                     'seller_id' => $user_id == $provider->id ? 1 : null
                 ]);
                 Client::create([
-                    'name' => 'Marcos '.$i,
-                    'user_id' => $user_id,
-                    'seller_id' => $user_id == $provider->id ? 1 : null
-                ]);
-                Client::create([
-                    'name' => 'Lucas '.$i,
-                    'user_id' => $user_id,
-                    'seller_id' => $user_id == $provider->id ? 1 : null
-                ]);
-                Client::create([
-                    'name' => 'Luquis '.$i,
+                    'name' => 'Luquis',
+                    'surname'           => 'Gonzalez',
+                    'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
+                    'cuit'              => '20242112025',
+                    'razon_social'      => 'MARCOS SRL', 
+                    'iva_condition_id'  => 1,
                     'user_id' => $user_id,
                     'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
                 Client::create([
-                    'name' => 'Marta '.$i,
+                    'name' => 'Marta',
+                    'surname'           => 'Gonzalez',
+                    'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
+                    'cuit'              => '20242112025',
+                    'razon_social'      => 'MARCOS SRL', 
+                    'iva_condition_id'  => 1,
                     'user_id' => $user_id,
                     'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
                 Client::create([
-                    'name' => 'Juana '.$i,
+                    'name' => 'Juana',
+                    'surname'           => 'Gonzalez',
+                    'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
+                    'cuit'              => '20242112025',
+                    'razon_social'      => 'MARCOS SRL', 
+                    'iva_condition_id'  => 1,
                     'user_id' => $user_id,
                     'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
-            }
+            // }
         }
 
     }

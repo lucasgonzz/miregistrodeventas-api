@@ -16,21 +16,6 @@ use Validator;
 class UserController extends Controller
 {
 
-    // Configuracion
-    function linkRecommended() {
-        $user = Auth()->user();
-        $recommendations = Recommendation::where('commerce_id', $user->id)
-                                        ->get();
-
-        $num_recommended = (count($recommendations) >= 1 ? count($recommendations) : 0) + 1;
-
-        // $link = Str::slug('hola me llañño lucas') . '/' . $num_recommended;
-        $link = Str::slug($user->company_name) . '/' . $num_recommended;
-        return [
-            'link' => $link,
-        ];  
-    }
-
     function user() {
         $auth_user = Auth()->user();
         if (is_null($auth_user->owner_id)) {
@@ -38,6 +23,8 @@ class UserController extends Controller
                             ->with('plan.permissions')
                             ->with('plan.features')
                             ->with('addresses')
+                            ->with('afip_information.iva_condition')
+                            ->with('extencions')
                             ->first();
         } else {
             $user = User::where('id', $auth_user->id)
@@ -65,7 +52,8 @@ class UserController extends Controller
             'delivery_price'    => 0,
             'online_prices'     => 'all',
             'order_description' => '¿Hay que envolver algo?',
-            'expired_at'         =>  Carbon::now()->addWeek(),
+            'expired_at'         =>  Carbon::now()->addMonth(),
+            'created_at'         =>  Carbon::now(),
         ]);
     }
 
@@ -76,6 +64,7 @@ class UserController extends Controller
         $user->has_delivery = $request->has_delivery;
         $user->delivery_price = $request->delivery_price;
         $user->online_prices = $request->online_prices;
+        $user->dolar = $request->dolar;
         $user->dolar_plus = $request->dolar_plus;
         $user->order_description = $request->order_description;
         $user->save();

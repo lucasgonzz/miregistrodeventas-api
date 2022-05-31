@@ -25,7 +25,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $hidden = [
-        'password', 'remember_token',
+        'remember_token',
     ];
 
     /**
@@ -37,8 +37,16 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    public function extencions() {
+        return $this->belongsToMany('App\Extencion');
+    }
+
     public function plan() {
         return $this->belongsTo('App\Plan');
+    }
+
+    public function afip_information() {
+        return $this->hasOne('App\AfipInformation');
     }
 
     public function permissions() {

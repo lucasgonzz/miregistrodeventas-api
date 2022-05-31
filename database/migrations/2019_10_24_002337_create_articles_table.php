@@ -26,6 +26,7 @@ class CreateArticlesTable extends Migration
             $table->boolean('with_dolar')->default(0);
             $table->integer('user_id')->unsigned();
             $table->integer('brand_id')->unsigned()->nullable();
+            $table->integer('iva_id')->unsigned()->default(2);
             $table->bigInteger('sub_category_id')->nullable()->unsigned();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->bigInteger('condition_id')->nullable()->unsigned();

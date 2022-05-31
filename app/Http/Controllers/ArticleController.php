@@ -83,11 +83,12 @@ class ArticleController extends Controller
 
     function update(Request $request) {
         $article = Article::find($request->id);
-        $article->timestamps = false;
-        $article->bar_code = $request->bar_code;
+        $article->timestamps      = false;
+        $article->bar_code        = $request->bar_code;
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
-        $article->brand_id = $request->brand_id != 0 ? $request->brand_id : null;
-        $article->with_dolar = $request->with_dolar;
+        $article->brand_id        = $request->brand_id != 0 ? $request->brand_id : null;
+        $article->iva_id          = $request->iva_id;
+        $article->with_dolar      = $request->with_dolar;
         if ($article->price != $request->price) {
             $article->previus_price = $article->price;
             $article->timestamps = true;
@@ -147,6 +148,17 @@ class ArticleController extends Controller
         ArticleHelper::deleteVariants($article);
         $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 200);
+    }
+
+    function updateProp(Request $request, $prop) {
+        $articles = [];
+        foreach ($request->articles_ids as $id) {
+            $article = Article::find($id);
+            $article->{$prop} = $request->{$prop};
+            $article->save();
+            $articles[] = ArticleHelper::getFullArticle($article->id);
+        }
+        return response()->json(['articles' => $articles], 200);
     }
 
     function updateCategory(Request $request) {
@@ -351,10 +363,11 @@ class ArticleController extends Controller
         if ($request->brand_id != 0) {
             $article->brand_id = $request->brand_id;
         }
-        $article->name = ucfirst($request->name);
-        $article->slug = ArticleHelper::slug($request->name);
-        $article->cost = $request->cost;
-        $article->price = $request->price;
+        $article->name   = ucfirst($request->name);
+        $article->slug   = ArticleHelper::slug($request->name);
+        $article->cost   = $request->cost;
+        $article->price  = $request->price;
+        $article->iva_id = $request->iva_id;
         if ($request->stock != '') {
             $article->stock = $request->stock;
         }
@@ -379,7 +392,7 @@ class ArticleController extends Controller
     }
 
     function import(Request $request) {
-        Excel::import(new ArticlesImport, $request->file('articles'));
+        Excel::import(new ArticlesImport($request->percentage, $request->provider_id), $request->file('articles'));
     }
 
     function newArticle(Request $request) {
@@ -400,8 +413,8 @@ class ArticleController extends Controller
         $article->save();
     }
 
-    function delete($ids) {
-        foreach (explode('-', $ids) as $article_id) {
+    function delete(Request $request) {
+        foreach ($request->articles_id as $article_id) {
             $article = Article::find($article_id);
             $article->status = 'inactive';
             $article->save();

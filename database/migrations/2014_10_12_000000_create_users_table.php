@@ -16,27 +16,27 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name', 128)->nullable();
-            $table->string('city', 128)->nullable();
-            $table->string('email')->nullable()->unique();
-            $table->string('phone')->nullable()->unique();
+            $table->string('email')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('image_url')->nullable();
             $table->string('company_name', 128)->nullable();
             $table->enum('type', ['commerce', 'provider'])->default('commerce');
             $table->string('password', 128);
+            $table->string('prev_password', 128)->nullable();
             $table->integer('owner_id')->nullable()->unsigned();
             $table->integer('plan_id')->unsigned()->nullable();
-            // $table->integer('admin_id')->nullable()->unsigned();
             $table->integer('percentage_card')->nullable();
-            $table->string('iva')->nullable();
             $table->string('dni')->nullable();
-            $table->string('cuit')->nullable();
-            $table->integer('punto_venta')->nullable();
             $table->boolean('has_delivery')->default(1);
             $table->decimal('delivery_price')->nullable();
             $table->enum('online_prices', ['all', 'only_registered'])->nullable();
             $table->string('order_description')->nullable();
+            $table->string('dolar')->nullable();
             $table->decimal('dolar_plus', 8,2)->nullable();
+            $table->decimal('dolar_cara_chica', 8,2)->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('expired_at')->nullable();
+            $table->timestamp('email_verified_at')->nullable();
             $table->string('online')->nullable();
             $table->rememberToken();
 

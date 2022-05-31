@@ -17,9 +17,9 @@ class SubCategorySeeder extends Seeder
         $users = User::where('company_name', 'Fiushh')
                     ->orWhere('company_name', 'Pinocho')
                     ->get();
-        $categories = Category::where('user_id', $users[0]->id)
-                                ->get();
         foreach ($users as $user) {
+            $categories = Category::where('user_id', $user->id)
+                                    ->get();
             foreach ($categories as $category) {
                 if ($category->name == 'Celulares') {
                     $names = ['Iphone'];

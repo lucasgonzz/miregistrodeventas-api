@@ -30,6 +30,22 @@ class PermissionsTableSeeder extends Seeder
             'name' => 'Stock en los articulos',
             'slug' => 'articles.stock',
         ]);
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ordenes de produccion
+        |--------------------------------------------------------------------------
+        */
+        Permission::create([
+            'name' => 'Ver Presupuestos',
+            'slug' => 'production.budgets',
+        ]);
+        Permission::create([
+            'name' => 'Ver Ordenes de Produccion',
+            'slug' => 'production.order_productions',
+        ]);
+
+        
         // Fotos
         Permission::create([
             'name' => 'Fotos en los articulos',
@@ -112,6 +128,10 @@ class PermissionsTableSeeder extends Seeder
         Permission::create([
             'name' => 'Descuentos y vendedores',
             'slug' => 'discounts_sellers',
+        ]);
+        Permission::create([
+            'name' => 'Factura electronica',
+            'slug' => 'afip_tickets',
         ]);
 
         // Online
