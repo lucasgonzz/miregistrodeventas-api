@@ -31,20 +31,9 @@ class ArticleController extends Controller
         $articles = Article::where('user_id',$this->userId())
                             ->where('status', 'active')
                             ->orderBy('created_at', 'DESC')
-                            ->with('images.color')
-                            ->with('sizes')
-                            ->with('colors')
-                            ->with('condition')
-                            ->with('descriptions')
-                            ->with('sub_category')
-                            ->with('variants')
-                            ->with('tags')
-                            ->with('brand')
-                            ->with('specialPrices')
-                            ->with(['providers' => function($q) {
-                                $q->orderBy('cost', 'asc');
-                            }])
+                            ->withAll()
                             ->get();
+        $articles = ArticleHelper::setPrices($articles);
         return response()->json(['articles' => $articles], 200);
     }
 
@@ -84,12 +73,14 @@ class ArticleController extends Controller
     function update(Request $request) {
         $article = Article::find($request->id);
         $article->timestamps      = false;
+        $article->status          = 'active';
         $article->bar_code        = $request->bar_code;
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
         $article->brand_id        = $request->brand_id != 0 ? $request->brand_id : null;
         $article->iva_id          = $request->iva_id;
         $article->with_dolar      = $request->with_dolar;
-        if ($article->price != $request->price) {
+        $article->percentage_gain = $request->percentage_gain;
+        if ($article->percentage_gain == '' && $article->price != $request->price) {
             $article->previus_price = $article->price;
             $article->timestamps = true;
             $article->price = $request->price;
@@ -108,11 +99,12 @@ class ArticleController extends Controller
         ArticleHelper::checkAdvises($article);
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
+        ArticleHelper::setDiscounts($article, $request->discounts);
         ArticleHelper::setDescriptions($article, $request->descriptions);
         ArticleHelper::setSizes($article, $request->sizes_id);
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
-        if ($request->new_stock != 0) {
+        if ($request->new_stock != 0 && $request->save_provider && $request->provider_id != 0) {
             $article->providers()
                             ->attach(
                                 $request->provider_id, 
@@ -367,6 +359,7 @@ class ArticleController extends Controller
         $article->slug   = ArticleHelper::slug($request->name);
         $article->cost   = $request->cost;
         $article->price  = $request->price;
+        $article->percentage_gain  = $request->percentage_gain;
         $article->iva_id = $request->iva_id;
         if ($request->stock != '') {
             $article->stock = $request->stock;
@@ -374,6 +367,7 @@ class ArticleController extends Controller
         $article->user_id = $user->id;
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
+        ArticleHelper::setDiscounts($article, $request->discounts);
         ArticleHelper::setDescriptions($article, $request->descriptions);
         ArticleHelper::setSizes($article, $request->sizes_id);
         ArticleHelper::setColors($article, $request->colors);

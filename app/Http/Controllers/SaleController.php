@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticle;
@@ -393,13 +394,10 @@ class SaleController extends Controller
                 $current_acount->deleteFromSale($sale);
                 $commission = new CommissionController();
                 $commission->delete($sale);
-                CurrentAcountHelper::restartCurrentAcounts($sale->client_id);
+                // CurrentAcountHelper::restartCurrentAcounts($sale->client_id);
             }
             foreach ($sale->articles as $article) {
-                if (!is_null($article->stock)) {
-                    $article->stock += $article->pivot->amount;
-                }
-                $article->save();
+                ArticleHelper::resetStock($article, $article->pivot->amount);
             }
             $sale->delete();
             // if ($sale->client_id) {

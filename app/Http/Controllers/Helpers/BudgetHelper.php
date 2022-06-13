@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Helpers;
 use App\Budget;
 use App\BudgetObservation;
 use App\BudgetProduct;
+use App\CurrentAcount;
+use App\Http\Controllers\Helpers\CurrentAcountHelper;
+use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\UserHelper;
+use App\Notifications\BudgetCreated;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -18,6 +22,55 @@ class BudgetHelper {
 		return is_null($last) ? 1 : $last->num + 1; 
 	}
 
+	static function getFormatedNum($budgets) {
+		foreach ($budgets as $budget) {
+			$letras_faltantes = 8 - strlen($budget->num);
+			$cbte_numero = '';
+			for ($i=0; $i < $letras_faltantes; $i++) { 
+				$cbte_numero .= '0'; 
+			}
+			$cbte_numero  .= $budget->num;
+			$budget->num = $cbte_numero;
+		}
+		return $budgets;
+	}
+
+	static function sendMail($budget, $send_mail) {
+		if ($send_mail && $budget->client->email != '') {
+			$budget->client->notify(new BudgetCreated($budget));
+		}
+	}
+
+	static function saveCurrentAcount($budget) {
+		$debe = Self::getTotal($budget);
+        $current_acount = CurrentAcount::create([
+            'detalle'     => 'Presupuesto '.$budget->num,
+            'debe'        => $debe,
+            'status'      => 'sin_pagar',
+            'client_id'   => $budget->client_id,
+            'budget_id'   => $budget->id,
+            'description' => null,
+        ]);
+        $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($budget->client_id, $current_acount) + $debe);
+        $current_acount->save();
+	}
+
+	static function getTotal($budget) {
+		$total = 0;
+		foreach ($budget->products as $product) {
+			$total += Self::totalProduct($product);
+		}
+		return $total;
+	}
+
+	static function totalProduct($product) {
+		$total = $product->price * $product->amount;
+		if (!is_null($product->bonus)) {
+			$total -= $total * (float)$product->bonus / 100;
+		}
+		return $total;
+	}
+
 	static function attachProducts($budget, $products) {
 		$models_products = BudgetProduct::where('budget_id', $budget->id)->pluck('id');
 		BudgetProduct::destroy($models_products);
@@ -26,11 +79,11 @@ class BudgetHelper {
 			$product = (object) $product;
 			Log::info($product->name);
 			BudgetProduct::create([
-				'code'		=> $product->code,
+				'bar_code'	=> $product->bar_code,
 				'amount'	=> $product->amount,
 				'name'		=> $product->name,
 				'price'		=> $product->price,
-				'bonus'		=> $product->bonus,
+				'bonus'		=> isset($product->bonus) ? $product->bonus : null,
 				'budget_id' => $budget->id
 			]);
 		}

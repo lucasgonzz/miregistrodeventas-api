@@ -26,9 +26,10 @@ class ProviderController extends Controller
 
     function store(Request $request) {
         $provider = Provider::create([
-            'name' => ucwords($request->name),
-            'address' => ucwords($request->address),
-            'user_id' => $this->getArticleOwnerId(),
+            'name'      => ucwords($request->name),
+            'address'   => ucwords($request->address),
+            'email'     => $request->email,
+            'user_id'   => $this->getArticleOwnerId(),
         ]);
         return response()->json(['provider' => $provider], 201);
     }
@@ -37,6 +38,7 @@ class ProviderController extends Controller
         $provider = Provider::find($request->id);
         $provider->name = ucwords($request->name);
         $provider->address = ucwords($request->address);
+        $provider->email = $request->email;
         $provider->save();
         return response()->json(['provider' => $provider], 200);
     }

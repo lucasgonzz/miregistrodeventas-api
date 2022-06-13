@@ -24,7 +24,16 @@ class CurrentAcountController extends Controller
 {
 
     public function pagoFromClient(Request $request) {
-        $pago = CurrentAcountHelper::pagoFromClient($request->monto, $request->client_id, $request->current_date, $request->created_at);
+        $data = [
+            'haber'                             => $request->haber,
+            'client_id'                         => $request->client_id,
+            'current_date'                      => $request->current_date,
+            'created_at'                        => $request->created_at,
+            'current_acount_payment_method_id'  => $request->current_acount_payment_method_id,
+            'checks'                            => $request->checks,
+            'to_pay'                            => $request->to_pay,
+        ];
+        $pago = CurrentAcountHelper::pagoFromClient($data);
         return response()->json(['current_acount' => $pago], 201);
     }
 
@@ -113,6 +122,6 @@ class CurrentAcountController extends Controller
     function delete($id) {
         $current_acount = CurrentAcount::find($id);
         $current_acount->delete();
-        CurrentAcountHelper::restartCurrentAcounts($current_acount->client_id);
+        // CurrentAcountHelper::restartCurrentAcounts($current_acount->client_id);
     }
 }

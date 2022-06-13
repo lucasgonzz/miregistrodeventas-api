@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Configuration extends Model
+class ArticleDiscount extends Model
 {
     protected $guarded = [];
 }

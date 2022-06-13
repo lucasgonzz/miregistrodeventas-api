@@ -9,11 +9,23 @@ class CurrentAcount extends Model
     protected $guarded = [];
 
     public function sale() {
-    	return $this->belongsTo('App\Sale');
+        return $this->belongsTo('App\Sale');
+    }
+
+    public function budget() {
+        return $this->belongsTo('App\Budget');
+    }
+
+    public function checks() {
+        return $this->hasMany('App\Check');
+    }
+
+    public function payment_method() {
+        return $this->belongsTo('App\CurrentAcountPaymentMethod', 'current_acount_payment_method_id');
     }
 
     public function client() {
-    	return $this->belongsTo('App\Client');
+        return $this->belongsTo('App\Client');
     }
 
     public function seller() {

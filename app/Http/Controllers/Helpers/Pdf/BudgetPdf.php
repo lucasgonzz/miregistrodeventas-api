@@ -2,20 +2,23 @@
 
 namespace App\Http\Controllers\Helpers\Pdf;
 
+use App\Http\Controllers\Helpers\BudgetHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\Numbers;
+use App\Http\Controllers\Helpers\UserHelper;
 use fpdf;
 require(__DIR__.'/../../fpdf/fpdf.php');
 
 class BudgetPdf extends fpdf {
 
-	function __construct($budget) {
+	function __construct($only_deliveries, $budget) {
 		parent::__construct();
 		$this->SetAutoPageBreak(true, 1);
 		$this->b = 0;
 		$this->line_height = 7;
 		
-		$this->user = Auth()->user();
+		$this->user = UserHelper::getFullModel();
+		$this->only_deliveries = $only_deliveries;
 		$this->budget = $budget;
 
 		$this->AddPage();
@@ -34,26 +37,28 @@ class BudgetPdf extends fpdf {
 	}
 
 	function Footer() {
-		$y = 220;
-		$this->SetLineWidth(.4);
-		$this->Line(5, $y, 205, $y);
-		$this->y = $y;
-		$this->observations();
-		$this->y = $y;
-		$this->total();
+		if (!$this->only_deliveries) {
+			$y = 220;
+			$this->SetLineWidth(.4);
+			// $this->Line(5, $y, 205, $y);
+			$this->y = $y;
+			$this->observations();
+			$this->y = $y;
+			$this->total();
+		}
 		$this->comerciocityInfo();
 	}
 
 	function logo() {
         // Logo
         if (!is_null($this->user->image_url)) {
-        	$this->Image(ImageHelper::image($this->user), 0, 0, 0, 30);
+        	$this->Image(ImageHelper::image($this->user), 5, 5, 0, 27);
         }
 		
         // Company name
 		$this->SetFont('Arial', 'B', 10);
 		$this->x = 5;
-		$this->y = 32;
+		$this->y = 30;
 		$this->Cell(100, 5, $this->user->company_name, $this->b, 0, 'C');
 
 		// Info
@@ -74,7 +79,7 @@ class BudgetPdf extends fpdf {
 		$this->x = 5;
 		$this->y += 5;
 	    $this->MultiCell(100, 5, $info, $this->b, 'L', false);
-	    $this->lineInfo();
+	    // $this->lineInfo();
 	}
 
 	function lineInfo() {
@@ -136,7 +141,7 @@ class BudgetPdf extends fpdf {
 	function commerceInfo() {
 		$this->SetFont('Arial', '', 10);
 		$this->x = 105;
-		$this->y = 37;
+		$this->y = 35;
 		$this->Cell(100, 5, 'Cuit: '.$this->user->afip_information->cuit, $this->b, 0, 'L');
 		$this->x = 105;
 		$this->y += 5;
@@ -144,13 +149,13 @@ class BudgetPdf extends fpdf {
 		$this->x = 105;
 		$this->y += 5;
 		$this->Cell(100, 5, 'Inicio Actividades: '.date_format($this->user->afip_information->inicio_actividades, 'd/m/Y'), $this->b, 0, 'L');
-		$this->lineCommerce();
+		// $this->lineCommerce();
 	}
 
 	function clientInfo() {
 		$this->SetFont('Arial', '', 10);
 		$this->x = 5;
-		$this->y = 55;
+		$this->y = 58;
 
 		$this->Cell(100, 5, 'Nombre: '.$this->budget->client->name.' '.$this->budget->client->surname, $this->b, 0, 'L');
 		if ($this->budget->client->address != '') {
@@ -168,20 +173,20 @@ class BudgetPdf extends fpdf {
 			$this->x = 5;
 			$this->Cell(100, 5, 'CUIT: '.$this->budget->client->cuit, $this->b, 0, 'L');
 		}
-		$this->lineClient();
+		// $this->lineClient();
 	}
 
 	function budgetDates() {
 		if (!is_null($this->budget->start_at) && !is_null($this->budget->finish_at)) {
 			$this->SetFont('Arial', '', 10);
 			$this->x = 105;
-			$this->y = 55;
+			$this->y = 58;
 			$this->Cell(100, 5, 'Fecha de entrega', $this->b, 0, 'L');
 			$this->y += 5;
 			$this->x = 105;
 			$date = 'Entre el '.date_format($this->budget->start_at, 'd/m/Y').' y el '.date_format($this->budget->finish_at, 'd/m/Y');
 			$this->Cell(100, 5, $date, $this->b, 0, 'L');
-			$this->lineDates();
+			// $this->lineDates();
 		}
 	}
 
@@ -191,6 +196,21 @@ class BudgetPdf extends fpdf {
 		$this->y = 80;
 
 		$this->SetLineWidth(.4);
+		if ($this->only_deliveries) {
+			$this->tableHeaderOnlyDeliveries();
+		} else {
+			$this->tableHeaderWithAll();
+		}
+	}
+
+	function tableHeaderOnlyDeliveries() {
+		$this->Cell(20, 10, 'Codigo', 1, 0, 'C');
+		$this->Cell(20, 10, 'Cant.', 1, 0, 'C');
+		$this->Cell(80, 10, 'Producto', 1, 0, 'C');
+		$this->Cell(50, 10, 'Unidades Entregadas', 1, 0, 'C');
+	}
+
+	function tableHeaderWithAll() {
 		$this->Cell(20, 10, 'Codigo', 1, 0, 'C');
 		$this->Cell(20, 10, 'Cant.', 1, 0, 'C');
 		$this->Cell(80, 10, 'Producto', 1, 0, 'C');
@@ -203,7 +223,14 @@ class BudgetPdf extends fpdf {
 		$this->SetFont('Arial', '', 10);
 		$this->x = 5;
 		$this->y = 90;
-		foreach ($this->budget->products as $product) {
+
+		if ($this->only_deliveries) {
+			$products = $this->getDeliveredProducts();
+		} else {
+			$products = $this->budget->products;
+		}
+
+		foreach ($products as $product) {
 			if ($this->y < 210) {
 				$this->printProduct($product);
 			} else {
@@ -218,14 +245,49 @@ class BudgetPdf extends fpdf {
 	}
 
 	function printProduct($product) {
-		$this->Cell(20, $this->getHeight($product), $product->id, 'T', 0, 'C');
+		if ($this->only_deliveries) {
+			$this->printProductDelivered($product);
+		} else {
+			$this->printProductWithAll($product);
+		}
+	}
+
+	function printProductDelivered($product) {
+		$this->Cell(20, $this->getHeight($product), $product->bar_code, 'T', 0, 'C');
+		$this->Cell(20, $this->getHeight($product), $product->amount, 'T', 0, 'C');
+		$this->MultiCell(80, $this->line_height, $product->name, 'T', 'C', false);
+		$this->x = 125;
+		$this->y -= $this->getHeight($product);
+		$this->Cell(50, $this->getHeight($product), $this->getTotalDeliveries($product), 'T', 0, 'C');
+	}
+
+	function printProductWithAll($product) {
+		$this->Cell(20, $this->getHeight($product), $product->bar_code, 'T', 0, 'C');
 		$this->Cell(20, $this->getHeight($product), $product->amount, 'T', 0, 'C');
 		$this->MultiCell(80, $this->line_height, $product->name, 'T', 'C', false);
 		$this->x = 125;
 		$this->y -= $this->getHeight($product);
 		$this->Cell(30, $this->getHeight($product), '$'.Numbers::price($product->price), 'T', 0, 'C');
-		$this->Cell(20, $this->getHeight($product), $product->bonus, 'T', 0, 'C');
-		$this->Cell(30, $this->getHeight($product), '$'.Numbers::price($product->price * $product->amount), 'T', 0, 'C');
+		$this->Cell(20, $this->getHeight($product), $this->getBonus($product), 'T', 0, 'C');
+		$this->Cell(30, $this->getHeight($product), '$'.Numbers::price(BudgetHelper::totalProduct($product)), 'T', 0, 'C');
+	}
+
+	function getDeliveredProducts() {
+		$products = [];
+		foreach ($this->budget->products as $product) {
+			if (count($product->deliveries) >= 1) {
+				$products[] = $product;
+			}
+		}
+		return $products;
+	}
+
+	function getTotalDeliveries($product) {
+		$total = 0;
+		foreach ($product->deliveries as $delivery) {
+			$total += $delivery->amount;
+		}
+		return $total;
 	}
 
 	function observations() {
@@ -233,21 +295,28 @@ class BudgetPdf extends fpdf {
 		if (count($this->budget->observations)) {
 		    $this->x = 5;
 	    	$this->SetFont('Arial', 'B', 12);
-			$this->Cell(100, 10, 'Observaciones', 'BRL', 0, 'L');
+			$this->Cell(100, 10, 'Observaciones', 'BTL', 0, 'L');
 			$this->y += 10;
 		    $this->x = 5;
 	    	$this->SetFont('Arial', '', 10);
 			foreach ($this->budget->observations as $observation) {
-		    	$this->MultiCell(200, $this->line_height, $observation->text, $this->b, 'L', false);
+		    	$this->MultiCell(200, $this->line_height, $observation->text, $this->b, 'LTB', false);
 		    	$this->x = 5;
 			}
 		}
 	}
 
+	function getBonus($product) {
+		if (!is_null($product->bonus)) {
+			return $product->bonus.'%';
+		}
+		return '';
+	}
+
 	function total() {
 	    $this->x = 105;
 	    $this->SetFont('Arial', 'B', 14);
-		$this->Cell(100, 10, 'Total: $'. Numbers::price($this->getTotal()), 'BR', 0, 'R');
+		$this->Cell(100, 10, 'Total: $'. Numbers::price(BudgetHelper::getTotal($this->budget)), 1, 0, 'R');
 	}
 
 	function comerciocityInfo() {
@@ -255,14 +324,6 @@ class BudgetPdf extends fpdf {
 	    $this->x = 5;
 	    $this->SetFont('Arial', '', 10);
 		$this->Cell(200, 5, 'Comprobante creado con el sistema de control de stock ComercioCity - comerciocity.com', $this->b, 0, 'C');
-	}
-
-	function getTotal() {
-		$total = 0;
-		foreach ($this->budget->products as $product) {
-			$total += $product->price * $product->amount;			
-		}
-		return $total;
 	}
 
 	function getHeight($product) {

@@ -17,21 +17,7 @@ class UserController extends Controller
 {
 
     function user() {
-        $auth_user = Auth()->user();
-        if (is_null($auth_user->owner_id)) {
-            $user = User::where('id', $auth_user->id)
-                            ->with('plan.permissions')
-                            ->with('plan.features')
-                            ->with('addresses')
-                            ->with('afip_information.iva_condition')
-                            ->with('extencions')
-                            ->first();
-        } else {
-            $user = User::where('id', $auth_user->id)
-                            ->with('permissions')
-                            ->with('addresses')
-                            ->first();
-        }
+        $user = UserHelper::getFullModel($this->userId(false));
         $user = UserHelper::checkUserTrial($user);
         return response()->json(['user' => $user], 200);
     }
@@ -81,6 +67,13 @@ class UserController extends Controller
             return response()->json(['repeated' => true], 200);
         }
     }
+
+    function updateImage(Request $request, $id) {
+        $user = User::find($id);
+        $user->image_url = $request->image_url;
+        $user->save();
+        return response()->json(['user' => UserHelper::getFullModel($id)], 200);
+    } 
 
     function isCompanyNameRepeated($company_name) {
         $user = User::where('company_name', $company_name)

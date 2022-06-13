@@ -6,7 +6,7 @@
 @if ($level === 'error')
 # @lang('Whoops!')
 @else
-# @lang('Hello!')
+# @lang('¡Hola!')
 @endif
 @endif
 
@@ -19,14 +19,14 @@
 {{-- Action Button --}}
 @isset($actionText)
 <?php
-    switch ($level) {
-        case 'success':
-        case 'error':
-            $color = $level;
-            break;
-        default:
-            $color = 'primary';
-    }
+switch ($level) {
+case 'success':
+case 'error':
+$color = $level;
+break;
+default:
+$color = 'primary';
+}
 ?>
 @component('mail::button', ['url' => $actionUrl, 'color' => $color])
 {{ $actionText }}
@@ -43,20 +43,15 @@
 @if (! empty($salutation))
 {{ $salutation }}
 @else
-@lang('Regards'),<br>
 {{ config('app.name') }}
 @endif
 
 {{-- Subcopy --}}
 @isset($actionText)
 @slot('subcopy')
-@lang(
-    "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-    'into your web browser:',
-    [
-        'actionText' => $actionText,
-    ]
-) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
+
+Si tenes problemas para ingresar desde el boton {{ $actionText }}, copia y pega la siguiente URL en tu navegador: 
+<span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
 @endslot
 @endisset
 @endcomponent

@@ -97,7 +97,7 @@ class LoginController extends Controller
                                 ->with('plan.features')
                                 ->with('subscription')
                                 ->with('addresses')
-                                ->with('extencions')
+                                ->with('extencions.permissions')
                                 ->first();
                 $user = UserHelper::checkUserTrial($user);
                 return response()->json([
@@ -116,6 +116,7 @@ class LoginController extends Controller
                             ], $request->remember)) {
                 $user = User::where('id', Auth::user()->id)
                                 ->with('permissions')
+                                ->with('extencions')
                                 ->first();
                 $user = UserHelper::checkUserTrial($user);
                 return response()->json([

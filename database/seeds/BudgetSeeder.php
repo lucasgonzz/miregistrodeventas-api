@@ -18,81 +18,82 @@ class BudgetSeeder extends Seeder
     {
         $user = User::where('company_name', 'KAS Aberturas')
                             ->first();
-        $clients = Client::where('user_id', $user->id)->take(2)->get();
+        $client = Client::where('user_id', $user->id)
+                        ->where('name', 'lucas')->first();
 
         $products = [
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS, MEDIDAS 2.00 X 2.05 CON VIDRIO DVH 4+9+4',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS, MEDIDAS 2.00 X 2.05 CON VIDRIO DVH 4+9+4',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS, MEDIDAS 2.00 X 2.05 CON VIDRIO DVH 4+9+4',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS, MEDIDAS 2.00 X 2.05 CON VIDRIO DVH 4+9+4',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS, MEDIDAS 2.00 X 2.05 CON VIDRIO DVH 4+9+4 CON MUCHAS COSAS MAS COMO PARA RELLENAR',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS, MEDIDAS 2.00 X 2.05 CON VIDRIO DVH 4+9+4 CON MUCHAS COSAS MAS COMO PARA RELLENAR',
                 'price'     => 77000.5,
                 'bonus'     => null,
             ],
             [
-                'code'      => '',
+                'bar_code'  => '',
                 'amount'    => 2,
                 'name'      => 'PUERTA BALCON EN ALUMINIO BLANCO - 2 PAÑOS CORREDIZOS, MEDIDAS 2.00 X 2.05 CON VIDRIO DVH 4+9+4 CON MUCHAS COSAS MAS COMO PARA RELLENAR',
                 'price'     => 77000.5,
@@ -107,7 +108,7 @@ class BudgetSeeder extends Seeder
         ];
 
         $budget = Budget::create([
-            'client_id' => $clients[0]->id,
+            'client_id' => $client->id,
             'num'       => 1,
             'start_at'  => Carbon::now()->addWeeks(4),
             'finish_at' => Carbon::now()->addWeeks(5),
@@ -115,7 +116,7 @@ class BudgetSeeder extends Seeder
         ]);
         BudgetHelper::attachProducts($budget, $products);
         BudgetHelper::attachObservations($budget, $observations);
-
+        return;
         $budget = Budget::create([
             'client_id'                 => $clients[1]->id,
             'num'                       => 2,

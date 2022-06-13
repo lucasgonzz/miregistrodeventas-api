@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Advise;
 use App\Article;
+use App\ArticleDiscount;
 use App\Description;
 use App\Http\Controllers\Helpers\MessageHelper;
+use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Mail\ArticleAdvise;
 use App\SpecialPrice;
@@ -13,6 +15,21 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ArticleHelper {
+
+    static function setPrices($articles) {
+        foreach ($articles as $article) {
+            if (!is_null($article->percentage_gain)) {
+                $article->price = $article->cost + ($article->cost * Numbers::percentage($article->percentage_gain));
+            }
+            if (count($article->discounts) >= 1) {
+                foreach ($article->discounts as $discount) {
+                    $article->price = $article->price - ($article->price * Numbers::percentage($discount->percentage));
+                    
+                }
+            }
+        }
+        return $articles;
+    }
 
     static function checkAdvises($article) {
         $advises = Advise::where('article_id', $article->id)
@@ -24,6 +41,28 @@ class ArticleHelper {
                 $advise->delete();
             }
         }
+    }
+
+    static function discountStock($id, $amount) {
+        $article = Article::find($id);
+        if (!is_null($article->stock)) {
+            $stock_resultante = $article->stock - $amount;
+            if ($stock_resultante > 0) {
+                $article->stock = $stock_resultante;
+            } else {
+                $article->stock = 0;
+            }
+            $article->timestamps = false;
+            $article->save();
+        }
+    }
+
+    static function resetStock($article, $amount) {
+        if (!is_null($article->stock)) {
+            $article->stock += $amount;
+        }
+        $article->timestamps = false;
+        $article->save();
     }
 
     static function getShortName($name, $length) {
@@ -53,6 +92,23 @@ class ArticleHelper {
         $article->tags()->sync([]);
         foreach ($tags as $tag) {
             $article->tags()->attach($tag['id']);
+        }
+    }
+
+    static function setDiscounts($article, $discounts) {
+        $article_discounts = ArticleDiscount::where('article_id', $article->id)
+                                            ->pluck('id');
+        ArticleDiscount::destroy($article_discounts);                                   
+        if ($discounts) {
+            foreach ($discounts as $discount) {
+                $discount = (object) $discount;
+                if ($discount->percentage != '') {
+                    ArticleDiscount::create([
+                        'percentage' => $discount->percentage,
+                        'article_id' => $article->id,
+                    ]);
+                }
+            }
         }
     }
 
@@ -160,20 +216,9 @@ class ArticleHelper {
 
     static function getFullArticle($article_id) {
         $article = Article::where('id', $article_id)
-                            ->with('images.color')
-                            ->with('descriptions')
-                            ->with('sizes')
-                            ->with('colors')
-                            ->with('condition')
-                            ->with('sub_category')
-                            ->with('variants')
-                            ->with('specialPrices')
-                            ->with('tags')
-                            ->with('brand')
-                            ->with(['providers' => function($q) {
-                                $q->orderBy('cost', 'asc');
-                            }])
+                            ->withAll()
                             ->first();
+        $article = Self::setPrices([$article])[0];
         return $article;
     }
 

@@ -9,12 +9,20 @@ class Article extends Model
     
     protected $guarded = [];
 
+    function scopeWithAll($query) {
+        $query->with('images.color', 'sizes', 'colors', 'condition', 'descriptions', 'sub_category', 'variants', 'tags', 'brand', 'discounts', 'specialPrices', 'providers');
+    }
+
     function views() {
         return $this->morphMany('App\View', 'viewable');
     }
 
     function prices_lists() {
         return $this->belongsToMany('App\PricesList');
+    }
+
+    function discounts() {
+        return $this->hasMany('App\ArticleDiscount');
     }
 
     function brand() {

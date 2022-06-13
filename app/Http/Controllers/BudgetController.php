@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Budget;
 use App\Http\Controllers\Helpers\BudgetHelper;
+use App\Http\Controllers\Helpers\ClientHelper;
+use App\Http\Controllers\Helpers\OrderProductionHelper;
 use App\Http\Controllers\Helpers\Pdf\BudgetPdf;
 use Illuminate\Http\Request;
 
@@ -15,9 +17,10 @@ class BudgetController extends Controller
                             ->with('client.iva_condition')
                             ->with('products')
                             ->with('observations')
-                            ->with('order_production')
+                            ->with('order_production.status')
                             ->orderBy('id', 'DESC')
                             ->get();
+        $budgets = BudgetHelper::getFormatedNum($budgets);
         return response()->json(['budgets' => $budgets], 200);
     }
 
@@ -32,6 +35,8 @@ class BudgetController extends Controller
         ]);
         BudgetHelper::attachProducts($budget, $request->products);
         BudgetHelper::attachObservations($budget, $request->observations);
+        BudgetHelper::sendMail($budget, $request->send_mail);
+
         return response()->json(['budget' => $this->getFullModel($budget->id)], 200);
     }
 
@@ -52,18 +57,28 @@ class BudgetController extends Controller
         return response(null, 200);
     }
 
+    function confirm(Request $request) {
+        $budget = Budget::find($request->id);
+        $budget->status = 'confirmed';
+        $budget->save();
+        BudgetHelper::saveCurrentAcount($budget);
+        $client = ClientHelper::getFullModel($budget->client_id);
+        return response()->json(['budget' => $this->getFullModel($budget->id), 'client' => $client], 200);
+    }
+
     function getFullModel($id) {
         $budget = Budget::where('id', $id)
                         ->with('client.iva_condition')
                         ->with('products')
                         ->with('observations')
-                        ->with('order_production')
+                        ->with('order_production.status')
                         ->first();
+        $budget = BudgetHelper::getFormatedNum([$budget])[0];
         return $budget;
     }
 
-    function pdf($id) {
+    function pdf($only_deliveries, $id) {
         $budget = Budget::find($id);
-        $pdf = new BudgetPdf($budget);
+        $pdf = new BudgetPdf($only_deliveries, $budget);
     }
 }

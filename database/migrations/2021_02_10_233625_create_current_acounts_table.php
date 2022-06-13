@@ -18,9 +18,9 @@ class CreateCurrentAcountsTable extends Migration
             $table->text('detalle')->nullable();
             $table->integer('page')->nullable();
             $table->string('description')->nullable();
-            $table->decimal('debe', 12,2)->nullable();
-            $table->decimal('haber', 12,2)->nullable();
-            $table->decimal('saldo', 12,2)->nullable();
+            $table->decimal('debe', 15,2)->nullable();
+            $table->decimal('haber', 15,2)->nullable();
+            $table->decimal('saldo', 15,2)->nullable();
             $table->enum('status', [
                 'saldo_inicial',
                 'sin_pagar', 
@@ -30,7 +30,13 @@ class CreateCurrentAcountsTable extends Migration
                 'pago_from_client',
                 'pago_for_commissioner',
             ]);
-            $table->decimal('pagandose', 8,2)->nullable();
+            $table->decimal('pagandose', 15,2)->nullable();
+            $table->integer('num_receipt')->nullable();
+
+            $table->integer('to_pay_id')->unsigned()->nullable();
+
+            $table->integer('user_id')->unsigned()->nullable();
+
             $table->bigInteger('client_id')->unsigned()->nullable();
             $table->foreign('client_id')->references('id')->on('clients');
             $table->bigInteger('commissioner_id')->unsigned()->nullable();
@@ -39,6 +45,8 @@ class CreateCurrentAcountsTable extends Migration
             $table->foreign('seller_id')->references('id')->on('sellers');
             $table->bigInteger('sale_id')->unsigned()->nullable();
             $table->foreign('sale_id')->references('id')->on('sales');
+            $table->bigInteger('budget_id')->unsigned()->nullable();
+            $table->bigInteger('current_acount_payment_method_id')->unsigned()->nullable();
             $table->timestamps();
         });
     }

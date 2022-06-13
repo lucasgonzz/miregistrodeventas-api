@@ -10,6 +10,7 @@ use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
@@ -19,6 +20,7 @@ use App\Sale;
 use App\SaleType;
 use App\Variant;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class SaleHelper extends Controller {
 
@@ -116,28 +118,30 @@ class SaleHelper extends Controller {
                                                                     : null,
                                                         'price' => Self::getArticleSalePrice($sale, $article),
                                                         'with_dolar' => Self::getDolar($article, $dolar_blue),
+                                                        'created_at' => Carbon::now(),
                                                     ]);
-            $article_ = Article::find($article['id']);
-            if (isset($article['selected_variant_id'])) {
-                $variant = Variant::find($article['selected_variant_id']);
-                $stock_resultante = $variant->stock - $article['amount'];
-                if ($stock_resultante > 0) {
-                    $variant->stock = $stock_resultante;
-                } else {
-                    $variant->stock = 0;
-                }
-                // $variant->description = 'hola';
-                $variant->save();
-            } else if (!is_null($article_->stock)) {
-                $stock_resultante = $article_->stock - $article['amount'];
-                if ($stock_resultante > 0) {
-                    $article_->stock = $stock_resultante;
-                } else {
-                    $article_->stock = 0;
-                }
-                $article_->timestamps = false;
-                $article_->save();
-            }
+            ArticleHelper::discountStock($article['id'], $article['amount']);
+            // $article_ = Article::find($article['id']);
+            // if (isset($article['selected_variant_id'])) {
+            //     $variant = Variant::find($article['selected_variant_id']);
+            //     $stock_resultante = $variant->stock - $article['amount'];
+            //     if ($stock_resultante > 0) {
+            //         $variant->stock = $stock_resultante;
+            //     } else {
+            //         $variant->stock = 0;
+            //     }
+            //     // $variant->description = 'hola';
+            //     $variant->save();
+            // } else if (!is_null($article_->stock)) {
+            //     $stock_resultante = $article_->stock - $article['amount'];
+            //     if ($stock_resultante > 0) {
+            //         $article_->stock = $stock_resultante;
+            //     } else {
+            //         $article_->stock = 0;
+            //     }
+            //     $article_->timestamps = false;
+            //     $article_->save();
+            // }
         }
     }
 

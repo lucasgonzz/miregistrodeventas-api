@@ -27,7 +27,7 @@ class PdfPrintCurrentAcounts extends fpdf {
 		$this->lineas_impresas = 0;
 		$this->num_page = 0;
 		$this->Y = 40;
-		$this->maximo_letras = 20;
+		$this->maximo_letras = 15;
 		$this->line_height = 6;
 
 		/*

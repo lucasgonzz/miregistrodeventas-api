@@ -15,7 +15,7 @@ class CreateBudgetProductsTable extends Migration
     {
         Schema::create('budget_products', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->nullable();
+            $table->string('bar_code')->nullable();
             $table->integer('amount');
             $table->text('name');
             $table->decimal('price', 8,2);

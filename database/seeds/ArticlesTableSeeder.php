@@ -256,6 +256,42 @@ class ArticlesTableSeeder extends Seeder
             ],
         ];
 
+        $kas_aberturas_articles = [
+            [
+                'bar_code'          => '123',
+                'name'              => 'Visagra mediana',
+                'stock'             => 10,
+                'cost'              => 50,
+                'percentage_gain'   => 50,
+            ],
+            [
+                'bar_code'          => '234',
+                'name'              => 'Picaporte',
+                'stock'             => 10,
+                'cost'              => 200,
+                'percentage_gain'   => 30,
+            ],
+            [
+                'bar_code'          => '345',
+                'name'              => 'Cerradura reforzada',
+                'stock'             => 10,
+                'cost'              => 700,
+                'percentage_gain'   => 50,
+            ],
+        ];
+
+        $kas_aberturas = User::where('company_name', 'kas aberturas')->first();
+        foreach ($kas_aberturas_articles as $article) {
+            Article::create([
+                'bar_code'          => $article['bar_code'],
+                'name'              => $article['name'],
+                'cost'              => $article['cost'],
+                'stock'             => $article['stock'],
+                'percentage_gain'   => $article['percentage_gain'],
+                'user_id'           => $kas_aberturas->id,
+            ]);        
+        }
+
         $fiushh = User::where('company_name', 'Fiushh')->first();
         foreach ($articles_iva as $article) {
             Article::create([

@@ -24,6 +24,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::put('/user', 
 		'UserController@update'
 	);
+	Route::put('/users/image/{id}', 
+		'UserController@updateImage'
+	);
 	Route::get('/user/trial/contratar-servicio', 
 		'UserController@contratarServicio'
 	);
@@ -151,6 +154,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::put('/budgets', 
 		'BudgetController@update'
 	);
+	Route::put('/budgets/confirm', 
+		'BudgetController@confirm'
+	);
 	Route::delete('/budgets/{id}', 
 		'BudgetController@delete'
 	);
@@ -172,9 +178,39 @@ Route::middleware('auth:sanctum')->group(function () {
 		'OrderProductionController@delete'
 	);
 
+	// ProductDelivery
+	Route::post('/budget-product-deliveries', 
+		'BudgetProductDeliveryController@store'
+	);
+	Route::delete('/budget-product-deliveries/{id}', 
+		'BudgetProductDeliveryController@delete'
+	);
+
+	// ProductArticleStock
+	Route::post('/budget-product-article-stocks', 
+		'BudgetProductArticleStockController@store'
+	);
+	Route::delete('/budget-product-article-stocks/{id}', 
+		'BudgetProductArticleStockController@delete'
+	);
+
 	// OrderProductionStatuses
 	Route::get('/order-production-statuses', 
 		'OrderProductionStatusController@index'
+	);
+
+	// ProviderOrders
+	Route::get('/provider-orders', 
+		'ProviderOrderController@index'
+	);
+	Route::post('/provider-orders', 
+		'ProviderOrderController@store'
+	);
+	Route::put('/provider-orders/{id}', 
+		'ProviderOrderController@update'
+	);
+	Route::post('/provider-orders/received', 
+		'ProviderOrderController@setReceived'
 	);
 
 
@@ -526,6 +562,8 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/clients/{id}', 
 		'ClientController@delete'
 	);
+
+	// CurrentAcounts
 	Route::get('/clients/current-acounts/{id}/{months_ago}', 
 		'ClientController@currentAcounts'
 	);
@@ -553,6 +591,13 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/clients/nota-credito', 
 		'CurrentAcountController@notaCredito'
 	);
+
+	// CurrentAcountsPaymentMethods
+	Route::get('/current-acount-payment-methods', 
+		'CurrentAcountPaymentMethodController@index'
+	);
+
+
 	// Ivas
 	Route::get('/ivas', 
 		'IvaController@index'
@@ -621,6 +666,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/permissions', 
 		'PermissionController@index'
 	);
+	// Route::get('/permissions/extencions', 
+	// 	'PermissionController@extencions'
+	// );
 
 	// --------------------------------------------------------------------------------------
 

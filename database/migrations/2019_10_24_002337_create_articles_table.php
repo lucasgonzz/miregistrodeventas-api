@@ -19,7 +19,8 @@ class CreateArticlesTable extends Migration
             $table->string('name', 128)->nullable();
             $table->string('slug')->nullable();
             $table->decimal('cost', 8, 2)->nullable();
-            $table->decimal('price', 8, 2);
+            $table->decimal('price', 8, 2)->nullable();
+            $table->decimal('percentage_gain', 8, 2)->nullable();
             $table->decimal('previus_price', 8, 2)->nullable();
             $table->integer('stock')->nullable();
             $table->boolean('online')->default(1);
@@ -28,7 +29,7 @@ class CreateArticlesTable extends Migration
             $table->integer('brand_id')->unsigned()->nullable();
             $table->integer('iva_id')->unsigned()->default(2);
             $table->bigInteger('sub_category_id')->nullable()->unsigned();
-            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('status', ['active', 'inactive', 'from_provider_order'])->default('active');
             $table->bigInteger('condition_id')->nullable()->unsigned();
             $table->integer('featured')->nullable();
 

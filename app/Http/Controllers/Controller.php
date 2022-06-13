@@ -12,12 +12,16 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
 
-    function userId() {
+    function userId($from_owner = true) {
         $user = Auth()->user();
-        if (is_null($user->owner_id)) {
-            return $user->id;
+        if ($from_owner) {
+            if (is_null($user->owner_id)) {
+                return $user->id;
+            } else {
+                return $user->owner_id;
+            }
         } else {
-            return $user->owner_id;
+            return $user->id;
         }
     }
 

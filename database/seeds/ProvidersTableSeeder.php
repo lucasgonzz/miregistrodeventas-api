@@ -40,16 +40,22 @@ class ProvidersTableSeeder extends Seeder
             'Carmen Gadea 787',
             'Pellegrini 1876',
         ];
-        $user = User::where('company_name', 'Fiushh')->first();
+        $users = User::where('company_name', 'Fiushh')
+                    ->orWhere('company_name', 'kas aberturas')
+                    ->get();
         $index = 0;
-    	foreach ($providers as $provider) {
-	        Provider::create([
-	        	'name' => $provider,
-                'address' => $addresses[$index],
-	        	'user_id' => $user->id,
-	        ]);
-            $index++;
-    	}
+        foreach ($users as $user) {
+        	foreach ($providers as $provider) {
+    	        Provider::create([
+    	        	'name' => $provider,
+                    'address' => $addresses[$index],
+                    'email' => 'lucasgonzalez5500@gmail.com',
+    	        	'user_id' => $user->id,
+    	        ]);
+                $index++;
+        	}
+            $index = 0;
+        }
 
     	$articles = Article::where('user_id', $user->id)->get();
     	foreach ($articles as $article) {

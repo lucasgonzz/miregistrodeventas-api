@@ -9,6 +9,8 @@ class Numbers {
 		$percentage_card = (float)$p;
 		if ($percentage_card < 10) {
 			return '0.0'.$percentage_card;
+		} else if ($percentage_card == 100) {
+			return '1';
 		} 
 		return '0.'.$percentage_card;
 	}

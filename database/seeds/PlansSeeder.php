@@ -66,6 +66,7 @@ class PlansSeeder extends Seeder
                                 ->orWhere('slug', 'articles.cost')
                                 ->orWhere('slug', 'articles.stock')
                                 ->orWhere('slug', 'articles.images')
+                                ->orWhere('slug', 'articles.discounts')
                                 ->orWhere('slug', 'providers')
                                 ->orWhere('slug', 'special_prices')
                                 ->orWhere('slug', 'categories')

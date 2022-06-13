@@ -18,6 +18,7 @@ class CreateBudgetsTable extends Migration
 
             $table->integer('client_id')->unsigned();
             $table->integer('num');
+            $table->enum('status', ['unconfirmed', 'confirmed'])->default('unconfirmed');
 
             $table->boolean('delivery_and_placement')->default(0);
 

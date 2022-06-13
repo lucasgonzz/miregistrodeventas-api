@@ -11,4 +11,9 @@ class Permission extends Model
     function plans() {
         return $this->belongsToMany('App\Plan');
     }
+
+    function extencion() {
+        return $this->belongsTo('App\Extencion');
+        // return $this->belongsTo('App\Extencion', 'extencion_id');
+    }
 }

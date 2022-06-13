@@ -18,6 +18,7 @@ class CreateProvidersTable extends Migration
 
             $table->string('name', 128);
             $table->string('address', 128)->nullable();
+            $table->string('email', 128)->nullable();
             $table->integer('user_id')->unsigned();
             // $table->softDeletes();
             $table->enum('status', ['active', 'inactive'])->default('active');

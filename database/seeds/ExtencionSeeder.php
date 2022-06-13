@@ -12,10 +12,28 @@ class ExtencionSeeder extends Seeder
      */
     public function run()
     {
-        $extencions = ['produccion'];
+        $extencions = [
+            [
+                'name' => 'Presupuestos',
+                'slug' => 'budgets',
+            ],
+            [
+                'name' => 'Ordenes de Produccion',
+                'slug' => 'order_productions',
+            ],
+            [
+                'name' => 'Margen de ganancia en los artículos',
+                'slug' => 'articles.percentage_gain',
+            ],
+            [
+                'name' => 'Proveedores',
+                'slug' => 'providers',
+            ],
+        ];
         foreach ($extencions as $extencion) {
             Extencion::create([
-                'name' => $extencion
+                'name' => $extencion['name'],
+                'slug' => $extencion['slug'],
             ]);
         }
     }

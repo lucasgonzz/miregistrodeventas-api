@@ -98,7 +98,7 @@ class Commissioners extends Controller {
     }
 
     function isSaleFromSeller() {
-        if (!is_null($this->client->seller_id)) {
+        if (!is_null($this->client) && !is_null($this->client->seller_id)) {
             return true;
         } 
         return false;

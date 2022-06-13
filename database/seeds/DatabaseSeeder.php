@@ -11,10 +11,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        $this->call(ExtencionSeeder::class);
         $this->call(PermissionsTableSeeder::class);
         $this->call(FeaturesSeeder::class);
         $this->call(PlansSeeder::class);
-        $this->call(ExtencionSeeder::class);
         // $this->call(RoleTableSeeder::class);
         $this->call(UsersTableSeeder::class);
         $this->call(IconsTableSeeder::class);
@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call(IvaConditionSeeder::class);
         $this->call(IvaSeeder::class);
         $this->call(ClientsTableSeeder::class);
-        $this->call(BuyerSeeder::class);
+        // $this->call(BuyerSeeder::class);
         // $this->call(SaleTimesTableSeeder::class);
         // $this->call(CollectionsSeeder::class);
         // $this->call(ImageSeeder::class);
@@ -48,5 +48,6 @@ class DatabaseSeeder extends Seeder
         $this->call(PlateletSeeder::class);
         $this->call(BudgetSeeder::class);
         $this->call(OrderProductionStatusSeeder::class);
+        $this->call(CurrentAcountPaymentMethodSeeder::class);
     }
 }

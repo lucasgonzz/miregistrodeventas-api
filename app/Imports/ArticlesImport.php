@@ -5,6 +5,7 @@ namespace App\Imports;
 use App\Article;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
+use App\Http\Controllers\update;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToCollection;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -39,9 +40,16 @@ class ArticlesImport implements ToCollection, WithHeadingRow
                                         ->where('bar_code', $row['codigo_de_barras'])
                                         ->where('status', 'active')
                                         ->first();
-                    if (is_null($article)) {
-                        $this->saveArticle($row);
+                    if (!is_null($article)) {
+                        if (count($article->sales) >= 1) {
+                            $article->update([
+                                'status' => 'inactive',
+                            ]);
+                        } else {
+                            $article->delete();
+                        }
                     }
+                    $this->saveArticle($row);
                 }
             }
         }

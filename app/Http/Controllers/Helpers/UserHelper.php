@@ -7,21 +7,37 @@ use Carbon\Carbon;
 
 class UserHelper {
 
-	static function userId() {
+	static function userId($from_owner = true) {
         $user = Auth()->user();
-        if (is_null($user)) {
-        	$user = User::where('company_name', 'Lucas')->first();
-        	return $user->id;
+        if (is_null($user) && env('APP_ENV') == 'local') {
+            $user = User::where('company_name', 'Lucas')->first();
+            return $user->id;
+        }
+        if ($from_owner) {
+            if (is_null($user->owner_id)) {
+                return $user->id;
+            } else {
+    	        return $user->owner_id;
+            }
         } else {
-	        if (is_null($user->owner_id)) {
-	            return $user->id;
-	        } else {
-	            return $user->owner_id;
-	        }
+            return $user->id;
         }
     }
 
-    static function checkUserTrial($user) {
+    static function getFullModel($id = null) {
+        if (is_null($id)) {
+            $id = Self::userId();
+        }
+        $user = User::where('id', $id)
+                    ->withAll()
+                    ->first();
+        return $user;
+    }
+
+    static function checkUserTrial($user = null) {
+        if (is_null($user)) {
+            $user = Self::getFullModel();
+        }
     	$expired_at = $user->expired_at;
     	if (!is_null($expired_at) && $expired_at->lte(Carbon::now())) {
     		$user->trial_expired = true;

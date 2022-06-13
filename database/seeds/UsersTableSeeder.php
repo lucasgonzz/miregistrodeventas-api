@@ -2,6 +2,7 @@
 
 use App\AfipInformation;
 use App\User;
+use App\UserConfiguration;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -57,7 +58,11 @@ class UsersTableSeeder extends Seeder
             'dolar_plus'            => 3,
             'created_at'            => Carbon::now()->subMonths(2),
         ]);
-
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'A cta saldo',
+            'current_acount_pagandose_details'      => 'A cta',
+            'user_id'                               => $commerce->id,
+        ]);
         AfipInformation::create([
             'iva_condition_id'      => 1,
             'razon_social'          => 'LUCAS GONZALEZ FIUSHH',
@@ -90,7 +95,11 @@ class UsersTableSeeder extends Seeder
             'dolar_plus'        => 3,
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
-
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'Me pago',
+            'current_acount_pagandose_details'      => 'Me pago',
+            'user_id'                               => $commerce->id,
+        ]);
         AfipInformation::create([
             'iva_condition_id'      => 1,
             'razon_social'          => 'PINOCHO LIBREIRA',
@@ -105,7 +114,7 @@ class UsersTableSeeder extends Seeder
         $commerce = User::create([
             'id'                => 304,
             'name'              => 'Bartolo',
-            'email'             => 'bartolo@gmail.com',
+            'email'             => 'lucasgonzalez210200@gmail.com',
             'image_url'         => 'v1653518851/articles/yiqq6hy84ww0gpk4ouwp.jpg',
             'phone'             => '3444622139',
             'company_name'      => 'KAS Aberturas',
@@ -124,7 +133,12 @@ class UsersTableSeeder extends Seeder
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
-        $commerce->extencions()->attach([1]);
+        $commerce->extencions()->attach([1, 2, 3]);
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
+            'current_acount_pagandose_details'      => 'Recibo de pago',
+            'user_id'                               => $commerce->id,
+        ]);
 
         AfipInformation::create([
             'iva_condition_id'      => 1,

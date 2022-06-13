@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Database\Seeder;
+use App\Extencion;
 use App\Permission;
+use Illuminate\Database\Seeder;
 
 class PermissionsTableSeeder extends Seeder
 {
@@ -30,19 +31,9 @@ class PermissionsTableSeeder extends Seeder
             'name' => 'Stock en los articulos',
             'slug' => 'articles.stock',
         ]);
-
-        /*
-        |--------------------------------------------------------------------------
-        | Ordenes de produccion
-        |--------------------------------------------------------------------------
-        */
         Permission::create([
-            'name' => 'Ver Presupuestos',
-            'slug' => 'production.budgets',
-        ]);
-        Permission::create([
-            'name' => 'Ver Ordenes de Produccion',
-            'slug' => 'production.order_productions',
+            'name' => 'Descuentos en los articulos',
+            'slug' => 'articles.discounts',
         ]);
 
         
@@ -159,6 +150,94 @@ class PermissionsTableSeeder extends Seeder
             'name' => 'Recibir ordenes de llamada en la Tienda Online',
             'slug' => 'online.calls',
         ]);
-        
+
+        /*
+        |--------------------------------------------------------------------------
+        | EXTENCIONES
+        |--------------------------------------------------------------------------
+        */
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ordenes de produccion
+        |--------------------------------------------------------------------------
+        */
+        $order_productions_extencion = Extencion::where('slug', 'order_productions')->first();
+        $permissions = [
+            [
+                'name' => 'Ver Ordenes de Produccion',
+                'slug' => 'order_productions.index',
+            ],
+            [
+                'name' => 'Ver precios de los artículos en las Ordenes de Produccion',
+                'slug' => 'order_productions.articles.price',
+            ],
+        ];
+        foreach ($permissions as $permission) {
+            Permission::create([
+                'name'          => $permission['name'],
+                'slug'          => $permission['slug'],
+                'extencion_id'  => $order_productions_extencion->id,
+            ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Ordenes de produccion
+        |--------------------------------------------------------------------------
+        */
+        $budgets_extencion = Extencion::where('slug', 'budgets')->first();
+        $permissions = [
+            [
+                'name' => 'Ver Presupuestos',
+                'slug' => 'budgets.index',
+            ],
+            [
+                'name' => 'Crear Presupuestos',
+                'slug' => 'budgets.store',
+            ],
+            [
+                'name' => 'Ver precios de los productos en los Presupuestos',
+                'slug' => 'budgets.articles.price',
+            ],
+        ];
+        foreach ($permissions as $permission) {
+            Permission::create([
+                'name'          => $permission['name'],
+                'slug'          => $permission['slug'],
+                'extencion_id'  => $budgets_extencion->id,
+            ]);
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Proveedores
+        |--------------------------------------------------------------------------
+        */
+        $providers_extencion = Extencion::where('slug', 'providers')->first();
+        $permissions = [
+            [
+                'name' => 'Ver Proveedores',
+                'slug' => 'providers.index',
+            ],
+            [
+                'name' => 'Hacer pedidos a los Proveedores',
+                'slug' => 'providers.orders.create',
+            ],
+            [
+                'name' => 'Ver los pedidos hechos a los Proveedores',
+                'slug' => 'providers.orders.index',
+            ],
+        ];
+        foreach ($permissions as $permission) {
+            Permission::create([
+                'name'          => $permission['name'],
+                'slug'          => $permission['slug'],
+                'extencion_id'  => $providers_extencion->id,
+            ]);
+        }
     }
 }

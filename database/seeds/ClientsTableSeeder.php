@@ -38,8 +38,9 @@ class ClientsTableSeeder extends Seeder
                     'seller_id'         => $user_id == $provider->id ? 1 : null
                 ]);
                 Client::create([
-                    'name' => 'Lucas',
+                    'name'              => 'Lucas',
                     'surname'           => 'Gonzalez',
+                    'email'             => 'lucasgonzalez5500@gmail.com',
                     'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
                     'cuit'              => '20242112025',
                     'razon_social'      => 'MARCOS SRL', 
@@ -48,7 +49,7 @@ class ClientsTableSeeder extends Seeder
                     'seller_id' => $user_id == $provider->id ? 1 : null
                 ]);
                 Client::create([
-                    'name' => 'Luquis',
+                    'name'              => 'Luquis',
                     'surname'           => 'Gonzalez',
                     'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
                     'cuit'              => '20242112025',
@@ -58,7 +59,7 @@ class ClientsTableSeeder extends Seeder
                     'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
                 Client::create([
-                    'name' => 'Marta',
+                    'name'              => 'Marta',
                     'surname'           => 'Gonzalez',
                     'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
                     'cuit'              => '20242112025',
@@ -68,7 +69,7 @@ class ClientsTableSeeder extends Seeder
                     'seller_id' => $user_id == $provider->id ? 2 : null
                 ]);
                 Client::create([
-                    'name' => 'Juana',
+                    'name'              => 'Juana',
                     'surname'           => 'Gonzalez',
                     'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
                     'cuit'              => '20242112025',

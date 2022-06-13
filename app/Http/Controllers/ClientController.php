@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Client;
 use App\CurrentAcount;
 use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\ClientHelper;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
@@ -27,20 +28,14 @@ class ClientController extends Controller
                             ->with('sales')
                             ->with('iva_condition')
                             ->withCount('current_acounts')
-                            // ->with('errors')
                             ->orderBy('id', 'DESC')
                             ->get();
-        return response()->json(['clients' => $this->setClientsSaldo($clients)], 200);
+        return response()->json(['clients' => ClientHelper::setClientsSaldo($clients)], 200);
     }
 
     function show($id) {
-        $client = Client::where('id', $id)
-                        ->with('sales')
-                        ->with('iva_condition')
-                        ->withCount('current_acounts')
-                        // ->with('errors')
-                        ->first();
-        return response()->json(['client' => $this->setClientsSaldo([$client])[0]], 200);
+        $client = ClientHelper::getFullModel($id);
+        return response()->json(['client' => $client], 200);
     }
 
     function update(Request $request) {
@@ -63,12 +58,12 @@ class ClientController extends Controller
             $seller->surname = '';
             $clients = Client::where('seller_id', null)
                                 ->get();
-            $clients = $this->setClientsSaldo($clients);
+            $clients = ClientHelper::setClientsSaldo($clients);
         } else {
             $seller = Seller::where('id', $seller_id)
                             ->with('clients')
                             ->first();
-            $clients = $this->setClientsSaldo($seller->clients);
+            $clients = ClientHelper::setClientsSaldo($seller->clients);
         }
         // dd($seller->clients);
         $pdf = new PdfPrintClients($seller, $clients);
@@ -114,7 +109,7 @@ class ClientController extends Controller
 
     function currentAcounts($client_id, $months_ago) {
         // $this->checkCurrentAcounts($client_id);
-        CurrentAcountHelper::checkSaldos($client_id);
+        // CurrentAcountHelper::checkSaldos($client_id);
         $current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($client_id, $months_ago);
         return response()->json(['current_acounts' => $current_acounts], 200);
     }
@@ -124,27 +119,6 @@ class ClientController extends Controller
         $client->status = 'inactive';
         $client->save();
         return response(null, 200);
-    }
-
-    function setClientsDebt($clients) {
-        foreach ($clients as $client) {
-            $client->debt = 0;
-            $debt = 0;
-            foreach ($client->sales as $sale) {
-                if (!is_null($sale->debt)) {
-                    $total = 0;
-                    foreach ($sale->articles as $article) {
-                        $total += $article->pivot->price * $article->pivot->amount;
-                    }
-                    if (!is_null($sale->percentage_card)) {
-                        $total = $total * floatval("1.".$sale->percentage_card);
-                    }
-                    $debt += $total - $sale->debt;
-                }
-            }
-            $client->debt = $debt;
-        }
-        return $clients;
     }
 
     function setClientsSaldo($clients) {

@@ -37,6 +37,14 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    function scopeWithAll($query) {
+        $query->with('afip_information.iva_condition', 'plan.permissions', 'plan.features', 'subscription', 'addresses', 'extencions.permissions', 'permissions.extencion', 'addresses');
+    }
+
+    public function configuration() {
+        return $this->hasOne('App\UserConfiguration');
+    }
+
     public function extencions() {
         return $this->belongsToMany('App\Extencion');
     }

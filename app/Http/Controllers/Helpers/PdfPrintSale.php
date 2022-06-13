@@ -470,7 +470,8 @@ class PdfPrintSale extends fpdf {
 	function printSaleTypeSaleDiscounts() {
 	 	$this->SetY($this->Y);
     	$this->SetX(5);
-    	if ($this->hasUserSaleTypes()) {
+    	// if ($this->hasUserSaleTypes()) {
+    	if (!is_null($this->sale->sale_type)) {
 	    	$this->Cell(100,5,'Tipo venta: '.$this->sale->sale_type->name,'B',0,'L');
 			$this->Y += 5;
     	}
