@@ -411,6 +411,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		'PricesListController@delete'
 	);
 
+	// Combos
+	Route::resource('combos', 'ComboController');
+
 	// Variants
 	Route::post('/articles/variants/{article_id}', 
 		'ArticleController@setVariants'

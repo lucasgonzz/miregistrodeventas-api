@@ -121,27 +121,17 @@ class SaleHelper extends Controller {
                                                         'created_at' => Carbon::now(),
                                                     ]);
             ArticleHelper::discountStock($article['id'], $article['amount']);
-            // $article_ = Article::find($article['id']);
-            // if (isset($article['selected_variant_id'])) {
-            //     $variant = Variant::find($article['selected_variant_id']);
-            //     $stock_resultante = $variant->stock - $article['amount'];
-            //     if ($stock_resultante > 0) {
-            //         $variant->stock = $stock_resultante;
-            //     } else {
-            //         $variant->stock = 0;
-            //     }
-            //     // $variant->description = 'hola';
-            //     $variant->save();
-            // } else if (!is_null($article_->stock)) {
-            //     $stock_resultante = $article_->stock - $article['amount'];
-            //     if ($stock_resultante > 0) {
-            //         $article_->stock = $stock_resultante;
-            //     } else {
-            //         $article_->stock = 0;
-            //     }
-            //     $article_->timestamps = false;
-            //     $article_->save();
-            // }
+        }
+    }
+
+    static function attachCombos($sale, $combos) {
+        foreach ($combos as $combo) {
+            $price = 0;
+            $sale->combos()->attach($combo['id'], [
+                                                        'amount' => (float)$combo['amount'],
+                                                        'price' => $combo['price'],
+                                                        'created_at' => Carbon::now(),
+                                                    ]);
         }
     }
 

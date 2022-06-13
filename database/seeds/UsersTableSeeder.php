@@ -95,6 +95,8 @@ class UsersTableSeeder extends Seeder
             'dolar_plus'        => 3,
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
+
+        $commerce->extencions()->attach([5]);
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'Me pago',
             'current_acount_pagandose_details'      => 'Me pago',

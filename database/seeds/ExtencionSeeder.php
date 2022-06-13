@@ -29,6 +29,10 @@ class ExtencionSeeder extends Seeder
                 'name' => 'Proveedores',
                 'slug' => 'providers',
             ],
+            [
+                'name' => 'Combos',
+                'slug' => 'combos',
+            ],
         ];
         foreach ($extencions as $extencion) {
             Extencion::create([

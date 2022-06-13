@@ -37,7 +37,7 @@ class BudgetController extends Controller
         BudgetHelper::attachObservations($budget, $request->observations);
         BudgetHelper::sendMail($budget, $request->send_mail);
 
-        return response()->json(['budget' => $this->getFullModel($budget->id)], 200);
+        return response()->json(['budget' => BudgetHelper::getFullModel($budget->id)], 200);
     }
 
     function update(Request $request) {
@@ -48,7 +48,7 @@ class BudgetController extends Controller
         $budget->save();
         BudgetHelper::attachProducts($budget, $request->products);
         BudgetHelper::attachObservations($budget, $request->observations);
-        return response()->json(['budget' => $this->getFullModel($budget->id)], 200);
+        return response()->json(['budget' => BudgetHelper::getFullModel($budget->id)], 200);
     }
 
     function delete($id) {
@@ -63,22 +63,11 @@ class BudgetController extends Controller
         $budget->save();
         BudgetHelper::saveCurrentAcount($budget);
         $client = ClientHelper::getFullModel($budget->client_id);
-        return response()->json(['budget' => $this->getFullModel($budget->id), 'client' => $client], 200);
-    }
-
-    function getFullModel($id) {
-        $budget = Budget::where('id', $id)
-                        ->with('client.iva_condition')
-                        ->with('products')
-                        ->with('observations')
-                        ->with('order_production.status')
-                        ->first();
-        $budget = BudgetHelper::getFormatedNum([$budget])[0];
-        return $budget;
+        return response()->json(['budget' => BudgetHelper::getFullModel($budget->id), 'client' => $client], 200);
     }
 
     function pdf($only_deliveries, $id) {
-        $budget = Budget::find($id);
+        $budget = BudgetHelper::getFullModel($id);
         $pdf = new BudgetPdf($only_deliveries, $budget);
     }
 }

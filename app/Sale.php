@@ -13,6 +13,10 @@ class Sale extends Model
         return $this->hasMany('App\Impression');
     }
 
+    function scopeWithAll($query) {
+        $query->with('client', 'buyer', 'articles', 'impressions', 'special_price', 'commissions', 'discounts', 'afip_ticket', 'combos');
+    }
+
     public function sale_type() {
         return $this->belongsTo('App\SaleType');
     }
@@ -39,6 +43,10 @@ class Sale extends Model
 
     public function articles() {
         return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'price', 'with_dolar');
+    }
+
+    public function combos() {
+        return $this->belongsToMany('App\Combo')->withPivot('amount', 'price',);
     }
 
     public function client() {

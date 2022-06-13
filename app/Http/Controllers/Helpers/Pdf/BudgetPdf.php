@@ -132,7 +132,7 @@ class BudgetPdf extends fpdf {
 		$this->y = 5;
 
 		// Numero
-		$this->Cell(100, 10, 'N° '.$this->getNum(), $this->b, 0, 'L');
+		$this->Cell(100, 10, 'N° '.$this->budget->num, $this->b, 0, 'L');
 		$this->y += 10;
 		$this->x = 105;
 		$this->Cell(100, 10, date_format($this->budget->created_at, 'd/m/Y'), $this->b, 0, 'L');
@@ -334,16 +334,6 @@ class BudgetPdf extends fpdf {
     		$letras -= 41;
     	}
     	return $this->line_height * $lines;
-	}
-
-	function getNum() {
-		$letras_faltantes = 8 - strlen($this->budget->num);
-		$cbte_numero = '';
-		for ($i=0; $i < $letras_faltantes; $i++) { 
-			$cbte_numero .= '0'; 
-		}
-		$cbte_numero  .= $this->budget->num;
-		return $cbte_numero;
 	}
 
 }

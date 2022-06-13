@@ -25,6 +25,10 @@ class Article extends Model
         return $this->hasMany('App\ArticleDiscount');
     }
 
+    function combos() {
+        return $this->belongsToMany('App\Article');
+    }
+
     function brand() {
         return $this->belongsTo('App\Brand');
     }

@@ -35,8 +35,19 @@ class BudgetHelper {
 		return $budgets;
 	}
 
+    static function getFullModel($id) {
+        $budget = Budget::where('id', $id)
+                        ->with('client.iva_condition')
+                        ->with('products')
+                        ->with('observations')
+                        ->with('order_production.status')
+                        ->first();
+        $budget = Self::getFormatedNum([$budget])[0];
+        return $budget;
+    }
+
 	static function sendMail($budget, $send_mail) {
-		if ($send_mail && $budget->client->email != '') {
+		if ($send_mail == 1 && $budget->client->email != '') {
 			$budget->client->notify(new BudgetCreated($budget));
 		}
 	}

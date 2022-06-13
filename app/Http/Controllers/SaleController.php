@@ -22,104 +22,6 @@ use Jenssegers\Agent\Agent;
 class SaleController extends Controller
 {
 
-    function statistics() {
-        $user = Auth()->user();
-        $first_sale = Sale::where('user_id', $user->id)
-                            ->orderBy('id', 'ASC')
-                            ->first();
-        $last_sale = Sale::where('user_id', Auth()->user()->id)
-                            ->orderBy('id', 'DESC')
-                            ->first();
-
-
-        $first_date =new Carbon($first_sale->created_at);
-        $first_date->addMonth();
-        $first_date->day = 1;
-        $first_date = Carbon::create($first_date->year, $first_date->month, $first_date->day);
-
-        $last_date =new Carbon($last_sale->created_at);
-        $last_date->subMonth();
-        $last_date->endOfMonth();
-        $last_date = Carbon::create($last_date->year, $last_date->month, $last_date->day);
-
-
-        $result = [];
-        $result['first']['labels'] = [];
-        $result['first']['data'] = [];
-        $result['second'] = [];
-        $result['second']['labels'] = [];
-        $result['second']['data'] = [];
-
-        $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
-
-        // dd($meses[$first_date->format('n') - 1]);
-        $sale_times = SaleTime::where('user_id', Auth()->user()->id)
-                                ->get();
-        foreach ($sale_times as $sale_time) {
-            ${$sale_time->name} = 0;
-            $result['second']['labels'][] = $sale_time->name;
-        }
-        while ($first_date < $last_date) {
-            $mes = $meses[($first_date->format('n')) - 1];
-            $label = $mes . ' ' . $first_date->year;
-            $sales_of_month = Sale::where('user_id', Auth()->user()->id)
-                                    ->whereDate('created_at', '>=', $first_date)
-                                    ->whereDate('created_at', '<', $first_date->addMonth())
-                                    ->with('articles')
-                                    ->get();
-            // dd($sales_of_month);
-            $total = 0;
-            $cant_ventas = 0;
-            foreach ($sales_of_month as $sale) {
-                // dd($sale->articles);
-                foreach ($sale->articles as $article) {
-                    $total += $article->pivot->price * $article->pivot->amount;
-                }
-                $cant_ventas++;
-
-                foreach ($sale_times as $sale_time) {
-                    $created_at = new Carbon($sale->created_at);
-
-                    $from = new Carbon(date(substr($sale->created_at, 0, 10) . ' ' . $sale_time->from));
-                    // $from = Carbon::create($date->year, $date->month, $date->day . ' ' . $sale_time->from);
-                    $to = new Carbon(date(substr($sale->created_at, 0, 10) . ' ' . $sale_time->to));
-                    if ($from > $to) {
-                        // created_at 20 02
-                        // from 19 20
-                        // to 20 04
-                        $to->addDay();
-                        if ($created_at >= $from && $created_at < $to) {
-                            ${$sale_time->name}++;
-                        } else {
-                            $to->subDay();
-                            $from->subDay();
-                            if ($created_at >= $from && $created_at < $to) {
-                                ${$sale_time->name}++;
-                            }
-                        }
-                    } else {
-                        if ($created_at >= $from && $created_at < $to) {
-                            ${$sale_time->name}++;
-                        }
-                    }
-                }
-            }
-            // dd($mes);
-            // $created_at = Carbon::parse($sale->created_at);
-            $label = $label . ', ' . $cant_ventas . ' ventas';
-            $result['first']['labels'][] = $label;
-            $result['first']['data'][] = (int)$total;
-            $cantidades_de_cada_horario = [];
-            foreach ($sale_times as $sale_time) {
-                $cantidades_de_cada_horario[] = ${$sale_time->name};
-                ${$sale_time->name} = 0;
-            }
-            $result['second']['data'][] = $cantidades_de_cada_horario;
-        }
-        // dd($result);
-        return $result;
-    }
-
     function previusNext($index) {
         $sales = Sale::where('user_id', $this->userId())
                         ->with('articles')
@@ -169,14 +71,7 @@ class SaleController extends Controller
     function index() {
         $sales = Sale::where('user_id', $this->userId())
                         ->where('created_at', '>=', Carbon::today())
-                        ->with('client')
-                        ->with('buyer')
-                        ->with('articles')
-                        ->with('impressions')
-                        ->with('special_price')
-                        ->with('commissions')
-                        ->with('discounts')
-                        ->with('afip_ticket')
+                        ->withAll()
                         ->orderBy('created_at', 'DESC')
                         ->get();
         return response()->json(['sales' => $sales], 200);
@@ -444,6 +339,7 @@ class SaleController extends Controller
             'sale_type_id'      => SaleHelper::getSaleType($request),
         ]);
         SaleHelper::attachArticles($sale, $request->articles, $request->dolar_blue);
+        SaleHelper::attachCombos($sale, $request->combos);
         if ($request->client_id) {
             $discounts = DiscountHelper::getDiscountsFromDiscountsId($request->discounts);
             SaleHelper::attachDiscounts($sale, $discounts);
@@ -451,15 +347,8 @@ class SaleController extends Controller
             $helper->attachCommissionsAndCurrentAcounts();
         }
         $sale = Sale::where('id', $sale->id)
-                        ->with('client')
-                        ->with('special_price')
-                        ->with('articles')
-                        ->with('impressions')
-                        ->with('discounts')
-                        ->with('afip_ticket')
-                        ->with('buyer')
-                        ->with('commissions')
-                        ->first();
+                    ->withAll()
+                    ->first();
         return response()->json(['sale' => $sale], 201);
     }
 
@@ -473,6 +362,104 @@ class SaleController extends Controller
         $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce, $afip_ticket);
         // $pdf = new SalePdf($sales_id, (bool)$for_commerce, $afip_ticket);
         $pdf->printSales();
+    }
+
+    function statistics() {
+        $user = Auth()->user();
+        $first_sale = Sale::where('user_id', $user->id)
+                            ->orderBy('id', 'ASC')
+                            ->first();
+        $last_sale = Sale::where('user_id', Auth()->user()->id)
+                            ->orderBy('id', 'DESC')
+                            ->first();
+
+
+        $first_date =new Carbon($first_sale->created_at);
+        $first_date->addMonth();
+        $first_date->day = 1;
+        $first_date = Carbon::create($first_date->year, $first_date->month, $first_date->day);
+
+        $last_date =new Carbon($last_sale->created_at);
+        $last_date->subMonth();
+        $last_date->endOfMonth();
+        $last_date = Carbon::create($last_date->year, $last_date->month, $last_date->day);
+
+
+        $result = [];
+        $result['first']['labels'] = [];
+        $result['first']['data'] = [];
+        $result['second'] = [];
+        $result['second']['labels'] = [];
+        $result['second']['data'] = [];
+
+        $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+
+        // dd($meses[$first_date->format('n') - 1]);
+        $sale_times = SaleTime::where('user_id', Auth()->user()->id)
+                                ->get();
+        foreach ($sale_times as $sale_time) {
+            ${$sale_time->name} = 0;
+            $result['second']['labels'][] = $sale_time->name;
+        }
+        while ($first_date < $last_date) {
+            $mes = $meses[($first_date->format('n')) - 1];
+            $label = $mes . ' ' . $first_date->year;
+            $sales_of_month = Sale::where('user_id', Auth()->user()->id)
+                                    ->whereDate('created_at', '>=', $first_date)
+                                    ->whereDate('created_at', '<', $first_date->addMonth())
+                                    ->with('articles')
+                                    ->get();
+            // dd($sales_of_month);
+            $total = 0;
+            $cant_ventas = 0;
+            foreach ($sales_of_month as $sale) {
+                // dd($sale->articles);
+                foreach ($sale->articles as $article) {
+                    $total += $article->pivot->price * $article->pivot->amount;
+                }
+                $cant_ventas++;
+
+                foreach ($sale_times as $sale_time) {
+                    $created_at = new Carbon($sale->created_at);
+
+                    $from = new Carbon(date(substr($sale->created_at, 0, 10) . ' ' . $sale_time->from));
+                    // $from = Carbon::create($date->year, $date->month, $date->day . ' ' . $sale_time->from);
+                    $to = new Carbon(date(substr($sale->created_at, 0, 10) . ' ' . $sale_time->to));
+                    if ($from > $to) {
+                        // created_at 20 02
+                        // from 19 20
+                        // to 20 04
+                        $to->addDay();
+                        if ($created_at >= $from && $created_at < $to) {
+                            ${$sale_time->name}++;
+                        } else {
+                            $to->subDay();
+                            $from->subDay();
+                            if ($created_at >= $from && $created_at < $to) {
+                                ${$sale_time->name}++;
+                            }
+                        }
+                    } else {
+                        if ($created_at >= $from && $created_at < $to) {
+                            ${$sale_time->name}++;
+                        }
+                    }
+                }
+            }
+            // dd($mes);
+            // $created_at = Carbon::parse($sale->created_at);
+            $label = $label . ', ' . $cant_ventas . ' ventas';
+            $result['first']['labels'][] = $label;
+            $result['first']['data'][] = (int)$total;
+            $cantidades_de_cada_horario = [];
+            foreach ($sale_times as $sale_time) {
+                $cantidades_de_cada_horario[] = ${$sale_time->name};
+                ${$sale_time->name} = 0;
+            }
+            $result['second']['data'][] = $cantidades_de_cada_horario;
+        }
+        // dd($result);
+        return $result;
     }
     
 }

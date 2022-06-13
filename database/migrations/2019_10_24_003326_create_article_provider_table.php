@@ -22,10 +22,10 @@ class CreateArticleProviderTable extends Migration
             $table->integer('cost')->nullable();
             $table->integer('price')->nullable();
 
-            $table->foreign('article_id')
-                    ->references('id')->on('articles');
-            $table->foreign('provider_id')
-                    ->references('id')->on('providers');
+            // $table->foreign('article_id')
+            //         ->references('id')->on('articles');
+            // $table->foreign('provider_id')
+            //         ->references('id')->on('providers');
 
             $table->timestamps();
         });

@@ -32,30 +32,28 @@ class ArticlesImport implements ToCollection, WithHeadingRow
                                         ->where('name', $row['nombre'])
                                         ->where('status', 'active')
                                         ->first();
-                    if (!is_null($article)) {
-                        $this->saveArticle($row);
-                    }
+                    $this->saveArticle($row, $article);
                 } else {
                     $article = Article::where('user_id', UserHelper::userId())
                                         ->where('bar_code', $row['codigo_de_barras'])
                                         ->where('status', 'active')
                                         ->first();
-                    if (!is_null($article)) {
-                        if (count($article->sales) >= 1) {
-                            $article->update([
-                                'status' => 'inactive',
-                            ]);
-                        } else {
-                            $article->delete();
-                        }
-                    }
-                    $this->saveArticle($row);
+                    $this->saveArticle($row, $article);
                 }
             }
         }
     }
 
-    function saveArticle($row) {
+    function saveArticle($row, $article) {
+        if (!is_null($article)) {
+            if (count($article->sales) >= 1) {
+                $article->update([
+                    'status' => 'inactive',
+                ]);
+            } else {
+                $article->delete();
+            }
+        }
         $article = Article::create([
             'bar_code'  => $row['codigo_de_barras'],
             'name'      => $row['nombre'],

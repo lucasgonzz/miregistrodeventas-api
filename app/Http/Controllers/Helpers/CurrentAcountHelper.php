@@ -30,7 +30,7 @@ class CurrentAcountHelper {
 
     static function getNumReceipt() {
         $last_receipt = CurrentAcount::where('user_id', UserHelper::userId())
-                                        ->whereNotNull('debe')
+                                        ->where('status', 'pago_from_client')
                                         ->where('status', '!=', 'nota_credito')
                                         ->orderBy('created_at', 'DESC')
                                         ->first();
@@ -38,6 +38,7 @@ class CurrentAcountHelper {
     }
 
     static function getSaldo($client_id, $until_current_acount) {
+        Log::info('Buscando ultimo saldo del cliente '.$until_current_acount->client->name.' hasta la cuenta corriente: '.$until_current_acount->detalle.'. Creada en: '.date_format($until_current_acount->created_at, 'd/m/Y H:i:s'));
         $last_current_acount = CurrentAcount::where('client_id', $client_id)
                                 ->orderBy('created_at', 'DESC')
                                 ->where('created_at', '<', $until_current_acount->created_at)
@@ -45,17 +46,12 @@ class CurrentAcountHelper {
         if (is_null($last_current_acount)) {
             return 0;
         } else {
+            Log::info('Retornando saldo: '.$last_current_acount->saldo.' de la cuenta corriente '.$last_current_acount->detalle.'. Creada en: '.date_format($last_current_acount->created_at, 'd/m/Y H:i:s'));
             return $last_current_acount->saldo;
         }
     }
 
     static function restartCurrentAcounts($client_id) {
-        CurrentAcount::where('client_id', $client_id)
-                    ->whereNotNull('sale_id')
-                    ->orWhereNotNull('budget_id')
-                    ->update([
-                        'status'    => 'sin_pagar',
-                    ]);
         CurrentAcount::where('client_id', $client_id)
                     ->whereNotNull('debe')
                     ->update([
@@ -270,6 +266,7 @@ class CurrentAcountHelper {
         $current_acounts = CurrentAcount::where('client_id', $client_id)
                                         ->orderBy('created_at', 'ASC')
                                         ->get();
+
         foreach ($current_acounts as $current_acount) {
             $saldo = Self::getSaldo($client_id, $current_acount);
             if ($current_acount->debe) {
@@ -328,21 +325,43 @@ class CurrentAcountHelper {
         $current_acounts = CurrentAcount::where('client_id', $client_id)
                                         ->whereDate('created_at', '>=', $months_ago)
                                         ->orderBy('created_at', 'ASC')
-                                        ->with('budget')
-                                        ->with('sale')
+                                        ->with('budget.client.iva_condition')
+                                        ->with('budget.products')
+                                        ->with('sale.client.iva_condition')
+                                        ->with('sale.articles')
+                                        ->with('sale.combos')
+                                        ->with('sale.discounts')
+                                        ->with('sale.commissions')
                                         ->with('payment_method')
                                         ->with('checks')
                                         ->get();
+        $current_acounts = Self::format($current_acounts);
         return $current_acounts;
     }
 
-    // static function getCurrentAcountsSinceMonths($client_id, $months_ago) {
-    //     $months_ago = Carbon::now()->subMonths($months_ago);
-    //     $current_acounts = CurrentAcount::where('client_id', $client_id)
-    //                                     ->whereDate('created_at', '>=', $months_ago)
-    //                                     ->orderBy('sale_id', 'ASC')
-    //                                     ->get();
-    //     return $current_acounts;
-    // }
+    static function format($current_acounts) {
+        foreach ($current_acounts as $current_acount) {
+            if (!is_null($current_acount->num_receipt)) {
+                $current_acount->numero = 'RP'.Self::getFormatedNum($current_acount, 'num_receipt');
+            }
+            if (!is_null($current_acount->sale_id)) {
+                $current_acount->numero = 'RT'.Self::getFormatedNum($current_acount, 'sale_id');
+            }
+            if (!is_null($current_acount->budget_id)) {
+                $current_acount->numero = 'P'.Self::getFormatedNum($current_acount, 'budget_id');
+            }
+        }
+        return $current_acounts;
+    }
+
+    static function getFormatedNum($current_acount, $prop) {
+        $letras_faltantes = 8 - strlen($current_acount->{$prop});
+        $cbte_numero = '';
+        for ($i=0; $i < $letras_faltantes; $i++) { 
+            $cbte_numero .= '0'; 
+        }
+        $cbte_numero  .= $current_acount->{$prop};
+        return $cbte_numero;
+    }
 
 }
