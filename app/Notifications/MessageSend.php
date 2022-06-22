@@ -2,11 +2,12 @@
 
 namespace App\Notifications;
 
+use App\Http\Controllers\Helpers\ImageHelper;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Support\Facades\Log;
 
 class MessageSend extends Notification
@@ -61,16 +62,17 @@ class MessageSend extends Notification
     public function toMail($notifiable)
     {
         Log::info('Enviando correo a '.$notifiable->email);
-        $mail_message = (new MailMessage)
-                    ->greeting('Hola '.$notifiable->name)
+        return (new MailMessage)
                     ->from(Auth()->user()->email, Auth()->user()->company_name)
                     ->subject($this->title)
-                    ->line($this->message->text)
-                    ->line('¡Muchas gracias por usar nuestros servicios!');
-        if (!is_null($this->url)) {
-            $mail_message->action('Ver producto en la tienda', $this->url);
-        }
-        return $mail_message;
+                    ->markdown('emails.message-send', [
+                        'commerce'  => Auth()->user(),
+                        'message'   => $this->message->text,
+                        'logo_url'  => ImageHelper::image(Auth()->user()),
+                    ]);
+        // if (!is_null($this->url)) {
+        //     $mail_message->action('Ver producto en la tienda', $this->url);
+        // }
         // return (new MailMessage)
         //             // ->theme('custom')
         //             ->greeting('Hola '.$notifiable->name)

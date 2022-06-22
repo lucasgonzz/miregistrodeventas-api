@@ -37,7 +37,7 @@ class AddressSeeder extends Seeder
         // Commerce
         $commerces = User::where('company_name', 'Fiushh')
                             ->orWhere('company_name', 'Pinocho')
-                            ->orWhere('company_name', 'kas aberturas')
+                            ->orWhere('company_name', 'CandyGuay')
                             ->get();
         foreach ($commerces as $commerce) {
             Address::create([

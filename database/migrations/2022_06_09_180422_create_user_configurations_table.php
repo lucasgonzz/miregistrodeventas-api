@@ -17,6 +17,7 @@ class CreateUserConfigurationsTable extends Migration
             $table->id();
             $table->string('current_acount_pagandose_details')->nullable();
             $table->string('current_acount_pagado_details')->nullable();
+            $table->boolean('show_articles_without_stock')->default(true);
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

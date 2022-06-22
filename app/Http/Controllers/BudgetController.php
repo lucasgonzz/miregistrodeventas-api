@@ -41,7 +41,7 @@ class BudgetController extends Controller
     }
 
     function update(Request $request) {
-        $budget = Budget::find($request->id);
+        $budget = Budget::find($request->budget['id']);
         $budget->start_at = $request->start_at;
         $budget->finish_at = $request->finish_at;
         $budget->delivery_and_placement = $request->delivery_and_placement;

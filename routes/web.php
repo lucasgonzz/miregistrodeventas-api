@@ -115,6 +115,8 @@ Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}/{afip_ticket?}', 'SaleController@pdf');
 
+Route::get('/sales/tickets/pdf/{sale_id}/{address_id?}', 'SaleController@ticketPdf');
+
 // Exel
 Route::get('/articles/excel/export', 'ArticleController@export');
 

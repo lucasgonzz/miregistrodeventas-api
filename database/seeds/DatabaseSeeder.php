@@ -27,7 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call(IvaConditionSeeder::class);
         $this->call(IvaSeeder::class);
         $this->call(ClientsTableSeeder::class);
-        // $this->call(BuyerSeeder::class);
+        $this->call(BuyerSeeder::class);
         // $this->call(SaleTimesTableSeeder::class);
         // $this->call(CollectionsSeeder::class);
         // $this->call(ImageSeeder::class);
@@ -46,8 +46,10 @@ class DatabaseSeeder extends Seeder
         $this->call(SizeSeeder::class);
         $this->call(PricesListSeeder::class);
         $this->call(PlateletSeeder::class);
-        $this->call(BudgetSeeder::class);
+        // $this->call(BudgetSeeder::class);
         $this->call(OrderProductionStatusSeeder::class);
         $this->call(CurrentAcountPaymentMethodSeeder::class);
+        $this->call(PaymentMethodSeeder::class);
+        $this->call(DeliveryZoneSeeder::class);
     }
 }

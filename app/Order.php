@@ -8,6 +8,10 @@ class Order extends Model
 {
     protected $guarded = [];
 
+    function scopeWithAll($query) {
+        $query->with('articles.images', 'articles.variants', 'articles.colors', 'articles.sizes', 'address', 'cupons', 'buyer', 'payment_method', 'delivery_zone');
+    }
+
     function articles() {
     	return $this->belongsToMany('App\Article')->withPivot('cost', 'price', 'amount', 'variant_id', 'color_id', 'size_id', 'with_dolar');
     }
@@ -18,6 +22,14 @@ class Order extends Model
 
     function cupons() {
         return $this->hasMany('App\Cupon');
+    }
+
+    function payment_method() {
+        return $this->belongsTo('App\PaymentMethod');
+    }
+
+    function delivery_zone() {
+        return $this->belongsTo('App\DeliveryZone');
     }
 
     function user() {

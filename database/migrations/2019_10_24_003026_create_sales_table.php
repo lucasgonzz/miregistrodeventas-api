@@ -23,6 +23,7 @@ class CreateSalesTable extends Migration
             $table->bigInteger('client_id')->nullable()->unsigned();
             $table->integer('buyer_id')->nullable()->unsigned();
             $table->integer('special_price_id')->nullable()->unsigned();
+            $table->integer('address_id')->nullable()->unsigned();
             $table->decimal('debt')->nullable();
 
             $table->foreign('user_id')

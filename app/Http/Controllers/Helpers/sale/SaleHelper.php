@@ -65,6 +65,10 @@ class SaleHelper extends Controller {
         return !is_null($request->sale_type) ? $request->sale_type : null;
     }
 
+    static function getSelectedAddress($request) {
+        return !is_null($request->selected_address) ? $request->selected_address['id'] : null;
+    }
+
     static function getNumSaleFromSaleId($sale_id) {
         $sale = Sale::where('id', $sale_id)
                     ->select('num_sale')
@@ -110,28 +114,30 @@ class SaleHelper extends Controller {
 
     static function attachArticles($sale, $articles, $dolar_blue = null) {
         foreach ($articles as $article) {
-            $price = 0;
-            $sale->articles()->attach($article['id'], [
-                                                        'amount' => (float)$article['amount'],
-                                                        'cost' => isset($article['cost'])
-                                                                    ? (float)$article['cost']
-                                                                    : null,
-                                                        'price' => Self::getArticleSalePrice($sale, $article),
-                                                        'with_dolar' => Self::getDolar($article, $dolar_blue),
-                                                        'created_at' => Carbon::now(),
-                                                    ]);
-            ArticleHelper::discountStock($article['id'], $article['amount']);
+            if (isset($article['is_article'])) {
+                $sale->articles()->attach($article['id'], [
+                                                            'amount' => (float)$article['amount'],
+                                                            'cost' => isset($article['cost'])
+                                                                        ? (float)$article['cost']
+                                                                        : null,
+                                                            'price' => Self::getArticleSalePrice($sale, $article),
+                                                            'with_dolar' => Self::getDolar($article, $dolar_blue),
+                                                            'created_at' => Carbon::now(),
+                                                        ]);
+                ArticleHelper::discountStock($article['id'], $article['amount']);
+            }
         }
     }
 
     static function attachCombos($sale, $combos) {
         foreach ($combos as $combo) {
-            $price = 0;
-            $sale->combos()->attach($combo['id'], [
-                                                        'amount' => (float)$combo['amount'],
-                                                        'price' => $combo['price'],
-                                                        'created_at' => Carbon::now(),
-                                                    ]);
+            if (isset($combo['is_combo'])) {
+                $sale->combos()->attach($combo['id'], [
+                                                            'amount' => (float)$combo['amount'],
+                                                            'price' => $combo['price'],
+                                                            'created_at' => Carbon::now(),
+                                                        ]);
+            }
         }
     }
 
@@ -160,7 +166,7 @@ class SaleHelper extends Controller {
     }
 
     static function getDolar($article, $dolar_blue) {
-        if ($article['with_dolar']) {
+        if (isset($article['with_dolar']) && $article['with_dolar']) {
             return $dolar_blue;
         }
         return null;
@@ -179,7 +185,7 @@ class SaleHelper extends Controller {
         }
     }
 
-    static function detachArticles($sale) {
+    static function detachItems($sale) {
         foreach ($sale->articles as $article) {
             if (!is_null($article->stock)) {
                 $stock = 0;
@@ -189,6 +195,7 @@ class SaleHelper extends Controller {
             }
         }
         $sale->articles()->detach();
+        $sale->combos()->detach();
     }
 
     static function getTotalSale($sale, $with_discount = true) {
@@ -199,6 +206,9 @@ class SaleHelper extends Controller {
             } else {
                 $total += $article->pivot->price * $article->pivot->amount;
             }
+        }
+        foreach ($sale->combos as $combo) {
+            $total += $combo->pivot->price * $combo->pivot->amount;
         }
         if ($with_discount) {
             foreach ($sale->discounts as $discount) {

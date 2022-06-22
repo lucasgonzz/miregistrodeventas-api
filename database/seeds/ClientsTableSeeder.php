@@ -14,7 +14,7 @@ class ClientsTableSeeder extends Seeder
     public function run()
     {
         $provider = User::where('company_name', 'Lucas')->first();
-        for ($user_id=301; $user_id <= 304 ; $user_id++) { 
+        for ($user_id=301; $user_id <= 306 ; $user_id++) { 
             // for ($i=1; $i < 10; $i++) { 
                 // Client::create([
                 //     'name' => 'Mio',

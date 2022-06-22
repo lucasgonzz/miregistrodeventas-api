@@ -61,6 +61,12 @@ Route::middleware('auth:sanctum')->group(function () {
 		'ScheduleController@update'
 	);
 
+	// PaymentMethods
+	Route::resource('payment-methods', 'PaymentMethodController');
+
+	// DeliveryZones
+	Route::resource('delivery-zones', 'DeliveryZoneController');
+
 	// -----------------------SUPER--------------------------------------------------
 	Route::get('super/admins', 
 		'SuperController@admins'
@@ -617,9 +623,6 @@ Route::middleware('auth:sanctum')->group(function () {
 		'SaleController@pagarDeuda'
 	);
 	// PreviusDays
-	Route::get('/sales/days-previus-sales/{index}/{retroceder}/{fecha_limite?}', 
-		'SaleController@daysPreviusSales'
-	);
 	Route::get('/sales/prev/{index}', 
 		'SaleController@previusDays'
 	);
@@ -636,9 +639,6 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::get('/sale-time/allowed', 
 		'SaleTimeController@allowed'
-	);
-	Route::get('/sales/from-sale-time/{sale_time_id}/{inverted}/{only_one_date?}', 
-		'SaleController@fromSaleTime'
 	);
 	Route::post('/sale-time', 
 		'SaleTimeController@store'

@@ -45,7 +45,10 @@ class ArticlesTableSeeder extends Seeder
         ];
     public function run()
     {
-
+        $this->candy();
+        $this->kasAberturas();
+        $this->pinocho();
+        return;
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
 
         $iphones = [
@@ -256,41 +259,8 @@ class ArticlesTableSeeder extends Seeder
             ],
         ];
 
-        $kas_aberturas_articles = [
-            [
-                'bar_code'          => '123',
-                'name'              => 'Visagra mediana',
-                'stock'             => 10,
-                'cost'              => 50,
-                'percentage_gain'   => 50,
-            ],
-            [
-                'bar_code'          => '234',
-                'name'              => 'Picaporte',
-                'stock'             => 10,
-                'cost'              => 200,
-                'percentage_gain'   => 30,
-            ],
-            [
-                'bar_code'          => '345',
-                'name'              => 'Cerradura reforzada',
-                'stock'             => 10,
-                'cost'              => 700,
-                'percentage_gain'   => 50,
-            ],
-        ];
+        
 
-        $kas_aberturas = User::where('company_name', 'kas aberturas')->first();
-        foreach ($kas_aberturas_articles as $article) {
-            Article::create([
-                'bar_code'          => $article['bar_code'],
-                'name'              => $article['name'],
-                'cost'              => $article['cost'],
-                'stock'             => $article['stock'],
-                'percentage_gain'   => $article['percentage_gain'],
-                'user_id'           => $kas_aberturas->id,
-            ]);        
-        }
 
         $fiushh = User::where('company_name', 'Fiushh')->first();
         foreach ($articles_iva as $article) {
@@ -349,6 +319,143 @@ class ArticlesTableSeeder extends Seeder
                     }
                 }
             }
+        }
+    }
+
+    function candy() {
+        $articles = [
+            [
+                'name'              => 'Cafe con leche',
+                'price'             => 100,
+            ],
+            [
+                'name'              => 'Medialuna',
+                'price'             => 80,
+            ],
+            [
+                'name'              => 'Tostada',
+                'price'             => 50,
+            ],
+        ];
+        $candy = User::where('company_name', 'CandyGuay')->first();
+        foreach ($articles as $article) {
+            Article::create([
+                'name' => $article['name'],
+                'price' => $article['price'],
+                'user_id' => $candy->id,
+            ]);        
+        }
+    }
+
+    function kasAberturas() {
+        $kas_aberturas_articles = [
+            [
+                'bar_code'          => '123',
+                'name'              => 'Visagra mediana',
+                'stock'             => 10,
+                'cost'              => 50,
+                'percentage_gain'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '234',
+                'name'              => 'Picaporte',
+                'stock'             => 10,
+                'cost'              => 200,
+                'percentage_gain'   => 30,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '345',
+                'name'              => 'Cerradura reforzada',
+                'stock'             => 10,
+                'cost'              => 700,
+                'percentage_gain'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+        ];
+
+        $kas_aberturas = User::where('company_name', 'kas aberturas')->first();
+        foreach ($kas_aberturas_articles as $article) {
+            $art = Article::create([
+                'bar_code'          => $article['bar_code'],
+                'name'              => $article['name'],
+                'cost'              => $article['cost'],
+                'stock'             => $article['stock'],
+                'percentage_gain'   => $article['percentage_gain'],
+                'user_id'           => $kas_aberturas->id,
+            ]);    
+            foreach ($article['images'] as $url) { 
+                Image::create([
+                    'article_id' => $art->id,
+                    'url'        => $url,
+                ]);
+            }    
+        }
+    }
+
+    function pinocho() {
+        $articles = [
+            [
+                'bar_code'          => '123',
+                'name'              => 'Remera manga larga',
+                'stock'             => 10,
+                'cost'              => 50,
+                'price'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '234',
+                'name'              => 'Picaporte',
+                'stock'             => 10,
+                'cost'              => 200,
+                'price'   => 30,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '345',
+                'name'              => 'Cerradura reforzada',
+                'stock'             => 10,
+                'cost'              => 700,
+                'price'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+        ];
+
+        $kas_aberturas = User::where('company_name', 'pinocho')->first();
+        foreach ($articles as $article) {
+            $art = Article::create([
+                'bar_code'          => $article['bar_code'],
+                'name'              => $article['name'],
+                'cost'              => $article['cost'],
+                'stock'             => $article['stock'],
+                'price'   => $article['price'],
+                'user_id'           => $kas_aberturas->id,
+            ]);    
+            foreach ($article['images'] as $url) { 
+                Image::create([
+                    'article_id' => $art->id,
+                    'url'        => $url,
+                ]);
+            }    
         }
     }
 

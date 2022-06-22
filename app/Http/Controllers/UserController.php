@@ -7,6 +7,7 @@ use App\Http\Controllers\Helpers\StringHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Recommendation;
 use App\User;
+use App\UserConfiguration;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -47,6 +48,7 @@ class UserController extends Controller
     function update(Request $request) {
         $user = User::where('id', $this->userId())->with('employees')->first();
         $user->name = StringHelper::modelName($request->name, true);
+        $user->phone = $request->phone;
         $user->has_delivery = $request->has_delivery;
         $user->delivery_price = $request->delivery_price;
         $user->online_prices = $request->online_prices;
@@ -54,6 +56,12 @@ class UserController extends Controller
         $user->dolar_plus = $request->dolar_plus;
         $user->order_description = $request->order_description;
         $user->save();
+
+        $configuration = UserConfiguration::where('user_id', $this->userId())
+                                            ->first();
+        $configuration->show_articles_without_stock = $request->configuration['show_articles_without_stock'];
+        $configuration->save();
+
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {
             $user->company_name = ucwords($request->company_name);

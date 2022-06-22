@@ -17,6 +17,7 @@ class CreateArticleComboTable extends Migration
             $table->id();
             $table->integer('article_id');
             $table->integer('combo_id');
+            $table->integer('amount');
             $table->timestamps();
         });
     }

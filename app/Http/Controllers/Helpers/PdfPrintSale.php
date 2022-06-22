@@ -618,8 +618,15 @@ class PdfPrintSale extends fpdf {
 		return null;
 	}
 
+	function getCost($article) {
+		if (!is_null($article->pivot->cost)) {
+			return $article->pivot->cost;
+		}
+		return $article->cost;
+	}
+
 	function sumarCostosYPrecios($article) {
-        $this->suma_costos_pagina += $article->pivot->cost * $article->pivot->amount;
+        $this->suma_costos_pagina += $this->getCost($article) * $article->pivot->amount;
         $this->suma_precios_pagina += $article->pivot->price * $article->pivot->amount;
 	}
 
@@ -660,7 +667,7 @@ class PdfPrintSale extends fpdf {
 	        $name = ArticleHelper::getShortName($article->name, 20);
 	        $this->Cell($this->widths['name'],6,$name,$this->borders,0,'L');
 	        if ($this->for_commerce) {
-	        	$this->Cell($this->widths['cost'],6,'$'.Numbers::price($article->pivot->cost),$this->borders,0,'L');
+	        	$this->Cell($this->widths['cost'],6,'$'.Numbers::price($this->getCost($article)),$this->borders,0,'L');
 	        }
 	        $this->Cell($this->widths['price'],6,'$'.Numbers::price($article->pivot->price),$this->borders,0,'L');
 	        $this->Cell($this->widths['amount'],6,PdfArticleHelper::amount($article),$this->borders,0,'L');

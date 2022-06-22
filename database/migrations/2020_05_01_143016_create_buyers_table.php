@@ -25,6 +25,7 @@ class CreateBuyersTable extends Migration
             // $table->string('address_number', 128)->nullable();
             $table->string('phone', 128)->nullable();
             $table->string('email', 128)->nullable();
+            $table->string('verification_code', 128)->nullable();
             $table->string('provider_id', 128)->nullable();
             $table->dateTime('last_login')->nullable();
             $table->boolean('isVerified')->default(false);

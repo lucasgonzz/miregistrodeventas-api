@@ -38,11 +38,15 @@ class User extends Authenticatable
     ];
 
     function scopeWithAll($query) {
-        $query->with('afip_information.iva_condition', 'plan.permissions', 'plan.features', 'subscription', 'addresses', 'extencions.permissions', 'permissions.extencion', 'addresses');
+        $query->with('afip_information.iva_condition', 'plan.permissions', 'plan.features', 'subscription', 'addresses', 'extencions.permissions', 'permissions.extencion', 'addresses', 'configuration');
     }
 
     public function configuration() {
         return $this->hasOne('App\UserConfiguration');
+    }
+
+    public function delivery_zones() {
+        return $this->hasOne('App\DeliveryZone');
     }
 
     public function extencions() {

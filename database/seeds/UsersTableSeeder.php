@@ -78,9 +78,49 @@ class UsersTableSeeder extends Seeder
             'id'                => 303,
             'name'              => 'Juliana',
             'email'             => 'juliana5500@gmail.com',
-            'image_url'         => 'v1653571722/articles/ibqe6ejo529nslxsjlxv.jpg',
+            'image_url'         => 'v1655483046/articles/hxfzuliiuyt9b2gacmpo.png',
             'phone'             => '3444622139',
             'company_name'      => 'Pinocho',
+            'status'            => 'commerce',
+            'plan_id'           => 3,
+            'type'              => 'commerce',
+            'password'          => bcrypt('1234'),
+            'percentage_card'   => 20,
+            'has_delivery'      => 1,
+            'dolar'             => 'promedio',
+            'delivery_price'    => 70,
+            'online_prices'     => 'all',
+            'online'            => 'http://kioscoverde.local:8080',
+            'order_description' => 'Observaciones',
+            'dolar_plus'        => 3,
+            'created_at'        => Carbon::now()->subMonths(2),
+        ]);
+
+        $commerce->extencions()->attach([5]);
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'Me pago',
+            'current_acount_pagandose_details'      => 'Me pago',
+            'show_articles_without_stock'           => true,
+            'user_id'                               => $commerce->id,
+        ]);
+        AfipInformation::create([
+            'iva_condition_id'      => 1,
+            'razon_social'          => 'PINOCHO LIBREIRA',
+            'domicilio_comercial'   => 'Pellegrini 1876',
+            'cuit'                  => '20175018841',
+            'punto_venta'           => 4,
+            'ingresos_brutos'       => '20175018841',
+            'inicio_actividades'    => Carbon::now()->subYears(5),
+            'user_id'               => $commerce->id,
+        ]);
+
+        $commerce = User::create([
+            'id'                => 304,
+            'name'              => 'Liliana',
+            'email'             => 'juliana5500@gmail.com',
+            'image_url'         => 'v1655302896/articles/tiao9oeep5fyfowxpbay.jpg',
+            'phone'             => '3444622139',
+            'company_name'      => 'CandyGuay',
             'status'            => 'commerce',
             'plan_id'           => 3,
             'type'              => 'commerce',
@@ -114,7 +154,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $commerce = User::create([
-            'id'                => 304,
+            'id'                => 305,
             'name'              => 'Bartolo',
             'email'             => 'lucasgonzalez210200@gmail.com',
             'image_url'         => 'v1653518851/articles/yiqq6hy84ww0gpk4ouwp.jpg',
@@ -135,7 +175,7 @@ class UsersTableSeeder extends Seeder
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
-        $commerce->extencions()->attach([1, 2, 3]);
+        $commerce->extencions()->attach([1, 2, 3, 4]);
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
             'current_acount_pagandose_details'      => 'Recibo de pago',
@@ -154,7 +194,7 @@ class UsersTableSeeder extends Seeder
         ]);
         
         $lucas = User::create([
-            'id'            => 305,
+            'id'            => 306,
             'name'          => 'Lucas',
         	'company_name'  => 'Lucas',
             'status'        => 'commerce',
@@ -167,7 +207,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $commerce = User::create([
-            'id'              => 306,
+            'id'              => 307,
             'name' => 'Fran',
             'company_name' => 'Lo de Fran',
             'status' => 'commerce',
@@ -179,7 +219,7 @@ class UsersTableSeeder extends Seeder
         ]);
 
         $super = User::create([
-            'id'              => 307,
+            'id'              => 308,
             'name' => 'Lucas super',
             'status' => 'super',
             'password' => bcrypt('1234'),

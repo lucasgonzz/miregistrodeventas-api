@@ -14,6 +14,7 @@ class ComboController extends Controller
                         ->orderBy('created_at', 'DESC')
                         ->with('articles')
                         ->get();
+        $combos = ComboHelper::setArticles($combos);
         return response()->json(['combos' => $combos], 200);
     }
 
@@ -33,11 +34,7 @@ class ComboController extends Controller
         $combo->name = $request->name;
         $combo->price = $request->price;
         $combo->save();
-        foreach ($request->articles as $article) {
-            if (!ComboHelper::hasArticle($combo, $article)) {
-                $combo->articles()->attach($article['id']);
-            }
-        }
+        ComboHelper::attachArticles($combo, $request->articles);
         $combo = ComboHelper::getFullModel($combo->id);
         return response()->json(['combo' => $combo], 200);
     }

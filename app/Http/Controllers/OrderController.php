@@ -21,13 +21,7 @@ class OrderController extends Controller
     function unconfirmed() {
         $orders = Order::where('user_id', $this->userId())
                         ->where('status', 'unconfirmed')
-                        ->with('articles.images')
-                        ->with('articles.variants')
-                        ->with('articles.colors')
-                        ->with('articles.sizes')
-                        ->with('buyer')
-                        ->with('address')
-                        ->with('cupons')
+                        ->withAll()
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         $orders = OrderHelper::setArticlesColor($orders);
@@ -39,14 +33,7 @@ class OrderController extends Controller
         $orders = Order::where('user_id', $this->userId())
                         ->where('status', 'confirmed')
                         ->orWhere('status', 'finished')
-                        ->with('articles.images')
-                        ->with('articles.variants')
-                        ->with('articles.colors')
-                        ->with('articles.sizes')
-                        ->with('buyer')
-                        ->with('address')
-                        ->with('payment')
-                        ->with('cupons')
+                        ->withAll()
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);
         $orders = OrderHelper::setArticlesColor($orders);
@@ -123,13 +110,7 @@ class OrderController extends Controller
         ]);
         SaleHelper::attachArticlesFromOrder($sale, $order->articles);
         $sale = Sale::where('id', $sale->id)
-                    ->with('client')
-                    ->with('buyer')
-                    ->with('articles')
-                    ->with('impressions')
-                    ->with('special_price')
-                    ->with('discounts')
-                    ->with('commissions')
+                    ->withAll()
                     ->first();
         return $sale;
     }
