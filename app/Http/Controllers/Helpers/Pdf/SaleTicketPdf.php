@@ -18,7 +18,7 @@ class SaleTicketPdf extends fpdf {
 		$this->sale = $sale;
 		$this->address = $address;
 
-		parent::__construct('P', 'mm', [55, $this->getPdfHeight()]);
+		parent::__construct('P', 'mm', [58, $this->getPdfHeight()]);
 		$this->SetAutoPageBreak(false);
 		$this->b = 0;
 
@@ -43,12 +43,12 @@ class SaleTicketPdf extends fpdf {
 	function logo() {
         // Logo
         if (!is_null($this->user->image_url)) {
-        	$this->Image(ImageHelper::image($this->user), 15, 0, 0, 25);
+        	$this->Image(ImageHelper::image($this->user), 17, 0, 0, 25);
         }
 		
         // Company name
 		$this->SetFont('Arial', 'B', 14);
-		$this->x = 5;
+		$this->x = 7;
 		$this->y = 25;
 		$this->Cell(45, 10, $this->user->company_name, $this->b, 0, 'C');
 		$this->y += 10;
@@ -59,32 +59,40 @@ class SaleTicketPdf extends fpdf {
 	}
 
 	function items() {
-		$this->x = 0;
+		$this->x = 2;
 
 		foreach ($this->sale->combos as $combo) {
 			$this->SetFont('Arial', '', 9);
 
-			$this->MultiCell(35, $this->line_height, $combo->name.' ('.$combo->pivot->amount.')', 'T', 'L', 0);
-			$this->x = 35;
-			$this->y -= $this->getHeight($combo, 20);
+			$y_1 = $this->y;
+			$this->MultiCell(34, $this->line_height, $combo->name.' ('.$combo->pivot->amount.')', 'LTB', 'L', 0);
+			$y_2 = $this->y;
+			$this->x = 36;
+			$this->y = $y_1;
 			
 			$this->SetFont('Arial', 'B', 9);
-			$this->Cell(20, $this->getHeight($combo, 20), '$'.Numbers::Price($combo->pivot->price * $combo->pivot->amount), 'T', 0, 'R');
+			$this->Cell(20, $y_2 - $y_1, '$'.Numbers::Price($combo->pivot->price * $combo->pivot->amount), 'RTB', 0, 'R');
 
-			$this->y += $this->getHeight($combo, 20);
+			$this->y = $y_2;
 			
 			$this->comboArticles($combo);
-			$this->x = 0;
+			$this->x = 2;
 		}
 
 		foreach ($this->sale->articles as $article) {
-			$this->MultiCell(35, $this->line_height, $article->name." ({$article->pivot->amount})", 'T', 'L', 0);
-			$this->x = 35;
-			$this->y -= $this->getHeight($article, 30);
-			$this->Cell(20, $this->getHeight($article, 30), '$'.Numbers::Price($article->pivot->price * $article->pivot->amount), 'T', 0, 'R');
+			$this->SetFont('Arial', '', 9);
+			$y_1 = $this->y;
+			$this->MultiCell(35, $this->line_height, $article->name." ({$article->pivot->amount})", 'TLB', 'L', 0);
+			$y_2 = $this->y;
+
+			$this->x = 36;
+			$this->y = $y_1;
+
+			$this->SetFont('Arial', 'B', 9);
+			$this->Cell(20, $y_2 - $y_1, '$'.Numbers::Price($article->pivot->price * $article->pivot->amount), 'TRB', 0, 'R');
 			
-			$this->x = 0;
-			$this->y += $this->getHeight($article, 30);
+			$this->x = 2;
+			$this->y = $y_2;
 		}
 	}
 
@@ -92,39 +100,39 @@ class SaleTicketPdf extends fpdf {
 		$this->SetFont('Arial', '', 9);
 
 		foreach ($combo->articles as $article) {
-			$this->x = 5;
-			$this->MultiCell(50, $this->line_height, $article->name.' ('.$article->pivot->amount.')', 'L', 'L', 0);
+			$this->x = 6;
+			$this->MultiCell(50, $this->line_height, $article->name.' ('.$article->pivot->amount.')', 'LR', 'L', 0);
 		}
 	}
 
 	function total() {
-	    $this->x = 0;
+	    $this->x = 2;
 	    $this->SetFont('Arial', 'B', 12);
-		$this->Cell(55, 10, 'Total: $'. Numbers::price(SaleHelper::getTotalSale($this->sale)), 1, 0, 'C');
+		$this->Cell(54, 10, 'Total: $'. Numbers::price(SaleHelper::getTotalSale($this->sale)), 1, 0, 'C');
 		$this->y += 10;
 	}
 
 	function thanks() {
-	    $this->x = 0;
+	    $this->x = 2;
 	    $this->SetFont('Arial', '', 10);
-		$this->Cell(55, 10, 'GRACIAS POR SU VISITA', 0, 0, 'C');
+		$this->Cell(54, 10, 'GRACIAS POR SU VISITA', 0, 0, 'C');
 		$this->y += 10;
 	}
 
 	function date() {
 		$date = date_format($this->sale->created_at, 'd/m/Y H:i');
-	    $this->x = 0;
+	    $this->x = 2;
 	    $this->SetFont('Arial', '', 9);
-		$this->Cell(55, 5, $date, 0, 0, 'L');
+		$this->Cell(54, 5, $date, 0, 0, 'L');
 		$this->y += 5;
 	}
 	
 	function address() {
 		if (!is_null($this->address)) {
 			$address = $this->address->street.' '.$this->address->street_number;
-		    $this->x = 0;
+		    $this->x = 2;
 		    $this->SetFont('Arial', 'I', 9);
-			$this->Cell(55, 5, $address, 0, 0, 'L');
+			$this->Cell(54, 5, $address, 0, 0, 'L');
 		}
 	}
 

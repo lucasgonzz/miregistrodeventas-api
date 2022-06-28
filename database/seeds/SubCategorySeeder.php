@@ -14,37 +14,26 @@ class SubCategorySeeder extends Seeder
      */
     public function run()
     {
-        $users = User::where('company_name', 'Fiushh')
-                    ->orWhere('company_name', 'Pinocho')
-                    ->get();
-        foreach ($users as $user) {
-            $categories = Category::where('user_id', $user->id)
-                                    ->get();
-            foreach ($categories as $category) {
-                if ($category->name == 'Celulares') {
-                    $names = ['Iphone'];
-                } else if ($category->name == 'Cargadores') {
-                    $names = ['Iphone', 'Android'];
-                } else if ($category->name == 'Auriculares') {
-                    $names = ['Casco', 'Comunes'];
-                } 
-                for ($i=0; $i < count($names); $i++) {
-                    $sub_category = SubCategory::create([
-                        'name'        => $names[$i],
-                        'category_id' => $category->id,
-                        'user_id' => $user->id,
-                    ]);         
-                }
-            }
-        }
-        
-        $user = User::where('name', 'Mi Negocio')->first();
+        $this->pinocho();
+    }
+
+    function pinocho() {
+        $user = User::where('company_name', 'Pinocho')
+                    ->first();
         $categories = Category::where('user_id', $user->id)
                                 ->get();
         foreach ($categories as $category) {
-            for ($i=1; $i <= 5; $i++) { 
+            $names = [];
+            if ($category->name == 'Juguetes infantiles') {
+                $names = ['sonajeros'];
+            } else if ($category->name == 'INFLABLES') {
+                $names = ['personajes', 'homrigas'];
+            } else if ($category->name == 'Auriculares con muchas cosas') {
+                $names = ['Casco', 'Comunes'];
+            } 
+            for ($i=0; $i < count($names); $i++) {
                 $sub_category = SubCategory::create([
-                    'name'        => $category->name.' sub '.$i,
+                    'name'        => $names[$i],
                     'category_id' => $category->id,
                     'user_id' => $user->id,
                 ]);         
@@ -52,3 +41,4 @@ class SubCategorySeeder extends Seeder
         }
     }
 }
+ 

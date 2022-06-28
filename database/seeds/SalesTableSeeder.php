@@ -1,5 +1,6 @@
 <?php
 
+use App\Address;
 use App\Article;
 use App\Client;
 use App\CurrentAcount;
@@ -21,6 +22,8 @@ class SalesTableSeeder extends Seeder
      */
     public function run()
     {
+        $this->pinocho();
+        return;
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
         $now = Carbon::now();
         $total_ventas = 1;
@@ -52,6 +55,32 @@ class SalesTableSeeder extends Seeder
                 $helper = new SaleHelper_Commissioners($sale, $discounts, false);
                 $helper->attachCommissionsAndCurrentAcounts();
             // }
+        }
+    }
+
+    function pinocho() {
+        $user = User::where('company_name', 'pinocho')->first();
+        $address = Address::where('user_id', $user->id)->first();
+        for ($day=1; $day < 5; $day++) { 
+            $sale = Sale::create([
+                'user_id' => $user->id,
+                'num_sale' => SaleHelper::numSale($user->id),
+                'percentage_card' => null,
+                // 'client_id' => $client->id,
+                'sale_type_id' => 1,
+                'created_at' => Carbon::now()->subDays($day),
+                'address_id' => $address->id,
+            ]);
+            $articles = Article::where('user_id', $user->id)
+                                ->take(2)
+                                ->get();
+            foreach ($articles as $article) {
+                $sale->articles()->attach($article->id, [
+                                            'amount'      => 2,
+                                            'cost'        => $article->cost,
+                                            'price'       => $article->price,
+                                        ]);
+            }
         }
     }
 

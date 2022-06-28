@@ -623,16 +623,16 @@ Route::middleware('auth:sanctum')->group(function () {
 		'SaleController@pagarDeuda'
 	);
 	// PreviusDays
-	Route::get('/sales/prev/{index}', 
+	Route::get('/sales/previus-days/{index}', 
 		'SaleController@previusDays'
 	);
 	// Buscar por fecha
-	Route::get('/sales/from-date/{from}/{to}/{last_day_inclusive}', 
+	Route::get('/sales/from-date/{date}', 
 		'SaleController@fromDate'
 	);
-	Route::get('/sales/only-one-date/{date}', 
-		'SaleController@onlyOneDate'
-	);
+	// Route::get('/sales/only-one-date/{date}', 
+	// 	'SaleController@onlyOneDate'
+	// );
 	// Horarios de ventas
 	Route::get('/sale-time', 
 		'SaleTimeController@index'

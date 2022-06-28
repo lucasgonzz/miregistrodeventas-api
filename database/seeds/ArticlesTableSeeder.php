@@ -410,7 +410,8 @@ class ArticlesTableSeeder extends Seeder
                 'name'              => 'Remera manga larga',
                 'stock'             => 10,
                 'cost'              => 50,
-                'price'   => 50,
+                'price'             => 50,
+                'sub_category_id'   => 1,
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -421,7 +422,8 @@ class ArticlesTableSeeder extends Seeder
                 'name'              => 'Picaporte',
                 'stock'             => 10,
                 'cost'              => 200,
-                'price'   => 30,
+                'price'             => 30,
+                'sub_category_id'   => 2,
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -432,7 +434,8 @@ class ArticlesTableSeeder extends Seeder
                 'name'              => 'Cerradura reforzada',
                 'stock'             => 10,
                 'cost'              => 700,
-                'price'   => 50,
+                'price'             => 50,
+                'sub_category_id'   => 3,
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -440,15 +443,16 @@ class ArticlesTableSeeder extends Seeder
             ],
         ];
 
-        $kas_aberturas = User::where('company_name', 'pinocho')->first();
+        $user = User::where('company_name', 'pinocho')->first();
         foreach ($articles as $article) {
             $art = Article::create([
                 'bar_code'          => $article['bar_code'],
                 'name'              => $article['name'],
                 'cost'              => $article['cost'],
-                'stock'             => $article['stock'],
-                'price'   => $article['price'],
-                'user_id'           => $kas_aberturas->id,
+                'stock'             => $article['stock'] ,
+                'price'             => $article['price'],
+                'sub_category_id'   => $article['sub_category_id'],
+                'user_id'           => $user->id,
             ]);    
             foreach ($article['images'] as $url) { 
                 Image::create([

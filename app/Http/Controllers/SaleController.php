@@ -81,7 +81,6 @@ class SaleController extends Controller
         $result = [];
         $index = 0;
         while ($start < $end) {
-            // dd($start);
             $start_date = $start->format('Y-m-d H:i:s');
             $end_date = $start->addDay()->format('Y-m-d H:i:s');
             $sales = Sale::where('user_id', $this->userId())
@@ -91,30 +90,23 @@ class SaleController extends Controller
             $result[$index]['sales'] = $sales;
             $index++;
         }
-        return response()->json(['days_previus_sales' => $result], 200);
+        return response()->json(['days' => $result], 200);
     }
 
     /* ----------------------------------------------------------------------------------------
         Fechas
      ---------------------------------------------------------------------------------------- */
 
-    function onlyOneDate($date) {
-        $user = Auth()->user();
+    function fromDate($date) {
         $sales = Sale::where('user_id', $this->userId())
-                ->whereDate('created_at', $date)
-                ->with('articles')
-                ->with('impressions')
-                ->with('client')
-                ->with('special_price')
-                ->with('commissions')
-                ->with('discounts')
-                ->with('afip_ticket')
-                ->orderBy('created_at', 'DESC')
-                ->get();
+                        ->whereDate('created_at', $date)
+                        ->withAll()
+                        ->orderBy('created_at', 'DESC')
+                        ->get();
         return response()->json(['sales' => $sales], 200);
     }
 
-    function fromDate($from, $to, $last_day_inclusive) {
+    function betweenDate($from, $to, $last_day_inclusive) {
         $user = Auth()->user();
         $last_day_inclusive = (bool)$last_day_inclusive;
         if ($last_day_inclusive) {
@@ -123,14 +115,7 @@ class SaleController extends Controller
         }
         $sales = Sale::where('user_id', $this->userId())
                 ->whereBetween('created_at', [$from, $to])
-                ->with('articles')
-                ->with('impressions')
-                ->with('client')
-                ->with('buyer')
-                ->with('special_price')
-                ->with('commissions')
-                ->with('discounts')
-                ->with('afip_ticket')
+                ->withAll()
                 ->orderBy('created_at', 'DESC')
                 ->get();          
         return response()->json(['sales' => $sales], 200);

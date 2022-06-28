@@ -35,10 +35,10 @@ class DatabaseSeeder extends Seeder
         $this->call(CommissionerSeeder::class);
         $this->call(SaleTypeSeeder::class);
         $this->call(CurrentAcountSeeder::class);
-        // $this->call(SalesTableSeeder::class);
         $this->call(ScheduleSeeder::class);
         // $this->call(MessageSeeder::class);
         $this->call(AddressSeeder::class);
+        $this->call(SalesTableSeeder::class);
         $this->call(WorkdaySeeder::class);
         $this->call(ConditionSeeder::class);
         $this->call(TitleSeeder::class);
