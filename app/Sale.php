@@ -14,7 +14,7 @@ class Sale extends Model
     }
 
     function scopeWithAll($query) {
-        $query->with('client', 'buyer', 'articles', 'impressions', 'special_price', 'commissions', 'discounts', 'afip_ticket', 'combos');
+        $query->with('client', 'buyer', 'articles', 'impressions', 'special_price', 'commissions', 'discounts', 'afip_ticket', 'combos', 'order.cupons');
     }
 
     public function sale_type() {
@@ -35,6 +35,10 @@ class Sale extends Model
 
     public function commissions() {
         return $this->hasMany('App\Commission');
+    }
+
+    public function order() {
+        return $this->belongsTo('App\Order');
     }
 
     public function discounts() {

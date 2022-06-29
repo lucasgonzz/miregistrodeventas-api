@@ -13,15 +13,15 @@ class Order extends Model
     }
 
     function articles() {
-    	return $this->belongsToMany('App\Article')->withPivot('cost', 'price', 'amount', 'variant_id', 'color_id', 'size_id', 'with_dolar');
+        return $this->belongsToMany('App\Article')->withPivot('cost', 'price', 'amount', 'variant_id', 'color_id', 'size_id', 'with_dolar');
+    }
+
+    function cupons() {
+        return $this->belongsToMany('App\Cupon');
     }
 
     function buyer() {
         return $this->belongsTo('App\Buyer');
-    }
-
-    function cupons() {
-        return $this->hasMany('App\Cupon');
     }
 
     function payment_method() {

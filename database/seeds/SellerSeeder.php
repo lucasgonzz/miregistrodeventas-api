@@ -14,8 +14,9 @@ class SellerSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::where('company_name', 'Lucas')
+        $user = User::where('company_name', 'pinocho')
         			->first();
+                    
         $user_id = $user->id;
         // $user_id = 2;
         $potro = Seller::create([

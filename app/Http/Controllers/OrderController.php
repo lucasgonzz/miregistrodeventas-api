@@ -106,7 +106,8 @@ class OrderController extends Controller
         $sale = Sale::create([
             'user_id' => $this->userId(),
             'buyer_id' => $order->buyer_id,
-            'num_sale' => $num_sale
+            'num_sale' => $num_sale,
+            'order_id' => $order->id,
         ]);
         SaleHelper::attachArticlesFromOrder($sale, $order->articles);
         $sale = Sale::where('id', $sale->id)

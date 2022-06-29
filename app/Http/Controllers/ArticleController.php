@@ -80,7 +80,10 @@ class ArticleController extends Controller
         $article->iva_id          = $request->iva_id;
         $article->with_dolar      = $request->with_dolar;
         $article->percentage_gain = $request->percentage_gain;
-        if ($article->percentage_gain == '' && $article->price != $request->price) {
+        if (isset($request->original_price)) {
+            $article->price = $request->original_price;
+        }
+        if ($article->percentage_gain == '' && $article->price != $request->price && !isset($request->original_price)) {
             $article->previus_price = $article->price;
             $article->timestamps = true;
             $article->price = $request->price;
@@ -359,7 +362,7 @@ class ArticleController extends Controller
         $article->slug   = ArticleHelper::slug($request->name);
         $article->cost   = $request->cost;
         $article->price  = $request->price;
-        $article->percentage_gain  = $request->percentage_gain;
+        $article->percentage_gain = $request->percentage_gain;
         $article->iva_id = $request->iva_id;
         if ($request->stock != '') {
             $article->stock = $request->stock;

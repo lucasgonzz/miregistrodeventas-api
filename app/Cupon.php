@@ -11,4 +11,8 @@ class Cupon extends Model
     function buyer() {
         return $this->belongsTo('App\Buyer');
     }
+
+    function orders() {
+        return $this->belongsToMany('App\Order');
+    }
 }

@@ -448,6 +448,7 @@ class ArticlesTableSeeder extends Seeder
             $art = Article::create([
                 'bar_code'          => $article['bar_code'],
                 'name'              => $article['name'],
+                'slug'              => ArticleHelper::slug($article['name']),
                 'cost'              => $article['cost'],
                 'stock'             => $article['stock'] ,
                 'price'             => $article['price'],

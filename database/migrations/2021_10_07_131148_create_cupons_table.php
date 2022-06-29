@@ -18,6 +18,7 @@ class CreateCuponsTable extends Migration
             $table->decimal('amount', 8, 2)->nullable();
             $table->decimal('percentage', 8, 2)->nullable();
             $table->decimal('min_amount', 8, 2)->nullable();
+            $table->string('code')->nullable();
             $table->dateTime('expiration_date')->nullable();
             $table->integer('expiration_days')->nullable();
             $table->enum('type', ['normal', 'for_new_buyers'])->default('normal');

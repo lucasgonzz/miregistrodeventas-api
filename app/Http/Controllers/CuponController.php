@@ -17,6 +17,15 @@ class CuponController extends Controller
     }
 
     function store(Request $request) {
+        $cupon = Cupon::create([
+            'amount'            => CuponHelper::getAmount($request),
+            'percentage'        => CuponHelper::getPercentage($request),
+            'min_amount'        => CuponHelper::getMinAmount($request),
+            'code'              => $request->code,
+            'user_id'           => $this->userId(),
+            'type'              => 'normal',
+        ]);
+        return response()->json(['cupon' => $cupon], 201);
         $cupons = [];
         if (CuponHelper::isForNewBuyers($request)) {
             $cupon = Cupon::create([
@@ -50,8 +59,7 @@ class CuponController extends Controller
     }
 
     function delete($id) {
-        $cupon = Cupon::find($id);
-        $cupon->delete();
+        $cupon = Cupon::find($id)->update(['valid' => 0]);
         return response(null, 200);
     }
 }

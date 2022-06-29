@@ -22,6 +22,7 @@ class ArticleHelper {
                 $article->price = $article->cost + ($article->cost * Numbers::percentage($article->percentage_gain));
             }
             if (count($article->discounts) >= 1) {
+                $article->original_price = $article->price;
                 foreach ($article->discounts as $discount) {
                     $article->price = $article->price - ($article->price * Numbers::percentage($discount->percentage));
                     

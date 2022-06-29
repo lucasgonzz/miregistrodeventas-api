@@ -6,7 +6,6 @@ use App\Article;
 use App\Check;
 use App\CurrentAcount;
 use App\ErrorCurrentAcount;
-use App\Hola;
 use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\Numbers;
@@ -141,7 +140,9 @@ class CurrentAcountHelper {
             $saldar_pagandose = Self::saldarPagandose($haber, $client_id, $until_pago);
             $haber_restante = $saldar_pagandose['haber'];
             $detalle = $saldar_pagandose['detalle'];    
+            Log::info('saldarPagandose detalle: '.$detalle);
             $detalle .= Self::saldarCuentasSinPagar($haber_restante, $client_id, $until_pago);
+            Log::info('saldarCuentasSinPagar detalle: '.$detalle);
         }
         return $detalle;
     }
@@ -265,7 +266,16 @@ class CurrentAcountHelper {
     static function checkSaldos($client_id) {
         $current_acounts = CurrentAcount::where('client_id', $client_id)
                                         ->orderBy('created_at', 'ASC')
+                                        ->whereNotNull('debe')
+                                        ->update([
+                                            'pagandose' => 0,
+                                            'status' => 'sin_pagar',
+                                        ]);
+
+        $current_acounts = CurrentAcount::where('client_id', $client_id)
+                                        ->orderBy('created_at', 'ASC')
                                         ->get();
+
 
         foreach ($current_acounts as $current_acount) {
             $saldo = Self::getSaldo($client_id, $current_acount);

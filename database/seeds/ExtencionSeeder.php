@@ -33,6 +33,10 @@ class ExtencionSeeder extends Seeder
                 'name' => 'Combos',
                 'slug' => 'combos',
             ],
+            [
+                'name' => 'Esconder ventas',
+                'slug' => 'sales.hide',
+            ],
         ];
         foreach ($extencions as $extencion) {
             Extencion::create([
