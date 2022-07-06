@@ -15,14 +15,17 @@ class CreateArticlesTable extends Migration
     {
         Schema::create('articles', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->integer('num')->nullable();
             $table->string('bar_code', 128)->nullable();
-            $table->string('name', 128)->nullable();
+            $table->string('provider_code', 128)->nullable();
+            $table->text('name')->nullable();
             $table->string('slug')->nullable();
-            $table->decimal('cost', 8, 2)->nullable();
-            $table->decimal('price', 8, 2)->nullable();
+            $table->decimal('cost', 12, 2)->nullable();
+            $table->decimal('price', 12, 2)->nullable();
             $table->decimal('percentage_gain', 8, 2)->nullable();
-            $table->decimal('previus_price', 8, 2)->nullable();
+            $table->decimal('previus_price', 12, 2)->nullable();
             $table->integer('stock')->nullable();
+            $table->integer('stock_min')->nullable();
             $table->boolean('online')->default(1);
             $table->boolean('with_dolar')->default(0);
             $table->integer('user_id')->unsigned();
@@ -35,8 +38,8 @@ class CreateArticlesTable extends Migration
 
             $table->foreign('user_id')
                     ->references('id')->on('users');
-            $table->foreign('sub_category_id')
-                    ->references('id')->on('sub_categories');
+            // $table->foreign('sub_category_id')
+            //         ->references('id')->on('sub_categories');
                     
             $table->timestamps();
         });

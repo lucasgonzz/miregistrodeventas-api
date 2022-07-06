@@ -13,7 +13,7 @@ class DiscountSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::where('company_name', 'Lucas')
+        $user = User::where('company_name', 'kas aberturas')
         			->first();
         $user_id = $user->id;
         Discount::create([

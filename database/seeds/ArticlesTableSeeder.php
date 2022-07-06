@@ -2,6 +2,7 @@
 
 use App\Article;
 use App\Description;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Image;
 use App\Provider;
@@ -384,13 +385,17 @@ class ArticlesTableSeeder extends Seeder
             ],
         ];
 
+        $ct = new Controller();
+
         $kas_aberturas = User::where('company_name', 'kas aberturas')->first();
         foreach ($kas_aberturas_articles as $article) {
             $art = Article::create([
+                'num'               => $ct->num('articles', $kas_aberturas->id),
                 'bar_code'          => $article['bar_code'],
                 'name'              => $article['name'],
                 'cost'              => $article['cost'],
                 'stock'             => $article['stock'],
+                'stock_min'         => 1,
                 'percentage_gain'   => $article['percentage_gain'],
                 'user_id'           => $kas_aberturas->id,
             ]);    

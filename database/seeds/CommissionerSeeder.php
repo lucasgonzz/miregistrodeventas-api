@@ -13,7 +13,7 @@ class CommissionerSeeder extends Seeder
      */
     public function run()
     {
-    	$mayorista = User::where('company_name', 'Lucas')
+    	$mayorista = User::where('company_name', 'kas aberturas')
     						->first();
         $user_id = $mayorista->id;
         Commissioner::create([

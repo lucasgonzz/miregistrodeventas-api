@@ -16,21 +16,24 @@ class CreateClientsTable extends Migration
         Schema::create('clients', function (Blueprint $table) {
             $table->bigIncrements('id');
 
+            $table->integer('num')->nullable();
             $table->string('name', 128);
-            $table->string('surname', 128)->nullable();
             $table->string('email', 128)->nullable();
-            $table->string('address', 128)->nullable();
+            $table->string('phone', 128)->nullable();
+            $table->text('address')->nullable();
             $table->string('cuit', 128)->nullable();
             $table->string('razon_social', 128)->nullable();
             $table->integer('iva_condition_id')->unsigned()->nullable();
+            $table->integer('location_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned();
             $table->bigInteger('seller_id')->nullable()->unsigned();
             $table->enum('status', ['active', 'inactive'])->default('active');
 
+
             $table->foreign('user_id')
                     ->references('id')->on('users');
-            $table->foreign('seller_id')
-                    ->references('id')->on('sellers');
+            // $table->foreign('seller_id')
+            //         ->references('id')->on('sellers');
 
             $table->timestamps();
         });

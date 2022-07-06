@@ -244,7 +244,7 @@ class SaleHelper extends Controller {
         $sale_type = SaleType::where('user_id', UserHelper::userId())
                                     ->where('name', $sale_type_name)
                                     ->first();
-        if ($sale->sale_type_id == $sale_type->id) {
+        if (!is_null($sale_type) && $sale->sale_type_id == $sale_type->id) {
             return true;
         } 
         return false;

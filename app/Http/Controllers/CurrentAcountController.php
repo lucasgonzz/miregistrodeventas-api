@@ -122,6 +122,6 @@ class CurrentAcountController extends Controller
     function delete($id) {
         $current_acount = CurrentAcount::find($id);
         $current_acount->delete();
-        CurrentAcountHelper::restartCurrentAcounts($current_acount->client_id);
+        CurrentAcountHelper::checkSaldos($current_acount->client_id);
     }
 }

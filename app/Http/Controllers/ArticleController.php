@@ -96,6 +96,7 @@ class ArticleController extends Controller
         if (!$request->stock_null && $request->stock != '') {
             $article->stock = $request->stock;
             $article->stock += $request->new_stock;
+            $article->stock_min = $request->stock_min;
         } else {
             $article->stock = null;
         }
@@ -349,25 +350,29 @@ class ArticleController extends Controller
     }
 
     function store(Request $request) {
-        $user = Auth()->user();
         $article = new Article();
+        $article->num = $this->num('articles');
         $article->bar_code = $request->bar_code;
-        if ($request->sub_category_id != 0) {
-            $article->sub_category_id = $request->sub_category_id;
-        }
-        if ($request->brand_id != 0) {
-            $article->brand_id = $request->brand_id;
-        }
+        // if ($request->sub_category_id != 0) {
+        //     $article->sub_category_id = $request->sub_category_id;
+        // }
+        $article->sub_category_id = $request->sub_category_id;
+        // if ($request->brand_id != 0) {
+        //     $article->brand_id = $request->brand_id;
+        // }
+        $article->brand_id = $request->brand_id;
         $article->name   = ucfirst($request->name);
         $article->slug   = ArticleHelper::slug($request->name);
         $article->cost   = $request->cost;
         $article->price  = $request->price;
         $article->percentage_gain = $request->percentage_gain;
         $article->iva_id = $request->iva_id;
-        if ($request->stock != '') {
-            $article->stock = $request->stock;
-        }
-        $article->user_id = $user->id;
+        // if ($request->stock != '') {
+        //     $article->stock = $request->stock;
+        // }
+        $article->stock = $request->stock;
+        $article->stock_min = $request->stock_min;
+        $article->user_id = $this->userId();
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDiscounts($article, $request->discounts);

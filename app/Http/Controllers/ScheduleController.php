@@ -33,4 +33,10 @@ class ScheduleController extends Controller
         $schedule->save();
         return response()->json(['schedule' => $schedule], 200);
     }
+
+    function delete($id) {
+        $schedule = Schedule::find($id);
+        $schedule->delete();
+        return response(null, 200);
+    }
 }

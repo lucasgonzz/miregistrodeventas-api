@@ -10,6 +10,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Notifications\BudgetCreated;
+use App\OrderProduction;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -20,6 +21,21 @@ class BudgetHelper {
 						->orderBy('id', 'DESC')
 						->first();
 		return is_null($last) ? 1 : $last->num + 1; 
+	}
+
+	static function deleteCurrentAcount($budget) {
+		$current_acount = CurrentAcount::where('budget_id', $budget->id)
+										->first();
+		$current_acount->delete();
+        CurrentAcountHelper::checkSaldos($budget->client_id);
+	}
+
+	static function deleteOrderProduction($budget) {
+		$order_production = OrderProduction::where('budget_id', $budget->id)
+											->first();
+		if (!is_null($order_production)) {
+			$order_production->delete();
+		}
 	}
 
 	static function getFormatedNum($budgets) {

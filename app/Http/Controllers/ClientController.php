@@ -38,15 +38,34 @@ class ClientController extends Controller
         return response()->json(['client' => $client], 200);
     }
 
-    function update(Request $request) {
-        $client = Client::find($request->client['id']);
-        $client->name = ucwords($request->client['name']);
-        $client->surname = ucwords($request->client['surname']);
-        $client->address = ucwords($request->client['address']);
-        $client->cuit = $request->client['cuit'];
-        $client->razon_social = $request->client['razon_social'];
-        $client->seller_id = $request->client['seller_id'] != 0 ? $request->client['seller_id'] : null;
-        $client->iva_condition_id = $request->client['iva_condition_id'] != 0 ? $request->client['iva_condition_id'] : null;
+    function store(Request $request) {
+        $seller_id = $request->seller_id != 0 ? $request->seller_id : null;
+        $client = Client::create([
+            'name'              => $request->name,
+            'phone'             => $request->phone,
+            'email'             => $request->email,
+            'address'           => $request->address,
+            'location_id'       => $request->location_id,
+            'cuit'              => $request->cuit,
+            'razon_social'      => $request->razon_social,
+            'iva_condition_id'  => $request->iva_condition_id,
+            'seller_id'         => $seller_id,
+            'user_id'           => $this->userId(),
+        ]);
+        return response()->json(['client' => $client], 201);
+    }
+
+    function update(Request $request, $id) {
+        $client = Client::find($id);
+        $client->name               = $request->name;
+        $client->phone              = $request->phone;
+        $client->email              = $request->email;
+        $client->address            = $request->address;
+        $client->location_id        = $request->location_id;
+        $client->cuit               = $request->cuit;
+        $client->razon_social       = $request->razon_social;
+        $client->iva_condition_id   = $request->iva_condition_id;
+        $client->seller_id          = $request->seller_id;
         $client->save();
         return response()->json(['client' => $client], 200);
     }
@@ -78,21 +97,6 @@ class ClientController extends Controller
         } else {
             return ['repetido' => true];
         }
-    }
-
-    function store(Request $request) {
-        $seller_id = $request->client['seller_id'] == 0 ? null : $request->client['seller_id'];
-    	$client = Client::create([
-            'name'              => ucwords($request->client['name']),
-            'surname'           => ucwords($request->client['surname']),
-            'address'           => ucwords($request->client['address']),
-            'cuit'              => $request->client['cuit'],
-            'razon_social'      => $request->client['razon_social'],
-    		'iva_condition_id'  => $request->client['iva_condition_id'],
-            'user_id'           => $this->userId(),
-    		'seller_id'         => $seller_id,
-    	]);
-        return response()->json(['client' => $client], 201);
     }
 
     function saldoInicial(Request $request) {

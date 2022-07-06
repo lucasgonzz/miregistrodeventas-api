@@ -13,7 +13,7 @@ class SaleTypeSeeder extends Seeder
      */
     public function run()
     {
-    	$mayorista = User::where('company_name', 'Lucas')->first();
+    	$mayorista = User::where('company_name', 'kas aberturas')->first();
         $user_id = $mayorista->id;
         SaleType::create([
         	'name' => 'Normal',

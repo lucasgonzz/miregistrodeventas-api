@@ -60,6 +60,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::put('/schedules', 
 		'ScheduleController@update'
 	);
+	Route::delete('/schedules/{id}', 
+		'ScheduleController@delete'
+	);
 
 	// PaymentMethods
 	Route::resource('payment-methods', 'PaymentMethodController');
@@ -205,6 +208,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		'OrderProductionStatusController@index'
 	);
 
+	// Locations
+	Route::resource('locations', 'LocationController');
+
 	// ProviderOrders
 	Route::get('/provider-orders', 
 		'ProviderOrderController@index'
@@ -270,17 +276,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 		// Provedores de comercios
-		Route::get('/providers', 
-			'ProviderController@index'
-		);
-		Route::post('/providers', 
-			'ProviderController@store'
-		);
-		Route::put('/providers', 
-			'ProviderController@update'
-		);
-		Route::delete('/providers/{id}', 
-			'ProviderController@delete'
+		Route::resource('providers', 'ProviderController');
+		Route::post('/providers/excel/import', 
+			'ProviderController@import'
 		);
 		// Icons
 		Route::get('/icons', 
@@ -565,7 +563,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/clients', 
 		'ClientController@store'
 	);
-	Route::put('/clients', 
+	Route::put('/clients/{id}', 
 		'ClientController@update'
 	);
 	Route::delete('/clients/{id}', 

@@ -51,5 +51,6 @@ class DatabaseSeeder extends Seeder
         $this->call(CurrentAcountPaymentMethodSeeder::class);
         $this->call(PaymentMethodSeeder::class);
         $this->call(DeliveryZoneSeeder::class);
+        $this->call(LocationSeeder::class);
     }
 }

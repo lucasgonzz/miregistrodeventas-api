@@ -19,7 +19,7 @@ class ProviderOrderHelper {
 	}
 
 	static function sendEmail($send_email, $provider_order) {
-		if ($send_email) {
+		if ($send_email && !is_null($provider_order->provider->email)) {
 			$provider_order->provider->notify(new ProviderOrderCreated($provider_order));
 		}
 	}
@@ -44,6 +44,7 @@ class ProviderOrderHelper {
 		foreach ($articles as $article) {
 			$amount = $article['amount'];
 			$notes = isset($article['notes']) ? $article['notes'] : null;
+			$received = isset($article['pivot']['received']) ? $article['pivot']['received'] : 0;
 			if (isset($article['from_provider_order']) && $article['from_provider_order']) {
 				$article = Article::create([
 					'name'	 	=> $article['name'],
@@ -55,8 +56,9 @@ class ProviderOrderHelper {
 				$article = (object)$article;
 			}
 			$provider_order->articles()->attach($article->id, [
-											'amount' => $amount,
-											'notes' => $notes,
+											'amount' 	=> $amount,
+											'notes' 	=> $notes,
+											'received' 	=> $received,
 										]);
 		}
 	}

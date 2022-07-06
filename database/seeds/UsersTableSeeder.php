@@ -61,6 +61,7 @@ class UsersTableSeeder extends Seeder
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'A cta saldo',
             'current_acount_pagandose_details'      => 'A cta',
+            'iva_included'                          => 0,
             'user_id'                               => $commerce->id,
         ]);
         AfipInformation::create([
@@ -179,6 +180,7 @@ class UsersTableSeeder extends Seeder
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
             'current_acount_pagandose_details'      => 'Recibo de pago',
+            'iva_included'                          => 0,
             'user_id'                               => $commerce->id,
         ]);
 
@@ -191,31 +193,6 @@ class UsersTableSeeder extends Seeder
             'ingresos_brutos'       => '20175018841',
             'inicio_actividades'    => Carbon::now()->subYears(5),
             'user_id'               => $commerce->id,
-        ]);
-        
-        $lucas = User::create([
-            'id'            => 306,
-            'name'          => 'Lucas',
-        	'company_name'  => 'Lucas',
-            'status'        => 'commerce',
-            'plan_id'       => 3,
-            'type'          => 'provider',
-        	'password'      => bcrypt('1234'),
-            // 'admin_id' => $admin->id,
-            'created_at'    => Carbon::now(),
-            'expired_at'    => Carbon::now()->addWeek(),
-        ]);
-
-        $commerce = User::create([
-            'id'              => 307,
-            'name' => 'Fran',
-            'company_name' => 'Lo de Fran',
-            'status' => 'commerce',
-            'plan_id'         => 2,
-            'password' => bcrypt('1234'),
-            // 'admin_id' => $admin->id,
-            'created_at' => Carbon::now(),
-            'expired_at' => Carbon::now()->addMonth(),
         ]);
 
         $super = User::create([

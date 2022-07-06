@@ -16,9 +16,16 @@ class CreateProvidersTable extends Migration
         Schema::create('providers', function (Blueprint $table) {
             $table->bigIncrements('id');
 
+            $table->integer('num')->nullable();
             $table->string('name', 128);
-            $table->string('address', 128)->nullable();
+            $table->string('phone', 128)->nullable();
+            $table->text('address')->nullable();
             $table->string('email', 128)->nullable();
+            $table->string('razon_social', 128)->nullable();
+            $table->string('cuit', 128)->nullable();
+            $table->text('observations')->nullable();
+            $table->integer('location_id')->unsigned()->default(0);
+            $table->integer('iva_condition_id')->unsigned()->default(0);
             $table->integer('user_id')->unsigned();
             // $table->softDeletes();
             $table->enum('status', ['active', 'inactive'])->default('active');

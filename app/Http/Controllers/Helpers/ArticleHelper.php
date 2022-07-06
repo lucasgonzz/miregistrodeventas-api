@@ -12,6 +12,7 @@ use App\Http\Controllers\Helpers\UserHelper;
 use App\Mail\ArticleAdvise;
 use App\SpecialPrice;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ArticleHelper {
@@ -19,7 +20,11 @@ class ArticleHelper {
     static function setPrices($articles) {
         foreach ($articles as $article) {
             if (!is_null($article->percentage_gain)) {
+                Log::info('Percentage: '.Numbers::percentage($article->percentage_gain));
                 $article->price = $article->cost + ($article->cost * Numbers::percentage($article->percentage_gain));
+            }
+            if (!UserHelper::user()->configuration->iva_included) {
+                $article->price = $article->price + ($article->price * Numbers::percentage($article->iva->percentage));
             }
             if (count($article->discounts) >= 1) {
                 $article->original_price = $article->price;

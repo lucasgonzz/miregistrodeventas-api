@@ -38,13 +38,13 @@ class CreateCurrentAcountsTable extends Migration
             $table->integer('user_id')->unsigned()->nullable();
 
             $table->bigInteger('client_id')->unsigned()->nullable();
-            $table->foreign('client_id')->references('id')->on('clients');
+            // $table->foreign('client_id')->references('id')->on('clients');
             $table->bigInteger('commissioner_id')->unsigned()->nullable();
-            $table->foreign('commissioner_id')->references('id')->on('commissioners');
+            // $table->foreign('commissioner_id')->references('id')->on('commissioners');
             $table->bigInteger('seller_id')->unsigned()->nullable();
-            $table->foreign('seller_id')->references('id')->on('sellers');
+            // $table->foreign('seller_id')->references('id')->on('sellers');
             $table->bigInteger('sale_id')->unsigned()->nullable();
-            $table->foreign('sale_id')->references('id')->on('sales');
+            // $table->foreign('sale_id')->references('id')->on('sales');
             $table->bigInteger('budget_id')->unsigned()->nullable();
             $table->bigInteger('current_acount_payment_method_id')->unsigned()->nullable();
             $table->timestamps();

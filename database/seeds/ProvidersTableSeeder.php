@@ -1,6 +1,7 @@
 <?php
 
 use App\Article;
+use App\Http\Controllers\Controller;
 use App\Provider;
 use App\User;
 use Carbon\Carbon;
@@ -44,12 +45,14 @@ class ProvidersTableSeeder extends Seeder
                     ->orWhere('company_name', 'kas aberturas')
                     ->get();
         $index = 0;
+        $ct = new Controller();
         foreach ($users as $user) {
         	foreach ($providers as $provider) {
     	        Provider::create([
-    	        	'name' => $provider,
+                    'num'     => $ct->num('providers', $user->id), 
+    	        	'name'    => $provider,
                     'address' => $addresses[$index],
-                    'email' => 'lucasgonzalez5500@gmail.com',
+                    'email'   => 'lucasgonzalez5500@gmail.com',
     	        	'user_id' => $user->id,
     	        ]);
                 $index++;

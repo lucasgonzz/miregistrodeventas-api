@@ -5,6 +5,7 @@ use App\Article;
 use App\Client;
 use App\CurrentAcount;
 use App\Http\Controllers\CurrentAcountController;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
 use App\Http\Controllers\Helpers\Sale\SaleHelper;
@@ -23,6 +24,7 @@ class SalesTableSeeder extends Seeder
     public function run()
     {
         $this->pinocho();
+        $this->kasAberturas();
         return;
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
         $now = Carbon::now();
@@ -74,6 +76,30 @@ class SalesTableSeeder extends Seeder
             $articles = Article::where('user_id', $user->id)
                                 ->take(2)
                                 ->get();
+            foreach ($articles as $article) {
+                $sale->articles()->attach($article->id, [
+                                            'amount'      => 2,
+                                            'cost'        => $article->cost,
+                                            'price'       => $article->price,
+                                        ]);
+            }
+        }
+    }
+
+    function kasAberturas() {
+        $user = User::where('company_name', 'kas aberturas')->first();
+        $address = Address::where('user_id', $user->id)->first();
+        for ($day=1; $day < 5; $day++) { 
+            $sale = Sale::create([
+                'user_id' => $user->id,
+                'num_sale' => SaleHelper::numSale($user->id),
+                'percentage_card' => null,
+                'created_at' => Carbon::now()->subDays($day),
+            ]);
+            $articles = Article::where('user_id', $user->id)
+                                ->take(2)
+                                ->get();
+            $articles = ArticleHelper::setPrices($articles);
             foreach ($articles as $article) {
                 $sale->articles()->attach($article->id, [
                                             'amount'      => 2,

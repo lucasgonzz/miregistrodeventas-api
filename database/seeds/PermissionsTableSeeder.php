@@ -239,5 +239,26 @@ class PermissionsTableSeeder extends Seeder
                 'extencion_id'  => $providers_extencion->id,
             ]);
         }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Margen de ganancia en los precios
+        |--------------------------------------------------------------------------
+        */
+        $extencion = Extencion::where('slug', 'articles.percentage_gain')->first();
+        $permissions = [
+            [
+                'name' => 'Margen de ganancia en los precios',
+                'slug' => 'articles.percentage_gain.index',
+            ],
+        ];
+        foreach ($permissions as $permission) {
+            Permission::create([
+                'name'          => $permission['name'],
+                'slug'          => $permission['slug'],
+                'extencion_id'  => $extencion->id,
+            ]);
+        }
     }
 }

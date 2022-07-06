@@ -154,7 +154,7 @@ class SaleTicketPdf extends fpdf {
 	}
 
 	function getPdfHeight() {
-		$height = 65;
+		$height = 85;
 		foreach ($this->sale->combos as $combo) {
 			$height += $this->getHeight($combo, 20);
 			foreach ($combo->articles as $article) {

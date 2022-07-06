@@ -10,7 +10,7 @@ class UserHelper {
 	static function userId($from_owner = true) {
         $user = Auth()->user();
         if (is_null($user) && env('APP_ENV') == 'local') {
-            $user = User::where('company_name', 'Lucas')->first();
+            $user = User::where('company_name', 'kas aberturas')->first();
             return $user->id;
         }
         if ($from_owner) {
@@ -22,6 +22,10 @@ class UserHelper {
         } else {
             return $user->id;
         }
+    }
+
+    static function user() {
+        return User::find(Self::userId());
     }
 
     static function getFullModel($id = null) {

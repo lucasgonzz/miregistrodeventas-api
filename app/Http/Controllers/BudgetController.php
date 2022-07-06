@@ -53,6 +53,8 @@ class BudgetController extends Controller
 
     function delete($id) {
         $budget = Budget::find($id);
+        BudgetHelper::deleteCurrentAcount($budget);
+        BudgetHelper::deleteOrderProduction($budget);
         $budget->delete();
         return response(null, 200);
     }
