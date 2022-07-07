@@ -60,9 +60,7 @@ class ArticlesImport implements ToCollection, WithHeadingRow
             }
         }
         ImportHelper::saveProvider($row, $this->ct);
-        Log::info('iva1: '.$row['iva']);
         $iva = ImportHelper::getIva($row, $this->ct);
-        Log::info('iva id: '.$iva);
         $article = Article::create([
             'num'               => $this->ct->num('articles'),
             'name'              => $row['nombre'],

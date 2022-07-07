@@ -46,18 +46,12 @@ class AuthController extends Controller
             }
             
         } else {
-            Log::info('login empleado');
             if (Auth::attempt([
                                 'dni' => $request->dni, 
                                 'password' => $request->password, 
                             ], $request->remember)) {
-                Log::info('Piediendo user con id: '.$this->userId(false));
                 $user = UserHelper::getFullModel($this->userId(false));
-                Log::info('User:');
-                Log::info($user);
                 $user = UserHelper::checkUserTrial($user);
-                Log::info('User desdpues de checkUserTrial:');
-                Log::info($user);
                 return response()->json([
                     'login' => true,
                     'user'  => $user

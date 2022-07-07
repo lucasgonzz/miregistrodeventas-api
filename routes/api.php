@@ -396,6 +396,12 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/articles/delete', 
 		'ArticleController@delete'
 	);
+
+	// Ticket pdf
+	Route::get('/articles/pdf/{ids}', 
+		'ArticleController@pdf'
+	);
+
 	// Copiar descripciones
 	Route::put('/articles/descriptions-copy', 
 		'ArticleController@descriptionsCopy'

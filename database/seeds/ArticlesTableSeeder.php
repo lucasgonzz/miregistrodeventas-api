@@ -351,8 +351,9 @@ class ArticlesTableSeeder extends Seeder
     function kasAberturas() {
         $kas_aberturas_articles = [
             [
-                'bar_code'          => '123',
-                'name'              => 'Visagra mediana',
+                'bar_code'          => '1238392489023489',
+                'provider_code'     => '1232-asd-1232132',
+                'name'              => 'Visagra mediana con muchas cosas utiles por ejemplo el hecho de que la podes usar para ir a pescar con tus amigos',
                 'stock'             => 10,
                 'cost'              => 50,
                 'percentage_gain'   => 50,
@@ -362,7 +363,8 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '234',
+                'bar_code'          => '2348392489023489',
+                'provider_code'     => '1232-asd-1232132',
                 'name'              => 'Picaporte',
                 'stock'             => 10,
                 'cost'              => 200,
@@ -373,10 +375,59 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '345',
+                'bar_code'          => '3458392489023489',
+                'provider_code'     => '1232-asd-1232132',
                 'name'              => 'Cerradura reforzada',
                 'stock'             => 10,
                 'cost'              => 700,
+                'percentage_gain'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '4448392489023489',
+                'provider_code'     => '1232-asd-1232132',
+                'name'              => 'revestimineto',
+                'stock'             => 10,
+                'cost'              => 700,
+                'percentage_gain'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '445548392489023489',
+                'provider_code'     => '1232-asd-1232132',
+                'name'              => 'revestimineto',
+                'stock'             => 10,
+                'cost'              => 700,
+                'percentage_gain'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '12638392489023489',
+                'provider_code'     => '1232-asd-1232132',
+                'name'              => 'Visagra mediana con muchas cosas utiles por ejemplo el hecho de que la podes usar para ir a pescar con tus amigos',
+                'stock'             => 10,
+                'cost'              => 50,
+                'percentage_gain'   => 50,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '12643',
+                'provider_code'     => '1232-asd-1232132',
+                'name'              => 'Visagra mediana con',
+                'stock'             => 10,
+                'cost'              => 50,
                 'percentage_gain'   => 50,
                 'images'            => [
                     $this->iphone_images['cargador'],
@@ -388,23 +439,26 @@ class ArticlesTableSeeder extends Seeder
         $ct = new Controller();
 
         $kas_aberturas = User::where('company_name', 'kas aberturas')->first();
-        foreach ($kas_aberturas_articles as $article) {
-            $art = Article::create([
-                'num'               => $ct->num('articles', $kas_aberturas->id),
-                'bar_code'          => $article['bar_code'],
-                'name'              => $article['name'],
-                'cost'              => $article['cost'],
-                'stock'             => $article['stock'],
-                'stock_min'         => 1,
-                'percentage_gain'   => $article['percentage_gain'],
-                'user_id'           => $kas_aberturas->id,
-            ]);    
-            foreach ($article['images'] as $url) { 
-                Image::create([
-                    'article_id' => $art->id,
-                    'url'        => $url,
-                ]);
-            }    
+        for ($i=0; $i < 10; $i++) { 
+            foreach ($kas_aberturas_articles as $article) {
+                $art = Article::create([
+                    'num'               => $ct->num('articles', $kas_aberturas->id),
+                    'bar_code'          => $article['bar_code'],
+                    'provider_code'     => $article['provider_code'],
+                    'name'              => $article['name'],
+                    'cost'              => $article['cost'],
+                    'stock'             => $article['stock'],
+                    'stock_min'         => 1,
+                    'percentage_gain'   => $article['percentage_gain'],
+                    'user_id'           => $kas_aberturas->id,
+                ]);    
+                foreach ($article['images'] as $url) { 
+                    Image::create([
+                        'article_id' => $art->id,
+                        'url'        => $url,
+                    ]);
+                }    
+            }
         }
     }
 

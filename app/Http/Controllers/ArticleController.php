@@ -7,6 +7,7 @@ use App\BarCode;
 use App\Description;
 use App\Exports\ArticlesExport;
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\Pdf\ArticleTicketPdf;
 use App\Image;
 use App\Imports\ArticlesImport;
 use App\Notifications\CreatedArticle;
@@ -75,6 +76,7 @@ class ArticleController extends Controller
         $article->timestamps      = false;
         $article->status          = 'active';
         $article->bar_code        = $request->bar_code;
+        $article->provider_code   = $request->provider_code;
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
         $article->brand_id        = $request->brand_id != 0 ? $request->brand_id : null;
         $article->iva_id          = $request->iva_id;
@@ -353,6 +355,7 @@ class ArticleController extends Controller
         $article = new Article();
         $article->num = $this->num('articles');
         $article->bar_code = $request->bar_code;
+        $article->provider_code = $request->provider_code;
         // if ($request->sub_category_id != 0) {
         //     $article->sub_category_id = $request->sub_category_id;
         // }
@@ -395,6 +398,15 @@ class ArticleController extends Controller
 
     function import(Request $request) {
         Excel::import(new ArticlesImport($request->percentage, $request->provider_id), $request->file('articles'));
+    }
+
+    function pdf($ids) {
+        $articles = [];
+        foreach (explode('-', $ids) as $id) {
+            $articles[] = Article::find($id);
+        }
+        $articles = ArticleHelper::setPrices($articles);
+        (new ArticleTicketPdf($articles));
     }
 
     function newArticle(Request $request) {

@@ -7,19 +7,7 @@ class Numbers {
 
 
 	static function percentage($p) {
-		if (substr($p, strpos($p, '.'), strlen($p)) != '.00') {
-			Log::info('entro con: '.$p);
-			$p = str_replace('.', '', $p);
-			Log::info('sale con: '.$p);
-		} 
-		$percentage = (float)$p;
-		if ($percentage < 10) {
-			return '0.0'.$percentage;
-		} else if ($percentage < 100) {
-			return '0.'.$percentage;
-		} else if ($percentage >= 100) {
-			return substr($percentage, 0, 1).'.'.substr($percentage, 1, strlen($percentage));
-		}
+		return (float)$p / 100;
 	}
 
     static function redondear($num) {

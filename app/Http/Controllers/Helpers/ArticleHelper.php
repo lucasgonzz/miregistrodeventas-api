@@ -6,21 +6,22 @@ use App\Advise;
 use App\Article;
 use App\ArticleDiscount;
 use App\Description;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Mail\ArticleAdvise;
 use App\SpecialPrice;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
 class ArticleHelper {
 
     static function setPrices($articles) {
+        // Log::info($articles);
         foreach ($articles as $article) {
             if (!is_null($article->percentage_gain)) {
-                Log::info('Percentage: '.Numbers::percentage($article->percentage_gain));
                 $article->price = $article->cost + ($article->cost * Numbers::percentage($article->percentage_gain));
             }
             if (!UserHelper::user()->configuration->iva_included) {
@@ -33,6 +34,28 @@ class ArticleHelper {
                     
                 }
             }
+        }
+        return $articles;
+    }
+
+    static function setIva($articles) {
+        $ct = new Controller();
+        foreach ($articles as $article) {
+            $article->iva_id = $ct->getModelBy('ivas', 'id', $article->iva_id, false, 'percentage'); 
+        }
+        return $articles;
+    }
+
+    static function setDiscount($articles) {
+        foreach ($articles as $article) {
+            if (count($article->discounts) >= 1) {
+                $article->slug = $article->discounts[0]->percentage;
+            } else {
+                $article->slug = 'no tinee';
+            }
+            // foreach ($article->discounts as $discount) {
+            //     $article->slug .= $discount->percentage.' ';
+            // }
         }
         return $articles;
     }
