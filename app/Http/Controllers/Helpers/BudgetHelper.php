@@ -101,16 +101,15 @@ class BudgetHelper {
 	static function attachProducts($budget, $products) {
 		$models_products = BudgetProduct::where('budget_id', $budget->id)->pluck('id');
 		BudgetProduct::destroy($models_products);
-		Log::info($products);
 		foreach ($products as $product) {
 			$product = (object) $product;
-			Log::info($product->name);
 			BudgetProduct::create([
 				'bar_code'	=> $product->bar_code,
 				'amount'	=> $product->amount,
 				'name'		=> $product->name,
 				'price'		=> $product->price,
 				'bonus'		=> isset($product->bonus) ? $product->bonus : null,
+				'location'  => isset($product->location) ? $product->location : null,
 				'budget_id' => $budget->id
 			]);
 		}

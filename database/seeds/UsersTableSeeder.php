@@ -15,26 +15,22 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        
-        $commerce = User::create([
-            'id'                => 301,
-            'name'              => 'Mi Negocio',
-            'email'             => 'marcos@gmail.com',
-            'company_name'      => 'Mi Negocio',
-            'status'            => 'commerce',
-            'plan_id'           => 1,
-            'type'              => 'provider',
-            'password'          => bcrypt('1234'),
-            'percentage_card'   => 20,
-            'has_delivery'      => 1,
-            'delivery_price'    => 70,
-            'online_prices'     => 'all',
-            'online'            => 'http://kioscoverde.local:8080',
-            'online_prices'     => 'only_registered',
-            'order_description' => '¿Hay que envolver algo?',
-            'created_at'        => Carbon::now()->subMonths(2),
-        ]);
 
+        $this->fiushh();
+
+        $this->pinocho();
+
+        $this->candy();
+
+        $this->kasAberturas();
+
+        $this->nebulaStore();
+
+        $this->super();
+
+    }
+
+    function fiushh() {
         $commerce = User::create([
             'id'                    => 302,
             'name'                  => 'Lucas',
@@ -74,7 +70,9 @@ class UsersTableSeeder extends Seeder
             'inicio_actividades'    => Carbon::now()->subYears(5),
             'user_id'               => $commerce->id,
         ]);
+    }
 
+    function pinocho() {
         $commerce = User::create([
             'id'                => 303,
             'name'              => 'Juliana',
@@ -114,7 +112,9 @@ class UsersTableSeeder extends Seeder
             'inicio_actividades'    => Carbon::now()->subYears(5),
             'user_id'               => $commerce->id,
         ]);
+    }
 
+    function candy() {
         $commerce = User::create([
             'id'                => 304,
             'name'              => 'Liliana',
@@ -153,7 +153,9 @@ class UsersTableSeeder extends Seeder
             'inicio_actividades'    => Carbon::now()->subYears(5),
             'user_id'               => $commerce->id,
         ]);
+    }
 
+    function kasAberturas() {
         $commerce = User::create([
             'id'                => 305,
             'name'              => 'Bartolo',
@@ -194,7 +196,53 @@ class UsersTableSeeder extends Seeder
             'inicio_actividades'    => Carbon::now()->subYears(5),
             'user_id'               => $commerce->id,
         ]);
+    }
 
+    function nebulaStore() {
+        $commerce = User::create([
+            'id'                => 306,
+            'name'              => 'Patricio',
+            'email'             => 'lucasgonzalez5500@gmail.com',
+            'image_url'         => 'v1653518851/articles/yiqq6hy84ww0gpk4ouwp.jpg',
+            'phone'             => '3444622139',
+            'company_name'      => 'NebulaStore',
+            'status'            => 'commerce',
+            'plan_id'           => 3,
+            'type'              => 'commerce',
+            'password'          => bcrypt('1234'),
+            'percentage_card'   => 0,
+            'has_delivery'      => 1,
+            'dolar'             => 'promedio',
+            'delivery_price'    => 70,
+            'online_prices'     => 'all',
+            'online'            => 'http://kioscoverde.local:8080',
+            'order_description' => 'Observaciones',
+            'dolar_plus'        => 3,
+            'created_at'        => Carbon::now()->subMonths(2),
+        ]);
+
+        $commerce->extencions()->attach([3]);
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
+            'current_acount_pagandose_details'      => 'Recibo de pago',
+            'iva_included'                          => 1,
+            'user_id'                               => $commerce->id,
+        ]);
+
+        AfipInformation::create([
+            'iva_condition_id'      => 1,
+            'razon_social'          => '',
+            'domicilio_comercial'   => '',
+            'cuit'                  => '',
+            'punto_venta'           => null,
+            'ingresos_brutos'       => '',
+            'inicio_actividades'    => null,
+            'user_id'               => $commerce->id,
+        ]);
+
+    }
+
+    function super() {
         $super = User::create([
             'id'              => 308,
             'name' => 'Lucas super',

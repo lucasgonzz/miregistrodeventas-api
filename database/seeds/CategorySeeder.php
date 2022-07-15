@@ -14,11 +14,24 @@ class CategorySeeder extends Seeder
     public function run()
     {
         $this->pinocho();
+
+        $this->nebulaStore();
     }
 
     function pinocho() {
         $user = User::where('company_name', 'pinocho')->first();
         $categories = ['Juguetes infantiles', 'INFLABLES', 'Auriculares con muchas cosas', 'categoria para rellenar mas que nada', 'segunda categoria', 'otra cateogoria mas', 'otra', 'y otra', 'y otra mas'];
+        foreach ($categories as $category) {
+            Category::create([
+                'name'    => $category,
+                'user_id' => $user->id,
+            ]);
+        }
+    }
+
+    function nebulaStore() {
+        $user = User::where('company_name', 'nebulaStore')->first();
+        $categories = ['Camperas', 'Pantalones', 'Zapatillas', 'Bufandas', 'Remeras', 'Camisas'];
         foreach ($categories as $category) {
             Category::create([
                 'name'    => $category,

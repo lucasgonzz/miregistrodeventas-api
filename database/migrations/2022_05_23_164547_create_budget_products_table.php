@@ -20,6 +20,7 @@ class CreateBudgetProductsTable extends Migration
             $table->text('name');
             $table->decimal('price', 8,2);
             $table->decimal('bonus', 8,2)->nullable();
+            $table->text('location')->nullable();
             $table->integer('budget_id')->unsigned();
             $table->timestamps();
         });

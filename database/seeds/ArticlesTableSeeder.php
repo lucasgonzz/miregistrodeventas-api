@@ -47,8 +47,13 @@ class ArticlesTableSeeder extends Seeder
     public function run()
     {
         $this->candy();
+
         $this->kasAberturas();
+
         $this->pinocho();
+
+        $this->nebulaStore();
+
         return;
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
 
@@ -351,8 +356,8 @@ class ArticlesTableSeeder extends Seeder
     function kasAberturas() {
         $kas_aberturas_articles = [
             [
-                'bar_code'          => '1238392489023489',
-                'provider_code'     => '1232-asd-1232132',
+                'bar_code'          => '123',
+                'provider_code'     => 'p-123',
                 'name'              => 'Visagra mediana con muchas cosas utiles por ejemplo el hecho de que la podes usar para ir a pescar con tus amigos',
                 'stock'             => 10,
                 'cost'              => 50,
@@ -363,8 +368,8 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '2348392489023489',
-                'provider_code'     => '1232-asd-1232132',
+                'bar_code'          => '234',
+                'provider_code'     => 'p-234',
                 'name'              => 'Picaporte',
                 'stock'             => 10,
                 'cost'              => 200,
@@ -375,8 +380,8 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '3458392489023489',
-                'provider_code'     => '1232-asd-1232132',
+                'bar_code'          => '345',
+                'provider_code'     => 'p-345',
                 'name'              => 'Cerradura reforzada',
                 'stock'             => 10,
                 'cost'              => 700,
@@ -387,8 +392,8 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '4448392489023489',
-                'provider_code'     => '1232-asd-1232132',
+                'bar_code'          => '456',
+                'provider_code'     => 'p-456',
                 'name'              => 'revestimineto',
                 'stock'             => 10,
                 'cost'              => 700,
@@ -399,8 +404,8 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '445548392489023489',
-                'provider_code'     => '1232-asd-1232132',
+                'bar_code'          => '567',
+                'provider_code'     => 'p-567',
                 'name'              => 'revestimineto',
                 'stock'             => 10,
                 'cost'              => 700,
@@ -411,8 +416,8 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '12638392489023489',
-                'provider_code'     => '1232-asd-1232132',
+                'bar_code'          => '678',
+                'provider_code'     => 'p-678',
                 'name'              => 'Visagra mediana con muchas cosas utiles por ejemplo el hecho de que la podes usar para ir a pescar con tus amigos',
                 'stock'             => 10,
                 'cost'              => 50,
@@ -423,8 +428,8 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '12643',
-                'provider_code'     => '1232-asd-1232132',
+                'bar_code'          => '789',
+                'provider_code'     => 'p-789',
                 'name'              => 'Visagra mediana con',
                 'stock'             => 10,
                 'cost'              => 50,
@@ -439,26 +444,24 @@ class ArticlesTableSeeder extends Seeder
         $ct = new Controller();
 
         $kas_aberturas = User::where('company_name', 'kas aberturas')->first();
-        for ($i=0; $i < 10; $i++) { 
-            foreach ($kas_aberturas_articles as $article) {
-                $art = Article::create([
-                    'num'               => $ct->num('articles', $kas_aberturas->id),
-                    'bar_code'          => $article['bar_code'],
-                    'provider_code'     => $article['provider_code'],
-                    'name'              => $article['name'],
-                    'cost'              => $article['cost'],
-                    'stock'             => $article['stock'],
-                    'stock_min'         => 1,
-                    'percentage_gain'   => $article['percentage_gain'],
-                    'user_id'           => $kas_aberturas->id,
-                ]);    
-                foreach ($article['images'] as $url) { 
-                    Image::create([
-                        'article_id' => $art->id,
-                        'url'        => $url,
-                    ]);
-                }    
-            }
+        foreach ($kas_aberturas_articles as $article) {
+            $art = Article::create([
+                'num'               => $ct->num('articles', $kas_aberturas->id),
+                'bar_code'          => $article['bar_code'],
+                'provider_code'     => $article['provider_code'],
+                'name'              => $article['name'],
+                'cost'              => $article['cost'],
+                'stock'             => $article['stock'],
+                'stock_min'         => 1,
+                'percentage_gain'   => $article['percentage_gain'],
+                'user_id'           => $kas_aberturas->id,
+            ]);    
+            foreach ($article['images'] as $url) { 
+                Image::create([
+                    'article_id' => $art->id,
+                    'url'        => $url,
+                ]);
+            }    
         }
     }
 
@@ -521,6 +524,104 @@ class ArticlesTableSeeder extends Seeder
                 ]);
             }    
         }
+    }
+
+    function nebulaStore() {
+        $articles = [
+            [
+                'bar_code'          => '',
+                'name'              => 'Campera Tommy',
+                'stock'             => 2,
+                'cost'              => 500,
+                'price'             => 700,
+                'sub_category_name' => 'Inflables',
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                ]
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Campera de lana',
+                'stock'             => 10,
+                'cost'              => 200,
+                'price'             => 800,
+                'sub_category_name' => 'De lana',
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                ]
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Jean',
+                'stock'             => 10,
+                'cost'              => 700,
+                'price'             => 800,
+                'sub_category_name' => 'Jeans',
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                ]
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Jean',
+                'stock'             => 10,
+                'cost'              => 700,
+                'price'             => 800,
+                'sub_category_name' => 'De cuero',
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                ]
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Zapatilla Adidas',
+                'stock'             => 10,
+                'cost'              => 700,
+                'price'             => 800,
+                'sub_category_name' => 'Deportivas',
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                ]
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Zapatilla Vanz',
+                'stock'             => 10,
+                'cost'              => 700,
+                'price'             => 800,
+                'sub_category_name' => 'Urbanas',
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                ]
+            ],
+        ];
+
+        $user = User::where('company_name', 'nebulaStore')->first();
+        foreach ($articles as $article) {
+            $art = Article::create([
+                'bar_code'          => $article['bar_code'],
+                'name'              => $article['name'],
+                'slug'              => ArticleHelper::slug($article['name']),
+                'cost'              => $article['cost'],
+                'stock'             => $article['stock'] ,
+                'price'             => $article['price'],
+                'sub_category_id'   => $this->getSubcategory($user, $article)->id,
+                'user_id'           => $user->id,
+            ]);    
+            foreach ($article['images'] as $url) { 
+                Image::create([
+                    'article_id' => $art->id,
+                    'url'        => $url,
+                ]);
+            }    
+        }
+    }
+
+    function getSubcategory($user, $article) {
+        $sub_category = SubCategory::where('user_id', $user->id)
+                                    ->where('name', $article['sub_category_name'])
+                                    ->first();
+        return $sub_category;
     }
 
     function createDescriptions($article) {

@@ -38,6 +38,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('expired_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('online')->nullable();
+            $table->text('online_description')->nullable();
             $table->rememberToken();
 
             $table->enum('status', ['commerce', 'admin', 'super']);

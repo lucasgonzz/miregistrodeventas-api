@@ -186,6 +186,16 @@ class ArticleHelper {
         }
     }
 
+    static function attachProvider($article, $request) {
+        if ($request->provider_id != 0) {
+            $article->providers()->attach($request->provider_id, [
+                                            'amount' => $request->stock,
+                                            'cost'   => $request->cost,
+                                            'price'  => $request->price
+                                        ]);
+        }
+    }
+
     static function deleteVariants($article) {
         foreach ($article->variants as $variant) {
             $variant->delete();

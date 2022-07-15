@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AfipInformation;
 use App\Collection;
 use App\Http\Controllers\Helpers\StringHelper;
 use App\Http\Controllers\Helpers\UserHelper;
@@ -31,8 +32,8 @@ class UserController extends Controller
             'company_name'      => $request->company_name,
             'status'            => 'commerce',
             'plan_id'           => 3,
-            'type'              => 'commerce',
-            // 'type'              => $request->type,
+            // 'type'              => 'commerce',
+            'type'              => $request->type,
             'password'          => bcrypt($request->password),
             // 'iva'            => 'Responsable inscripto',
             'has_delivery'      => 1,
@@ -42,6 +43,24 @@ class UserController extends Controller
             'expired_at'         =>  Carbon::now()->addMonth(),
             'created_at'         =>  Carbon::now(),
         ]);
+
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
+            'current_acount_pagandose_details'      => 'Recibo de pago',
+            'iva_included'                          => 1,
+            'user_id'                               => $user->id,
+        ]);
+        AfipInformation::create([
+            'iva_condition_id'      => 1,
+            'razon_social'          => strtoupper($request->company_name),
+            'domicilio_comercial'   => '',
+            'cuit'                  => '',
+            'punto_venta'           => null,
+            'ingresos_brutos'       => '',
+            'inicio_actividades'    => null,
+            'user_id'               => $user->id,
+        ]);
+
     }
 
     // Confirguracion - Editar
@@ -49,6 +68,7 @@ class UserController extends Controller
         $user = User::where('id', $this->userId())->with('employees')->first();
         $user->name = StringHelper::modelName($request->name, true);
         $user->phone = $request->phone;
+        $user->online_description = $request->online_description;
         $user->has_delivery = $request->has_delivery;
         $user->delivery_price = $request->delivery_price;
         $user->online_prices = $request->online_prices;

@@ -104,6 +104,7 @@ class ArticleController extends Controller
         }
         ArticleHelper::checkAdvises($article);
         $article->save();
+        ArticleHelper::attachProvider($article, $request);
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDiscounts($article, $request->discounts);
         ArticleHelper::setDescriptions($article, $request->descriptions);
@@ -383,13 +384,7 @@ class ArticleController extends Controller
         ArticleHelper::setSizes($article, $request->sizes_id);
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
-        if ($request->provider_id != 0) {
-            $article->providers()->attach($request->provider_id, [
-                                            'amount' => $request->stock,
-                                            'cost' => $request->cost,
-                                            'price' => $request->price
-                                        ]);
-        }
+        ArticleHelper::attachProvider($article, $request);
         ArticleHelper::setSpecialPrices($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
         $article->user->notify(new CreatedArticle($article));

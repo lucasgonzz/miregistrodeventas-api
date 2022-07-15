@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\ClientHelper;
 use App\Http\Controllers\Helpers\OrderProductionHelper;
+use App\Http\Controllers\Helpers\Pdf\OrderProductionProductsPdf;
 use App\OrderProduction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -66,4 +67,10 @@ class OrderProductionController extends Controller
                                             ->first();
         return $order_production;                              
     }
+
+    function productsPdf($id) {
+        $order_production = OrderProduction::find($id);
+        $pdf = new OrderProductionProductsPdf($order_production);
+    }
+
 }

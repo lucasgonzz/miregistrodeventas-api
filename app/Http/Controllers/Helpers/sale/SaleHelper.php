@@ -121,6 +121,7 @@ class SaleHelper extends Controller {
                                                                         ? (float)$article['cost']
                                                                         : null,
                                                             'price' => Self::getArticleSalePrice($sale, $article),
+                                                            'discount' => Self::getDiscount($article),
                                                             'with_dolar' => Self::getDolar($article, $dolar_blue),
                                                             'created_at' => Carbon::now(),
                                                         ]);
@@ -163,6 +164,13 @@ class SaleHelper extends Controller {
         $sale = Sale::find($id);
         // Self::updateCurrentAcountsAndCommissions($sale, false);
         Self::updateCurrentAcountsAndCommissions($sale, true);
+    }
+
+    static function getDiscount($article) {
+        if (isset($article['discount'])) {
+            return $article['discount'];
+        }
+        return null;
     }
 
     static function getDolar($article, $dolar_blue) {

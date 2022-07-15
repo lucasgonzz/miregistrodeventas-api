@@ -12,7 +12,7 @@ class CurrentAcountPaymentMethodSeeder extends Seeder
      */
     public function run()
     {
-        $payment_methods = ['Cheque', 'Debito', 'Efectivo', 'Transferencia'];
+        $payment_methods = ['Cheque', 'Debito', 'Efectivo', 'Transferencia', 'Credito'];
         foreach ($payment_methods as $payment_method) {
             CurrentAcountPaymentMethod::create([
                 'name' => $payment_method

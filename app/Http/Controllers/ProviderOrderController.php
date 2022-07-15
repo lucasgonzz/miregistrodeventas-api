@@ -64,5 +64,12 @@ class ProviderOrderController extends Controller
         $provider_order = ProviderOrderHelper::setArticles([$provider_order])[0];
         return $provider_order;
     }
+
+    function destroy($id) {
+        $model = ProviderOrder::find($id);
+        $model->articles()->sync([]);
+        $model->delete();
+        return response(null, 200);
+    }
     
 }

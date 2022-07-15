@@ -186,6 +186,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/order-productions/{id}', 
 		'OrderProductionController@delete'
 	);
+	Route::get('/order-productions/products-pdf/{id}', 
+		'OrderProductionController@productsPdf'
+	);
 
 	// ProductDelivery
 	Route::post('/budget-product-deliveries', 
@@ -223,6 +226,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::post('/provider-orders/received', 
 		'ProviderOrderController@setReceived'
+	);
+	Route::delete('/provider-orders/{id}', 
+		'ProviderOrderController@destroy'
 	);
 
 
