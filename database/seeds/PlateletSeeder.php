@@ -15,26 +15,27 @@ class PlateletSeeder extends Seeder
     {
         $users = User::where('company_name', 'Fiushh')
                     ->orWhere('company_name', 'Pinocho')
+                    ->orWhere('company_name', 'nebulaStore')
                     ->get();
         $platelets = [
             [
-                'title' => 'Envios a todo Argentina',
-                'text'  => 'Dependiendo tu zona calculamos el envio'
+                'name' => 'Envios a todo Argentina',
+                'description'  => 'Dependiendo tu zona calculamos el envio'
             ],
             [
-                'title' => 'PAGA SIMPLE Y RAPIDO',
-                'text'  => 'Tarjetas de Crédito y Debito con Mercado Pago'
+                'name' => 'PAGA SIMPLE Y RAPIDO',
+                'description'  => 'Tarjetas de Crédito y Debito con Mercado Pago'
             ],
             [
-                'title' => 'COMPRÁ CON SEGURIDAD',
-                'text'  => 'Tus datos siempre están protegidos'
+                'name' => 'COMPRÁ CON SEGURIDAD',
+                'description'  => 'Tus datos siempre están protegidos'
             ],
         ];
         foreach ($users as $user) {
             foreach ($platelets as $platelet) {
                 Platelet::create([
-                    'title'     => $platelet['title'],
-                    'text'      => $platelet['text'],
+                    'name'     => $platelet['name'],
+                    'description'      => $platelet['description'],
                     'user_id'   => $user->id,
                 ]);
             }

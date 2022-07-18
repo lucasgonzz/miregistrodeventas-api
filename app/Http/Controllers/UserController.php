@@ -21,6 +21,9 @@ class UserController extends Controller
     function user() {
         $user = UserHelper::getFullModel($this->userId(false));
         $user = UserHelper::checkUserTrial($user);
+        if ($user->owner_id) {
+            $user = UserHelper::setEmployeeExtencions($user);
+        }
         return response()->json(['user' => $user], 200);
     }
 

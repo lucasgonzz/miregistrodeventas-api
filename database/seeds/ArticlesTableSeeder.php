@@ -537,7 +537,9 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Inflables',
                 'images'            => [
                     $this->iphone_images['cargador'],
-                ]
+                ],
+                'colors'            => [1],
+                'sizes'             => [1],
             ],
             [
                 'bar_code'          => '',
@@ -548,7 +550,9 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'De lana',
                 'images'            => [
                     $this->iphone_images['cargador'],
-                ]
+                ],
+                'colors'            => [1, 2],
+                'sizes'             => [2, 3],
             ],
             [
                 'bar_code'          => '',
@@ -559,7 +563,9 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Jeans',
                 'images'            => [
                     $this->iphone_images['cargador'],
-                ]
+                ],
+                'colors'            => [1],
+                'sizes'             => [],
             ],
             [
                 'bar_code'          => '',
@@ -570,7 +576,9 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'De cuero',
                 'images'            => [
                     $this->iphone_images['cargador'],
-                ]
+                ],
+                'colors'            => [],
+                'sizes'             => [1],
             ],
             [
                 'bar_code'          => '',
@@ -581,7 +589,9 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Deportivas',
                 'images'            => [
                     $this->iphone_images['cargador'],
-                ]
+                ],
+                'colors'            => [1],
+                'sizes'             => [],
             ],
             [
                 'bar_code'          => '',
@@ -592,7 +602,9 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Urbanas',
                 'images'            => [
                     $this->iphone_images['cargador'],
-                ]
+                ],
+                'colors'            => [],
+                'sizes'             => [1],
             ],
         ];
 
@@ -613,6 +625,12 @@ class ArticlesTableSeeder extends Seeder
                     'article_id' => $art->id,
                     'url'        => $url,
                 ]);
+            }    
+            foreach ($article['colors'] as $color) { 
+                $art->colors()->attach($color);
+            }    
+            foreach ($article['sizes'] as $size) { 
+                $art->sizes()->attach($size);
             }    
         }
     }

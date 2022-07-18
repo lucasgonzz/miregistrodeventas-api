@@ -70,6 +70,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	// DeliveryZones
 	Route::resource('delivery-zones', 'DeliveryZoneController');
 
+	// Platelets
+	Route::resource('platelets', 'PlateletController');
+
 	// -----------------------SUPER--------------------------------------------------
 	Route::get('super/admins', 
 		'SuperController@admins'

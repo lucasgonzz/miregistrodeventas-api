@@ -178,7 +178,7 @@ class UsersTableSeeder extends Seeder
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
-        $commerce->extencions()->attach([1, 2, 3, 4]);
+        $commerce->extencions()->attach([1, 2, 3, 4, 7]);
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
             'current_acount_pagandose_details'      => 'Recibo de pago',

@@ -411,6 +411,9 @@ class ArticleController extends Controller
         if ($request->bar_code != '') {
             $article->bar_code = $request->bar_code;
         }
+        if ($request->name != '') {
+            $article->name = $request->name;
+        }
         $article->save();
         $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['article' => $article], 201);

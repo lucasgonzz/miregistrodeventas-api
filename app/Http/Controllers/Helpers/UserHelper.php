@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class UserHelper {
 
@@ -49,6 +50,12 @@ class UserHelper {
     		$user->trial_expired = false;
     	}
     	return $user;
+    }
+
+    static function setEmployeeExtencions($employee) {
+        $user_owner = Self::getFullModel(); 
+        $employee->owner_extencions = $user_owner->extencions;
+        return $employee;
     }
 
 	static function isOscar() {

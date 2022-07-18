@@ -15,8 +15,8 @@ class CreatePlateletsTable extends Migration
     {
         Schema::create('platelets', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->text('text');
+            $table->string('name');
+            $table->text('description');
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

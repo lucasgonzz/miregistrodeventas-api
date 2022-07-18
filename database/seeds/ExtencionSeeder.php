@@ -37,6 +37,10 @@ class ExtencionSeeder extends Seeder
                 'name' => 'Esconder ventas',
                 'slug' => 'sales.hide',
             ],
+            [
+                'name' => 'Descuentos en los artículos de las ventas',
+                'slug' => 'sales.articles.discounts',
+            ],
         ];
         foreach ($extencions as $extencion) {
             Extencion::create([
