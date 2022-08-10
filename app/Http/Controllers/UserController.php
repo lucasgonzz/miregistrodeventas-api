@@ -22,7 +22,7 @@ class UserController extends Controller
         $user = UserHelper::getFullModel($this->userId(false));
         $user = UserHelper::checkUserTrial($user);
         if ($user->owner_id) {
-            $user = UserHelper::setEmployeeExtencions($user);
+            $user = UserHelper::setEmployeeExtencionsAndConfigurations($user);
         }
         return response()->json(['user' => $user], 200);
     }
@@ -83,6 +83,9 @@ class UserController extends Controller
         $configuration = UserConfiguration::where('user_id', $this->userId())
                                             ->first();
         $configuration->show_articles_without_stock = $request->configuration['show_articles_without_stock'];
+        $configuration->iva_included = $request->configuration['iva_included'];
+        $configuration->set_articles_updated_at_always = $request->configuration['set_articles_updated_at_always'];
+        $configuration->limit_items_in_sale_per_page = $request->configuration['limit_items_in_sale_per_page'];
         $configuration->save();
 
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);

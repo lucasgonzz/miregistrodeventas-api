@@ -52,9 +52,10 @@ class UserHelper {
     	return $user;
     }
 
-    static function setEmployeeExtencions($employee) {
+    static function setEmployeeExtencionsAndConfigurations($employee) {
         $user_owner = Self::getFullModel(); 
         $employee->owner_extencions = $user_owner->extencions;
+        $employee->owner_configuration = $user_owner->configuration;
         return $employee;
     }
 

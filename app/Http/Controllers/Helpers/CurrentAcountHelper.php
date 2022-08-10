@@ -14,6 +14,7 @@ use App\Http\Controllers\Helpers\UserHelper;
 use App\Sale;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class CurrentAcountHelper {
 
@@ -339,11 +340,9 @@ class CurrentAcountHelper {
                                         ->with('budget.observations')
                                         ->with('budget.products.deliveries')
                                         ->with('budget.products.article_stocks')
-                                        ->with('sale.client.iva_condition')
-                                        ->with('sale.articles')
-                                        ->with('sale.combos')
-                                        ->with('sale.discounts')
-                                        ->with('sale.commissions')
+                                        ->with(['sale' => function($q) {
+                                            return $q->withAll();
+                                        }])
                                         ->with('payment_method')
                                         ->with('checks')
                                         ->get();
@@ -354,25 +353,30 @@ class CurrentAcountHelper {
     static function format($current_acounts) {
         foreach ($current_acounts as $current_acount) {
             if (!is_null($current_acount->num_receipt)) {
-                $current_acount->numero = 'RP'.Self::getFormatedNum($current_acount, 'num_receipt');
+                $current_acount->numero = 'RP'.Self::getFormatedNum($current_acount->num_receipt);
             }
             if (!is_null($current_acount->sale_id)) {
-                $current_acount->numero = 'RT'.Self::getFormatedNum($current_acount, 'sale_id');
+                $current_acount->numero = 'RT'.Self::getNum('sales', $current_acount->sale_id, 'num_sale');
             }
             if (!is_null($current_acount->budget_id)) {
-                $current_acount->numero = 'P'.Self::getFormatedNum($current_acount, 'budget_id');
+                $current_acount->numero = 'P'.Self::getNum('budgets', $current_acount->budget_id ,'num');
             }
         }
         return $current_acounts;
     }
 
-    static function getFormatedNum($current_acount, $prop) {
-        $letras_faltantes = 8 - strlen($current_acount->{$prop});
+    static function getNum($table, $id, $prop) {
+        $model = DB::table($table)->where('id', $id)->first();
+        return Self::getFormatedNum($model->{$prop});
+    }
+
+    static function getFormatedNum($num) {
+        $letras_faltantes = 8 - strlen($num);
         $cbte_numero = '';
         for ($i=0; $i < $letras_faltantes; $i++) { 
             $cbte_numero .= '0'; 
         }
-        $cbte_numero  .= $current_acount->{$prop};
+        $cbte_numero  .= $num;
         return $cbte_numero;
     }
 

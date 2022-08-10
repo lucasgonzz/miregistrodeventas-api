@@ -16,15 +16,17 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->integer('buyer_id')->unsigned();
-            $table->integer('user_id')->unsigned();
             $table->enum('status', ['unconfirmed', 'canceled', 'confirmed', 'finished', 'delivered']);
             $table->boolean('deliver');
             $table->integer('address_id')->unsigned()->nullable();
             $table->string('description')->nullable();
+            $table->integer('payment_id')->nullable();
             $table->integer('payment_method_id')->unsigned()->nullable();
             $table->integer('delivery_zone_id')->unsigned()->nullable();
             $table->decimal('percentage_card', 8, 2)->nullable();
+            $table->integer('cupon_id')->unsigned()->nullable();
+            $table->integer('buyer_id')->unsigned();
+            $table->integer('user_id')->unsigned();
 
             $table->timestamps();
         });

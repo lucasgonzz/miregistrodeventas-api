@@ -28,6 +28,13 @@ class ImportHelper {
 	static function getIva($row) {
 		Log::info('buscando iva '.$row['iva']);
 		$ivas = [
+			'27' 	=> 1,
+			'21' 	=> 2,
+			'10.5' => 3,
+			'5' 	=> 4,
+			'2.5' => 5,
+			'0' 	=> 6,
+
 			'0.27' 	=> 1,
 			'0.21' 	=> 2,
 			'0.105' => 3,

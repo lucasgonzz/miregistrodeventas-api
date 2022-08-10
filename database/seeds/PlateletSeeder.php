@@ -16,6 +16,7 @@ class PlateletSeeder extends Seeder
         $users = User::where('company_name', 'Fiushh')
                     ->orWhere('company_name', 'Pinocho')
                     ->orWhere('company_name', 'nebulaStore')
+                    ->orWhere('company_name', 'kas aberturas')
                     ->get();
         $platelets = [
             [

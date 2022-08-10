@@ -17,6 +17,8 @@ class SubCategorySeeder extends Seeder
         $this->pinocho();
 
         $this->nebulaStore();
+
+        $this->kasAberturas();
     }
 
     function pinocho() {
@@ -56,6 +58,32 @@ class SubCategorySeeder extends Seeder
                 $names = ['Jeans', 'De cuero'];
             } else if ($category->name == 'Zapatillas') {
                 $names = ['Deportivas', 'Urbanas'];
+            } 
+            for ($i=0; $i < count($names); $i++) {
+                $sub_category = SubCategory::create([
+                    'name'        => $names[$i],
+                    'category_id' => $category->id,
+                    'user_id' => $user->id,
+                ]);         
+            }
+        }
+    }
+
+    function kasAberturas() {
+        $user = User::where('company_name', 'kas aberturas')
+                    ->first();
+        $categories = Category::where('user_id', $user->id)
+                                ->get();
+        foreach ($categories as $category) {
+            $names = [];
+            if ($category->name == 'puertas') {
+                $names = ['de exterior'];
+            } else if ($category->name == 'repuestos') {
+                $names = ['industriales', 'de otras cosas'];
+            } else if ($category->name == 'visagras') {
+                $names = ['puertas', 'portones'];
+            }  else if ($category->name == 'calefactores') {
+                $names = ['nacionales', 'importados'];
             } 
             for ($i=0; $i < count($names); $i++) {
                 $sub_category = SubCategory::create([

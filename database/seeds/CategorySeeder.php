@@ -16,6 +16,8 @@ class CategorySeeder extends Seeder
         $this->pinocho();
 
         $this->nebulaStore();
+
+        $this->kasAberturas();
     }
 
     function pinocho() {
@@ -32,6 +34,17 @@ class CategorySeeder extends Seeder
     function nebulaStore() {
         $user = User::where('company_name', 'nebulaStore')->first();
         $categories = ['Camperas', 'Pantalones', 'Zapatillas', 'Bufandas', 'Remeras', 'Camisas'];
+        foreach ($categories as $category) {
+            Category::create([
+                'name'    => $category,
+                'user_id' => $user->id,
+            ]);
+        }
+    }
+
+    function kasAberturas() {
+        $user = User::where('company_name', 'kas aberturas')->first();
+        $categories = ['puertas', 'repuestos', 'visagras', 'calefactores'];
         foreach ($categories as $category) {
             Category::create([
                 'name'    => $category,

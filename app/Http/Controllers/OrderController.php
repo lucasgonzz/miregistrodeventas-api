@@ -49,9 +49,9 @@ class OrderController extends Controller
         $orders = OrderHelper::setArticlesKeyAndVariant([$order]);
         $orders = OrderHelper::setArticlesColor([$order]);
         $orders = OrderHelper::setArticlesSize([$order]);
-        OrderHelper::procesarPago($order);
+        // OrderHelper::procesarPago($order);
         MessageHelper::sendOrderConfirmedMessage($order);
-        OrderHelper::checkPaymentMethodError($order);
+        // OrderHelper::checkPaymentMethodError($order);
         OrderHelper::discountArticleStock($order->articles);
         return response(null, 200);
     }
@@ -61,9 +61,9 @@ class OrderController extends Controller
         $order->status = 'canceled';
         $order->save();
         $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
-        CartHelper::detachArticulosFaltantes($request->articulos_faltantes, $order);
-        MessageHelper::sendOrderCanceledMessage($request->articulos_faltantes, $order);
-        OrderHelper::updateCuponsStatus($order);
+        // CartHelper::detachArticulosFaltantes($request->articulos_faltantes, $order);
+        MessageHelper::sendOrderCanceledMessage($request->order['cancel_description'], $order);
+        // OrderHelper::updateCuponsStatus($order);
         // $buyer = Buyer::find($order->buyer_id);
         // $message = OrderHelper::getCanceledDescription($request->articulos_faltantes, $request->order);
         // $buyer->notify(new OrderCanceledNotification($order, $message));
@@ -86,8 +86,7 @@ class OrderController extends Controller
 
     function deliver($order_id) {
         $order = Order::where('id', $order_id)
-                        ->with('articles')
-                        ->with('cupons')
+                        ->withAll()
                         ->first();
         $order->status = 'delivered';
         $order->save();
@@ -104,7 +103,7 @@ class OrderController extends Controller
     function saveSale($order) {
         $num_sale = SaleHelper::numSale($this->userId());
         $sale = Sale::create([
-            'user_id' => $this->userId(),
+            'user_id'  => $this->userId(),
             'buyer_id' => $order->buyer_id,
             'num_sale' => $num_sale,
             'order_id' => $order->id,

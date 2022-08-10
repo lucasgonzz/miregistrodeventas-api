@@ -16,7 +16,7 @@ class CreateAdvisesTable extends Migration
         Schema::create('advises', function (Blueprint $table) {
             $table->id();
             $table->integer('article_id')->unsigned();
-            $table->integer('buyer_id')->unsigned();
+            $table->string('email');
             $table->timestamps();
         });
     }

@@ -22,9 +22,6 @@ class CreateCuponsTable extends Migration
             $table->dateTime('expiration_date')->nullable();
             $table->integer('expiration_days')->nullable();
             $table->enum('type', ['normal', 'for_new_buyers'])->default('normal');
-            $table->integer('cart_id')->unsigned()->nullable();
-            $table->integer('order_id')->unsigned()->nullable();
-            $table->integer('sale_id')->unsigned()->nullable();
             $table->integer('buyer_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned()->nullable();
             $table->boolean('valid')->default(1);

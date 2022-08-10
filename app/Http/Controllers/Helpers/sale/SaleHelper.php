@@ -142,6 +142,18 @@ class SaleHelper extends Controller {
         }
     }
 
+    static function attachServices($sale, $services) {
+        foreach ($services as $service) {
+            if (isset($service['is_service'])) {
+                $sale->services()->attach($service['id'], [
+                    'price' => $service['price'],
+                    'amount' => $service['amount'],
+                    'discount' => Self::getDiscount($service),
+                ]);
+            }
+        }
+    }
+
     static function updateCurrentAcountsAndCommissions($sale, $only_commissions = false) {
         // Se eliminan las cuentas corrientes y se actualizan los saldos se las siguientes
         if (!$only_commissions) {
@@ -166,9 +178,9 @@ class SaleHelper extends Controller {
         Self::updateCurrentAcountsAndCommissions($sale, true);
     }
 
-    static function getDiscount($article) {
-        if (isset($article['discount'])) {
-            return $article['discount'];
+    static function getDiscount($item) {
+        if (isset($item['discount'])) {
+            return $item['discount'];
         }
         return null;
     }
@@ -180,9 +192,9 @@ class SaleHelper extends Controller {
         return null;
     }
 
-    static function attachArticlesFromOrder($order, $articles) {
+    static function attachArticlesFromOrder($sale, $articles) {
         foreach ($articles as $article) {
-            $order->articles()->attach($article->id, [
+            $sale->articles()->attach($article->id, [
                                             'amount' => $article->pivot->amount,
                                             'cost' => isset($article->pivot->cost)
                                                         ? $article->pivot->cost
@@ -204,24 +216,35 @@ class SaleHelper extends Controller {
         }
         $sale->articles()->detach();
         $sale->combos()->detach();
+        $sale->services()->detach();
     }
 
     static function getTotalSale($sale, $with_discount = true) {
         $total = 0;
         foreach ($sale->articles as $article) {
-            if (!is_null($sale->percentage_card)) {
-                $total += ($article->pivot->price * Numbers::percentage($sale->percentage_card)) * $article->pivot->amount;
-            } else {
-                $total += $article->pivot->price * $article->pivot->amount;
-            }
+            $total += Self::getTotalItem($article);
         }
         foreach ($sale->combos as $combo) {
-            $total += $combo->pivot->price * $combo->pivot->amount;
+            $total += Self::getTotalItem($combo);
+        }
+        foreach ($sale->services as $service) {
+            $total += Self::getTotalItem($service);
         }
         if ($with_discount) {
             foreach ($sale->discounts as $discount) {
                 $total -= $total * Numbers::percentage($discount->pivot->percentage); 
             }
+        }
+        if (!is_null($sale->percentage_card)) {
+            $total += ($total * Numbers::percentage($sale->percentage_card));
+        }
+        return $total;
+    }
+
+    static function getTotalItem($item) {
+        $total = $item->pivot->price * $item->pivot->amount;
+        if (!is_null($item->pivot->discount)) {
+            $total -= $total * ($item->pivot->discount / 100);
         }
         return $total;
     }

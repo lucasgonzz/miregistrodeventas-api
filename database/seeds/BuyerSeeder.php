@@ -13,15 +13,20 @@ class BuyerSeeder extends Seeder
      */
     public function run()
     {
-        $pinocho = User::where('company_name', 'pinocho')->first();
-        $lucas = Buyer::create([
-            'name'      => 'Lucas',
-            'surname'   => 'Gonzalez',
-            'city'      => 'Gualeguay',
-            'phone'     => '+5493444622139',
-            'email'     => 'lucasgonzalez5500@gmail.com',
-            'password'  => bcrypt('1234'),
-            'user_id'   => $pinocho->id,
-        ]);
+        $users = User::where('company_name', 'pinocho')
+                        ->orWhere('company_name', 'kas aberturas')
+                        ->orWhere('company_name', 'nebulaStore')
+                        ->get();
+        foreach ($users as $user) {
+            $lucas = Buyer::create([
+                'name'      => 'Lucas',
+                'surname'   => 'Gonzalez',
+                'city'      => 'Gualeguay',
+                'phone'     => '+5493444622139',
+                'email'     => 'lucasgonzalez5500@gmail.com',
+                'password'  => bcrypt('1234'),
+                'user_id'   => $user->id,
+            ]);
+        }
     }
 }

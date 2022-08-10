@@ -160,14 +160,14 @@ class UsersTableSeeder extends Seeder
             'id'                => 305,
             'name'              => 'Bartolo',
             'email'             => 'lucasgonzalez210200@gmail.com',
-            'image_url'         => 'v1653518851/articles/yiqq6hy84ww0gpk4ouwp.jpg',
+            'image_url'         => 'v1656680715/articles/crp5twb4jul34bcd98wr.jpg',
             'phone'             => '3444622139',
             'company_name'      => 'KAS Aberturas',
             'status'            => 'commerce',
             'plan_id'           => 3,
             'type'              => 'provider',
             'password'          => bcrypt('1234'),
-            'percentage_card'   => 20,
+            'percentage_card'   => 0,
             'has_delivery'      => 1,
             'dolar'             => 'promedio',
             'delivery_price'    => 70,
@@ -178,11 +178,12 @@ class UsersTableSeeder extends Seeder
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
-        $commerce->extencions()->attach([1, 2, 3, 4, 7]);
+        $commerce->extencions()->attach([1, 2, 3, 4, 7, 8]);
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
             'current_acount_pagandose_details'      => 'Recibo de pago',
             'iva_included'                          => 0,
+            'limit_items_in_sale_per_page'          => 3,
             'user_id'                               => $commerce->id,
         ]);
 

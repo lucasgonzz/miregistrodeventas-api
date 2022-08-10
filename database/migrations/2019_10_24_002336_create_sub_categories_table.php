@@ -19,6 +19,7 @@ class CreateSubCategoriesTable extends Migration
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->bigInteger('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories');
+            $table->boolean('show_in_vender')->default(0);
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

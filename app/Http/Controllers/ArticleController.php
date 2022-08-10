@@ -8,6 +8,7 @@ use App\Description;
 use App\Exports\ArticlesExport;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Pdf\ArticleTicketPdf;
+use App\Http\Controllers\Helpers\UserHelper;
 use App\Image;
 use App\Imports\ArticlesImport;
 use App\Notifications\CreatedArticle;
@@ -59,7 +60,7 @@ class ArticleController extends Controller
     }
 
     function show($id) {
-        $article = ArticleHelper::getFullArticle($article->id);
+        $article = ArticleHelper::getFullArticle($id);
         return response()->json(['article' => $article], 200);
     }
 
@@ -73,7 +74,9 @@ class ArticleController extends Controller
 
     function update(Request $request) {
         $article = Article::find($request->id);
-        $article->timestamps      = false;
+        if (!UserHelper::getFullModel()->configuration->set_articles_updated_at_always) {
+            $article->timestamps  = false;
+        }
         $article->status          = 'active';
         $article->bar_code        = $request->bar_code;
         $article->provider_code   = $request->provider_code;

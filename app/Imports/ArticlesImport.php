@@ -89,7 +89,7 @@ class ArticlesImport implements ToCollection, WithHeadingRow
                                             'price'  => $this->getPrice($row)
                                         ]);
         }
-        Log::info('Se guardo '.$article->name);
+        // Log::info('Se guardo '.$article->name);
     }
 
     function getPrice($row) {

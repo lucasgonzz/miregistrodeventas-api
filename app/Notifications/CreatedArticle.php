@@ -43,7 +43,7 @@ class CreatedArticle extends Notification
     public function toBroadcast($notifiable)
     {
         return new BroadcastMessage([
-            'article' => $this->article,
+            'article_id' => $this->article->id,
         ]);
     }
 }

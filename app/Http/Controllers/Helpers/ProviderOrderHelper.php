@@ -52,9 +52,12 @@ class ProviderOrderHelper {
 					'status' 	=> 'from_provider_order',
 					'user_id'	=> UserHelper::userId(),
 				]);
-			} else {
-				$article = (object)$article;
-			}
+			} else if (isset($article['status']) && $article['status'] == 'from_provider_order') {
+				$art = Article::find($article['id']);
+				$art->name = $article['name'];
+				$art->save();
+			} 
+			$article = (object)$article;
 			$provider_order->articles()->attach($article->id, [
 											'amount' 	=> $amount,
 											'notes' 	=> $notes,

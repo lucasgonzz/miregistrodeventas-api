@@ -52,5 +52,7 @@ class DatabaseSeeder extends Seeder
         $this->call(PaymentMethodSeeder::class);
         $this->call(DeliveryZoneSeeder::class);
         $this->call(LocationSeeder::class);
+        $this->call(PaymentMethodTypeSeeder::class);
+        $this->call(CuponSeeder::class);
     }
 }

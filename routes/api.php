@@ -67,6 +67,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	// PaymentMethods
 	Route::resource('payment-methods', 'PaymentMethodController');
 
+	// PaymentMethodTypes
+	Route::get('payment-method-types', 'PaymentMethodTypeController@index');
+
 	// DeliveryZones
 	Route::resource('delivery-zones', 'DeliveryZoneController');
 
@@ -267,6 +270,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		Route::put('/articles/price', 
 			'ArticleController@updatePrice'
 		);
+		Route::get('/articles/{id}', 
+			'ArticleController@show'
+		);
 		Route::get('/articles/get-by-bar-code/{bar_code}', 
 			'ArticleController@getByBarCode'
 		);
@@ -309,6 +315,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		// Sub Categorias
 		Route::get('/sub-categories', 
 			'SubCategoryController@index'
+		);
+		Route::get('/sub-categories/for-vender/{ids}', 
+			'SubCategoryController@forVender'
 		);
 		Route::post('/sub-categories', 
 			'SubCategoryController@store'
@@ -432,6 +441,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// Combos
 	Route::resource('combos', 'ComboController');
+
+	// Services
+	Route::post('services', 'ServiceController@store');
 
 	// Variants
 	Route::post('/articles/variants/{article_id}', 
@@ -749,6 +761,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::get('/orders/deliver/{order_id}', 
 		'OrderController@deliver'
+	);
+
+	// MercadoPago
+	Route::get('/mercado-pago/payment/{payment_id}',
+		'MercadoPagoController@payment'
 	);
 	// Examine
 	// Route::get('/google-analytics', 

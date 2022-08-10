@@ -15,6 +15,7 @@ class TitleSeeder extends Seeder
     {
         $fiushh = User::where('company_name', 'Fiushh')->first();
         $pinocho = User::where('company_name', 'Pinocho')->first();
+        $kas_aberturas = User::where('company_name', 'kas aberturas')->first();
         $titles = [
             // Fisuhh
             [
@@ -60,6 +61,28 @@ class TitleSeeder extends Seeder
                 'color'     => '#f9b234',
                 'image_url' => 'v1649351459/articles/juzmron8lzikfagntdjh.png',
             ],
+            // Pinocho
+            [
+                'user_id'   => $kas_aberturas->id,
+                'header'    => null,
+                'lead'      => null,
+                'color'     => '#f9b234',
+                'image_url' => 'v1649351573/articles/bofqeirvpjhiftewmx07.png'
+            ],
+            [
+                'user_id'   => $kas_aberturas->id,
+                'header'    => null,
+                'lead'      => null,
+                'color'     => '#f9b234',
+                'image_url' => 'v1649351480/articles/dopmuvwafreurlxjbeim.png'
+            ],
+            [
+                'user_id'   => $kas_aberturas->id,
+                'header'    => null,
+                'lead'      => null,
+                'color'     => '#f9b234',
+                'image_url' => 'v1649351459/articles/juzmron8lzikfagntdjh.png',
+            ],
         ];
         foreach ($titles as $title) {
             Title::create([
@@ -71,4 +94,5 @@ class TitleSeeder extends Seeder
             ]);
         }
     }
+
 }

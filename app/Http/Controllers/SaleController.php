@@ -11,6 +11,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticle;
 use App\Http\Controllers\Helpers\PdfPrintSale;
+use App\Http\Controllers\Helpers\Pdf\NewSalePdf;
 use App\Http\Controllers\Helpers\Pdf\SaleTicketPdf;
 use App\Http\Controllers\Helpers\Pdf\Sale\Index as SalePdf;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
@@ -152,6 +153,7 @@ class SaleController extends Controller
         SaleHelper::detachItems($sale);
         SaleHelper::attachArticles($sale, $request->items, $request->dolar_blue);
         SaleHelper::attachCombos($sale, $request->items);
+        SaleHelper::attachServices($sale, $request->items);
         $with_card = (bool)$request->with_card;
         if ($with_card) {
             $sale->percentage_card = $user->percentage_card;
@@ -181,6 +183,7 @@ class SaleController extends Controller
         ]);
         SaleHelper::attachArticles($sale, $request->items, $request->dolar_blue);
         SaleHelper::attachCombos($sale, $request->items);
+        SaleHelper::attachServices($sale, $request->items);
         if ($request->client_id) {
             $discounts = DiscountHelper::getDiscountsFromDiscountsId($request->discounts);
             SaleHelper::attachDiscounts($sale, $discounts);
@@ -203,6 +206,14 @@ class SaleController extends Controller
         $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce, $afip_ticket);
         // $pdf = new SalePdf($sales_id, (bool)$for_commerce, $afip_ticket);
         $pdf->printSales();
+    }
+
+    function newPdf($ids) {
+        $sales = [];
+        foreach (explode('-', $ids) as $id) {
+            $sales[] = Sale::find($id);
+        }
+        $pdf = new NewSalePdf($sales);
     }
 
     function ticketPdf($id, $address_id = null) {

@@ -28,9 +28,9 @@ class MessageHelper {
         // TwilioHelper::sendNotification($order->buyer_id, $title, $confirmation_message);
     }
 
-    static function sendOrderCanceledMessage($articulos_faltantes, $order) {
-        $description = OrderHelper::getCanceledDescription($articulos_faltantes, $order);
-        $canceled_message = OrderNotificationHelper::getCanceledMessage($description);
+    static function sendOrderCanceledMessage($cancel_description, $order) {
+        // $description = OrderHelper::getCanceledDescription($articulos_faltantes, $order);
+        $canceled_message = OrderNotificationHelper::getCanceledMessage($cancel_description);
         $message = Message::create([
             'user_id' => UserHelper::userId(),
             'buyer_id' => $order->buyer_id,

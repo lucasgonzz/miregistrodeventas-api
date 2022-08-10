@@ -23,6 +23,7 @@ use App\SaleType;
 class Commissioners extends Controller {
 
     function __construct($sale, $discounts, $only_commissions, $index = null) {
+        $this->user = UserHelper::getFullModel();
         $this->sale = $sale;
         $this->discounts = $discounts;
         $this->client = $sale->client;
@@ -42,37 +43,73 @@ class Commissioners extends Controller {
     }
 
     function attachCommissionsAndCurrentAcounts() {
-        $total_articles = count($this->sale->articles);
-        $articulos_en_pagina = 0;
-        $articulos_en_venta = 0;
-        $this->page = 0;
+        $total_items = $this->totalItems();
+        $this->items_en_pagina = 0;
+        $this->items_en_venta = 0;
+        $this->pagina = 0;
         $this->debe = 0;
         foreach ($this->sale->articles as $article) {
-            $articulos_en_venta++;
-            $articulos_en_pagina++;
-            $this->debe += (float)$article->pivot->price * (int)$article->pivot->amount;
-            if ($articulos_en_pagina == 30 || $articulos_en_venta == $total_articles) {
-                $this->page++;
-                $this->debe_sin_descuentos = $this->debe;
-                if ($this->hasSaleDiscounts()) {
-                    $this->debe = SaleHelper::getTotalMenosDescuentos($this->sale, $this->debe);
-                }
-                $this->createCurrentAcount();
-                if ($this->isProvider()) {
-                    if ($this->isSaleFromSeller()) {
-                        $this->commissionForSeller();
-                        if ($this->isSellerFromSeller() && $this->isDiscountMenosQue10()) {
-                            $this->commissionForSellerOwner();
-                        }
-                    } else {
-                        $this->commissionForPerdidas();
-                    }
-                    $this->commissionOscarFedePapi();
-                }
-                $articulos_en_pagina = 0;
-                $this->debe = 0;
+            $this->items_en_venta++;
+            $this->items_en_pagina++;
+            $this->debe += SaleHelper::getTotalItem($article);
+            if ($this->isItemOffset() || $this->items_en_venta == $total_items) {
+                $this->proccessCurrentAcount();
             }
         }
+        foreach ($this->sale->combos as $combo) {
+            $this->items_en_venta++;
+            $this->items_en_pagina++;
+            $this->debe += SaleHelper::getTotalItem($combo);
+            if ($this->isItemOffset() || $this->items_en_venta == $total_items) {
+                $this->proccessCurrentAcount();
+            }
+        }
+        foreach ($this->sale->services as $service) {
+            $this->items_en_venta++;
+            $this->items_en_pagina++;
+            $this->debe += SaleHelper::getTotalItem($service);
+            if ($this->isItemOffset() || $this->items_en_venta == $total_items) {
+                $this->proccessCurrentAcount();
+            }
+        }
+    }
+
+    function totalItems() {
+        $total_items = 0;
+        $total_items += count($this->sale->articles);
+        $total_items += count($this->sale->combos);
+        $total_items += count($this->sale->services);
+        Log::info('Total items: '.$total_items);
+        return $total_items;
+    }
+
+    function proccessCurrentAcount() {
+        $this->pagina++;
+        $this->debe_sin_descuentos = $this->debe;
+        if ($this->hasSaleDiscounts()) {
+            $this->debe = SaleHelper::getTotalMenosDescuentos($this->sale, $this->debe);
+        }
+        $this->createCurrentAcount();
+        if ($this->isProvider()) {
+            if ($this->isSaleFromSeller()) {
+                $this->commissionForSeller();
+                if ($this->isSellerFromSeller() && $this->isDiscountMenosQue10()) {
+                    $this->commissionForSellerOwner();
+                }
+            } else {
+                $this->commissionForPerdidas();
+            }
+            $this->commissionOscarFedePapi();
+        }
+        $this->items_en_pagina = 0;
+        $this->debe = 0;
+    }
+
+    function isItemOffset() {
+        if (!is_null($this->user->configuration->limit_items_in_sale_per_page) && $this->user->configuration->limit_items_in_sale_per_page == $this->items_en_pagina) {
+            return true;
+        }
+        return false;
     }
 
     function hasSaleDiscounts() {
@@ -82,8 +119,8 @@ class Commissioners extends Controller {
     function createCurrentAcount() {
         if (!$this->only_commissions) {
             $current_acount = CurrentAcount::create([
-                'detalle'     => 'Rto '.$this->sale->num_sale.' pag '.$this->page,
-                'page'        => $this->page,
+                'detalle'     => 'Rto '.$this->sale->num_sale.' pag '.$this->pagina,
+                'page'        => $this->pagina,
                 'debe'        => $this->debe,
                 'status'      => 'sin_pagar',
                 'client_id'   => $this->sale->client_id,
@@ -109,7 +146,7 @@ class Commissioners extends Controller {
         $commission = Commission::create([
             'commissioner_id' => $seller_commissioner->id,
             'sale_id'         => $this->sale->id,
-            'page'            => $this->page,
+            'page'            => $this->pagina,
             'percentage'      => $this->getSellerPercentage(),
             'monto'           => $this->getSellerMonto(),
             'status'          => 'inactive',
@@ -122,7 +159,7 @@ class Commissioners extends Controller {
 
     function getDetalle() {
         $detalle = 'Comision '.$this->client->name.' remito '.$this->sale->num_sale;
-        $detalle .= ' pag '.$this->page;
+        $detalle .= ' pag '.$this->pagina;
         $detalle .= ' ($'.Numbers::price($this->debe).')';
         return $detalle;
     }
@@ -133,7 +170,7 @@ class Commissioners extends Controller {
         $commission = Commission::create([
             'commissioner_id' => $seller_seller_commissioner->id,
             'sale_id'         => $this->sale->id,
-            'page'            => $this->page,
+            'page'            => $this->pagina,
             'percentage'      => $this->getSellerSellerPercentage(),
             'detalle'         => $this->getDetalle(),
             'monto'           => $this->getSellerSellerMonto(),
@@ -228,7 +265,7 @@ class Commissioners extends Controller {
                 'sale_id'         => $this->sale->id,
                 'detalle'         => $this->getDetalle(),
                 'saldo'           => CommissionHelper::getCommissionerSaldo($perdidas_commissioner) + $this->getPerdidaMonto(),
-                'page'            => $this->page,
+                'page'            => $this->pagina,
                 'percentage'      => $this->getPerdidaPercentage(),
                 'monto'           => $this->getPerdidaMonto(),
                 'updated_at'      => null,
@@ -263,7 +300,7 @@ class Commissioners extends Controller {
                     'sale_id'         => $this->sale->id,
                     'saldo'           => CommissionHelper::getCommissionerSaldo($commissioner) + $this->getMontoForOscarFedePapi($commissioner),
                     'detalle'         => $this->getDetalle(),
-                    'page'            => $this->page,
+                    'page'            => $this->pagina,
                     'percentage'      => $commissioner->percentage,
                     'monto'           => $this->getMontoForOscarFedePapi($commissioner),
                     'updated_at'      => null,
@@ -285,8 +322,8 @@ class Commissioners extends Controller {
     function getCreatedAt() {
         // $created_at = Carbon::now();
         $created_at = $this->sale->created_at;
-        if ($this->page > 1) {
-            $created_at = $this->sale->created_at->addSeconds($this->page);
+        if ($this->pagina > 1) {
+            $created_at = $this->sale->created_at->addSeconds($this->pagina);
         }
         if ($this->index) {
             $created_at->subDays($this->index);

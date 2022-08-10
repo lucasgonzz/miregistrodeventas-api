@@ -15,14 +15,17 @@ class CreateCartsTable extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->boolean('deliver');
-            $table->integer('user_id')->unsigned();
-            $table->integer('buyer_id')->unsigned();
-            $table->integer('order_id')->unsigned()->nullable();
+            $table->boolean('deliver')->default(0);
             $table->integer('address_id')->unsigned()->nullable();
+            $table->integer('delivery_zone_id')->unsigned()->nullable();
             $table->integer('payment_method_id')->unsigned()->nullable();
-            $table->string('card_id')->nullable();
+            $table->integer('payment_id')->nullable();
+            $table->string('payment_status')->nullable();
             $table->text('description')->nullable();
+            $table->integer('cupon_id')->unsigned()->nullable();
+            $table->integer('order_id')->unsigned()->nullable();
+            $table->integer('buyer_id')->unsigned();
+            $table->integer('user_id')->unsigned();
 
             $table->timestamps();
         });

@@ -22,15 +22,15 @@ class ArticleHelper {
         // Log::info($articles);
         foreach ($articles as $article) {
             if (!is_null($article->percentage_gain)) {
-                $article->price = $article->cost + ($article->cost * Numbers::percentage($article->percentage_gain));
+                $article->price = Numbers::redondear($article->cost + ($article->cost * Numbers::percentage($article->percentage_gain)));
             }
             if (!UserHelper::user()->configuration->iva_included) {
-                $article->price = $article->price + ($article->price * Numbers::percentage($article->iva->percentage));
+                $article->price = Numbers::redondear($article->price + ($article->price * Numbers::percentage($article->iva->percentage)));
             }
             if (count($article->discounts) >= 1) {
                 $article->original_price = $article->price;
                 foreach ($article->discounts as $discount) {
-                    $article->price = $article->price - ($article->price * Numbers::percentage($discount->percentage));
+                    $article->price = Numbers::redondear($article->price - ($article->price * Numbers::percentage($discount->percentage)));
                     
                 }
             }

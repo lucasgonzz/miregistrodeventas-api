@@ -38,7 +38,7 @@ class BudgetPdf extends fpdf {
 
 	function Footer() {
 		if (!$this->only_deliveries) {
-			$y = 220;
+			$y = 230;
 			$this->SetLineWidth(.4);
 			// $this->Line(5, $y, 205, $y);
 			$this->y = $y;

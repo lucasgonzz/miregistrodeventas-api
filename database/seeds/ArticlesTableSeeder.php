@@ -1,6 +1,7 @@
 <?php
 
 use App\Article;
+use App\ArticleDiscount;
 use App\Description;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\ArticleHelper;
@@ -362,6 +363,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => 10,
                 'cost'              => 50,
                 'percentage_gain'   => 50,
+                'sub_category_name' => 'de exterior',
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -373,6 +375,7 @@ class ArticlesTableSeeder extends Seeder
                 'name'              => 'Picaporte',
                 'stock'             => 10,
                 'cost'              => 200,
+                'sub_category_name' => 'industriales',
                 'percentage_gain'   => 30,
                 'images'            => [
                     $this->iphone_images['cargador'],
@@ -385,6 +388,7 @@ class ArticlesTableSeeder extends Seeder
                 'name'              => 'Cerradura reforzada',
                 'stock'             => 10,
                 'cost'              => 700,
+                'sub_category_name' => 'de otras cosas',
                 'percentage_gain'   => 50,
                 'images'            => [
                     $this->iphone_images['cargador'],
@@ -398,6 +402,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => 10,
                 'cost'              => 700,
                 'percentage_gain'   => 50,
+                'sub_category_name' => 'puertas',
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -410,6 +415,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => 10,
                 'cost'              => 700,
                 'percentage_gain'   => 50,
+                'sub_category_name' => 'portones',
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -422,6 +428,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => 10,
                 'cost'              => 50,
                 'percentage_gain'   => 50,
+                'sub_category_name' => 'nacionales',
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -434,6 +441,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => 10,
                 'cost'              => 50,
                 'percentage_gain'   => 50,
+                'sub_category_name' => 'importados',
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -450,10 +458,12 @@ class ArticlesTableSeeder extends Seeder
                 'bar_code'          => $article['bar_code'],
                 'provider_code'     => $article['provider_code'],
                 'name'              => $article['name'],
+                'slug'              => ArticleHelper::slug($article['name']),
                 'cost'              => $article['cost'],
                 'stock'             => $article['stock'],
                 'stock_min'         => 1,
                 'percentage_gain'   => $article['percentage_gain'],
+                'sub_category_id'   => $this->getSubcategory($kas_aberturas, $article)->id,
                 'user_id'           => $kas_aberturas->id,
             ]);    
             foreach ($article['images'] as $url) { 
@@ -469,6 +479,7 @@ class ArticlesTableSeeder extends Seeder
         $articles = [
             [
                 'bar_code'          => '123',
+                'featured'          => 1,
                 'name'              => 'Remera manga larga',
                 'stock'             => 10,
                 'cost'              => 50,
@@ -482,6 +493,7 @@ class ArticlesTableSeeder extends Seeder
             [
                 'bar_code'          => '234',
                 'name'              => 'Picaporte',
+                'featured'          => null,
                 'stock'             => 10,
                 'cost'              => 200,
                 'price'             => 30,
@@ -493,6 +505,7 @@ class ArticlesTableSeeder extends Seeder
             ],
             [
                 'bar_code'          => '345',
+                'featured'          => null,
                 'name'              => 'Cerradura reforzada',
                 'stock'             => 10,
                 'cost'              => 700,
@@ -509,6 +522,7 @@ class ArticlesTableSeeder extends Seeder
         foreach ($articles as $article) {
             $art = Article::create([
                 'bar_code'          => $article['bar_code'],
+                'featured'          => $article['featured'],
                 'name'              => $article['name'],
                 'slug'              => ArticleHelper::slug($article['name']),
                 'cost'              => $article['cost'],
@@ -522,7 +536,8 @@ class ArticlesTableSeeder extends Seeder
                     'article_id' => $art->id,
                     'url'        => $url,
                 ]);
-            }    
+            }
+            $this->createDiscount($art);    
         }
     }
 
@@ -624,6 +639,7 @@ class ArticlesTableSeeder extends Seeder
                 Image::create([
                     'article_id' => $art->id,
                     'url'        => $url,
+                    'color_id'   => $this->getColorId($article),
                 ]);
             }    
             foreach ($article['colors'] as $color) { 
@@ -635,11 +651,29 @@ class ArticlesTableSeeder extends Seeder
         }
     }
 
+    function createDiscount($article) {
+        ArticleDiscount::create([
+            'percentage' => '10',
+            'article_id' => $article->id,
+        ]);
+        ArticleDiscount::create([
+            'percentage' => '20',
+            'article_id' => $article->id,
+        ]);
+    }
+
     function getSubcategory($user, $article) {
         $sub_category = SubCategory::where('user_id', $user->id)
                                     ->where('name', $article['sub_category_name'])
                                     ->first();
         return $sub_category;
+    }
+
+    function getColorId($article) {
+        if (count($article['colors']) >= 1) {
+            return $article['colors'][0];
+        }
+        return null;
     }
 
     function createDescriptions($article) {

@@ -44,7 +44,7 @@ class MessageController extends Controller
         $buyer = Buyer::find($request->buyer_id);
         $buyer->notify(new MessageSend($message));
         $title = 'Nuevo mensaje';
-        TwilioHelper::sendNotification($message->buyer_id, $title, $message->text);
+        // TwilioHelper::sendNotification($message->buyer_id, $title, $message->text);
         return response()->json(['message' => $message], 201);
     }
 }

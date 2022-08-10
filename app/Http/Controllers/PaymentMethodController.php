@@ -18,9 +18,12 @@ class PaymentMethodController extends Controller
     public function store(Request $request)
     {
         $payment_method = PaymentMethod::create([
-            'name'          => $request->name,
-            'description'   => $request->description,
-            'user_id'       => $this->userId(),
+            'name'                      => $request->name,
+            'description'               => $request->description,
+            'payment_method_type_id'    => $request->payment_method_type_id,
+            'public_key'                => $request->public_key,
+            'access_token'              => $request->access_token,
+            'user_id'                   => $this->userId(),
         ]);
         return response()->json(['payment_method' => $payment_method], 201);
     }
@@ -28,8 +31,11 @@ class PaymentMethodController extends Controller
     public function update(Request $request, $id)
     {
         $payment_method = PaymentMethod::find($id);
-        $payment_method->name = $request->name;
-        $payment_method->description = $request->description;
+        $payment_method->name                   = $request->name;
+        $payment_method->description            = $request->description;
+        $payment_method->payment_method_type_id = $request->payment_method_type_id;
+        $payment_method->public_key             = $request->public_key;
+        $payment_method->access_token           = $request->access_token;
         $payment_method->save();
         return response()->json(['payment_method' => $payment_method], 200);
     }

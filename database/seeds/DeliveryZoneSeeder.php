@@ -13,7 +13,9 @@ class DeliveryZoneSeeder extends Seeder
      */
     public function run()
     {
-        $pinocho = User::where('company_name', 'pinocho')->first();
+        $users = User::where('company_name', 'pinocho')
+                        ->orWhere('company_name', 'kas aberturas')
+                        ->get();
         $models = [
             [
                 'name' => 'Rosario',
@@ -26,13 +28,15 @@ class DeliveryZoneSeeder extends Seeder
                 'price' => 800,
             ],
         ];
-        foreach ($models as $model) {
-            DeliveryZone::create([
-                'name'          => $model['name'],
-                'description'   => $model['description'],
-                'price'         => $model['price'],
-                'user_id'       => $pinocho->id,
-            ]);
+        foreach ($users as $user) {
+            foreach ($models as $model) {
+                DeliveryZone::create([
+                    'name'          => $model['name'],
+                    'description'   => $model['description'],
+                    'price'         => $model['price'],
+                    'user_id'       => $user->id,
+                ]);
+            }
         }
     }
 }

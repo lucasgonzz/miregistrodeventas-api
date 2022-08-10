@@ -1,6 +1,7 @@
 <?php
 
 use App\Address;
+use App\Buyer;
 use App\User;
 use Illuminate\Database\Seeder;
 
@@ -13,7 +14,8 @@ class AddressSeeder extends Seeder
      */
     public function run()
     {
-        for ($buyer_id=8; $buyer_id < 21; $buyer_id++) { 
+        $buyers = Buyer::all();
+        foreach ($buyers as $buyer) {
             Address::create([
                 'street'        => 'Carmen Gadea',
                 'street_number' => '787',
@@ -21,7 +23,7 @@ class AddressSeeder extends Seeder
                 'province'      => 'Entre Rios',
                 'lat'           => '-33.146681',
                 'lng'           => '-59.309596',
-                'buyer_id'      => $buyer_id
+                'buyer_id'      => $buyer->id
             ]);
             Address::create([
                 'street'        => 'Chacabuco',
@@ -30,7 +32,7 @@ class AddressSeeder extends Seeder
                 'province'      => 'Entre Rios',
                 'lat'           => '-33.146681',
                 'lng'           => '-59.309596',
-                'buyer_id'      => $buyer_id
+                'buyer_id'      => $buyer->id
             ]);
         }
 
@@ -38,6 +40,7 @@ class AddressSeeder extends Seeder
         $commerces = User::where('company_name', 'Fiushh')
                             ->orWhere('company_name', 'Pinocho')
                             ->orWhere('company_name', 'CandyGuay')
+                            ->orWhere('company_name', 'kas aberturas')
                             ->get();
         foreach ($commerces as $commerce) {
             Address::create([

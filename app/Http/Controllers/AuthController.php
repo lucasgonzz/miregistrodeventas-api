@@ -52,7 +52,7 @@ class AuthController extends Controller
                             ], $request->remember)) {
                 $user = UserHelper::getFullModel($this->userId(false));
                 $user = UserHelper::checkUserTrial($user);
-                $user = UserHelper::setEmployeeExtencions($user);
+                $user = UserHelper::setEmployeeExtencionsAndConfigurations($user);
                 return response()->json([
                     'login' => true,
                     'user'  => $user
