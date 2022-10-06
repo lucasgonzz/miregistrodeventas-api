@@ -9,6 +9,6 @@ class IvaController extends Controller
 {
     function index() {
         $ivas = Iva::all();
-        return response()->json(['ivas' => $ivas], 200);
+        return response()->json(['models' => $ivas], 200);
     }
 }

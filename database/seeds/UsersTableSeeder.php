@@ -26,6 +26,10 @@ class UsersTableSeeder extends Seeder
 
         $this->nebulaStore();
 
+        $this->mcElectronica();
+
+        $this->colman();
+
         $this->super();
 
     }
@@ -39,7 +43,7 @@ class UsersTableSeeder extends Seeder
             'company_name'          => 'Fiushh',
             'phone'                 => '3444622138',
             'status'                => 'commerce',
-            'plan_id'               => 3,
+            'plan_id'               => 6,
             'type'                  => 'commerce',
             'password'              => bcrypt('1234'),
             'percentage_card'       => 20,
@@ -49,9 +53,7 @@ class UsersTableSeeder extends Seeder
             'online_prices'         => 'all',
             'online'                => 'http://kioscoverde.local:8080',
             'order_description'     => 'Observaciones',
-            'dolar'                 => 'promedio',
-            'dolar_cara_chica'      => 3,
-            'dolar_plus'            => 3,
+            'dollar'                => 200,
             'created_at'            => Carbon::now()->subMonths(2),
         ]);
         UserConfiguration::create([
@@ -81,17 +83,16 @@ class UsersTableSeeder extends Seeder
             'phone'             => '3444622139',
             'company_name'      => 'Pinocho',
             'status'            => 'commerce',
-            'plan_id'           => 3,
+            'plan_id'           => 6,
             'type'              => 'commerce',
             'password'          => bcrypt('1234'),
             'percentage_card'   => 20,
             'has_delivery'      => 1,
-            'dolar'             => 'promedio',
+            'dollar'            => 200,
             'delivery_price'    => 70,
             'online_prices'     => 'all',
             'online'            => 'http://kioscoverde.local:8080',
             'order_description' => 'Observaciones',
-            'dolar_plus'        => 3,
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
@@ -99,7 +100,7 @@ class UsersTableSeeder extends Seeder
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'Me pago',
             'current_acount_pagandose_details'      => 'Me pago',
-            'show_articles_without_stock'           => true,
+            'show_articles_without_stock'           => false,
             'user_id'                               => $commerce->id,
         ]);
         AfipInformation::create([
@@ -123,17 +124,16 @@ class UsersTableSeeder extends Seeder
             'phone'             => '3444622139',
             'company_name'      => 'CandyGuay',
             'status'            => 'commerce',
-            'plan_id'           => 3,
+            'plan_id'           => 6,
             'type'              => 'commerce',
             'password'          => bcrypt('1234'),
             'percentage_card'   => 20,
             'has_delivery'      => 1,
-            'dolar'             => 'promedio',
+            'dollar'            => 200,
             'delivery_price'    => 70,
             'online_prices'     => 'all',
             'online'            => 'http://kioscoverde.local:8080',
             'order_description' => 'Observaciones',
-            'dolar_plus'        => 3,
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
@@ -164,17 +164,16 @@ class UsersTableSeeder extends Seeder
             'phone'             => '3444622139',
             'company_name'      => 'KAS Aberturas',
             'status'            => 'commerce',
-            'plan_id'           => 3,
+            'plan_id'           => 6,
             'type'              => 'provider',
             'password'          => bcrypt('1234'),
             'percentage_card'   => 0,
             'has_delivery'      => 1,
-            'dolar'             => 'promedio',
+            'dollar'            => 200,
             'delivery_price'    => 70,
             'online_prices'     => 'all',
             'online'            => 'http://kioscoverde.local:8080',
             'order_description' => 'Observaciones',
-            'dolar_plus'        => 3,
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
@@ -208,17 +207,16 @@ class UsersTableSeeder extends Seeder
             'phone'             => '3444622139',
             'company_name'      => 'NebulaStore',
             'status'            => 'commerce',
-            'plan_id'           => 3,
+            'plan_id'           => 6,
             'type'              => 'commerce',
             'password'          => bcrypt('1234'),
             'percentage_card'   => 0,
             'has_delivery'      => 1,
-            'dolar'             => 'promedio',
+            'dollar'            => 200,
             'delivery_price'    => 70,
             'online_prices'     => 'all',
             'online'            => 'http://kioscoverde.local:8080',
             'order_description' => 'Observaciones',
-            'dolar_plus'        => 3,
             'created_at'        => Carbon::now()->subMonths(2),
         ]);
 
@@ -243,9 +241,95 @@ class UsersTableSeeder extends Seeder
 
     }
 
+    function mcElectronica() {
+        $commerce = User::create([
+            'id'                => 307,
+            'name'              => 'mc electronica',
+            'email'             => 'lucasgonzalez210200@gmail.com',
+            'image_url'         => 'v1656680715/articles/crp5twb4jul34bcd98wr.jpg',
+            'phone'             => '3444622139',
+            'company_name'      => 'mc electronica',
+            'status'            => 'commerce',
+            'plan_id'           => 6,
+            'type'              => 'provider',
+            'password'          => bcrypt('1234'),
+            'percentage_card'   => 0,
+            'has_delivery'      => 1,
+            'dollar'            => 200,
+            'delivery_price'    => 70,
+            'online_prices'     => 'all',
+            'online'            => 'http://kioscoverde.local:8080',
+            'order_description' => 'Observaciones',
+            'created_at'        => Carbon::now()->subMonths(2),
+        ]);
+
+        $commerce->extencions()->attach([1, 2, 3, 4, 7, 8]);
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
+            'current_acount_pagandose_details'      => 'Recibo de pago',
+            'iva_included'                          => 0,
+            'limit_items_in_sale_per_page'          => 3,
+            'user_id'                               => $commerce->id,
+        ]);
+
+        AfipInformation::create([
+            'iva_condition_id'      => 1,
+            'razon_social'          => 'Colman',
+            'domicilio_comercial'   => 'Pellegrini 1876',
+            'cuit'                  => '20175018841',
+            'punto_venta'           => 4,
+            'ingresos_brutos'       => '20175018841',
+            'inicio_actividades'    => Carbon::now()->subYears(5),
+            'user_id'               => $commerce->id,
+        ]);
+    }
+
+    function colman() {
+        $commerce = User::create([
+            'id'                => 308,
+            'name'              => 'colman',
+            'email'             => 'lucasgonzalez210200@gmail.com',
+            'image_url'         => 'v1656680715/articles/crp5twb4jul34bcd98wr.jpg',
+            'phone'             => '3444622139',
+            'company_name'      => 'colman',
+            'status'            => 'commerce',
+            'plan_id'           => 6,
+            'type'              => 'provider',
+            'password'          => bcrypt('1234'),
+            'percentage_card'   => 0,
+            'has_delivery'      => 1,
+            'dollar'            => 200,
+            'delivery_price'    => 70,
+            'online_prices'     => 'all',
+            'online'            => 'http://kioscoverde.local:8080',
+            'order_description' => 'Observaciones',
+            'created_at'        => Carbon::now()->subMonths(2),
+        ]);
+
+        $commerce->extencions()->attach([1, 2, 3, 4, 7, 8]);
+        UserConfiguration::create([
+            'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
+            'current_acount_pagandose_details'      => 'Recibo de pago',
+            'iva_included'                          => 0,
+            'limit_items_in_sale_per_page'          => null,
+            'user_id'                               => $commerce->id,
+        ]);
+
+        AfipInformation::create([
+            'iva_condition_id'      => 1,
+            'razon_social'          => 'Colman',
+            'domicilio_comercial'   => 'Pellegrini 1876',
+            'cuit'                  => '20175018841',
+            'punto_venta'           => 4,
+            'ingresos_brutos'       => '20175018841',
+            'inicio_actividades'    => Carbon::now()->subYears(5),
+            'user_id'               => $commerce->id,
+        ]);
+    }
+
     function super() {
         $super = User::create([
-            'id'              => 308,
+            'id'              => 309,
             'name' => 'Lucas super',
             'status' => 'super',
             'password' => bcrypt('1234'),

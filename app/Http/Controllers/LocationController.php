@@ -12,7 +12,7 @@ class LocationController extends Controller
         $models = Location::where('user_Id', $this->userId())
                             ->orderBy('name', 'ASC')
                             ->get();
-        return response()->json(['locations' => $models], 200);
+        return response()->json(['models' => $models], 200);
     }
 
 
@@ -21,7 +21,7 @@ class LocationController extends Controller
             'name'          => $request->name,
             'user_id'       => $this->userId(),
         ]);
-        return response()->json(['location' => $model], 201);
+        return response()->json(['model' => $model], 201);
     }
 
     
@@ -29,7 +29,7 @@ class LocationController extends Controller
         $model = Location::find($id);
         $model->name = $request->name;
         $model->save();
-        return response()->json(['location' => $model], 200);
+        return response()->json(['model' => $model], 200);
     }
 
     public function destroy($id) {

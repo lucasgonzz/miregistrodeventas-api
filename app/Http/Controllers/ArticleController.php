@@ -21,6 +21,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use \Gumlet\ImageResize;
@@ -36,7 +37,7 @@ class ArticleController extends Controller
                             ->withAll()
                             ->get();
         $articles = ArticleHelper::setPrices($articles);
-        return response()->json(['articles' => $articles], 200);
+        return response()->json(['models' => $articles], 200);
     }
 
     function mostViewed($weeks_ago) {
@@ -56,12 +57,12 @@ class ArticleController extends Controller
                             ->sortBy(function($q) {
                                 return $q->views_count;
                             });
-        return response()->json(['articles' => $articles], 200);
+        return response()->json(['models' => $articles], 200);
     }
 
     function show($id) {
         $article = ArticleHelper::getFullArticle($id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function updatePrice(Request $request) {
@@ -69,7 +70,7 @@ class ArticleController extends Controller
         $article->price = $request->price;
         $article->save();
         $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function update(Request $request) {
@@ -77,27 +78,40 @@ class ArticleController extends Controller
         if (!UserHelper::getFullModel()->configuration->set_articles_updated_at_always) {
             $article->timestamps  = false;
         }
+        $actual_price = $article->price;
+        $actual_stock = $article->stock;
         $article->status          = 'active';
         $article->bar_code        = $request->bar_code;
         $article->provider_code   = $request->provider_code;
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
         $article->brand_id        = $request->brand_id != 0 ? $request->brand_id : null;
         $article->iva_id          = $request->iva_id;
-        $article->with_dolar      = $request->with_dolar;
+        // $article->with_dolar      = $request->with_dolar;
         $article->percentage_gain = $request->percentage_gain;
-        if (isset($request->original_price)) {
-            $article->price = $request->original_price;
-        }
-        if ($article->percentage_gain == '' && $article->price != $request->price && !isset($request->original_price)) {
+        if (!$article->apply_provider_percentage_gain && is_null($article->percentage_gain)) {
             $article->previus_price = $article->price;
-            $article->timestamps = true;
             $article->price = $request->price;
+            $article->timestamps = true;
+            Log::info('1Se actualizo precio a '.$article->name);
+        } else {
+            $article->price = null;
         }
+        // if (isset($request->original_price)) {
+        //     $article->price = $request->original_price;
+        // }
+        // if ($article->percentage_gain == '' && $article->price != $request->price && !isset($request->original_price)) {
+        //     $article->previus_price = $article->price;
+        //     $article->timestamps = true;
+        //     $article->price = $request->price;
+        //     Log::info('2Se actualizo precio a '.$article->name);
+        // }
         if (strtolower($article->name) != strtolower($request->name)) {
             $article->name = ucfirst($request->name);
             $article->slug = ArticleHelper::slug($request->name);
         }
         $article->cost = $request->cost;
+        $article->cost_in_dollars = $request->cost_in_dollars;
+        $article->apply_provider_percentage_gain = $request->apply_provider_percentage_gain;
         if (!$request->stock_null && $request->stock != '') {
             $article->stock = $request->stock;
             $article->stock += $request->new_stock;
@@ -114,12 +128,12 @@ class ArticleController extends Controller
         ArticleHelper::setSizes($article, $request->sizes_id);
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
-        if ($request->new_stock != 0 && $request->save_provider && $request->provider_id != 0) {
+        if ($request->save_provider && (count($article->providers) >= 1 && $request->provider_id != 0 && $request->provider_id != $article->providers[count($article->providers)-1]->id || $request->price != $actual_price)) {
             $article->providers()
                             ->attach(
                                 $request->provider_id, 
                                 [
-                                    'amount' => (float)$request->new_stock,
+                                    'amount' => (float)$request->stock - $actual_stock,
                                     'cost' => $request->cost,
                                     'price' => $request->price,
                                 ]);
@@ -127,7 +141,7 @@ class ArticleController extends Controller
         ArticleHelper::setSpecialPrices($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
         $article->user->notify(new UpdatedArticle($article));
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function setVariants(Request $request, $article_id) {
@@ -142,14 +156,14 @@ class ArticleController extends Controller
             ]);
         }
         $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function deleteVariants($article_id) {
         $article = Article::find($article_id);
         ArticleHelper::deleteVariants($article);
         $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function updateProp(Request $request, $prop) {
@@ -160,7 +174,7 @@ class ArticleController extends Controller
             $article->save();
             $articles[] = ArticleHelper::getFullArticle($article->id);
         }
-        return response()->json(['articles' => $articles], 200);
+        return response()->json(['models' => $articles], 200);
     }
 
     function updateCategory(Request $request) {
@@ -171,7 +185,7 @@ class ArticleController extends Controller
             $article->save();
             $articles[] = ArticleHelper::getFullArticle($article->id);
         }
-        return response()->json(['articles' => $articles], 200);
+        return response()->json(['models' => $articles], 200);
     }
 
     function updateBrand(Request $request) {
@@ -182,16 +196,16 @@ class ArticleController extends Controller
             $article->save();
             $articles[] = ArticleHelper::getFullArticle($article->id);
         }
-        return response()->json(['articles' => $articles], 200);
+        return response()->json(['models' => $articles], 200);
     }
 
     function addImage(Request $request, $id) {
         $image = Image::create([
             'article_id' => $id,
-            'url'        => $request->path,
+            'url'        => $request->image_url,
         ]);
         $article = ArticleHelper::getFullArticle($id);
-        return response()->json(['article' => $article], 201);
+        return response()->json(['model' => $article], 201);
     }
 
     function updateImage(Request $request, $article_id) {
@@ -219,7 +233,7 @@ class ArticleController extends Controller
             ]);
         }
         $article = ArticleHelper::getFullArticle($article_to->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
 
     }
 
@@ -238,7 +252,7 @@ class ArticleController extends Controller
             ArticleHelper::setDescriptions($article_to, $article_from->descriptions);
         }
         $article = ArticleHelper::getFullArticle($article_to->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     // Eliminar el archivo tambien aca arriba
@@ -257,7 +271,7 @@ class ArticleController extends Controller
         $image->first = 1;
         $image->save();
         $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function updateImages(Request $request) {
@@ -317,7 +331,7 @@ class ArticleController extends Controller
             $article->save();
             $articles[] = $article;
         }
-        return response()->json(['articles' => $articles], 200);
+        return response()->json(['models' => $articles], 200);
     }
 
     function setFeatured($article_id) {
@@ -332,7 +346,7 @@ class ArticleController extends Controller
         }
         $article->save();
         $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function setOnline($articles_id) {
@@ -344,7 +358,7 @@ class ArticleController extends Controller
         }
         $article->save();
         $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['article' => $article], 200);
+        return response()->json(['model' => $article], 200);
     }
 
     function removeOnline($articles_id) {
@@ -367,19 +381,24 @@ class ArticleController extends Controller
         // if ($request->brand_id != 0) {
         //     $article->brand_id = $request->brand_id;
         // }
-        $article->brand_id = $request->brand_id;
-        $article->name   = ucfirst($request->name);
-        $article->slug   = ArticleHelper::slug($request->name);
-        $article->cost   = $request->cost;
-        $article->price  = $request->price;
-        $article->percentage_gain = $request->percentage_gain;
-        $article->iva_id = $request->iva_id;
+        $article->brand_id          = $request->brand_id;
+        $article->name              = ucfirst($request->name);
+        $article->slug              = ArticleHelper::slug($request->name);
+        $article->cost              = $request->cost;
+        $article->cost_in_dollars   = $request->cost_in_dollars;
+        $article->apply_provider_percentage_gain   = $request->apply_provider_percentage_gain;
+        $article->price             = $request->price;
+        $article->percentage_gain   = $request->percentage_gain;
+        $article->iva_id            = $request->iva_id;
         // if ($request->stock != '') {
         //     $article->stock = $request->stock;
         // }
         $article->stock = $request->stock;
         $article->stock_min = $request->stock_min;
         $article->user_id = $this->userId();
+        if (isset($request->status)) {
+            $article->status = $request->status;
+        }
         $article->save();
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDiscounts($article, $request->discounts);
@@ -391,7 +410,7 @@ class ArticleController extends Controller
         ArticleHelper::setSpecialPrices($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
         $article->user->notify(new CreatedArticle($article));
-        return response()->json(['article' => $article], 201);
+        return response()->json(['model' => $article], 201);
     }
 
     function import(Request $request) {
@@ -419,7 +438,7 @@ class ArticleController extends Controller
         }
         $article->save();
         $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['article' => $article], 201);
+        return response()->json(['model' => $article], 201);
     }
 
     function destroy($id) {
@@ -431,8 +450,12 @@ class ArticleController extends Controller
     function delete(Request $request) {
         foreach ($request->articles_id as $article_id) {
             $article = Article::find($article_id);
-            $article->status = 'inactive';
-            $article->save();
+            if (count($article->sales) >= 1) {
+                $article->status = 'inactive';
+                $article->save();
+            } else {
+                $article->delete();
+            }
         }
         return response(null, 200);
     }
@@ -519,7 +542,7 @@ class ArticleController extends Controller
 
     //     $articles->with('images');
     //     $articles = $articles->get();
-    //     return response()->json(['articles' => $articles], 200);
+    //     return response()->json(['models' => $articles], 200);
     // }
 
     function export() {

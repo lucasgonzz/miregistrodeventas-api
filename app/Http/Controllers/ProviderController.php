@@ -20,11 +20,12 @@ class ProviderController extends Controller
     }
 
     function index() {
-    	$providers = Provider::where('user_id', $this->getArticleOwnerId())
+    	$models = Provider::where('user_id', $this->getArticleOwnerId())
                             ->where('status', 'active')
                             ->orderBy('name', 'ASC')
+                            ->withAll()
                             ->get();
-        return response()->json(['providers' => $providers], 200);
+        return response()->json(['models' => $models], 200);
     }
 
     function store(Request $request) {
@@ -37,11 +38,12 @@ class ProviderController extends Controller
             'razon_social'      => $request->razon_social,
             'cuit'              => $request->cuit,
             'observations'      => $request->observations,
+            'percentage_gain'   => $request->percentage_gain,
             'location_id'       => $request->location_id,
             'iva_condition_id'  => $request->iva_condition_id,
             'user_id'           => $this->getArticleOwnerId(),
         ]);
-        return response()->json(['provider' => $provider], 201);
+        return response()->json(['model' => $this->getFullModel($provider->id)], 201);
     }
 
     function update(Request $request, $id) {
@@ -53,10 +55,11 @@ class ProviderController extends Controller
         $provider->razon_social = $request->razon_social;
         $provider->cuit = $request->cuit;
         $provider->observations = $request->observations;
+        $provider->percentage_gain = $request->percentage_gain;
         $provider->location_id = $request->location_id;
         $provider->iva_condition_id = $request->iva_condition_id;
         $provider->save();
-        return response()->json(['provider' => $provider], 200);
+        return response()->json(['model' => $this->getFullModel($provider->id)], 200);
     }
 
     function destroy($id) {
@@ -67,6 +70,13 @@ class ProviderController extends Controller
 
     function import(Request $request) {
         Excel::import(new ProvidersImport, $request->file('providers'));
+    }
+
+    function getFullModel($id) {
+        $model = Provider::where('id', $id)
+                        ->withAll()
+                        ->first();
+        return $model;
     }
 
 }

@@ -38,6 +38,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ScheduleSeeder::class);
         // $this->call(MessageSeeder::class);
         $this->call(AddressSeeder::class);
+        $this->call(EmployeeSeeder::class);
         $this->call(SalesTableSeeder::class);
         $this->call(WorkdaySeeder::class);
         $this->call(ConditionSeeder::class);
@@ -54,5 +55,7 @@ class DatabaseSeeder extends Seeder
         $this->call(LocationSeeder::class);
         $this->call(PaymentMethodTypeSeeder::class);
         $this->call(CuponSeeder::class);
+        // $this->call(PriceTypeSeeder::class);
+        $this->call(BudgetStatusSeeder::class);
     }
 }

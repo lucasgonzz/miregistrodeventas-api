@@ -7,20 +7,21 @@ use App\CurrentAcount;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintArticles;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
+use App\Provider;
 use Carbon\Carbon;
 use fpdf;
 require(__DIR__.'/../fpdf/fpdf.php');
 
 class PdfPrintCurrentAcounts extends fpdf {
 
-	function __construct($ids = null, $client_id = null, $months_ago = null) {
+	function __construct($ids = null, $model_name = null, $model_id = null, $months_ago = null) {
 		parent::__construct();
 		$this->SetAutoPageBreak(true, 1);
 		$this->current_acounts = [];
 		$this->ids = $ids;
-		$this->client_id = $client_id;
-		// $this->client = Client::find($client_id);
+		$this->model_name = $model_name;
+		$this->model_id = $model_id;
 		$this->months_ago = $months_ago;
 		$this->current_acount_por_pagina = 40;
 		$this->current_acount_impresos = 0;
@@ -49,15 +50,22 @@ class PdfPrintCurrentAcounts extends fpdf {
 	}
 
 	function initCurrentAcounts() {
-		if (!is_null($this->client_id)) {
-			$this->client = Client::find($this->client_id);
-	        $this->current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths(
-	        								$this->client_id, $this->months_ago);
+		if (!is_null($this->model_id)) {
+			if ($this->model_name == 'client') {
+				$this->model = Client::find($this->model_id);
+			} else {
+				$this->model = Provider::find($this->model_id);
+			}
+	        $this->current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($this->model_name, $this->model_id, $this->months_ago);
 		} else {
 			foreach ($this->ids as $current_acount_id) {
 				$this->current_acounts[] = CurrentAcount::find($current_acount_id);
 			}
-			$this->client = Client::find($this->current_acounts[0]->client_id);
+			if ($this->model_name == 'client') {
+				$this->model = Client::find($this->current_acounts[0]->client_id);
+			} else {
+				$this->model = Provider::find($this->current_acounts[0]->provider_id);
+			}
 		}
 		$this->cantidad_current_acounts_total = count($this->current_acounts);
 		$this->current_acounts_en_esta_pagina = 0;
@@ -183,7 +191,11 @@ class PdfPrintCurrentAcounts extends fpdf {
 		// Se escribe la fecha
 		$this->SetXY(100, 10);
 		$this->SetFont('Arial', '', 11, 'L');
-		$this->Cell(50,5,'Cliente: '.$this->client->name,0,0,'L');
+		if ($this->model_name == 'client') {
+			$this->Cell(50,5,'Cliente: '.$this->model->name,0,0,'L');
+		} else {
+			$this->Cell(50,5,'Proveedor: '.$this->model->name,0,0,'L');
+		}
 		$this->Ln();
 		$this->SetX(100);
 		$this->Cell(50,5,'Fecha: '.date_format(Carbon::now(), 'd/m/y'),0,0,'L');

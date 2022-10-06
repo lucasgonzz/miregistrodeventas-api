@@ -21,7 +21,7 @@ class CreateUserConfigurationsTable extends Migration
             $table->boolean('iva_included')->default(true);
             $table->boolean('set_articles_updated_at_always')->default(false);
             $table->integer('limit_items_in_sale_per_page')->nullable();
-            $table->boolean('show_google_login')->default(false);
+            $table->boolean('show_google_login')->default(true);
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

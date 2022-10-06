@@ -56,6 +56,7 @@ class UserHelper {
         $user_owner = Self::getFullModel(); 
         $employee->owner_extencions = $user_owner->extencions;
         $employee->owner_configuration = $user_owner->configuration;
+        $employee->owner_addresses = $user_owner->addresses;
         return $employee;
     }
 
@@ -65,7 +66,7 @@ class UserHelper {
         	return false;
         } else {
         	if (env('APP_ENV') == 'local') {
-	        	return $user->id == 308;
+	        	return $user->company_name == 'Oscar';
         	} else {
 	        	return $user->id == 2;
         	}

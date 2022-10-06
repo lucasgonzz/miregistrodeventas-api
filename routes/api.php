@@ -160,40 +160,48 @@ Route::middleware('auth:sanctum')->group(function () {
 	// -----------------------PRODUCCION--------------------------------------------------
 
 	// Budgets
-	Route::get('/budgets', 
+	Route::get('/budget/{from_date}/{until_date?}', 
 		'BudgetController@index'
 	);
-	Route::post('/budgets', 
+	Route::get('/budget-previus-days/{index}', 
+		'BudgetController@previusDays'
+	);
+	Route::post('/budget', 
 		'BudgetController@store'
 	);
-	Route::put('/budgets', 
+	Route::put('/budget/{id}', 
 		'BudgetController@update'
 	);
-	Route::put('/budgets/confirm', 
+	Route::put('/budget/confirm', 
 		'BudgetController@confirm'
 	);
-	Route::delete('/budgets/{id}', 
+	Route::delete('/budget/{id}', 
 		'BudgetController@delete'
 	);
 
+	// Budget Status
+	Route::get('/budget-status', 
+		'BudgetStatusController@index'
+	);
+
 	// OrderProductions
-	Route::get('/order-productions', 
+	Route::get('/order-production/{from_date}/{until_date?}', 
 		'OrderProductionController@index'
 	);
-	Route::post('/order-productions', 
+	Route::get('/order-production-previus-days/{index}', 
+		'OrderProductionController@previusDays'
+	);
+	Route::post('/order-production', 
 		'OrderProductionController@store'
 	);
-	Route::put('/order-productions', 
+	Route::put('/order-production/{id}', 
 		'OrderProductionController@update'
 	);
-	Route::post('/order-productions/pdf', 
+	Route::post('/order-production/pdf', 
 		'OrderProductionController@setPdf'
 	);
-	Route::delete('/order-productions/{id}', 
+	Route::delete('/order-production/{id}', 
 		'OrderProductionController@delete'
-	);
-	Route::get('/order-productions/products-pdf/{id}', 
-		'OrderProductionController@productsPdf'
 	);
 
 	// ProductDelivery
@@ -213,27 +221,25 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 
 	// OrderProductionStatuses
-	Route::get('/order-production-statuses', 
-		'OrderProductionStatusController@index'
-	);
+	Route::resource('/order-production-status', 'OrderProductionStatusController');
 
 	// Locations
-	Route::resource('locations', 'LocationController');
+	Route::resource('location', 'LocationController');
 
 	// ProviderOrders
-	Route::get('/provider-orders', 
+	Route::get('/provider-order', 
 		'ProviderOrderController@index'
 	);
-	Route::post('/provider-orders', 
+	Route::post('/provider-order', 
 		'ProviderOrderController@store'
 	);
-	Route::put('/provider-orders/{id}', 
+	Route::put('/provider-order/{id}', 
 		'ProviderOrderController@update'
 	);
-	Route::post('/provider-orders/received', 
+	Route::post('/provider-order/received', 
 		'ProviderOrderController@setReceived'
 	);
-	Route::delete('/provider-orders/{id}', 
+	Route::delete('/provider-order/{id}', 
 		'ProviderOrderController@destroy'
 	);
 
@@ -261,38 +267,38 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// --------------------------------------------------------------------------------------
 	// INGRESAR
-		Route::post('/articles', 
+		Route::post('/article', 
 			'ArticleController@store'
 		);
-		Route::post('/articles/new-article', 
+		Route::post('/article/new-article', 
 			'ArticleController@newArticle'
 		);
-		Route::put('/articles/price', 
+		Route::put('/article/price', 
 			'ArticleController@updatePrice'
 		);
-		Route::get('/articles/{id}', 
+		Route::get('/article/{id}', 
 			'ArticleController@show'
 		);
-		Route::get('/articles/get-by-bar-code/{bar_code}', 
+		Route::get('/article/get-by-bar-code/{bar_code}', 
 			'ArticleController@getByBarCode'
 		);
-		Route::get('/articles/bar-codes', 
+		Route::get('/article/bar-codes', 
 			'ArticleController@getBarCodes'
 		);
-		Route::get('/articles/names', 
+		Route::get('/article/names', 
 			'ArticleController@names'
 		);
-		Route::get('/articles/previus-next/{index}', 
+		Route::get('/article/previus-next/{index}', 
 			'ArticleController@previusNext'
 		);
-		Route::post('/articles/excel/import', 
+		Route::post('/article/excel/import', 
 			'ArticleController@import'
 		);
 
 
 		// Provedores de comercios
-		Route::resource('providers', 'ProviderController');
-		Route::post('/providers/excel/import', 
+		Route::resource('provider', 'ProviderController');
+		Route::post('/provider/excel/import', 
 			'ProviderController@import'
 		);
 		// Icons
@@ -367,16 +373,16 @@ Route::middleware('auth:sanctum')->group(function () {
 			'SizeController@index'
 		);
 		// Conditions
-		Route::get('conditions', 
+		Route::get('condition', 
 			'ConditionController@index'
 		);
-		Route::put('/conditions', 
+		Route::put('/condition/{id}', 
 			'ConditionController@update'
 		);
-		Route::post('/conditions', 
+		Route::post('/condition', 
 			'ConditionController@store'
 		);
-		Route::delete('/conditions/{id}', 
+		Route::delete('/condition/{id}', 
 			'ConditionController@delete'
 		);
 
@@ -390,33 +396,33 @@ Route::middleware('auth:sanctum')->group(function () {
 	// --------------------------------------------------------------------------------------
 
 	// LISTADO
-	Route::get('/articles', 
+	Route::get('/article', 
 		'ArticleController@index'
 	);
-	Route::get('/articles/paginated', 
+	Route::get('/article/paginated', 
 		'ArticleController@paginated'
 	);
-	Route::get('/articles/{id}', 
+	Route::get('/article/{id}', 
 		'ArticleController@show'
 	);
-	Route::get('/articles/search/{query}', 
+	Route::get('/article/search/{query}', 
 		'ArticleController@search'
 	);
-	Route::put('/articles', 
+	Route::put('/article', 
 		'ArticleController@update'
 	);
-	Route::put('/articles/{prop}', 
+	Route::put('/article/update-prop/{prop}', 
 		'ArticleController@updateProp'
 	);
-	Route::post('/articles/filter', 
+	Route::post('/article/filter', 
 		'ArticleController@filter'
 	);
-	Route::post('/articles/delete', 
+	Route::post('/article/delete', 
 		'ArticleController@delete'
 	);
 
 	// Ticket pdf
-	Route::get('/articles/pdf/{ids}', 
+	Route::get('/article/pdf/{ids}', 
 		'ArticleController@pdf'
 	);
 
@@ -438,6 +444,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/prices-lists/{id}', 
 		'PricesListController@delete'
 	);
+
+	// PriceType
+	Route::resource('price-type', 'PriceTypeController');
 
 	// Combos
 	Route::resource('combos', 'ComboController');
@@ -473,7 +482,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/articles/set-first-image/{image_id}', 
 		'ArticleController@setFirstImage'
 	);
-	Route::post('/articles/image/{article_id}', 
+	Route::put('/article/image/{article_id}', 
 		'ArticleController@addImage'
 	);
 	Route::get('/articles/set-first-image/{image_id}', 
@@ -483,7 +492,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		'ArticleController@deleteImage'
 	);
 	// Copiar imagenes
-	Route::put('/articles/images-copy', 
+	Route::put('/article/images-copy', 
 		'ArticleController@imagesCopy'
 	);
 
@@ -527,33 +536,31 @@ Route::middleware('auth:sanctum')->group(function () {
 	// --------------------------------------------------------------------------------------
 
 	// Ventas
-	Route::get('/sales', 
+	Route::get('/sale/{from_date?}/{until_date?}', 
 		'SaleController@index'
 	);
-	Route::delete('/sales/{sales_id}', 
+	Route::get('/sale/show/{id}', 
+		'SaleController@show'
+	);
+	Route::put('/sale/save-current-acount/{id}', 
+		'SaleController@saveCurrentAcount'
+	);
+	Route::delete('/sale/{sales_id}', 
 		'SaleController@deleteSales'
 	);
 
 	// Afip
 	Route::get('/afip/importes/{sale_id}', 'AfipWsController@getImportes');
-	Route::post('/afip/{sale_id}', 'AfipWsController@init');
+	Route::post('/sale/make-afip-ticket/{sale_id}', 'AfipWsController@init');
 
 	// Descuentos
-	Route::get('/discounts', 
-		'DiscountController@index'
-	);
-	Route::put('/discounts', 
-		'DiscountController@update'
-	);
-	Route::post('/discounts', 
-		'DiscountController@store'
-	);
+	Route::resource('/discount', 'DiscountController');
 
 	// Vendedores
-	Route::get('/sellers', 
+	Route::get('/seller', 
 		'SellerController@index'
 	);
-	Route::post('/sellers', 
+	Route::post('/seller', 
 		'SellerController@store'
 	);
 	// Devuelve las comisiones de las ventas que le corresponden al vendedor
@@ -581,49 +588,36 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 
 	// Clientes
-	Route::get('/clients', 
-		'ClientController@index'
-	);
-	Route::get('/clients/{id}', 
-		'ClientController@show'
-	);
-	Route::post('/clients', 
-		'ClientController@store'
-	);
-	Route::put('/clients/{id}', 
-		'ClientController@update'
-	);
-	Route::delete('/clients/{id}', 
-		'ClientController@delete'
-	);
+	Route::resource('/client', 'ClientController');
 
 	// CurrentAcounts
-	Route::get('/clients/current-acounts/{id}/{months_ago}', 
-		'ClientController@currentAcounts'
+	Route::get('/current-acount/{model_name}/{model_id}/{months_ago}', 
+		'CurrentAcountController@index'
 	);
+	Route::post('/current-acount/pago', 
+		'CurrentAcountController@pago'
+	);
+	Route::post('/current-acount/nota-credito', 
+		'CurrentAcountController@notaCredito'
+	);
+	Route::post('/current-acount/saldo-inicial', 
+		'ClientController@saldoInicial'
+	);
+	Route::delete('/current-acount/{model_name}/{id}', 
+		'CurrentAcountController@delete'
+	);
+	
 	Route::post('/clients/excel/import', 
 		'ClientController@import'
 	);
-	Route::post('/current-acounts/update-debe', 
+	Route::post('/current-acount/update-debe', 
 		'CurrentAcountController@updateDebe'
 	);
-	Route::delete('/current-acounts/{id}', 
-		'CurrentAcountController@delete'
-	);
-	Route::post('/current-acounts/excel/import/{client_id}', 
+	Route::post('/current-acount/excel/import/{client_id}', 
 		'CurrentAcountController@import'
 	);
 	Route::get('/clients/check-saldos/{client_id}', 
 		'ClientController@checkCurrentAcounts'
-	);
-	Route::post('/clients/saldo-inicial', 
-		'ClientController@saldoInicial'
-	);
-	Route::post('/clients/pago', 
-		'CurrentAcountController@pagoFromClient'
-	);
-	Route::post('/clients/nota-credito', 
-		'CurrentAcountController@notaCredito'
 	);
 
 	// CurrentAcountsPaymentMethods
@@ -633,11 +627,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 	// Ivas
-	Route::get('/ivas', 
+	Route::get('/iva', 
 		'IvaController@index'
 	);
 	// Ivas Conditions
-	Route::get('/iva-conditions', 
+	Route::get('/iva-condition', 
 		'IvaConditionController@index'
 	);
 	// Ventas de un cliente
@@ -648,16 +642,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		'SaleController@pagarDeuda'
 	);
 	// PreviusDays
-	Route::get('/sales/previus-days/{index}', 
+	Route::get('/sale-previus-days/{index}', 
 		'SaleController@previusDays'
 	);
-	// Buscar por fecha
-	Route::get('/sales/from-date/{date}', 
-		'SaleController@fromDate'
-	);
-	// Route::get('/sales/only-one-date/{date}', 
-	// 	'SaleController@onlyOneDate'
-	// );
 	// Horarios de ventas
 	Route::get('/sale-time', 
 		'SaleTimeController@index'
@@ -679,18 +666,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	// --------------------------------------------------------------------------------------
 
 	// EMPLEADOS
-	Route::get('/employees', 
-		'EmployeeController@index'
-	);
-	Route::post('/employees', 
-		'EmployeeController@store'
-	);
-	Route::put('/employees', 
-		'EmployeeController@update'
-	);
-	Route::delete('/employees/{id}', 
-		'EmployeeController@delete'
-	);
+	Route::resource('/employee', 'EmployeeController');
 	Route::get('/permissions', 
 		'PermissionController@index'
 	);
@@ -794,16 +770,16 @@ Route::middleware('auth:sanctum')->group(function () {
 		'TitleController@delete'
 	);
 	// Brands
-	Route::get('/brands', 
+	Route::get('/brand', 
 		'BrandController@index'
 	);
-	Route::put('/brands', 
+	Route::put('/brand/{id}', 
 		'BrandController@update'
 	);
-	Route::post('/brands', 
+	Route::post('/brand', 
 		'BrandController@store'
 	);
-	Route::delete('/brands/{id}', 
+	Route::delete('/brand/{id}', 
 		'BrandController@delete'
 	);
 	Route::post('/articles/brand', 

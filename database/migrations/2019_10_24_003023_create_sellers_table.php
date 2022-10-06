@@ -16,7 +16,7 @@ class CreateSellersTable extends Migration
         Schema::create('sellers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('surname')->nullable();
+            // $table->string('surname')->nullable();
             $table->double('commission')->nullable();
             $table->integer('user_id')->unsigned();
             $table->integer('seller_id')->nullable()->unsigned();

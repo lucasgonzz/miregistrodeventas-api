@@ -16,7 +16,6 @@ class CreateSalesTable extends Migration
         Schema::create('sales', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->integer('user_id')->unsigned();
             $table->integer('sale_type_id')->unsigned()->nullable();
             $table->integer('num_sale');
             $table->decimal('percentage_card')->nullable();
@@ -26,6 +25,11 @@ class CreateSalesTable extends Migration
             $table->integer('address_id')->nullable()->unsigned();
             $table->integer('order_id')->nullable()->unsigned();
             $table->decimal('debt')->nullable();
+            $table->boolean('save_current_acount')->default(1);
+            $table->boolean('price_type_id')->nullable();
+            $table->integer('employee_id')->unsigned()->nullable();
+            $table->integer('budget_id')->unsigned()->nullable();
+            $table->integer('user_id')->unsigned()->nullable();
 
             $table->foreign('user_id')
                     ->references('id')->on('users');

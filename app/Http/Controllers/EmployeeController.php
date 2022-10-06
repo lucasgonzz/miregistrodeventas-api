@@ -12,38 +12,41 @@ class EmployeeController extends Controller
     
 
 	function index() {
-		$employees = User::where('owner_id', $this->userId())
+		$models = User::where('owner_id', $this->userId())
                     ->with('permissions')
+                    ->orderBy('created_at', 'DESC')
                     ->get();
-		return response()->json(['employees' => $employees], 200);
+		return response()->json(['models' => $models], 200);
 	}      
 
-    function update(Request $request) {
-        $employee = User::where('id', $request->id)
+    function update(Request $request, $id) {
+        $model = User::where('id', $request->id)
                         ->first();
 
-        $employee->permissions()->sync($request->permissions_id);
+        $model->permissions()->sync($request->permissions_id);
+        // $model->password = bcrypt($request->password);
+        $model->save();
 
-        $employee = User::where('id', $request->id)
+        $model = User::where('id', $request->id)
         				->with('permissions')
                         ->first();
-        return response()->json(['employee' => $employee], 200);
+        return response()->json(['model' => $model], 200);
     }
 
-	function delete($id) {
+	function destroy($id) {
 		$user = User::find($id);
         $user->delete();
 	}
 
     function store(Request $request) {
     	$user = auth()->user();
-        $employee = User::where('owner_id', $this->userId())
+        $model = User::where('owner_id', $this->userId())
                             ->where('dni', $request->dni)
                             ->first();
 
 
-        if (is_null($employee)) {
-        	$employee = User::create([
+        if (is_null($model)) {
+        	$model = User::create([
                 'name'              => ucfirst($request->name),
                 'dni'               => $request->dni,
         		'company_name'      => $user->company_name,
@@ -56,11 +59,11 @@ class EmployeeController extends Controller
                 'expired_at'        => $user->expired_at,
         	]);
 
-        	$employee->permissions()->attach($request->permissions_id);
-            $employee = User::where('id', $employee->id)
+        	$model->permissions()->attach($request->permissions_id);
+            $model = User::where('id', $model->id)
                                 ->with('permissions')
                                 ->first();
-        	return response()->json(['repeated' => false, 'employee' => $employee], 201);
+        	return response()->json(['repeated' => false, 'model' => $model], 201);
         } else {
         	return response()->json(['repeated' => true], 200);
         }

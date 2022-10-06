@@ -1,13 +1,27 @@
-@component('mail::message')
-# Hola {{ $buyer->name }}!
+@component('mail::layout')
 
+@slot('header')
 
-En {{ $article->user->company_name }} ya ingreso {{ $article->name }} 
-
-@component('mail::button', ['url' => $url])
-Ver {{ $article->name }} 
+@component('mail::header', ['url' => $user->online])
+<img src="{{ $logo_url }}" class="logo" alt="{{ $user->company_name }} Logo">
 @endcomponent
 
-Gracias,<br>
-{{ config('app.name') }}
+@endslot
+<p>
+    Hola! Queriamos avisarte que ya ingreso nuevo stock para el artículo: {{ $article->name }}.
+</p>
+<p>
+	Puedes ingresar a ver el artículo presionando el botón de abajo.
+</p>
+
+@component('mail::button', ['url' => $article_url])
+Ver artículo
+@endcomponent
+
+@slot('footer')
+@component('mail::footer')
+© {{ date('Y') }} ComercioCity
+@endcomponent
+@endslot
+
 @endcomponent

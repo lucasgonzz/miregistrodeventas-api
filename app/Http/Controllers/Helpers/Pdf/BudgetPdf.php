@@ -11,18 +11,17 @@ require(__DIR__.'/../../fpdf/fpdf.php');
 
 class BudgetPdf extends fpdf {
 
-	function __construct($only_deliveries, $budget) {
+	function __construct($budget) {
 		parent::__construct();
 		$this->SetAutoPageBreak(true, 1);
 		$this->b = 0;
 		$this->line_height = 7;
 		
 		$this->user = UserHelper::getFullModel();
-		$this->only_deliveries = $only_deliveries;
 		$this->budget = $budget;
 
 		$this->AddPage();
-		$this->products();
+		$this->articles();
         $this->Output();
         exit;
 	}
@@ -37,15 +36,13 @@ class BudgetPdf extends fpdf {
 	}
 
 	function Footer() {
-		if (!$this->only_deliveries) {
-			$y = 230;
-			$this->SetLineWidth(.4);
-			// $this->Line(5, $y, 205, $y);
-			$this->y = $y;
-			$this->observations();
-			$this->y = $y;
-			$this->total();
-		}
+		$y = 230;
+		$this->SetLineWidth(.4);
+		// $this->Line(5, $y, 205, $y);
+		$this->y = $y;
+		$this->observations();
+		$this->y = $y;
+		$this->total();
 		$this->comerciocityInfo();
 	}
 
@@ -195,22 +192,6 @@ class BudgetPdf extends fpdf {
 		$this->x = 5;
 		$this->y = 80;
 
-		$this->SetLineWidth(.4);
-		if ($this->only_deliveries) {
-			$this->tableHeaderOnlyDeliveries();
-		} else {
-			$this->tableHeaderWithAll();
-		}
-	}
-
-	function tableHeaderOnlyDeliveries() {
-		$this->Cell(20, 10, 'Codigo', 1, 0, 'C');
-		$this->Cell(20, 10, 'Cant.', 1, 0, 'C');
-		$this->Cell(80, 10, 'Producto', 1, 0, 'C');
-		$this->Cell(50, 10, 'Unidades Entregadas', 1, 0, 'C');
-	}
-
-	function tableHeaderWithAll() {
 		$this->Cell(20, 10, 'Codigo', 1, 0, 'C');
 		$this->Cell(20, 10, 'Cant.', 1, 0, 'C');
 		$this->Cell(80, 10, 'Producto', 1, 0, 'C');
@@ -219,36 +200,20 @@ class BudgetPdf extends fpdf {
 		$this->Cell(30, 10, 'Importe', 1, 0, 'C');
 	}
 
-	function products() {
+	function articles() {
 		$this->SetFont('Arial', '', 10);
 		$this->x = 5;
 		$this->y = 90;
 
-		if ($this->only_deliveries) {
-			$products = $this->getDeliveredProducts();
-		} else {
-			$products = $this->budget->products;
-		}
-
-		foreach ($products as $product) {
+		foreach ($this->budget->articles as $article) {
 			if ($this->y < 210) {
-				$this->printProduct($product);
+				$this->printArticle($article);
 			} else {
 				$this->AddPage();
 				$this->x = 5;
 				$this->y = 90;
-				$this->printProduct($product);
+				$this->printArticle($article);
 			}
-			$this->x = 5;
-			$this->y += $this->getHeight($product);
-		}
-	}
-
-	function printProduct($product) {
-		if ($this->only_deliveries) {
-			$this->printProductDelivered($product);
-		} else {
-			$this->printProductWithAll($product);
 		}
 	}
 
@@ -261,22 +226,27 @@ class BudgetPdf extends fpdf {
 		$this->Cell(50, $this->getHeight($product), $this->getTotalDeliveries($product), 'T', 0, 'C');
 	}
 
-	function printProductWithAll($product) {
-		$this->Cell(20, $this->getHeight($product), $product->bar_code, 'T', 0, 'C');
-		$this->Cell(20, $this->getHeight($product), $product->amount, 'T', 0, 'C');
-		$this->MultiCell(80, $this->line_height, $product->name, 'T', 'C', false);
+	function printArticle($article) {
+		$this->x = 5;
+		$this->Cell(20, $this->line_height, $article->bar_code, 'T', 0, 'C');
+		$this->Cell(20, $this->line_height, $article->pivot->amount, 'T', 0, 'C');
+		$y_1 = $this->y;
+		$this->MultiCell(80, $this->line_height, $article->name, 'T', 'C', false);
 		$this->x = 125;
-		$this->y -= $this->getHeight($product);
-		$this->Cell(30, $this->getHeight($product), '$'.Numbers::price($product->price), 'T', 0, 'C');
-		$this->Cell(20, $this->getHeight($product), $this->getBonus($product), 'T', 0, 'C');
-		$this->Cell(30, $this->getHeight($product), '$'.Numbers::price(BudgetHelper::totalProduct($product)), 'T', 0, 'C');
+
+	    $y_2 = $this->y;
+		$this->y = $y_1;
+		$this->Cell(30, $this->line_height, '$'.Numbers::price($article->pivot->price), 'T', 0, 'C');
+		$this->Cell(20, $this->line_height, $this->getBonus($article), 'T', 0, 'C');
+		$this->Cell(30, $this->line_height, '$'.Numbers::price(BudgetHelper::totalArticle($article)), 'T', 0, 'C');
+		$this->y = $y_2;
 	}
 
-	function getDeliveredProducts() {
-		$products = [];
-		foreach ($this->budget->products as $product) {
-			if (count($product->deliveries) >= 1) {
-				$products[] = $product;
+	function getDeliveredArticles() {
+		$articles = [];
+		foreach ($this->budget->articles as $article) {
+			if (count($article->pivot->deliveries) >= 1) {
+				$articles[] = $article;
 			}
 		}
 		return $products;
@@ -292,23 +262,21 @@ class BudgetPdf extends fpdf {
 
 	function observations() {
 		// $this->SetLineWidth(.2);
-		if (count($this->budget->observations)) {
+		if ($this->budget->observations != '') {
 		    $this->x = 5;
 	    	$this->SetFont('Arial', 'B', 12);
 			$this->Cell(100, 10, 'Observaciones', 'BTL', 0, 'L');
 			$this->y += 10;
 		    $this->x = 5;
 	    	$this->SetFont('Arial', '', 10);
-			foreach ($this->budget->observations as $observation) {
-		    	$this->MultiCell(200, $this->line_height, $observation->text, $this->b, 'LTB', false);
-		    	$this->x = 5;
-			}
+	    	$this->MultiCell(200, $this->line_height, $this->budget->observation, $this->b, 'LTB', false);
+	    	$this->x = 5;
 		}
 	}
 
-	function getBonus($product) {
-		if (!is_null($product->bonus)) {
-			return $product->bonus.'%';
+	function getBonus($article) {
+		if (!is_null($article->pivot->bonus)) {
+			return $article->pivot->bonus.'%';
 		}
 		return '';
 	}

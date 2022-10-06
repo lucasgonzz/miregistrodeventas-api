@@ -46,6 +46,10 @@ class CreateCurrentAcountsTable extends Migration
             $table->bigInteger('sale_id')->unsigned()->nullable();
             // $table->foreign('sale_id')->references('id')->on('sales');
             $table->bigInteger('budget_id')->unsigned()->nullable();
+
+            $table->bigInteger('provider_id')->unsigned()->nullable();
+            $table->bigInteger('provider_order_id')->unsigned()->nullable();
+            
             $table->bigInteger('current_acount_payment_method_id')->unsigned()->nullable();
             $table->timestamps();
         });

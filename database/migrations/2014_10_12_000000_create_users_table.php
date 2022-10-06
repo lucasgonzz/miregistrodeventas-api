@@ -31,9 +31,7 @@ class CreateUsersTable extends Migration
             $table->decimal('delivery_price')->nullable();
             $table->enum('online_prices', ['all', 'only_registered'])->nullable();
             $table->string('order_description')->nullable();
-            $table->string('dolar')->nullable();
-            $table->decimal('dolar_plus', 8,2)->nullable();
-            $table->decimal('dolar_cara_chica', 8,2)->nullable();
+            $table->decimal('dollar', 10,2)->nullable();
             $table->timestamp('created_at')->nullable();
             $table->timestamp('expired_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();

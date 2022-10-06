@@ -21,12 +21,13 @@ class Numbers {
 			$new_price = explode('.', $price)[0];
 			if ($centavos != '00') {
 				$new_price += ".$centavos";
-				return number_format($new_price, 2, ',', '.');
+				$resutl = number_format($price, 2, ',', '.');
 			} else {
-				return number_format($new_price, 0, '', '.');			
+				$resutl = number_format($new_price, 0, '', '.');			
 			}
 		} else {
-			return number_format($price, 0, '', '.');
+			$resutl = number_format($price, 0, '', '.');
 		}
+		return $resutl;
 	}
 }

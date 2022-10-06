@@ -15,9 +15,16 @@ class CreateOrderProductionsTable extends Migration
     {
         Schema::create('order_productions', function (Blueprint $table) {
             $table->id();
-            $table->integer('budget_id')->unsigned();
+            // $table->integer('budget_id')->unsigned()->nullable();
+            $table->integer('num');
+            $table->integer('client_id')->unsigned()->nulalble();
             $table->integer('order_production_status_id')->unsigned();
+
             $table->string('pdf')->nullable();
+            $table->text('observations')->nullable();
+            
+            $table->timestamp('start_at')->nullable();
+            $table->timestamp('finish_at')->nullable();
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

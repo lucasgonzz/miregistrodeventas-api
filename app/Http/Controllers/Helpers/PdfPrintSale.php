@@ -8,7 +8,7 @@ use App\Http\Controllers\Helpers\AfipHelper;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintArticles;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Impression;
 use App\Sale;
 use fpdf;

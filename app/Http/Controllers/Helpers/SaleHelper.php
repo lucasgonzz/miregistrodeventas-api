@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Helpers\Sale;
+namespace App\Http\Controllers\Helpers;
 
 use App\Article;
 use App\Client;
@@ -11,16 +11,17 @@ use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\CurrentAcountAndCommissionHelper;
+use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
-use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Http\Controllers\SaleController;
 use App\Sale;
 use App\SaleType;
 use App\Variant;
-use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class SaleHelper extends Controller {
 
@@ -51,6 +52,14 @@ class SaleHelper extends Controller {
                     ->first();
         Log::info('SaleHelper getFullModel: '.$sale->id);
         return $sale;
+    }
+
+    static function getEmployeeId() {
+        $user = Auth()->user();
+        if (!is_null($user->owner_id)) {
+            return $user->id;
+        }
+        return null;
     }
 
     static function getPercentageCard($request) {
@@ -87,6 +96,13 @@ class SaleHelper extends Controller {
         }
     }
 
+    static function attachCurrentAcountsAndCommissions($sale, $client_id, $discounts) {
+        if ($client_id && $sale->save_current_acount) {
+            $helper = new CurrentAcountAndCommissionHelper($sale, $discounts, false);
+            $helper->attachCommissionsAndCurrentAcounts();
+        }
+    }
+
     static function getCantPag($sale) {
         $pag = 1;
         $count = 0;
@@ -101,7 +117,7 @@ class SaleHelper extends Controller {
     }
 
     static function getArticleSalePrice($sale, $article) {
-        $price = (float)$article['price'];
+        $price = (float)$article['price_vender'];
         if (!is_null($sale->special_price_id)) {
             foreach ($article['special_prices'] as $special_price) {
                 if ($special_price['id'] == $sale->special_price_id) {
@@ -120,7 +136,8 @@ class SaleHelper extends Controller {
                                                             'cost' => isset($article['cost'])
                                                                         ? (float)$article['cost']
                                                                         : null,
-                                                            'price' => Self::getArticleSalePrice($sale, $article),
+                                                            'price' => $article['price_vender'],
+                                                            // 'price' => Self::getArticleSalePrice($sale, $article),
                                                             'discount' => Self::getDiscount($article),
                                                             'with_dolar' => Self::getDolar($article, $dolar_blue),
                                                             'created_at' => Carbon::now(),
@@ -146,7 +163,7 @@ class SaleHelper extends Controller {
         foreach ($services as $service) {
             if (isset($service['is_service'])) {
                 $sale->services()->attach($service['id'], [
-                    'price' => $service['price'],
+                    'price' => $service['price_vender'],
                     'amount' => $service['amount'],
                     'discount' => Self::getDiscount($service),
                 ]);
@@ -163,10 +180,12 @@ class SaleHelper extends Controller {
 
         // Se eliminan las comisiones y se actualizan los saldos se las siguientes
         $commission_ct = new CommissionController();
-        $commission_ct->delete($sale);
+        $commission_ct->deleteFromSale($sale);
 
-        $helper = new SaleHelper_Commissioners($sale, $sale->discounts, $only_commissions);
+        $helper = new CurrentAcountAndCommissionHelper($sale, $sale->discounts, $only_commissions);
         $helper->attachCommissionsAndCurrentAcounts();
+
+        CurrentAcountHelper::checkSaldos($sale->client_id);
 
         // $client_controller = new ClientController();
         // $current_acount_ct->checkSaldos($sale->client_id);

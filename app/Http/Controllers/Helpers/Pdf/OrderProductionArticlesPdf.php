@@ -7,7 +7,7 @@ use App\Http\Controllers\Helpers\UserHelper;
 use fpdf;
 require(__DIR__.'/../../fpdf/fpdf.php');
 
-class OrderProductionProductsPdf extends fpdf {
+class OrderProductionArticlesPdf extends fpdf {
 
 	function __construct($order_production) {
 		$this->line_height = 7;
@@ -19,26 +19,28 @@ class OrderProductionProductsPdf extends fpdf {
 		$this->b = 'LR';
 
 		$this->AddPage();
-		$this->products();
+		$this->articles();
         $this->Output();
         exit;
 	}
 
-	function products() {
+	function articles() {
 		$x = 0;
 		$max_y = 1;
 		$last_max_y = 1;
 		$this->y = 1;
-		foreach ($this->order_production->budget->products as $product) {
-			for ($unidad=1; $unidad <= $product->amount ; $unidad++) { 
+		foreach ($this->order_production->articles as $article) {
+			for ($unidad=1; $unidad <= $article->pivot->amount ; $unidad++) { 
 				$this->x = $x;
 
 				$this->SetFont('Arial', '', 12);
-				$this->Cell(69, $this->line_height, $this->str($this->order_production->budget->client->name), $this->b.'TB', 0, 'L');
+				if (!is_null($this->order_production->client)) {
+					$this->Cell(69, $this->line_height, $this->str($this->order_production->client->name), $this->b.'TB', 0, 'L');
+				}
 
 				$this->x = $x;
 				$this->y += $this->line_height;
-				$this->MultiCell(69, $this->line_height, $product->name, $this->b.'B', 'L', 0);
+				$this->MultiCell(69, $this->line_height, $article->name, $this->b.'B', 'L', 0);
 				
 				$this->x = $x;
 				if ($this->y > $max_y) {
@@ -47,12 +49,12 @@ class OrderProductionProductsPdf extends fpdf {
 
 				$this->SetFont('Arial', '', 10);
 				$this->Cell(20, $this->line_height, 'Codigo', 'L', 0, 'L');
-				$this->Cell(49, $this->line_height, $this->str($product->bar_code), 'R', 0, 'R');
+				$this->Cell(49, $this->line_height, $this->str($article->bar_code), 'R', 0, 'R');
 
 				$this->x = $x;
 				$this->y += $this->line_height;
 				$this->Cell(20, $this->line_height, 'Ubi', 'LB', 0, 'L');
-				$this->Cell(49, $this->line_height, $this->str($product->location), 'RB', 0, 'R');
+				$this->Cell(49, $this->line_height, $this->str($article->pivot->location), 'RB', 0, 'R');
 
 				if ($x < 140) {
 					$x += 70;

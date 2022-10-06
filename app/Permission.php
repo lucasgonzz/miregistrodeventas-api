@@ -14,6 +14,5 @@ class Permission extends Model
 
     function extencion() {
         return $this->belongsTo('App\Extencion');
-        // return $this->belongsTo('App\Extencion', 'extencion_id');
     }
 }

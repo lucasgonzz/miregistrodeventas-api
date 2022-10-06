@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Helpers\Pdf;
 use App\Http\Controllers\Helpers\BudgetHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\Numbers;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use fpdf;
 require(__DIR__.'/../../fpdf/fpdf.php');

@@ -11,7 +11,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintCurrentAcounts;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Imports\CurrentAcountsImport;
 use App\Sale;
 use App\Seller;
@@ -23,22 +23,50 @@ use Maatwebsite\Excel\Facades\Excel;
 class CurrentAcountController extends Controller
 {
 
-    public function pagoFromClient(Request $request) {
+    function index($model_name, $model_id, $months_ago) {
+        $months_ago = Carbon::now()->subMonths($months_ago);
+        $models = CurrentAcount::whereDate('created_at', '>=', $months_ago);
+        if ($model_name == 'client') {
+            $models = $models->where('client_id', $model_id)
+                            ->orderBy('created_at', 'ASC')
+                            ->with(['budget' => function($q) {
+                                return $q->withAll();
+                            }])
+                            ->with(['sale' => function($q) {
+                                return $q->withAll();
+                            }]);
+        } else {
+            $models = $models->where('provider_id', $model_id)
+                            ->with(['provider_order' => function($q) {
+                                return $q->withAll();
+                            }]);
+        }
+        $models = $models->with('payment_method')
+                        ->with('checks')
+                        ->get();
+        $models = CurrentAcountHelper::format($models);
+        return response()->json(['models' => $models], 200);
+    }
+
+    public function pago(Request $request) {
         $data = [
             'haber'                             => $request->haber,
-            'client_id'                         => $request->client_id,
             'current_date'                      => $request->current_date,
             'created_at'                        => $request->created_at,
             'current_acount_payment_method_id'  => $request->current_acount_payment_method_id,
             'checks'                            => $request->checks,
             'to_pay'                            => $request->to_pay,
+            'model_name'                        => $request->model_name,
+            'model_id'                          => $request->model_id,
+            'client_id'                         => $request->model_name == 'client' ? $request->model_id : null,
+            'provider_id'                       => $request->model_name == 'provider' ? $request->model_id : null,
         ];
-        $pago = CurrentAcountHelper::pagoFromClient($data);
+        $pago = CurrentAcountHelper::savePago($data);
         return response()->json(['current_acount' => $pago], 201);
     }
 
     public function notaCredito(Request $request) {
-        $nota_credito = CurrentAcountHelper::notaCredito($request->form['nota_credito'], $request->form['description'], $request->client_id);
+        $nota_credito = CurrentAcountHelper::notaCredito($request->form['nota_credito'], $request->form['description'], $request->model_id);
         return response()->json(['current_acount' => $nota_credito], 201);
     }
 
@@ -51,8 +79,8 @@ class CurrentAcountController extends Controller
         // $client_controller->checkSaldoss($current_acount->client_id);
     }
 
-    function pdfFromClient($client_id, $months_ago) {
-        $pdf = new PdfPrintCurrentAcounts(null, $client_id, $months_ago);
+    function pdfFromModel($model_name, $model_id, $months_ago) {
+        $pdf = new PdfPrintCurrentAcounts(null, $model_name, $model_id, $months_ago);
         $pdf->printCurrentAcounts();
     }
 
@@ -119,9 +147,14 @@ class CurrentAcountController extends Controller
         return response(null, 200);
     }
 
-    function delete($id) {
+    function delete($model_name, $id) {
         $current_acount = CurrentAcount::find($id);
         $current_acount->delete();
-        CurrentAcountHelper::checkSaldos($current_acount->client_id);
+        if ($model_name == 'client') {
+            $model_id = $current_acount->client_id;
+        } else {
+            $model_id = $current_acount->provider_id;
+        }
+        CurrentAcountHelper::checkSaldos($model_name, $model_id);
     }
 }

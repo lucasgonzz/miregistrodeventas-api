@@ -20,10 +20,14 @@ class CreateBudgetsTable extends Migration
             $table->integer('num');
             $table->enum('status', ['unconfirmed', 'confirmed'])->default('unconfirmed');
 
-            $table->boolean('delivery_and_placement')->default(0);
+            // $table->boolean('delivery_and_placement')->default(0);
 
             $table->timestamp('start_at')->nullable();
             $table->timestamp('finish_at')->nullable();
+
+            $table->integer('budget_status_id')->unsigned()->default(1);
+
+            $table->text('observations')->nullable();
 
             $table->integer('user_id')->unsigned();
             $table->timestamps();

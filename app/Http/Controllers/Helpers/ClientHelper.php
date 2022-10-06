@@ -11,9 +11,7 @@ class ClientHelper {
 
 	static function getFullModel($id) {
         $client = Client::where('id', $id)
-	                        ->with('sales')
-	                        ->with('iva_condition')
-	                        ->withCount('current_acounts')
+	                        ->withAll()
 	                        ->first();
 	    $client = Self::setClientsSaldo([$client])[0];
 	    return $client;

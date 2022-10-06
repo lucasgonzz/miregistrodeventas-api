@@ -6,7 +6,7 @@ use App\AfipTicket;
 use App\Afip\WSFE;
 use App\Article;
 use App\Http\Controllers\Helpers\AfipHelper;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Sale;
 use App\WSMTXCA;
 use Illuminate\Http\Request;
@@ -144,6 +144,8 @@ class AfipWsController extends Controller
         $cbte_nro = AfipHelper::getNumeroComprobante($wsfe, $punto_venta, $cbte_tipo);
         Log::info('Numero comprobante: '.$cbte_nro);
         $importes = AfipHelper::getImportes($sale);
+        Log::info('importes:');
+        Log::info($importes);
         $today = date('Ymd');
         $moneda_id = 'PES';
         $invoice = array(
@@ -176,11 +178,13 @@ class AfipWsController extends Controller
         if (Auth()->user()->afip_information->iva_condition->name == 'Responsable inscripto') {
             $ivas = [];
             foreach ($importes['ivas'] as $iva) {
-                $ivas[] = [
-                    'Id'      => $iva['Id'],
-                    'BaseImp' => $iva['BaseImp'],
-                    'Importe' => $iva['Importe'],
-                ];
+                if ($iva['BaseImp'] > 0) {
+                    $ivas[] = [
+                        'Id'      => $iva['Id'],
+                        'BaseImp' => $iva['BaseImp'],
+                        'Importe' => $iva['Importe'],
+                    ];
+                }
             }
             $invoice['FeCAEReq']['FeDetReq']['FECAEDetRequest']['Iva'] = $ivas;
         }
@@ -216,14 +220,17 @@ class AfipWsController extends Controller
         if ($this->user()->afip_information->iva_condition->name == 'Responsable inscripto') {
             if ($client->iva_condition->name == 'Responsable inscripto') {
                 return 1; #A
-            } else if ($client->iva_condition->name == 'Monotributista') {
-                return 1; #A
-                // return 6; #B
-            } else if ($client->iva_condition->name == 'Consumidor final') {
-                return 6; #B
-            } else if ($client->iva_condition->name == 'Exento') {
+            } else {
                 return 6; #B
             }
+            // else if ($client->iva_condition->name == 'Monotributista') {
+            //     return 6; #B
+            //     // return 1; #A
+            // } else if ($client->iva_condition->name == 'Consumidor final') {
+            //     return 6; #B
+            // } else if ($client->iva_condition->name == 'Exento') {
+            //     return 6; #B
+            // }
         } else if ($this->user()->afip_information->iva_condition->name == 'Monotributista') {
             return 11; #C
         }

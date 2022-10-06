@@ -13,18 +13,21 @@ class DiscountSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::where('company_name', 'kas aberturas')
-        			->first();
-        $user_id = $user->id;
-        Discount::create([
-        	'name' 		 => 'Personajes',
-        	'percentage' => 10,
-        	'user_id'    => $user_id,
-        ]);
-        Discount::create([
-        	'name' 		 => 'Escolares',
-        	'percentage' => 20,
-        	'user_id'    => $user_id,
-        ]);
+        $users = User::where('company_name', 'kas aberturas')
+                    ->orWhere('company_name', 'colman')
+        			->get();
+
+        foreach ($users as $user) {
+            Discount::create([
+            	'name' 		 => 'Personajes',
+            	'percentage' => 10,
+            	'user_id'    => $user->id,
+            ]);
+            Discount::create([
+            	'name' 		 => 'Escolares',
+            	'percentage' => 20,
+            	'user_id'    => $user->id,
+            ]);
+        }
     }
 }

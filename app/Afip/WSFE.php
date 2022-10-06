@@ -37,7 +37,7 @@ class WSFE extends WSN
      */
     public function __construct(array $config = array())
     {
-        $this->testing                  = isset($config['testing'])     ? $config['testing']    : true;
+        $this->testing                  = isset($config['testing']) ? $config['testing'] : true;
 
         if (!isset($config['ws_url'])) {
             $config['ws_url']           = $this->testing ? 'https://wswhomo.afip.gov.ar/wsfev1/service.asmx' : 'https://servicios1.afip.gov.ar/wsfev1/service.asmx';

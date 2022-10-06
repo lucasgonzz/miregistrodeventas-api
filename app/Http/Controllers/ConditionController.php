@@ -9,31 +9,31 @@ use Illuminate\Http\Request;
 class ConditionController extends Controller
 {
     function index() {
-        $conditions = Condition::where('user_id', $this->userId())
+        $models = Condition::where('user_id', $this->userId())
                                 ->get();
-        return response()->json(['conditions' => $conditions], 200);
+        return response()->json(['models' => $models], 200);
     }
 
     function store(Request $request) {
-        $condition = Condition::create([
+        $model = Condition::create([
             'name'          => $request->name,
             'description'   => $request->description,
             'user_id'       => $this->userId(),
         ]);
-        return response()->json(['condition' => $condition], 200); 
+        return response()->json(['model' => $model], 200); 
     }
 
     function update(Request $request) {
-        $condition = Condition::find($request->id);
-        $condition->name = $request->name;
-        $condition->description = $request->description;
-        $condition->save();
-        return response()->json(['condition' => $condition], 200); 
+        $model = Condition::find($request->id);
+        $model->name = $request->name;
+        $model->description = $request->description;
+        $model->save();
+        return response()->json(['model' => $model], 200); 
     }
 
     function delete($id) {
-        $condition = Condition::find($id);
-        $condition->delete();
+        $model = Condition::find($id);
+        $model->delete();
         return response(null, 200);
     }
 }

@@ -9,7 +9,7 @@ use App\ErrorCurrentAcount;
 use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\Numbers;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Sale;
 use Carbon\Carbon;
@@ -37,17 +37,44 @@ class CurrentAcountHelper {
         return is_null($last_receipt) ? 1 : $last_receipt->num_receipt + 1;
     }
 
-    static function getSaldo($client_id, $until_current_acount) {
-        Log::info('Buscando ultimo saldo del cliente '.$until_current_acount->client->name.' hasta la cuenta corriente: '.$until_current_acount->detalle.'. Creada en: '.date_format($until_current_acount->created_at, 'd/m/Y H:i:s'));
-        $last_current_acount = CurrentAcount::where('client_id', $client_id)
-                                ->orderBy('created_at', 'DESC')
-                                ->where('created_at', '<', $until_current_acount->created_at)
-                                ->first();
-        if (is_null($last_current_acount)) {
+    static function getSaldo($model_name, $model_id, $until_current_acount) {
+        $last = CurrentAcount::orderBy('created_at', 'DESC')
+                                ->where('created_at', '<', $until_current_acount->created_at);
+        if ($model_name == 'client') {
+            $last = $last->where('client_id', $model_id);
+        } else {
+            $last = $last->where('provider_id', $model_id);
+        }
+        $last = $last->first();
+        if (is_null($last)) {
             return 0;
         } else {
-            Log::info('Retornando saldo: '.$last_current_acount->saldo.' de la cuenta corriente '.$last_current_acount->detalle.'. Creada en: '.date_format($last_current_acount->created_at, 'd/m/Y H:i:s'));
-            return $last_current_acount->saldo;
+            return $last->saldo;
+        }
+    }
+
+    static function getProviderSaldo($current_acount) {
+        $last = CurrentAcount::where('provider_id', $current_acount->provider_id)
+                            ->where('created_at', '<', $current_acount->created_at)
+                            ->orderBy('created_at', 'DESC')
+                            ->first();
+        if (is_null($last)) {
+            return 0;
+        }
+        return $last->saldo;
+    }
+
+    static function updateProviderSaldos($current_acount) {
+        $following = CurrentAcount::where('provider_id', $current_acount->provider_id)
+                                    ->where('created_at', '>', $current_acount->created_at)
+                                    ->get();
+        foreach ($following as $next) {
+            if (!is_null($next->debe)) {
+                $next->saldo = Self::getProviderSaldo($next) + $next->debe;
+            } else {
+                $next->saldo = Self::getProviderSaldo($next) - $next->haber;
+            }
+            $next->save();
         }
     }
 
@@ -88,22 +115,40 @@ class CurrentAcountHelper {
         Log::info('Se creo remito para venta sin articulos: '.$current_acount->detalle);
     }
 
-    static function pagoFromClient($data) {
+    static function savePago($data) {
+        $haber = $data['haber'];
         $pago = CurrentAcount::create([
-            'haber'                             => $data['haber'],
+            'haber'                             => $haber,
             'status'                            => 'pago_from_client',
             'user_id'                           => UserHelper::userId(),
             'num_receipt'                       => Self::getNumReceipt(),
             'client_id'                         => $data['client_id'],
+            'provider_id'                       => $data['provider_id'],
             'current_acount_payment_method_id'  => $data['current_acount_payment_method_id'],
             'created_at'                        => $data['current_date'] ? Carbon::now() : $data['created_at'],
         ]);
         $to_pay_id = !is_null($data['to_pay']) ? $data['to_pay']['id'] : null;
-        $pago->saldo = Self::getSaldo($pago->client_id, $pago) - $data['haber'];
-        $pago->detalle = Self::procesarPago($data['haber'], $data['client_id'], $pago, $to_pay_id);
+        $pago->saldo = Self::getSaldo($data['model_name'], $data['model_id'], $pago) - $haber;
+        $pago->detalle = Self::procesarPago($data['model_name'], $data['model_id'], $haber, $pago, $to_pay_id);
         $pago->save();
         Self::saveCheck($pago, $data['checks']);
         return $pago;
+    }
+
+    static function procesarPago($model_name, $model_id, $haber, $until_pago, $to_pay_id = null) {
+        if (!is_null($to_pay_id)) {
+            $until_pago->to_pay_id = $to_pay_id;
+            $until_pago->save();
+            $detalle = Self::saldarSpecificCurrentAcount($to_pay_id, $haber);
+        } else {
+            $saldar_pagandose = Self::saldarPagandose($model_name, $model_id, $haber, $until_pago);
+            $haber_restante = $saldar_pagandose['haber'];
+            $detalle = $saldar_pagandose['detalle'];    
+            // Log::info('saldarPagandose detalle: '.$detalle);
+            $detalle .= Self::saldarCuentasSinPagar($model_name, $model_id, $haber_restante, $until_pago);
+            // Log::info('saldarCuentasSinPagar detalle: '.$detalle);
+        }
+        return $detalle;
     }
 
     static function saveCheck($pago, $checks) {
@@ -125,39 +170,24 @@ class CurrentAcountHelper {
             'haber'         => $haber,
             'status'        => 'nota_credito',
             'client_id'     => $client_id,
+            'user_id'       => UserHelper::userId(),
         ]);
-        $nota_credito->saldo = Self::getSaldo($nota_credito->client_id, $nota_credito) - $haber;
-        $nota_credito->detalle = 'N.C '.Self::procesarPago($nota_credito->haber, $nota_credito->client_id, $nota_credito);
+        $nota_credito->saldo = Self::getSaldo('client', $nota_credito->client_id, $nota_credito) - $haber;
+        $nota_credito->detalle = 'N.C '.Self::procesarPago('client', $nota_credito->haber, $nota_credito->client_id, $nota_credito);
         $nota_credito->save();
         return $nota_credito;
     }
 
-    static function procesarPago($haber, $client_id, $until_pago = null, $to_pay_id = null) {
-        if (!is_null($to_pay_id)) {
-            $until_pago->to_pay_id = $to_pay_id;
-            $until_pago->save();
-            $detalle = Self::saldarSpecificCurrentAcount($to_pay_id, $haber);
-        } else {
-            $saldar_pagandose = Self::saldarPagandose($haber, $client_id, $until_pago);
-            $haber_restante = $saldar_pagandose['haber'];
-            $detalle = $saldar_pagandose['detalle'];    
-            Log::info('saldarPagandose detalle: '.$detalle);
-            $detalle .= Self::saldarCuentasSinPagar($haber_restante, $client_id, $until_pago);
-            Log::info('saldarCuentasSinPagar detalle: '.$detalle);
-        }
-        return $detalle;
-    }
-
-    static function saldarPagandose($haber, $client_id, $until_pago) {
+    static function saldarPagandose($model_name, $model_id, $haber, $until_pago) {
         $detalle = '';
-        $sin_pagar = Self::getFirstSinPagar($client_id, $until_pago);
-        $pagandose = Self::getFirstPagandose($client_id, $until_pago);
+        $sin_pagar = Self::getFirstSinPagar($model_name, $model_id, $until_pago);
+        $pagandose = Self::getFirstPagandose($model_name, $model_id, $until_pago);
         while (!is_null($sin_pagar) && !is_null($pagandose) && $sin_pagar->created_at->lt($pagandose->created_at) && $haber > 0) {
             $res = Self::saldarCurrentAcount($sin_pagar, $haber);
             $detalle .= $res['detalle'];
             $haber = $res['haber'];
-            $sin_pagar = Self::getFirstSinPagar($client_id, $until_pago);
-            $pagandose = Self::getFirstPagandose($client_id, $until_pago);
+            $sin_pagar = Self::getFirstSinPagar($model_name, $model_id, $until_pago);
+            $pagandose = Self::getFirstPagandose($model_name, $model_id, $until_pago);
             Log::info('Cuenta sin pagar despues de haber saldado la que estaba:');
             Log::info($sin_pagar);
         }
@@ -178,7 +208,7 @@ class CurrentAcountHelper {
             
             Log::info('Ahora hay '.$haber);
             
-            $pagandose = Self::getFirstPagandose($client_id, $until_pago);
+            $pagandose = Self::getFirstPagandose($model_name, $model_id, $until_pago);
         }
         return [
             'haber'   => $haber,
@@ -186,14 +216,14 @@ class CurrentAcountHelper {
         ];
     }
 
-    static function saldarCuentasSinPagar($haber, $client_id, $until_pago = null) {
+    static function saldarCuentasSinPagar($model_name, $model_id, $haber, $until_pago = null) {
         $detalle = '';
-        $sin_pagar = Self::getFirstSinPagar($client_id, $until_pago);
+        $sin_pagar = Self::getFirstSinPagar($model_name, $model_id, $until_pago);
         while (!is_null($sin_pagar) && $haber > 0) {
             $res = Self::saldarCurrentAcount($sin_pagar, $haber);
             $detalle .= $res['detalle'];
             $haber = $res['haber'];
-            $sin_pagar = Self::getFirstSinPagar($client_id, $until_pago);
+            $sin_pagar = Self::getFirstSinPagar($model_name, $model_id, $until_pago);
         }
         // if (!is_null($sin_pagar) && $haber > 0) {
         //     $res = Self::saldarCurrentAcount($sin_pagar, $haber);
@@ -222,6 +252,8 @@ class CurrentAcountHelper {
                 $detalle .= Self::pagadoDetails().' Rto '.SaleHelper::getNumSaleFromSaleId($current_acount->sale_id).' pag '.$current_acount->page.' ';
             } else if (!is_null($current_acount->budget_id)) {
                 $detalle .= Self::pagadoDetails().' Presupuesto '.$current_acount->budget->num;
+            } else if (!is_null($current_acount->provider_order_id)) {
+                $detalle .= Self::pagadoDetails().' Pedido '.$current_acount->provider_order->num;
             }
         } else { 
             if ($current_acount->status == 'pagandose') {
@@ -238,6 +270,8 @@ class CurrentAcountHelper {
                 $detalle .= Self::pagandoseDetails().' Rto '.SaleHelper::getNumSaleFromSaleId($current_acount->sale_id).' pag '.$current_acount->page.' ($'.Numbers::price($current_acount->pagandose).') ';
             } else if (!is_null($current_acount->budget_id)) {
                 $detalle .= Self::pagandoseDetails().' Presupuesto '.$current_acount->budget->num.' ($'.Numbers::price($current_acount->pagandose).') ';
+            } else if (!is_null($current_acount->provider_order_id)) {
+                $detalle .= Self::pagandoseDetails().' Pedido '.$current_acount->provider_order->num.' ($'.Numbers::price($current_acount->pagandose).') ';
             }
         }
         return [
@@ -246,46 +280,63 @@ class CurrentAcountHelper {
         ];
     }
 
-    static function getFirstSinPagar($client_id, $until_pago) {
-        $first_current_acount_sin_pagar = CurrentAcount::where('client_id', $client_id)
-                                    ->where('status', 'sin_pagar')
-                                    ->orderBy('created_at', 'ASC')
-                                    ->where('created_at', '<', $until_pago->created_at)
-                                    ->first();
-        return $first_current_acount_sin_pagar;
+    static function getFirstSinPagar($model_name, $model_id, $until_pago) {
+        $first = CurrentAcount::where('status', 'sin_pagar')
+                                ->orderBy('created_at', 'ASC')
+                                ->where('created_at', '<', $until_pago->created_at);
+        if ($model_name == 'client') {
+            $first = $first->where('client_id', $model_id);
+        } else {
+            $first = $first->where('provider_id', $model_id);
+        }
+        $first = $first->first();
+        // Log::info('saldo de la primera sin pagar = '.$first->saldo);
+        return $first;
     }
 
-    static function getFirstPagandose($client_id, $until_pago) {
-        $pagandose = CurrentAcount::where('client_id', $client_id)
-                                ->where('status', 'pagandose')
+    static function getFirstPagandose($model_name, $model_id, $until_pago) {
+        $pagandose = CurrentAcount::where('status', 'pagandose')
                                 ->orderBy('created_at', 'ASC')
-                                ->where('created_at', '<', $until_pago->created_at)
-                                ->first();
+                                ->where('created_at', '<', $until_pago->created_at);
+        if ($model_name == 'client') {
+            $pagandose = $pagandose->where('client_id', $model_id);
+        } else {
+            $pagandose = $pagandose->where('provider_id', $model_id);
+        }
+        $pagandose = $pagandose->first();
         return $pagandose;
     }
 
-    static function checkSaldos($client_id) {
-        $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        ->orderBy('created_at', 'ASC')
-                                        ->whereNotNull('debe')
-                                        ->update([
-                                            'pagandose' => 0,
-                                            'status' => 'sin_pagar',
-                                        ]);
+    static function checkSaldos($model_name, $model_id) {
+        $current_acounts = CurrentAcount::orderBy('created_at', 'ASC')
+                                        ->whereNotNull('debe');
+        if ($model_name == 'client') {
+            $current_acounts = $current_acounts->where('client_id', $model_id);
+        } else {
+            $current_acounts = $current_acounts->where('provider_id', $model_id);
+        }
 
-        $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        ->orderBy('created_at', 'ASC')
-                                        ->get();
+        $current_acounts->update([
+                            'pagandose' => 0,
+                            'status' => 'sin_pagar',
+                        ]);
 
+        $current_acounts = CurrentAcount::orderBy('created_at', 'ASC');
+        if ($model_name == 'client') {
+            $current_acounts = $current_acounts->where('client_id', $model_id);
+        } else {
+            $current_acounts = $current_acounts->where('provider_id', $model_id);
+        }
+        $current_acounts = $current_acounts->get();
 
         foreach ($current_acounts as $current_acount) {
-            $saldo = Self::getSaldo($client_id, $current_acount);
-            if ($current_acount->debe) {
+            $saldo = Self::getSaldo($model_name, $model_id, $current_acount);
+            if (!is_null($current_acount->debe)) {
                 $current_acount->saldo = Numbers::redondear($saldo + $current_acount->debe);
                 $current_acount->save();
             }
-            if ($current_acount->haber) {
-                $detalle = Self::procesarPago($current_acount->haber, $current_acount->client_id, $current_acount, $current_acount->to_pay_id);
+            if (!is_null($current_acount->haber)) {
+                $detalle = Self::procesarPago($model_name, $model_id, $current_acount->haber, $current_acount, $current_acount->to_pay_id);
                 $current_acount->saldo = Numbers::redondear($saldo - $current_acount->haber);
                 $current_acount->detalle = $detalle;
                 $current_acount->save();
@@ -331,21 +382,24 @@ class CurrentAcountHelper {
         }
     }
 
-    static function getCurrentAcountsSinceMonths($client_id, $months_ago) {
+    static function getCurrentAcountsSinceMonths($model_name, $model_id, $months_ago) {
         $months_ago = Carbon::now()->subMonths($months_ago);
-        $current_acounts = CurrentAcount::where('client_id', $client_id)
-                                        ->whereDate('created_at', '>=', $months_ago)
+        $current_acounts = CurrentAcount::whereDate('created_at', '>=', $months_ago)
                                         ->orderBy('created_at', 'ASC')
-                                        ->with('budget.client.iva_condition')
-                                        ->with('budget.observations')
-                                        ->with('budget.products.deliveries')
-                                        ->with('budget.products.article_stocks')
                                         ->with(['sale' => function($q) {
                                             return $q->withAll();
                                         }])
+                                        ->with(['budget' => function($q) {
+                                            return $q->withAll();
+                                        }])
                                         ->with('payment_method')
-                                        ->with('checks')
-                                        ->get();
+                                        ->with('checks');
+        if ($model_name == 'client') {
+            $current_acounts = $current_acounts->where('client_id', $model_id);
+        } else {
+            $current_acounts = $current_acounts->where('provider_id', $model_id);
+        }
+        $current_acounts = $current_acounts->get();
         $current_acounts = Self::format($current_acounts);
         return $current_acounts;
     }
@@ -353,13 +407,23 @@ class CurrentAcountHelper {
     static function format($current_acounts) {
         foreach ($current_acounts as $current_acount) {
             if (!is_null($current_acount->num_receipt)) {
-                $current_acount->numero = 'RP'.Self::getFormatedNum($current_acount->num_receipt);
+                $current_acount->numero = 'ReciboPago '.$current_acount->num_receipt;
+                // $current_acount->numero = 'ReciboPago'.Self::getFormatedNum($current_acount->num_receipt);
             }
             if (!is_null($current_acount->sale_id)) {
-                $current_acount->numero = 'RT'.Self::getNum('sales', $current_acount->sale_id, 'num_sale');
+                $current_acount->numero = 'Remito '.Self::getNum('sales', $current_acount->sale_id, 'num_sale');
             }
             if (!is_null($current_acount->budget_id)) {
-                $current_acount->numero = 'P'.Self::getNum('budgets', $current_acount->budget_id ,'num');
+                $current_acount->numero = 'Presupuesto '.Self::getNum('budgets', $current_acount->budget_id ,'num');
+            }
+            if (!is_null($current_acount->provider_order_id)) {
+                $current_acount->numero = 'Pedido '.Self::getNum('provider_orders', $current_acount->provider_order_id ,'num');
+            }
+            if ($current_acount->status == 'nota_credito') {
+                $current_acount->numero = 'NotaCredito';
+            }
+            if ($current_acount->detalle == 'Saldo inicial') {
+                $current_acount->numero = 'Saldo inicial';
             }
         }
         return $current_acounts;
@@ -367,6 +431,7 @@ class CurrentAcountHelper {
 
     static function getNum($table, $id, $prop) {
         $model = DB::table($table)->where('id', $id)->first();
+        return $model->{$prop};
         return Self::getFormatedNum($model->{$prop});
     }
 

@@ -52,7 +52,7 @@ class Controller extends BaseController
     function num($table, $user_id = null) {
         $last = DB::table($table)
                     ->where('user_id', $this->userId(true, $user_id))
-                    ->orderBy('id', 'DESC')
+                    ->orderBy('num', 'DESC')
                     ->first();
         if (is_null($last) || is_null($last->num)) {
             return 1;
@@ -100,4 +100,11 @@ class Controller extends BaseController
         }
         return $repeated;
     }
+
+    // function getFullModel($model_name, $id) {
+    //     $model = $model_name::where('id', $id)
+    //                     ->withAll()
+    //                     ->first();
+    //     return $model;
+    // }
 }

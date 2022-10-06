@@ -10,7 +10,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\SaleController;
 use App\Imports\ClientsImport;
 use App\Sale;
@@ -24,18 +24,15 @@ class ClientController extends Controller
 
     function index() {
     	$clients = Client::where('user_id', $this->userId())
-                            ->where('status', 'active')
-                            ->with('sales')
-                            ->with('iva_condition')
-                            ->withCount('current_acounts')
+                            ->withAll()
                             ->orderBy('id', 'DESC')
                             ->get();
-        return response()->json(['clients' => ClientHelper::setClientsSaldo($clients)], 200);
+        return response()->json(['models' => ClientHelper::setClientsSaldo($clients)], 200);
     }
 
     function show($id) {
         $client = ClientHelper::getFullModel($id);
-        return response()->json(['client' => $client], 200);
+        return response()->json(['model' => $client], 200);
     }
 
     function store(Request $request) {
@@ -49,10 +46,12 @@ class ClientController extends Controller
             'cuit'              => $request->cuit,
             'razon_social'      => $request->razon_social,
             'iva_condition_id'  => $request->iva_condition_id,
+            'price_type_id'     => $request->price_type_id,
             'seller_id'         => $seller_id,
             'user_id'           => $this->userId(),
         ]);
-        return response()->json(['client' => $client], 201);
+        $client = ClientHelper::getFullModel($client->id);
+        return response()->json(['model' => $client], 201);
     }
 
     function update(Request $request, $id) {
@@ -65,9 +64,11 @@ class ClientController extends Controller
         $client->cuit               = $request->cuit;
         $client->razon_social       = $request->razon_social;
         $client->iva_condition_id   = $request->iva_condition_id;
+        $client->price_type_id      = $request->price_type_id;
         $client->seller_id          = $request->seller_id;
         $client->save();
-        return response()->json(['client' => $client], 200);
+        $client = ClientHelper::getFullModel($client->id);
+        return response()->json(['model' => $client], 200);
     }
 
     function pdf($seller_id) {
@@ -111,14 +112,14 @@ class ClientController extends Controller
         return response()->json(['current_acount' => $current_acount], 201);
     }
 
-    function currentAcounts($client_id, $months_ago) {
-        // $this->checkCurrentAcounts($client_id);
-        CurrentAcountHelper::checkSaldos($client_id);
-        $current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($client_id, $months_ago);
-        return response()->json(['current_acounts' => $current_acounts], 200);
-    }
+    // function currentAcounts($client_id, $months_ago) {
+    //     // $this->checkCurrentAcounts($client_id);
+    //     CurrentAcountHelper::checkSaldos($client_id);
+    //     $current_acounts = CurrentAcountHelper::getCurrentAcountsSinceMonths($client_id, $months_ago);
+    //     return response()->json(['current_acounts' => $current_acounts], 200);
+    // }
 
-    function delete($id) {
+    function destroy($id) {
     	$client = Client::find($id);
         $client->status = 'inactive';
         $client->save();

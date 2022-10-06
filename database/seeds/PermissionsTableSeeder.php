@@ -2,6 +2,7 @@
 
 use App\Extencion;
 use App\Permission;
+use App\PermissionBeta;
 use Illuminate\Database\Seeder;
 
 class PermissionsTableSeeder extends Seeder
@@ -14,10 +15,207 @@ class PermissionsTableSeeder extends Seeder
     public function run()
     {
 
+        // $this->permissions();
+        $this->permissionsBeta();
+
+        
+    }
+
+    function permissionsBeta() {
+        /*
+        |--------------------------------------------------------------------------
+        | Articulos
+        |--------------------------------------------------------------------------
+        */
+        PermissionBeta::create([
+            'name' => 'Ingresar y editar articulos',
+            'slug' => 'article.store',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver articulos',
+            'slug' => 'article.index',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver costos de los articulos',
+            'slug' => 'article.cost',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Eliminar articulos',
+            'slug' => 'article.delete',
+        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Ventas
+        |--------------------------------------------------------------------------
+        */
+        PermissionBeta::create([
+            'name' => 'Crear y editar ventas',
+            'slug' => 'sale.store',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver ventas',
+            'slug' => 'sale.index',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver ventas de cualquier fecha',
+            'slug' => 'sale.index.all',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Eliminar ventas',
+            'slug' => 'sale.delete',
+        ]);
+        Permission::create([
+            'name' => 'Hacer Factura electronica',
+            'slug' => 'afip_ticket',
+        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Clientes
+        |--------------------------------------------------------------------------
+        */
+        PermissionBeta::create([
+            'name' => 'Crear clientes',
+            'slug' => 'client.store',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver clientes',
+            'slug' => 'client.index',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Eliminar clientes',
+            'slug' => 'client.delete',
+        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Empleados
+        |--------------------------------------------------------------------------
+        */
+        PermissionBeta::create([
+            'name' => 'Ver, crear y eliminar Empleados',
+            'slug' => 'employee',
+        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | Online
+        |--------------------------------------------------------------------------
+        */
+        PermissionBeta::create([
+            'name' => 'Ver pedidos en la Tienda Online',
+            'slug' => 'online.orders',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver preguntas en la Tienda Online',
+            'slug' => 'online.questions',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver clientes en la Tienda Online',
+            'slug' => 'online.buyers',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver mensajes en la Tienda Online',
+            'slug' => 'online.messages',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Ver cupones en la Tienda Online',
+            'slug' => 'online.cupons',
+        ]);
+        PermissionBeta::create([
+            'name' => 'Recibir ordenes de llamada en la Tienda Online',
+            'slug' => 'online.calls',
+        ]);
+        /*
+        |--------------------------------------------------------------------------
+        | EXTENCIONES
+        |--------------------------------------------------------------------------
+        */
+        /*
+        |--------------------------------------------------------------------------
+        | Ordenes de produccion
+        |--------------------------------------------------------------------------
+        */
+        $order_productions_extencion = Extencion::where('slug', 'order_productions')->first();
+        $permissions = [
+            [
+                'name' => 'Crear Ordenes de Produccion',
+                'slug' => 'order_production.store',
+            ],
+            [
+                'name' => 'Ver Ordenes de Produccion',
+                'slug' => 'order_production.index',
+            ],
+            // [
+            //     'name' => 'Ver precios de los artículos en las Ordenes de Produccion',
+            //     'slug' => 'order_productions.articles.price',
+            // ],
+        ];
+        foreach ($permissions as $permission) {
+            PermissionBeta::create([
+                'name'          => $permission['name'],
+                'slug'          => $permission['slug'],
+                'extencion_id'  => $order_productions_extencion->id,
+            ]);
+        }
+        /*
+        |--------------------------------------------------------------------------
+        | Presupuestos
+        |--------------------------------------------------------------------------
+        */
+        $budgets_extencion = Extencion::where('slug', 'budgets')->first();
+        $permissions = [
+            [
+                'name' => 'Crear Presupuestos',
+                'slug' => 'budget.store',
+            ],
+            [
+                'name' => 'Ver Presupuestos',
+                'slug' => 'budget.index',
+            ],
+            // [
+            //     'name' => 'Ver precios de los productos en los Presupuestos',
+            //     'slug' => 'budgets.articles.price',
+            // ],
+        ];
+        foreach ($permissions as $permission) {
+            PermissionBeta::create([
+                'name'          => $permission['name'],
+                'slug'          => $permission['slug'],
+                'extencion_id'  => $budgets_extencion->id,
+            ]);
+        }
+        /*
+        |--------------------------------------------------------------------------
+        | Proveedores
+        |--------------------------------------------------------------------------
+        */
+        $providers_extencion = Extencion::where('slug', 'providers')->first();
+        $permissions = [
+            [
+                'name' => 'Ver Proveedores',
+                'slug' => 'provider.index',
+            ],
+            [
+                'name' => 'Hacer pedidos a los Proveedores',
+                'slug' => 'provider_order.store',
+            ],
+            [
+                'name' => 'Ver los pedidos hechos a los Proveedores',
+                'slug' => 'provider_order.index',
+            ],
+        ];
+        foreach ($permissions as $permission) {
+            PermissionBeta::create([
+                'name'          => $permission['name'],
+                'slug'          => $permission['slug'],
+                'extencion_id'  => $providers_extencion->id,
+            ]);
+        }
+    }
+
+    function permissions() {
         // Articles
         Permission::create([
             'name' => 'Ingresar articulos',
-        	'slug' => 'articles.store',
+            'slug' => 'articles.store',
         ]);
         Permission::create([
             'name' => 'Ver articulos',
@@ -157,7 +355,6 @@ class PermissionsTableSeeder extends Seeder
         |--------------------------------------------------------------------------
         */
 
-
         /*
         |--------------------------------------------------------------------------
         | Ordenes de produccion
@@ -169,10 +366,10 @@ class PermissionsTableSeeder extends Seeder
                 'name' => 'Ver Ordenes de Produccion',
                 'slug' => 'order_productions.index',
             ],
-            [
-                'name' => 'Ver precios de los artículos en las Ordenes de Produccion',
-                'slug' => 'order_productions.articles.price',
-            ],
+            // [
+            //     'name' => 'Ver precios de los artículos en las Ordenes de Produccion',
+            //     'slug' => 'order_productions.articles.price',
+            // ],
         ];
         foreach ($permissions as $permission) {
             Permission::create([
@@ -198,10 +395,10 @@ class PermissionsTableSeeder extends Seeder
                 'name' => 'Crear Presupuestos',
                 'slug' => 'budgets.store',
             ],
-            [
-                'name' => 'Ver precios de los productos en los Presupuestos',
-                'slug' => 'budgets.articles.price',
-            ],
+            // [
+            //     'name' => 'Ver precios de los productos en los Presupuestos',
+            //     'slug' => 'budgets.articles.price',
+            // ],
         ];
         foreach ($permissions as $permission) {
             Permission::create([

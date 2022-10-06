@@ -10,7 +10,9 @@ use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\UserHelper;
+use App\Mail\Advise as AdviseMail;
 use App\Mail\ArticleAdvise;
+use App\PriceType;
 use App\SpecialPrice;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
@@ -19,23 +21,67 @@ use Illuminate\Support\Str;
 class ArticleHelper {
 
     static function setPrices($articles) {
-        // Log::info($articles);
+        $user = UserHelper::user();
         foreach ($articles as $article) {
-            if (!is_null($article->percentage_gain)) {
-                $article->price = Numbers::redondear($article->cost + ($article->cost * Numbers::percentage($article->percentage_gain)));
+            $cost = $article->cost;
+            if ($article->cost_in_dollars) {
+                $cost = $cost * $user->dollar;
             }
-            if (!UserHelper::user()->configuration->iva_included) {
-                $article->price = Numbers::redondear($article->price + ($article->price * Numbers::percentage($article->iva->percentage)));
+            $last_provider_percentage_gain = Self::lastProviderPercentageGain($article);
+            if ((!is_null($last_provider_percentage_gain) && $article->apply_provider_percentage_gain) || $article->percentage_gain) {
+                $article->price = null;
+                $article->save();
             }
+            if (is_null($article->price) || $article->price == '') {
+                $price = 0;
+                if (!is_null($last_provider_percentage_gain) && $article->apply_provider_percentage_gain) {
+                    $price = Numbers::redondear($cost + ($cost * Numbers::percentage($last_provider_percentage_gain)));
+                }
+                if (!is_null($article->percentage_gain)) {
+                    if ($price == 0) {
+                        $price = Numbers::redondear($cost + ($cost * Numbers::percentage($article->percentage_gain)));
+                    } else {
+                        $price = Numbers::redondear($price + ($price * Numbers::percentage($article->percentage_gain)));
+                    }
+                }
+                if (!$user->configuration->iva_included && Self::hasIva($article)) {
+                    if ($price == 0) {
+                        $price = Numbers::redondear($article->price + ($article->price * Numbers::percentage($article->iva->percentage)));
+                    } else {
+                        $price = Numbers::redondear($price + ($price * Numbers::percentage($article->iva->percentage)));
+                    }
+                }
+                $article->price = $price;
+            } 
             if (count($article->discounts) >= 1) {
-                $article->original_price = $article->price;
                 foreach ($article->discounts as $discount) {
                     $article->price = Numbers::redondear($article->price - ($article->price * Numbers::percentage($discount->percentage)));
-                    
                 }
             }
         }
         return $articles;
+    }
+
+    static function lastProviderPercentageGain($article) {
+        $last_provider = Self::lastProvider($article);
+        if (!is_null($last_provider) && !is_null($last_provider->percentage_gain)) {
+            return $last_provider->percentage_gain;
+        }
+        return null;
+    }
+
+    static function lastProvider($article) {
+        if (count($article->providers) >= 1) {
+            $last_provider = $article->providers[count($article->providers)-1];
+            if (!is_null($last_provider)) {
+                return $last_provider;
+            }
+        }
+        return null;
+    }
+
+    static function hasIva($article) {
+        return !is_null($article->iva) && $article->iva->percentage != '0' && $article->iva->percentage != 'Exento' && $article->iva->percentage != 'No Gravado'; 
     }
 
     static function setIva($articles) {
@@ -65,8 +111,7 @@ class ArticleHelper {
                             ->get();
         if ($article->stock >= 1 && count($advises) >= 1) {
             foreach ($advises as $advise) {
-                // Mail::to($advise->buyer)->send(new ArticleAdvise($advise->buyer, $advise->article));
-                MessageHelper::sendArticleAdviseMessage($advise);
+                Mail::to($advise->email)->send(new AdviseMail($article));
                 $advise->delete();
             }
         }
@@ -119,8 +164,10 @@ class ArticleHelper {
 
     static function setTags($article, $tags) {
         $article->tags()->sync([]);
-        foreach ($tags as $tag) {
-            $article->tags()->attach($tag['id']);
+        if (isset($tags)) {
+            foreach ($tags as $tag) {
+                $article->tags()->attach($tag['id']);
+            }
         }
     }
 
@@ -209,12 +256,16 @@ class ArticleHelper {
         return $variant['stock'];
     }
 
-    static function slug($name) {
+    static function slug($name, $ignore_id = null) {
         $index = 1;
         $slug = Str::slug($name);
         $repeated_article = Article::where('user_id', UserHelper::userId())
-                                    ->where('slug', $slug)
-                                    ->first();
+                                    ->where('slug', $slug);
+        if (!is_null($ignore_id)) {
+            $repeated_article = $repeated_article->where('id', '!=', $ignore_id);
+        }
+        $repeated_article = $repeated_article->first();
+        
         while (!is_null($repeated_article)) {
             $slug = substr($slug, 0, strlen($name));
             $slug .= '-'.$index;

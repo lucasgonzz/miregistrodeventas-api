@@ -16,6 +16,9 @@ class CreateOrderProductionStatusesTable extends Migration
         Schema::create('order_production_statuses', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->boolean('optional')->default(0);
+            $table->integer('position')->nullable();
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
         });
     }

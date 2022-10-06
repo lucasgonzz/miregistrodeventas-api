@@ -41,6 +41,7 @@ class AddressSeeder extends Seeder
                             ->orWhere('company_name', 'Pinocho')
                             ->orWhere('company_name', 'CandyGuay')
                             ->orWhere('company_name', 'kas aberturas')
+                            // ->orWhere('company_name', 'colman')
                             ->get();
         foreach ($commerces as $commerce) {
             Address::create([

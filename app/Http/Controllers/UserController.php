@@ -12,6 +12,7 @@ use App\UserConfiguration;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 use Validator;
 
@@ -69,23 +70,22 @@ class UserController extends Controller
     // Confirguracion - Editar
     function update(Request $request) {
         $user = User::where('id', $this->userId())->with('employees')->first();
-        $user->name = StringHelper::modelName($request->name, true);
-        $user->phone = $request->phone;
-        $user->online_description = $request->online_description;
-        $user->has_delivery = $request->has_delivery;
-        $user->delivery_price = $request->delivery_price;
-        $user->online_prices = $request->online_prices;
-        $user->dolar = $request->dolar;
-        $user->dolar_plus = $request->dolar_plus;
-        $user->order_description = $request->order_description;
+        $user->name                 = StringHelper::modelName($request->name, true);
+        $user->phone                = $request->phone;
+        $user->online_description   = $request->online_description;
+        $user->has_delivery         = $request->has_delivery;
+        $user->delivery_price       = $request->delivery_price;
+        $user->online_prices        = $request->online_prices;
+        $user->dollar               = $request->dollar;
+        $user->order_description    = $request->order_description;
         $user->save();
 
         $configuration = UserConfiguration::where('user_id', $this->userId())
                                             ->first();
-        $configuration->show_articles_without_stock = $request->configuration['show_articles_without_stock'];
-        $configuration->iva_included = $request->configuration['iva_included'];
-        $configuration->set_articles_updated_at_always = $request->configuration['set_articles_updated_at_always'];
-        $configuration->limit_items_in_sale_per_page = $request->configuration['limit_items_in_sale_per_page'];
+        $configuration->show_articles_without_stock     = $request->configuration['show_articles_without_stock'];
+        $configuration->iva_included                    = $request->configuration['iva_included'];
+        $configuration->set_articles_updated_at_always  = $request->configuration['set_articles_updated_at_always'];
+        $configuration->limit_items_in_sale_per_page    = $request->configuration['limit_items_in_sale_per_page'];
         $configuration->save();
 
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
@@ -112,6 +112,7 @@ class UserController extends Controller
     function isCompanyNameRepeated($company_name) {
         $user = User::where('company_name', $company_name)
                     ->where('id', '!=', $this->userId())
+                    ->whereNull('owner_id')
                     ->first();
         if (is_null($user)) {
             return false;

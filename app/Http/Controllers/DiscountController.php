@@ -11,10 +11,10 @@ class DiscountController extends Controller
     	$discounts = Discount::where('user_id', $this->userId())
                                 ->with('client')
     							->get();
-    	return response()->json(['discounts' => $discounts], 200);
+    	return response()->json(['models' => $discounts], 200);
     }
 
-    function update(Request $request) {
+    function update(Request $request, $id) {
     	$discount = Discount::find($request->id);
     	$discount->name = ucfirst($request->name);
     	$discount->percentage = $request->percentage;
@@ -22,7 +22,7 @@ class DiscountController extends Controller
         $discounts = Discount::where('id', $discount->id)
                                 ->with('client')
                                 ->first();
-    	return response()->json(['discount' => $discount], 200);
+    	return response()->json(['model' => $discount], 200);
     }
 
     function store(Request $request) {
@@ -35,6 +35,12 @@ class DiscountController extends Controller
         $discount = Discount::where('id', $discount->id)
                                 ->with('client')
                                 ->first();
-    	return response()->json(['discount' => $discount], 201);
+    	return response()->json(['model' => $discount], 201);
+    }
+
+    // TERMINAR
+    function delete($id) {
+        $model = Discount::find($id);
+        $model->delete();
     }
 }

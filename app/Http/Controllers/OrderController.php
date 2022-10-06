@@ -8,7 +8,7 @@ use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\CartHelper;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\OrderHelper;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Notifications\OrderCanceled as OrderCanceledNotification;
 use App\Notifications\OrderDelivered;
 use App\Notifications\OrderFinished;
@@ -31,8 +31,12 @@ class OrderController extends Controller
     
     function confirmedFinished() {
         $orders = Order::where('user_id', $this->userId())
-                        ->where('status', 'confirmed')
-                        ->orWhere('status', 'finished')
+                        ->where(function($query) {
+                            return $query->where('status', 'confirmed')
+                                        ->orWhere('status', 'finished');
+                        })
+                        // ->where('status', 'confirmed')
+                        // ->orWhere('status', 'finished')
                         ->withAll()
                         ->get();
         $orders = OrderHelper::setArticlesKeyAndVariant($orders);

@@ -17,8 +17,9 @@ class CreateArticleProviderOrderTable extends Migration
             $table->id();
             $table->integer('article_id')->unsigned();
             $table->integer('provider_order_id')->unsigned();
-            $table->integer('amount');
+            $table->integer('amount')->nullable();
             $table->integer('received')->default(0);
+            $table->decimal('cost', 12,2)->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
         });

@@ -19,22 +19,25 @@ class SubCategorySeeder extends Seeder
         $this->nebulaStore();
 
         $this->kasAberturas();
+
+        $this->colman();
     }
 
     function pinocho() {
         $user = User::where('company_name', 'Pinocho')
                     ->first();
         $categories = Category::where('user_id', $user->id)
+                                ->orderBy('id', 'ASC')
                                 ->get();
         foreach ($categories as $category) {
             $names = [];
-            if ($category->name == 'Juguetes infantiles') {
-                $names = ['sonajeros'];
+            if ($category->name == 'Auriculares con muchas cosas') {
+                $names = ['Casco', 'Comunes'];
             } else if ($category->name == 'INFLABLES') {
                 $names = ['personajes', 'homrigas'];
-            } else if ($category->name == 'Auriculares con muchas cosas') {
-                $names = ['Casco', 'Comunes'];
-            } 
+            }  else if ($category->name == 'Juguetes infantiles') {
+                $names = ['sonajeros'];
+            }
             for ($i=0; $i < count($names); $i++) {
                 $sub_category = SubCategory::create([
                     'name'        => $names[$i],
@@ -90,6 +93,28 @@ class SubCategorySeeder extends Seeder
                     'name'        => $names[$i],
                     'category_id' => $category->id,
                     'user_id' => $user->id,
+                ]);         
+            }
+        }
+    }
+
+    function colman() {
+        $user = User::where('company_name', 'colman')
+                    ->first();
+        $categories = Category::where('user_id', $user->id)
+                                ->get();
+        foreach ($categories as $category) {
+            $names = [];
+            if ($category->name == 'Lava ropas') {
+                $names = ['lavarropa nuevo'];
+            } else if ($category->name == 'Aires acondicionados') {
+                $names = ['aire nuevo'];
+            } 
+            for ($i=0; $i < count($names); $i++) {
+                $sub_category = SubCategory::create([
+                    'name'          => $names[$i],
+                    'category_id'   => $category->id,
+                    'user_id'       => $user->id,
                 ]);         
             }
         }

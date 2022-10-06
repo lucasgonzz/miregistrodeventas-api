@@ -32,14 +32,20 @@ Route::get('/order-productions/pdf/{link}', function($link) {
 Route::get('/delete-subs', 'SubscriptionController@deleteAll');
 Route::get('/afip/{sale_id}', 'AfipWsController@init');
 
-Route::get('/articles/pdf', 'ArticleController@pdf');
+Route::get('/articles/pdf/{ids}', 'ArticleController@pdf');
 
-Route::get('/budgets/pdf/{only_deliveries}/{id}', 'BudgetController@pdf');
+Route::get('/budgets/pdf/{id}', 'BudgetController@pdf');
+Route::get('/order-productions/print-pdf/{id}', 'OrderProductionController@pdf');
+Route::get('/order-productions/articles-pdf/{id}', 'OrderProductionController@articlesPdf');
+
 Route::get('/provider-orders/pdf/{id}', 'ProviderOrderController@pdf');
 
 Route::get('/clients/check-saldos/{client_id}', 
 	'ClientController@checkCurrentAcounts'
 );
+
+Route::get('/budgets/set-articles/{company_name}', 'HelperController@setArticlesFromBudgets');
+Route::get('/order-productions/set-articles/{company_name}', 'HelperController@setArticlesFromOrderProductions');
 
 // Devuelve las comisiones de las ventas que le corresponden al vendedor
 Route::get('/slugs', function() {
@@ -110,7 +116,7 @@ Route::post('/logout', 'AuthController@logout');
 Route::post('/users', 'UserController@store');
 
 Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
-Route::get('/current-acounts/pdf/{client_id}/{months_ago}', 'CurrentAcountController@pdfFromClient');
+Route::get('/current-acounts/pdf/{model_name}/{model_id}/{months_ago}', 'CurrentAcountController@pdfFromModel');
 Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}/{afip_ticket?}', 'SaleController@pdf');

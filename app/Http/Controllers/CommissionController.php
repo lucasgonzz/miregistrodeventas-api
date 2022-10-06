@@ -64,7 +64,7 @@ class CommissionController extends Controller
         return response(null, 201);
     }
     
-    function delete($sale) {
+    function deleteFromSale($sale) {
         $commissions = Commission::where('sale_id', $sale->id)
                                         ->pluck('id');
         Commission::destroy($commissions);

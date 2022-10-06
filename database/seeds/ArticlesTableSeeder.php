@@ -47,13 +47,15 @@ class ArticlesTableSeeder extends Seeder
         ];
     public function run()
     {
-        $this->candy();
+        // $this->candy();
 
-        $this->kasAberturas();
+        // $this->kasAberturas();
 
-        $this->pinocho();
+        // $this->pinocho();
 
-        $this->nebulaStore();
+        // $this->nebulaStore();
+
+        $this->colman();
 
         return;
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
@@ -480,7 +482,8 @@ class ArticlesTableSeeder extends Seeder
             [
                 'bar_code'          => '123',
                 'featured'          => 1,
-                'name'              => 'Remera manga larga',
+                'name'              => 'Auricular casco',
+                'featured'          => 1,
                 'stock'             => 10,
                 'cost'              => 50,
                 'price'             => 50,
@@ -491,26 +494,57 @@ class ArticlesTableSeeder extends Seeder
                 ]
             ],
             [
-                'bar_code'          => '234',
-                'name'              => 'Picaporte',
-                'featured'          => null,
-                'stock'             => 10,
-                'cost'              => 200,
-                'price'             => 30,
+                'bar_code'          => '1233',
+                'featured'          => 1,
+                'name'              => 'Auricular comun',
+                'featured'          => 2,
+                'stock'             => 0,
+                'cost'              => 50,
+                'price'             => 50,
                 'sub_category_id'   => 2,
+                'stock'             => 0,
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
                 ]
             ],
             [
-                'bar_code'          => '345',
+                'bar_code'          => '234',
+                'name'              => 'Inflable de personajes',
                 'featured'          => null,
-                'name'              => 'Cerradura reforzada',
                 'stock'             => 10,
-                'cost'              => 700,
-                'price'             => 50,
+                'cost'              => 200,
+                'price'             => 30,
                 'sub_category_id'   => 3,
+                'stock'             => null,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '2345',
+                'name'              => 'Inflable de hormigas',
+                'featured'          => 3,
+                'stock'             => 10,
+                'cost'              => 200,
+                'price'             => 30,
+                'sub_category_id'   => 4,
+                'stock'             => null,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    $this->iphone_images['cable'],
+                ]
+            ],
+            [
+                'bar_code'          => '2345',
+                'name'              => 'sonajero infantil',
+                'featured'          => null,
+                'stock'             => null,
+                'cost'              => 200,
+                'price'             => 30,
+                'sub_category_id'   => 5,
+                'stock'             => null,
                 'images'            => [
                     $this->iphone_images['cargador'],
                     $this->iphone_images['cable'],
@@ -519,25 +553,28 @@ class ArticlesTableSeeder extends Seeder
         ];
 
         $user = User::where('company_name', 'pinocho')->first();
-        foreach ($articles as $article) {
-            $art = Article::create([
-                'bar_code'          => $article['bar_code'],
-                'featured'          => $article['featured'],
-                'name'              => $article['name'],
-                'slug'              => ArticleHelper::slug($article['name']),
-                'cost'              => $article['cost'],
-                'stock'             => $article['stock'] ,
-                'price'             => $article['price'],
-                'sub_category_id'   => $article['sub_category_id'],
-                'user_id'           => $user->id,
-            ]);    
-            foreach ($article['images'] as $url) { 
-                Image::create([
-                    'article_id' => $art->id,
-                    'url'        => $url,
-                ]);
+        for ($i=1; $i < 10; $i++) { 
+            foreach ($articles as $article) {
+                $art = Article::create([
+                    'bar_code'          => $article['bar_code'],
+                    'featured'          => $article['featured'],
+                    'name'              => $article['name'].' $i: '.$i,
+                    'slug'              => ArticleHelper::slug($article['name']),
+                    'cost'              => $article['cost'],
+                    'stock'             => $article['stock'] ,
+                    'price'             => $article['price'],
+                    'sub_category_id'   => $article['sub_category_id'],
+                    'stock'             => $article['stock'],
+                    'user_id'           => $user->id,
+                ]);    
+                foreach ($article['images'] as $url) { 
+                    Image::create([
+                        'article_id' => $art->id,
+                        'url'        => $url,
+                    ]);
+                }
+                $this->createDiscount($art);    
             }
-            $this->createDiscount($art);    
         }
     }
 
@@ -552,9 +589,10 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Inflables',
                 'images'            => [
                     $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
-                'colors'            => [1],
-                'sizes'             => [1],
+                'colors'            => [],
+                'sizes'             => [],
             ],
             [
                 'bar_code'          => '',
@@ -565,6 +603,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'De lana',
                 'images'            => [
                     $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [1, 2],
                 'sizes'             => [2, 3],
@@ -578,6 +617,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Jeans',
                 'images'            => [
                     $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [1],
                 'sizes'             => [],
@@ -591,6 +631,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'De cuero',
                 'images'            => [
                     $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [],
                 'sizes'             => [1],
@@ -604,6 +645,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Deportivas',
                 'images'            => [
                     $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [1],
                 'sizes'             => [],
@@ -617,6 +659,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'Urbanas',
                 'images'            => [
                     $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [],
                 'sizes'             => [1],
@@ -647,7 +690,111 @@ class ArticlesTableSeeder extends Seeder
             }    
             foreach ($article['sizes'] as $size) { 
                 $art->sizes()->attach($size);
+            }   
+            $this->createDescriptions($art); 
+        }
+    }
+
+    function colman() {
+        $user = User::where('company_name', 'colman')
+                    ->first();
+        $bsas = Provider::where('user_id', $user->id)
+                            ->where('name', 'Buenos Aires')
+                            ->first();
+        $rosario = Provider::where('user_id', $user->id)
+                            ->where('name', 'Rosario')
+                            ->first();
+        $articles = [
+            [
+                'num'               => '1',
+                'bar_code'          => '123',
+                'name'              => 'Plaqueta de BSAS',
+                'stock'             => 10,
+                'cost'              => 100,
+                'price'             => null,
+                'sub_category_name' => 'lavarropa nuevo',
+                'provider_id'       => $bsas->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+            [
+                'num'               => '2',
+                'bar_code'          => '234',
+                'name'              => 'Plaqueta de Rosario',
+                'stock'             => 10,
+                'cost'              => 100,
+                'price'             => null,
+                'sub_category_name' => 'lavarropa nuevo',
+                'provider_id'       => $rosario->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+            [
+                'num'               => '3',
+                'bar_code'          => '345',
+                'name'              => 'Aire de BSAS',
+                'stock'             => 10,
+                'cost'              => 200,
+                'price'             => null,
+                'sub_category_name' => 'aire nuevo',
+                'provider_id'       => $bsas->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+            [
+                'num'               => '4',
+                'bar_code'          => '456',
+                'name'              => 'Aire de Rosario',
+                'stock'             => 10,
+                'cost'              => 200,
+                'price'             => null,
+                'sub_category_name' => 'aire nuevo',
+                'provider_id'       => $rosario->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+        ];
+        foreach ($articles as $article) {
+            $art = Article::create([
+                'num'               => $article['num'],
+                'bar_code'          => $article['bar_code'],
+                'provider_code'     => 'p-'.$article['bar_code'],
+                'name'              => $article['name'],
+                'slug'              => ArticleHelper::slug($article['name']),
+                'cost'              => $article['cost'],
+                'stock'             => $article['stock'] ,
+                'price'             => $article['price'],
+                'sub_category_id'   => $this->getSubcategory($user, $article)->id,
+                'user_id'           => $user->id,
+            ]);    
+            foreach ($article['images'] as $url) { 
+                Image::create([
+                    'article_id' => $art->id,
+                    'url'        => $url,
+                    'color_id'   => $this->getColorId($article),
+                ]);
             }    
+            $art->providers()->attach($article['provider_id'], [
+                                        'cost'  => $article['cost'],
+                                        'amount' => $article['stock'],
+                                    ]);
+            $this->createDescriptions($art); 
         }
     }
 

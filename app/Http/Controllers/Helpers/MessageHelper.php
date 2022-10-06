@@ -129,20 +129,20 @@ class MessageHelper {
     }
 
     static function sendArticleAdviseMessage($advise) {
-        $advise_message = "Hola {$advise->buyer->name}! Ya ingreso {$advise->article->name}";
-        $message = Message::create([
-            'user_id' => UserHelper::userId(),
-            'buyer_id' => $advise->buyer_id,
-            'text' => $advise_message,
-            'type' => 'article_advise',
-            'article_id' => $advise->article->id,
-        ]);
-        $message = Self::getFullMessage($message->id);
+        // $advise_message = "Hola! Queriamos avisarte que ya ingreso el artículo: {$advise->article->name}";
+        // $message = Message::create([
+        //     'user_id' => UserHelper::userId(),
+        //     'buyer_id' => $advise->buyer_id,
+        //     'text' => $advise_message,
+        //     'type' => 'article_advise',
+        //     'article_id' => $advise->article->id,
+        // ]);
+        // $message = Self::getFullMessage($message->id);
         // Broadcast
-        $title = "Ingreso nuevo stock para {$advise->article->name}";
+        $title = "Hola! Queriamos avisarte que ya ingreso nuevo stock para el artículo: {$advise->article->name}";
         $url = $advise->article->user->online.'/articulos/'.$advise->article->slug;
-        $advise->buyer->notify(new MessageSend($message, false, $title, $url));
-        $advise->buyer->user->notify(new MessageSend($message, true));
+        // $advise->buyer->notify(new MessageSend($message, false, $title, $url));
+        // $advise->buyer->user->notify(new MessageSend($message, true));
         // Notification
         // TwilioHelper::sendNotification($advise->buyer_id, $title, $advise_message);
     }

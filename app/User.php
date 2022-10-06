@@ -62,7 +62,7 @@ class User extends Authenticatable
     }
 
     public function permissions() {
-        return $this->belongsToMany('App\Permission');
+        return $this->belongsToMany('App\PermissionBeta');
     }
 
     public function articles() {

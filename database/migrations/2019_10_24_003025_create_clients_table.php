@@ -24,7 +24,9 @@ class CreateClientsTable extends Migration
             $table->string('cuit', 128)->nullable();
             $table->string('razon_social', 128)->nullable();
             $table->integer('iva_condition_id')->unsigned()->nullable();
+            $table->integer('price_type_id')->unsigned()->nullable();
             $table->integer('location_id')->unsigned()->nullable();
+            $table->text('description')->nullable();
             $table->integer('user_id')->unsigned();
             $table->bigInteger('seller_id')->nullable()->unsigned();
             $table->enum('status', ['active', 'inactive'])->default('active');

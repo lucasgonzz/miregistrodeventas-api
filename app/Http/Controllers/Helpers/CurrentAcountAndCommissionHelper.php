@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Helpers\Sale;
+namespace App\Http\Controllers\Helpers;
 
 use App\Article;
 use App\Client;
@@ -14,13 +14,13 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\CommissionHelper;
 use App\Http\Controllers\Helpers\Numbers;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Sale;
 use Illuminate\Support\Facades\Log;
 use App\SaleType;
 
-class Commissioners extends Controller {
+class CurrentAcountAndCommissionHelper extends Controller {
 
     function __construct($sale, $discounts, $only_commissions, $index = null) {
         $this->user = UserHelper::getFullModel();
@@ -52,7 +52,7 @@ class Commissioners extends Controller {
             $this->items_en_venta++;
             $this->items_en_pagina++;
             $this->debe += SaleHelper::getTotalItem($article);
-            if ($this->isItemOffset() || $this->items_en_venta == $total_items) {
+            if ($this->isLimitPerPage() || $this->items_en_venta == $total_items) {
                 $this->proccessCurrentAcount();
             }
         }
@@ -60,7 +60,7 @@ class Commissioners extends Controller {
             $this->items_en_venta++;
             $this->items_en_pagina++;
             $this->debe += SaleHelper::getTotalItem($combo);
-            if ($this->isItemOffset() || $this->items_en_venta == $total_items) {
+            if ($this->isLimitPerPage() || $this->items_en_venta == $total_items) {
                 $this->proccessCurrentAcount();
             }
         }
@@ -68,7 +68,7 @@ class Commissioners extends Controller {
             $this->items_en_venta++;
             $this->items_en_pagina++;
             $this->debe += SaleHelper::getTotalItem($service);
-            if ($this->isItemOffset() || $this->items_en_venta == $total_items) {
+            if ($this->isLimitPerPage() || $this->items_en_venta == $total_items) {
                 $this->proccessCurrentAcount();
             }
         }
@@ -79,7 +79,6 @@ class Commissioners extends Controller {
         $total_items += count($this->sale->articles);
         $total_items += count($this->sale->combos);
         $total_items += count($this->sale->services);
-        Log::info('Total items: '.$total_items);
         return $total_items;
     }
 
@@ -105,7 +104,7 @@ class Commissioners extends Controller {
         $this->debe = 0;
     }
 
-    function isItemOffset() {
+    function isLimitPerPage() {
         if (!is_null($this->user->configuration->limit_items_in_sale_per_page) && $this->user->configuration->limit_items_in_sale_per_page == $this->items_en_pagina) {
             return true;
         }
@@ -129,7 +128,7 @@ class Commissioners extends Controller {
                 'description' => CurrentAcountHelper::getDescription($this->sale, $this->debe_sin_descuentos),
                 'created_at' => $this->getCreatedAt(),
             ]);
-            $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo($this->sale->client_id, $current_acount) + $this->debe);
+            $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo('client', $this->sale->client_id, $current_acount) + $this->debe);
             $current_acount->save();
         }
     }

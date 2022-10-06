@@ -9,6 +9,6 @@ class Extencion extends Model
     protected $guarded = [];
 
     function permissions() {
-        return $this->hasMany('App\Permission');
+        return $this->hasMany('App\PermissionBeta');
     }
 }

@@ -27,14 +27,16 @@ class CreateArticlesTable extends Migration
             $table->integer('stock')->nullable();
             $table->integer('stock_min')->nullable();
             $table->boolean('online')->default(1);
-            $table->boolean('with_dolar')->default(0);
+            // $table->boolean('with_dolar')->default(0);
             $table->integer('user_id')->unsigned();
             $table->integer('brand_id')->unsigned()->nullable();
-            $table->integer('iva_id')->unsigned()->default(2);
+            $table->integer('iva_id')->unsigned()->default(2)->nullable();
             $table->bigInteger('sub_category_id')->nullable()->unsigned();
-            $table->enum('status', ['active', 'inactive', 'from_provider_order'])->default('active');
+            $table->enum('status', ['active', 'inactive', 'from_provider_order', 'from_budget'])->default('active');
             $table->bigInteger('condition_id')->nullable()->unsigned();
             $table->integer('featured')->nullable();
+            $table->boolean('cost_in_dollars')->default(0)->nullable();
+            $table->boolean('apply_provider_percentage_gain')->default(1)->nullable();
 
             $table->foreign('user_id')
                     ->references('id')->on('users');

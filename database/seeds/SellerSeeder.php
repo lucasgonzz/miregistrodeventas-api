@@ -21,7 +21,6 @@ class SellerSeeder extends Seeder
         // $user_id = 2;
         $potro = Seller::create([
         	'name' 		 => 'Potro',
-        	'surname' 	 => 'Apellido del Potro',
         	'commission' => 10,
         	'user_id' 	 => $user_id,
         ]);	
@@ -32,7 +31,6 @@ class SellerSeeder extends Seeder
         ]);
         $bocha = Seller::create([
             'name'       => 'Bocha',
-            'surname'    => 'Apellido del Bocha',
             'commission' => 10,
             'user_id'    => $user_id,
             'seller_id'  => $potro->id,

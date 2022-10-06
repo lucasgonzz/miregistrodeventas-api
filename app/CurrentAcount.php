@@ -16,6 +16,10 @@ class CurrentAcount extends Model
         return $this->belongsTo('App\Budget');
     }
 
+    public function provider_order() {
+        return $this->belongsTo('App\ProviderOrder');
+    }
+
     public function checks() {
         return $this->hasMany('App\Check');
     }

@@ -10,6 +10,11 @@ class Client extends Model
     use Notifiable;
     
     protected $guarded = [];
+
+    function scopeWithAll($query) {
+        $query->with('sales', 'iva_condition', 'price_type')
+            ->withCount('current_acounts');
+    }
     
     public function sales() {
         return $this->hasMany('App\Sale');
@@ -25,6 +30,10 @@ class Client extends Model
     
     public function current_acounts() {
         return $this->hasMany('App\CurrentAcount');
+    }
+    
+    public function price_type() {
+        return $this->belongsTo('App\PriceType');
     }
     
     // public function errors() {

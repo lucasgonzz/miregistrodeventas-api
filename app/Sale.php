@@ -14,7 +14,11 @@ class Sale extends Model
     }
 
     function scopeWithAll($query) {
-        $query->with('client.iva_condition', 'buyer', 'articles', 'impressions', 'special_price', 'commissions', 'discounts', 'afip_ticket', 'combos', 'order.cupon', 'services');
+        $query->with('client.iva_condition', 'client.price_type', 'buyer', 'articles', 'impressions', 'special_price', 'commissions', 'discounts', 'afip_ticket', 'combos', 'order.cupon', 'services', 'employee', 'budget.articles', 'budget.client');
+    }
+
+    public function budget() {
+        return $this->belongsTo('App\Budget');
     }
 
     public function sale_type() {
@@ -27,6 +31,10 @@ class Sale extends Model
 
     public function commissioners() {
         return $this->belongsToMany('App\Commissioner')->withPivot('percentage', 'is_seller');
+    }
+
+    public function employee() {
+        return $this->belongsTo('App\User', 'employee_id');
     }
 
     public function current_acounts() {

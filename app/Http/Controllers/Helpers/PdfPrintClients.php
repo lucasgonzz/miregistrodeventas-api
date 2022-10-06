@@ -6,7 +6,7 @@ use App\Client;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintArticles;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use Carbon\Carbon;
 use fpdf;
 require(__DIR__.'/../fpdf/fpdf.php');

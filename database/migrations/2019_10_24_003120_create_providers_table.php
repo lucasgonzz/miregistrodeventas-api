@@ -26,6 +26,7 @@ class CreateProvidersTable extends Migration
             $table->text('observations')->nullable();
             $table->integer('location_id')->unsigned()->default(0);
             $table->integer('iva_condition_id')->unsigned()->default(0);
+            $table->decimal('percentage_gain', 8,2)->nullable();
             $table->integer('user_id')->unsigned();
             // $table->softDeletes();
             $table->enum('status', ['active', 'inactive'])->default('active');

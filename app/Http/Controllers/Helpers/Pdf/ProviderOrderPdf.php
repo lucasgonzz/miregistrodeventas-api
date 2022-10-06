@@ -186,17 +186,20 @@ class ProviderOrderPdf extends fpdf {
 				$this->printArticle($article);
 			}
 			$this->x = 5;
-			$this->y += $this->getHeight($article);
 		}
 	}
 
 	function printArticle($article) {
-		$this->Cell(40, $this->getHeight($article), $article->bar_code, 'T', 0, 'C');
-		$this->Cell(20, $this->getHeight($article), $article->pivot->amount, 'T', 0, 'C');
-		$this->MultiCell(110, $this->line_height, $article->name, 'T', 'C', false);
+		$this->Cell(40, $this->line_height, $article->bar_code, 0, 0, 'C');
+		$this->Cell(20, $this->line_height, $article->pivot->amount, 0, 0, 'C');
+		$y_1 = $this->y;
+		$this->MultiCell(110, $this->line_height, $article->name, 0, 'C', false);
+		$y_2 = $this->y;
+		$this->y = $y_1;
 		$this->x = 175;
-		$this->y -= $this->getHeight($article);
-		$this->Cell(30, $this->getHeight($article), $article->pivot->received, 'T', 0, 'C');
+		$this->Cell(30, $this->line_height, $article->pivot->received, 0, 0, 'C');
+		$this->y = $y_2;
+		$this->Line(5, $this->y, 205, $this->y);
 	}
 
 	function observations() {

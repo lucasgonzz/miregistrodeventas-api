@@ -9,7 +9,7 @@ class Plan extends Model
     protected $guarded = [];
 
     function permissions() {
-        return $this->belongsToMany('App\Permission');
+        return $this->belongsToMany('App\PermissionBeta');
     }
 
     function features() {

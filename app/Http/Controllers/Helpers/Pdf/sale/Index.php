@@ -9,7 +9,7 @@ use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfArticleHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticles;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\pdf\sale\Footer;
 use App\Http\Controllers\Helpers\pdf\sale\Header;
 use App\Impression;

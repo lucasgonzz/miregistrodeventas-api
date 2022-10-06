@@ -8,7 +8,7 @@ use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
-use App\Http\Controllers\Helpers\Sale\SaleHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
 use App\Sale;
 use App\User;
 use Carbon\Carbon;
@@ -25,6 +25,7 @@ class SalesTableSeeder extends Seeder
     {
         $this->pinocho();
         $this->kasAberturas();
+        $this->colman();
         return;
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
         $now = Carbon::now();
@@ -106,6 +107,34 @@ class SalesTableSeeder extends Seeder
                                             'cost'        => $article->cost,
                                             'price'       => $article->price,
                                         ]);
+            }
+        }
+    }
+
+    function colman() {
+        $user = User::where('company_name', 'colman')->first();
+        $employees = User::where('owner_id', $user->id)
+                        ->get();
+        for ($day=1; $day < 5; $day++) { 
+            foreach ($employees as $employee) {
+                $sale = Sale::create([
+                    'user_id'           => $user->id,
+                    'num_sale'          => SaleHelper::numSale($user->id),
+                    'percentage_card'   => null,
+                    'created_at'        => Carbon::now()->subDays($day),
+                    'employee_id'       => $employee->id,
+                ]);
+                $articles = Article::where('user_id', $user->id)
+                                    ->take(2)
+                                    ->get();
+                $articles = ArticleHelper::setPrices($articles);
+                foreach ($articles as $article) {
+                    $sale->articles()->attach($article->id, [
+                                                'amount'      => 2,
+                                                'cost'        => $article->cost,
+                                                'price'       => $article->price,
+                                            ]);
+                }
             }
         }
     }
