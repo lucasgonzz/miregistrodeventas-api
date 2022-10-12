@@ -23,6 +23,7 @@ class AfipInformationController extends Controller
         $afip_information->ingresos_brutos = $request->ingresos_brutos;
         $afip_information->inicio_actividades = $request->inicio_actividades;
         $afip_information->punto_venta = $request->punto_venta;
+        $afip_information->afip_ticket_production = $request->afip_ticket_production;
         $afip_information->save();
         return response()->json(['afip_information' => $afip_information], 200);
     }

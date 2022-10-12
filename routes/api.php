@@ -204,6 +204,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		'OrderProductionController@delete'
 	);
 
+	// Recetas - recipe
+	Route::resource('recipe', 'RecipeController');
+
 	// ProductDelivery
 	Route::post('/budget-product-deliveries', 
 		'BudgetProductDeliveryController@store'
@@ -227,8 +230,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::resource('location', 'LocationController');
 
 	// ProviderOrders
-	Route::get('/provider-order', 
+	Route::get('/provider-order/{from_date}/{until_date?}', 
 		'ProviderOrderController@index'
+	);
+	Route::get('/provider-order-previus-days/{index}', 
+		'ProviderOrderController@previusDays'
 	);
 	Route::post('/provider-order', 
 		'ProviderOrderController@store'

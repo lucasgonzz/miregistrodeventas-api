@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\Pdf\ProviderOrderPdf;
 use App\Http\Controllers\Helpers\ProviderOrderHelper;
 use App\ProviderOrder;
@@ -11,14 +12,23 @@ use Illuminate\Http\Request;
 class ProviderOrderController extends Controller
 {
 
-    function index() {
-        $provider_orders = ProviderOrder::where('user_id', $this->userId())
-                                        ->with('provider')
-                                        ->with('articles')
-                                        ->orderBy('id', 'DESC')
-                                        ->get();
-        // $provider_orders = ProviderOrderHelper::setArticles($provider_orders);
-        return response()->json(['models' => $provider_orders], 200);
+    function index($from_date, $until_date = null) {
+        $models = ProviderOrder::where('user_id', $this->userId());
+        if (!is_null($until_date)) {
+            $models = $models->whereDate('created_at', '>=', $from_date)
+                            ->whereDate('created_at', '<=', $until_date);
+        } else {
+            $models = $models->whereDate('created_at', $from_date);
+        }
+        $models = $models->withAll()
+                        ->orderBy('created_at', 'DESC')
+                        ->get();
+        return response()->json(['models' => $models], 200);
+    }
+
+    function previusDays($index) {
+        $days = GeneralHelper::previusDays('App\ProviderOrder', $index);
+        return response()->json(['days' => $days], 200);
     }
 
     function store(Request $request) {
@@ -70,6 +80,7 @@ class ProviderOrderController extends Controller
 
     function destroy($id) {
         $model = ProviderOrder::find($id);
+        ProviderOrderHelper::deleteCurrentAcount($model);
         $model->articles()->sync([]);
         $model->delete();
         return response(null, 200);

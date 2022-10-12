@@ -223,6 +223,7 @@ class PdfPrintSale extends fpdf {
 		$this->setX(140);
 		if ($this->sale->afip_ticket->cbte_tipo == 1) {
 			$this->setY(190);
+			$this->setX(140);
 			$this->SetFont('Arial', 'B', 9);
 			// 1
 			$this->Cell(40, 5, 'Importe Neto Gravado: $', 0, 0, 'R');

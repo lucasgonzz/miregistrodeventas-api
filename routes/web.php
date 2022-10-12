@@ -120,6 +120,8 @@ Route::get('/current-acounts/pdf/{model_name}/{model_id}/{months_ago}', 'Current
 Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}/{afip_ticket?}', 'SaleController@pdf');
+Route::get('/sales/afip-ticket/pdf/{sale_id}', 'SaleController@pdfAfipTicket');
+
 
 Route::get('/sales/new-pdf/{ids}', 'SaleController@newPdf');
 

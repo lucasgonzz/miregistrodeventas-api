@@ -30,7 +30,7 @@ class Controller extends BaseController
     }
 
     function user() {
-        return Auth()->user();
+        return User::find($this->userId());
     }
 
     function getModelBy($table, $prop_name, $prop_value, $from_user = false, $prop_to_return = null, $return_0 = false) {
@@ -101,10 +101,10 @@ class Controller extends BaseController
         return $repeated;
     }
 
-    // function getFullModel($model_name, $id) {
-    //     $model = $model_name::where('id', $id)
-    //                     ->withAll()
-    //                     ->first();
-    //     return $model;
-    // }
+    function fullModel($model_name, $id) {
+        $model = $model_name::where('id', $id)
+                        ->withAll()
+                        ->first();
+        return $model;
+    }
 }

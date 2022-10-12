@@ -14,5 +14,12 @@ class StringHelper {
 	static function onlyFirstWordUpperCase($string) {
 		return ucfirst(strtolower($string));
 	}
+
+    static function short($string, $length) {
+        if (strlen($string) > $length) {
+            $string = substr($string, 0, $length-2) . '..';
+        }
+        return $string;
+    }
 	
 }

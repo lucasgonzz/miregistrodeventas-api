@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Helpers;
 use App\Http\Controllers\Helpers\Numbers;
+use App\Http\Controllers\Helpers\UserHelper;
 use Illuminate\Support\Facades\Log;
 
 class AfipHelper {
@@ -31,27 +32,32 @@ class AfipHelper {
         ];
         $subtotal           = 0;
         $total              = 0;
-        foreach ($sale->articles as $article) {
-            if (Auth()->user()->afip_information->iva_condition->name == 'Responsable inscripto') {
+        if (UserHelper::getFullModel()->afip_information->iva_condition->name == 'Responsable inscripto') {
+            foreach ($sale->articles as $article) {
                 $gravado                += Self::getImporteGravado($article);
-                $exento                 += Self::getImporteIva($article, 'Exento')['Importe'];
-                $neto_no_gravado        += Self::getImporteIva($article, 'No Gravado')['Importe'];
+                $exento                 += Self::getImporteIva($article, 'Exento')['BaseImp'];
+                $neto_no_gravado        += Self::getImporteIva($article, 'No Gravado')['BaseImp'];
                 $iva                    += Self::getImporteIva($article);
                 $res                    = Self::getImporteIva($article, '27');
                 $ivas['27']['Importe']  += $res['Importe'];
                 $ivas['27']['BaseImp']  += $res['BaseImp'];
+
                 $res                    = Self::getImporteIva($article, '21');
                 $ivas['21']['Importe']  += $res['Importe'];
                 $ivas['21']['BaseImp']  += $res['BaseImp'];
+
                 $res                    = Self::getImporteIva($article, '10.5');
                 $ivas['10']['Importe']  += $res['Importe'];
                 $ivas['10']['BaseImp']  += $res['BaseImp'];
+
                 $res                    = Self::getImporteIva($article, '5');
                 $ivas['5']['Importe']  += $res['Importe'];
                 $ivas['5']['BaseImp']  += $res['BaseImp'];
+
                 $res                    = Self::getImporteIva($article, '2.5');
                 $ivas['2']['Importe']  += $res['Importe'];
                 $ivas['2']['BaseImp']  += $res['BaseImp'];
+
                 $res                    = Self::getImporteIva($article, '0');
                 $ivas['0']['Importe']  += $res['Importe'];
                 $ivas['0']['BaseImp']  += $res['BaseImp'];
@@ -90,8 +96,17 @@ class AfipHelper {
     }
 
     static function getPriceWithoutIva($article) {
-        if (Auth()->user()->afip_information->iva_condition->name == 'Responsable inscripto') {
+        if ($article->iva->percentage != 'No Gravado' && $article->iva->percentage != 'Exento') {
+            return $article->pivot->price / (($article->iva->percentage / 100) + 1); 
+        } 
+        return $article->pivot->price;
+        
+
+
+        return $article->pivot->price - Self::montoIvaDelPrecio($article);
+        if (UserHelper::getFullModel()->afip_information->iva_condition->name == 'Responsable inscripto') {
             if ($article->iva->percentage != 'No Gravado' && $article->iva->percentage != 'Exento') {
+                return $article->pivot->price - Self::montoIvaDelPrecio($article);
                 $percentage = floatval($article->iva->percentage);
                 if (is_int($percentage)) {
                     $num = floatval('1.'.$article->iva->percentage);
@@ -112,7 +127,29 @@ class AfipHelper {
         }
     }
 
-    static function getIvaAmount($article) {
+    static function getArticlePrice($article, $client) {
+        if (UserHelper::getFullModel()->afip_information->iva_condition->name == 'Responsable inscripto' && !is_null($client) && $client->iva_condition->name == 'Responsable inscripto') {
+            if ($article->iva->percentage != 'No Gravado' && $article->iva->percentage != 'Exento') {
+                $percentage = floatval($article->iva->percentage);
+                if (is_int($percentage)) {
+                    $num = floatval('1.'.$article->iva->percentage);
+                } else {
+                    if (floatval($article->iva->percentage) >= 10) {
+                        $num = floatval('1.'.str_replace('.', '', $article->iva->percentage));
+                    } else {
+                        $num = floatval('1.0'.str_replace('.', '', $article->iva->percentage));
+                    }
+                }
+                $res = $article->pivot->price / $num ;
+                return Numbers::redondear($res);
+            } else {
+                return $article->pivot->price;
+            }
+        } 
+        return $article->pivot->price;
+    }
+
+    static function montoIvaDelPrecio($article) {
         if ($article->iva->percentage != 'No Gravado' || $article->iva->percentage != 'Exento') {
             return Numbers::redondear(Self::getPriceWithoutIva($article) * floatval($article->iva->percentage) / 100);
         } 
@@ -121,25 +158,34 @@ class AfipHelper {
 
     static function getImporteIva($article, $iva = null) {
         if (is_null($iva)) {
-            return Self::getIvaAmount($article) * $article->pivot->amount;
+            return Self::montoIvaDelPrecio($article) * $article->pivot->amount;
         }
+        $importe = 0;
+        $base_imp = 0;
+        if ($article->iva->percentage == $iva) {
+            $importe = Self::montoIvaDelPrecio($article) * $article->pivot->amount;
+            $base_imp = Self::getPriceWithoutIva($article) * $article->pivot->amount;
+        }
+        return ['Importe' => $importe, 'BaseImp' => Numbers::redondear($base_imp)];
+
+        // -----------
         if ($iva == '27' && $article->iva->percentage == '27') {
-            return ['Importe' => Self::getIvaAmount($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
+            return ['Importe' => Self::montoIvaDelPrecio($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
         }
         if ($iva == '21' && $article->iva->percentage == '21') {
-            return ['Importe' => Self::getIvaAmount($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
+            return ['Importe' => Self::montoIvaDelPrecio($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
         }
         if ($iva == '10.5' && $article->iva->percentage == '10.5') {
-            return ['Importe' => Self::getIvaAmount($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
+            return ['Importe' => Self::montoIvaDelPrecio($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
         }
         if ($iva == '5' && $article->iva->percentage == '5') {
-            return ['Importe' => Self::getIvaAmount($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
+            return ['Importe' => Self::montoIvaDelPrecio($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
         }
         if ($iva == '2.5' && $article->iva->percentage == '2.5') {
-            return ['Importe' => Self::getIvaAmount($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
+            return ['Importe' => Self::montoIvaDelPrecio($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
         }
         if ($iva == '0' && $article->iva->percentage == '0') {
-            return ['Importe' => Self::getIvaAmount($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
+            return ['Importe' => Self::montoIvaDelPrecio($article) * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
         }
         if ($iva == 'Exento' && $article->iva->percentage == 'Exento') {
             return ['Importe' => $article->pivot->price * $article->pivot->amount, 'BaseImp' => Self::getPriceWithoutIva($article) * $article->pivot->amount];
@@ -156,15 +202,15 @@ class AfipHelper {
 
     static function getImporteGravado($article) {
         if ($article->iva->percentage != 'No Gravado' && $article->iva->percentage != 'Exento') {
-            Log::info('Se suman '.Self::getPriceWithoutIva($article) * $article->pivot->amount.' al gravado del art '.$article->name);
+            // Log::info('Se suman '.Self::getPriceWithoutIva($article) * $article->pivot->amount.' al gravado del art '.$article->name);
             return Self::getPriceWithoutIva($article) * $article->pivot->amount;
         }
         return 0;
     }
 
 
-    static function getImporteNeto($article) {
-        return Self::getPriceWithoutIva($article) * $article->pivot->amount;
+    static function getImporteNeto($article, $client) {
+        return Self::getArticlePrice($article, $client) * $article->pivot->amount;
     }
 
 }

@@ -22,6 +22,7 @@ class CreateAfipInformationTable extends Migration
             $table->string('ingresos_brutos')->nullable();
             $table->timestamp('inicio_actividades')->nullable();
             $table->integer('punto_venta')->nullable();
+            $table->boolean('afip_ticket_production')->default(0);
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

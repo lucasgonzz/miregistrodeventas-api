@@ -87,7 +87,7 @@ class ClientsTableSeeder extends Seeder
     function colman() {
         $user = User::where('company_name', 'colman')->first();
         Client::create([
-            'name'              => 'Lucas',
+            'name'              => 'Lucas ResIns',
             'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
             'cuit'              => '20242112025',
             'razon_social'      => 'MARCOS SRL', 
@@ -97,12 +97,32 @@ class ClientsTableSeeder extends Seeder
             'seller_id'         => null,
         ]);
         Client::create([
-            'name'              => 'Marcos',
+            'name'              => 'Marcos MONO',
             'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
             'cuit'              => '20242112025',
             'razon_social'      => 'MARCOS SRL', 
             'price_type_id'     => 2,
-            'iva_condition_id'  => 1,
+            'iva_condition_id'  => 2,
+            'user_id'           => $user->id,
+            'seller_id'         => null,
+        ]);
+        Client::create([
+            'name'              => 'Marcos ConsFinal',
+            'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
+            'cuit'              => '20242112025',
+            'razon_social'      => 'MARCOS SRL', 
+            'price_type_id'     => 2,
+            'iva_condition_id'  => 3,
+            'user_id'           => $user->id,
+            'seller_id'         => null,
+        ]);
+        Client::create([
+            'name'              => 'Marcos nada',
+            'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
+            'cuit'              => '20242112025',
+            'razon_social'      => 'MARCOS SRL', 
+            'price_type_id'     => 2,
+            'iva_condition_id'  => null,
             'user_id'           => $user->id,
             'seller_id'         => null,
         ]);

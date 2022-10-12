@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Address;
 use App\Article;
+use App\CurrentAcount;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CurrentAcountController;
 use App\Http\Controllers\Helpers\ArticleHelper;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticle;
 use App\Http\Controllers\Helpers\PdfPrintSale;
 use App\Http\Controllers\Helpers\Pdf\NewSalePdf;
+use App\Http\Controllers\Helpers\Pdf\SaleAfipTicketPdf;
 use App\Http\Controllers\Helpers\Pdf\SaleTicketPdf;
 use App\Http\Controllers\Helpers\Pdf\Sale\Index as SalePdf;
 use App\Http\Controllers\Helpers\SaleHelper;
@@ -154,6 +156,14 @@ class SaleController extends Controller
         } else {
             $sale->percentage_card = null;
         }
+        if (!is_null($request->client_id) && $request->client_id != $sale->client_id) {
+            $current_acount = CurrentAcount::where('sale_id', $sale->id)->first();
+            if (!is_null($current_acount)) {
+                $current_acount->delete();
+                CurrentAcountHelper::checkSaldos('client', $sale->client_id);
+            }
+            $sale->client_id = $request->client_id;
+        }
         $sale->updated_at = Carbon::now();
         $sale->save();
         $sale = Sale::where('id', $sale->id)
@@ -193,13 +203,12 @@ class SaleController extends Controller
 
     function pdf($sales_id, $for_commerce, $afip_ticket = false) {
         $sales_id = explode('-', $sales_id);
-        // if ($this->isProvider()) {
-        //     foreach ($sales_id as $sale_id) {
-        //         SaleHelper::checkCommissions($sale_id);
-        //     }
-        // }
         $pdf = new PdfPrintSale($sales_id, (bool)$for_commerce, $afip_ticket);
-        // $pdf = new SalePdf($sales_id, (bool)$for_commerce, $afip_ticket);
+        $pdf->printSales();
+    }
+
+    function pdfAfipTicket($sale_id) {
+        $pdf = new SaleAfipTicketPdf($sale_id);
         $pdf->printSales();
     }
 

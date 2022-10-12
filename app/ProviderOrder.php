@@ -9,7 +9,7 @@ class ProviderOrder extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('articles');
+        $query->with('articles', 'provider');
     }
 
     function current_acount() {

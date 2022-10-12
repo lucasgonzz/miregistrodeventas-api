@@ -41,16 +41,8 @@ class SaleHelper extends Controller {
 
     static function getFullModel($id) {
         $sale = Sale::where('id', $id)
-                    ->with('client')
-                    ->with('buyer')
-                    ->with('articles')
-                    ->with('impressions')
-                    ->with('special_price')
-                    ->with('commissions')
-                    ->with('discounts')
-                    ->with('afip_ticket')
+                    ->withAll()
                     ->first();
-        Log::info('SaleHelper getFullModel: '.$sale->id);
         return $sale;
     }
 
@@ -185,7 +177,7 @@ class SaleHelper extends Controller {
         $helper = new CurrentAcountAndCommissionHelper($sale, $sale->discounts, $only_commissions);
         $helper->attachCommissionsAndCurrentAcounts();
 
-        CurrentAcountHelper::checkSaldos($sale->client_id);
+        CurrentAcountHelper::checkSaldos('client', $sale->client_id);
 
         // $client_controller = new ClientController();
         // $current_acount_ct->checkSaldos($sale->client_id);

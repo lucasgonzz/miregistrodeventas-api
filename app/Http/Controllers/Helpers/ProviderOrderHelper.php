@@ -21,6 +21,14 @@ class ProviderOrderHelper {
 		return is_null($last) ? 1 : $last->num + 1;
 	}
 
+	static function deleteCurrentAcount($provider_order) {
+		$current_acount = CurrentAcount::where('provider_order_id', $provider_order->id)->first();
+		if (!is_null($current_acount)) {
+			$current_acount->delete();
+			CurrentAcountHelper::updateProviderSaldos($current_acount);
+		}
+	}
+
 	static function sendEmail($send_email, $provider_order) {
 		if ($send_email && !is_null($provider_order->provider->email)) {
 			$provider_order->provider->notify(new ProviderOrderCreated($provider_order));
@@ -29,34 +37,34 @@ class ProviderOrderHelper {
 
 	static function updateArticleStock($_article, $last_received, $provider_order) {
 		if ($_article['pivot']['received'] > 0) {
-			Log::info('Se recivieron '.$_article['pivot']['received'].' unidades de '.$_article['name']);
+			// Log::info('Se recivieron '.$_article['pivot']['received'].' unidades de '.$_article['name']);
 			$article = Article::find($_article['id']);
 			if (is_null($article->stock)) {
 				$article->stock = 0;
-				Log::info('El stock estaba NULL, se puso en 0');
+				// Log::info('El stock estaba NULL, se puso en 0');
 			}
 			if ($_article['pivot']['cost'] != '') {
 				$article->cost = $_article['pivot']['cost'];
 			}
 			if (isset($last_received[$article->id])) {
-				Log::info('Ya se habian recivido '.$last_received[$article->id]);
-				Log::info('El stock estaba en '.$article->stock);
+				// Log::info('Ya se habian recivido '.$last_received[$article->id]);
+				// Log::info('El stock estaba en '.$article->stock);
 				$article->stock -= $last_received[$article->id];
-				Log::info('Se le restaron y quedo en '.$article->stock);
+				// Log::info('Se le restaron y quedo en '.$article->stock);
 			}
 			$article->stock += $_article['pivot']['received'];
-			Log::info('Se le sumaron las '.$_article['pivot']['received'].' que se recibieron y quedo en '.$article->stock);
+			// Log::info('Se le sumaron las '.$_article['pivot']['received'].' que se recibieron y quedo en '.$article->stock);
 			if ($article->status == 'inactive') {
 				$article->status = 'active';
 				$article->created_at = Carbon::now();
-				Log::info('Estaba en estado inactive, se activo');
+				// Log::info('Estaba en estado inactive, se activo');
 			}
 			$cant_providers = count($article->providers);
 			if ($cant_providers == 0 || ($cant_providers >= 1 && $article->providers[$cant_providers-1]->id != $provider_order->provider_id)) {
 				$article->providers()->attach($provider_order->provider_id, [
 										'amount' => $_article['pivot']['received']
 									]);
-				Log::info('Se seteo el proveedor');
+				// Log::info('Se seteo el proveedor');
 			}
 			$article->save();
         	$article->user->notify(new UpdatedArticle($article));

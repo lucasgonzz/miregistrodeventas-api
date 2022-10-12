@@ -13,6 +13,7 @@ use App\Variant;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class ArticlesTableSeeder extends Seeder
 {
@@ -56,6 +57,8 @@ class ArticlesTableSeeder extends Seeder
         // $this->nebulaStore();
 
         $this->colman();
+
+        $this->articlesIva('colman');
 
         return;
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
@@ -692,6 +695,68 @@ class ArticlesTableSeeder extends Seeder
                 $art->sizes()->attach($size);
             }   
             $this->createDescriptions($art); 
+        }
+    }
+
+    function articlesIva($company_name) {
+        $user = User::where('company_name', $company_name)
+                    ->first();
+        $num = 0;
+        $ct = new Controller();
+        $articles_iva = [
+            [
+                'name' => 'Iva 27',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', '27', false, 'id'),
+            ],
+            [
+                'name' => 'Iva 21',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', '21', false, 'id'),
+            ],
+            [
+                'name' => 'Iva 10.5',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', '10.5', false, 'id'),
+            ],
+            [
+                'name' => 'Iva 5',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', '5', false, 'id'),
+            ],
+            [
+                'name' => 'Iva 2.5',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', '2.5', false, 'id'),
+            ],
+
+            [
+                'name' => 'Iva 0',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', '0', false, 'id'),
+            ],
+            [
+                'name' => 'Iva No Gravado',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', 'No Gravado', false, 'id'),
+            ],
+            [
+                'name' => 'Iva Exento',
+                'price' => 100,
+                'iva_id' => $ct->getModelBy('ivas', 'percentage', 'Exento', false, 'id'),
+            ],
+        ];
+        foreach ($articles_iva as $article) {
+            $num++;
+            $art = Article::create([
+                'num'               => $num,
+                'name'              => $article['name'],
+                'slug'              => ArticleHelper::slug($article['name']),
+                'cost'              => 50,
+                'price'             => $article['price'],
+                'iva_id'            => $article['iva_id'],
+                'user_id'           => $user->id,
+            ]); 
         }
     }
 

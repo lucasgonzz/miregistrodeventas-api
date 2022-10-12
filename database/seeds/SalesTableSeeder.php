@@ -25,7 +25,8 @@ class SalesTableSeeder extends Seeder
     {
         $this->pinocho();
         $this->kasAberturas();
-        $this->colman();
+        $this->withAllArticlesIva('colman');
+        // $this->colman();
         return;
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
         $now = Carbon::now();
@@ -108,6 +109,46 @@ class SalesTableSeeder extends Seeder
                                             'price'       => $article->price,
                                         ]);
             }
+        }
+    }
+
+    function withAllArticlesIva($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+        $clients = Client::where('user_id', $user->id)->get();
+        foreach ($clients as $client) {
+            $sale = Sale::create([
+                'user_id'           => $user->id,
+                'num_sale'          => SaleHelper::numSale($user->id),
+                'percentage_card'   => null,
+                'created_at'        => Carbon::now(),
+                'client_id'         => $client->id,
+            ]);
+            $articles = Article::where('user_id', $user->id)
+                                ->get();
+            $articles = ArticleHelper::setPrices($articles);
+            foreach ($articles as $article) {
+                $sale->articles()->attach($article->id, [
+                                            'amount'      => 2,
+                                            'cost'        => $article->cost,
+                                            'price'       => $article->price,
+                                        ]);
+            }
+        }
+        $sale = Sale::create([
+            'user_id'           => $user->id,
+            'num_sale'          => SaleHelper::numSale($user->id),
+            'percentage_card'   => null,
+            'created_at'        => Carbon::now(),
+        ]);
+        $articles = Article::where('user_id', $user->id)
+                            ->get();
+        $articles = ArticleHelper::setPrices($articles);
+        foreach ($articles as $article) {
+            $sale->articles()->attach($article->id, [
+                                        'amount'      => 2,
+                                        'cost'        => $article->cost,
+                                        'price'       => $article->price,
+                                    ]);
         }
     }
 

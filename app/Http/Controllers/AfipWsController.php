@@ -7,6 +7,7 @@ use App\Afip\WSFE;
 use App\Article;
 use App\Http\Controllers\Helpers\AfipHelper;
 use App\Http\Controllers\Helpers\SaleHelper;
+use App\Http\Controllers\Helpers\UserHelper;
 use App\Sale;
 use App\WSMTXCA;
 use Illuminate\Http\Request;
@@ -16,12 +17,7 @@ class AfipWsController extends Controller
 {
 
     function __construct() {
-        $this->testing = true;
-        // Produccion
-        // define ('WSDL_WSAA', public_path().'/afip/wsaa.wsdl'); 
-        // define ('CERT', 'file://'.realpath(public_path().'/afip/comerciocity-alias_1775a2484a464aa3.crt')); 
-        // define ('PRIVATEKEY', 'file://'.realpath(public_path().'/afip/privada.key')); 
-        // define ("URL_WSAA", "https://wsaa.afip.gov.ar/ws/services/LoginCms");
+        $this->testing = UserHelper::getFullModel()->afip_information->afip_ticket_production;
         define ('TRA_xml', public_path().'/afip/wsaa/TRA.xml'); 
         define ('TRA_tmp', public_path().'/afip/wsaa/TRA.tmp'); 
         define ('TA_file', public_path().'/afip/wsaa/TA.xml'); 
@@ -35,21 +31,13 @@ class AfipWsController extends Controller
             $this->private_key = 'file://'.realpath(public_path().'/afip/privada.key');
             $this->url_wsaa = 'https://wsaa.afip.gov.ar/ws/services/LoginCms';
         }
-        // if ($this->testing) {
-        //     $this->url_wsaa = 'https://wswhomo.afip.gov.ar/wsfev1/service.asmx';
-        // } else {
-        //     $this->url_wsaa = 'https://servicios1.afip.gov.ar/wsfev1/service.asmx';
-        // }
-
-
     }
 
     function init(Request $request, $sale_id) {
         $service = 'wsfe';
-        // $service = 'wsmtxca';
         $this->checkWsaa($service);
-        $this->wsfe($sale_id);
-        // $this->wsmtxca($sale_id);
+        $sale = $this->wsfe($sale_id);
+        return response()->json(['model' => $sale], 201);
     }
 
     function checkWsaa($service) {
@@ -137,12 +125,17 @@ class AfipWsController extends Controller
         $sale = Sale::where('id', $sale_id)->with('articles')->first();
         $punto_venta = $user->afip_information->punto_venta;
         $cuit_negocio = $user->afip_information->cuit;
-        $cuit_cliente = $sale->client->cuit;
+        if ($sale->client) {
+            $cuit_cliente = $sale->client->cuit;
+        } else {
+            $cuit_cliente = '';
+        }
         $cbte_tipo = $this->getTipoCbte($sale->client);
         $wsfe = new WSFE(['testing'=> $this->testing, 'cuit_representada' => $cuit_negocio, 'for_wsfe' => true]);
         $wsfe->setXmlTa(file_get_contents(TA_file));
         $cbte_nro = AfipHelper::getNumeroComprobante($wsfe, $punto_venta, $cbte_tipo);
         Log::info('Numero comprobante: '.$cbte_nro);
+        Log::info('sigue con importes');
         $importes = AfipHelper::getImportes($sale);
         Log::info('importes:');
         Log::info($importes);
@@ -175,7 +168,7 @@ class AfipWsController extends Controller
                 )
             )
         );
-        if (Auth()->user()->afip_information->iva_condition->name == 'Responsable inscripto') {
+        if (UserHelper::getFullModel()->afip_information->iva_condition->name == 'Responsable inscripto' && $importes['iva'] > 0) {
             $ivas = [];
             foreach ($importes['ivas'] as $iva) {
                 if ($iva['BaseImp'] > 0) {
@@ -190,10 +183,10 @@ class AfipWsController extends Controller
         }
         // Se visualiza el resultado con el CAE correspondiente al comprobante.
         $result = $wsfe->FECAESolicitar($invoice);
-        print_r($result);
         $this->saveAfipTicket($result, $sale, $cbte_nro, $importes['total'], $moneda_id);
+        print_r($result);
         $sale = SaleHelper::getFullModel($sale->id);
-        return response()->json(['sale' => $sale], 201);
+        return $sale;
     }
 
     function saveAfipTicket($result, $sale, $cbte_nro, $importe_total, $moneda_id) {
@@ -209,7 +202,7 @@ class AfipWsController extends Controller
             'resultado'         => $result->FECAESolicitarResult->FeCabResp->Resultado,
             'concepto'          => $result->FECAESolicitarResult->FeDetResp->FECAEDetResponse->Concepto,
             'cuit_cliente'      => $result->FECAESolicitarResult->FeDetResp->FECAEDetResponse->DocNro,
-            'iva_cliente'       => $sale->client->iva_condition->name,
+            'iva_cliente'       => !is_null($sale->client) ? $sale->client->iva_condition->name : '',
             'cae'               => $result->FECAESolicitarResult->FeDetResp->FECAEDetResponse->CAE,
             'cae_expired_at'    => $result->FECAESolicitarResult->FeDetResp->FECAEDetResponse->CAEFchVto,
             'sale_id'           => $sale->id,
@@ -218,19 +211,11 @@ class AfipWsController extends Controller
 
     function getTipoCbte($client) {
         if ($this->user()->afip_information->iva_condition->name == 'Responsable inscripto') {
-            if ($client->iva_condition->name == 'Responsable inscripto') {
+            if (!is_null($client) && $client->iva_condition->name == 'Responsable inscripto') {
                 return 1; #A
             } else {
                 return 6; #B
             }
-            // else if ($client->iva_condition->name == 'Monotributista') {
-            //     return 6; #B
-            //     // return 1; #A
-            // } else if ($client->iva_condition->name == 'Consumidor final') {
-            //     return 6; #B
-            // } else if ($client->iva_condition->name == 'Exento') {
-            //     return 6; #B
-            // }
         } else if ($this->user()->afip_information->iva_condition->name == 'Monotributista') {
             return 11; #C
         }
@@ -336,69 +321,6 @@ class AfipWsController extends Controller
         $result = $wsmtxca->autorizarComprobante($invoice);
         file_put_contents(public_path().'/afip/result.xml', $result);
         dd($result);
-    }
-
-    // function wsfe($sale_id) {
-    //     $cuit_negocio = '20175018841';
-    //     $cuit_cliente = '20242112025';
-    //     $cbte_tipo = 1;
-    //     $punto_venta = 4;
-    //     $wsfe = new WSFE(['testing' => false, 'cuit_representada' => $cuit_negocio, 'for_wsfe' => true]);
-    //     $wsfe->setXmlTa(file_get_contents(TA_file));
-    //     $cbte_nro = AfipHelper::getNumeroComprobante($wsfe, $punto_venta, $cbte_tipo);
-    //     print_r('Numero de comprobante: '.$cbte_nro.'</br>');
-    //     $today = date('Ymd');
-
-    //     $sale = Sale::where('id', $sale_id)->with('articles')->first();
-    //     $importes = AfipHelper::getImportes($sale);
-
-    //     $invoice = array(
-    //         'FeCAEReq' => array(
-    //             'FeCabReq' => array(
-    //                 'CantReg'      => 1,
-    //                 'CbteTipo'     => $cbte_tipo,                   
-    //                 'PtoVta'       => $punto_venta,
-    //             ),
-    //             'FeDetReq' => array(
-    //                 'FECAEDetRequest' => array(
-    //                     'Concepto'     => 1,                
-    //                     'DocTipo'      => AfipHelper::getDocType('Cuit'),           
-    //                     'DocNro'       => $cuit_cliente,
-    //                     'CbteDesde'    => $cbte_nro,
-    //                     'CbteHasta'    => $cbte_nro,
-    //                     'CbteFch'      => $today,
-    //                     'ImpTotal'     => $importes['importe_total'],
-    //                     'ImpTotConc'   => 0,
-    //                     'ImpNeto'      => $importes['importe_gravado'],
-    //                     'ImpOpEx'      => 0,
-    //                     'ImpIVA'       => $importes['importe_iva'],
-    //                     'ImpTrib'      => 0,
-    //                     // 'FchServDesde' => $today,
-    //                     // 'FchServHasta' => $today,
-    //                     // 'FchVtoPago'   => $today,
-    //                     'MonId'        => 'PES',
-    //                     'MonCotiz'     => 1,
-    //                     'Iva'          => array(
-    //                         'AlicIva' => array(
-    //                             'Id'        => 5,
-    //                             'BaseImp'   => $importes['importe_gravado'],
-    //                             'Importe'   => $importes['importe_iva']
-    //                         )
-    //                     )
-    //                 )
-    //             )
-    //         )
-    //     );
-
-    //     // Se visualiza el resultado con el CAE correspondiente al comprobante.
-    //     $result = $wsfe->FECAESolicitar($invoice);
-    //     dd($result);
-    // }
-
-    function getImportes($sale_id) {
-        $sale = Sale::find($sale_id);
-        $importes = AfipHelper::getImportes($sale);
-        return response()->json(['importes' => $importes], 200);
     }
 
 }

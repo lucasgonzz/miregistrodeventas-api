@@ -53,7 +53,6 @@ class NewSalePdf extends fpdf {
 	function Footer() {
 		$this->total();
 		$this->discounts();
-		$this->afipTicket();
 		$this->comerciocityInfo();
 	}
 

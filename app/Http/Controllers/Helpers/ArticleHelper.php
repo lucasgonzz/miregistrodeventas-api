@@ -32,8 +32,8 @@ class ArticleHelper {
                 $article->price = null;
                 $article->save();
             }
+            $price = 0;
             if (is_null($article->price) || $article->price == '') {
-                $price = 0;
                 if (!is_null($last_provider_percentage_gain) && $article->apply_provider_percentage_gain) {
                     $price = Numbers::redondear($cost + ($cost * Numbers::percentage($last_provider_percentage_gain)));
                 }
@@ -44,15 +44,17 @@ class ArticleHelper {
                         $price = Numbers::redondear($price + ($price * Numbers::percentage($article->percentage_gain)));
                     }
                 }
-                if (!$user->configuration->iva_included && Self::hasIva($article)) {
-                    if ($price == 0) {
-                        $price = Numbers::redondear($article->price + ($article->price * Numbers::percentage($article->iva->percentage)));
-                    } else {
-                        $price = Numbers::redondear($price + ($price * Numbers::percentage($article->iva->percentage)));
-                    }
-                }
-                $article->price = $price;
             } 
+            if (!$user->configuration->iva_included && Self::hasIva($article)) {
+                if ($price == 0) {
+                    $price = Numbers::redondear($article->price + ($article->price * Numbers::percentage($article->iva->percentage)));
+                } else {
+                    $price = Numbers::redondear($price + ($price * Numbers::percentage($article->iva->percentage)));
+                }
+            }
+            if ($price > 0) {
+                $article->price = $price;
+            }
             if (count($article->discounts) >= 1) {
                 foreach ($article->discounts as $discount) {
                     $article->price = Numbers::redondear($article->price - ($article->price * Numbers::percentage($discount->percentage)));
