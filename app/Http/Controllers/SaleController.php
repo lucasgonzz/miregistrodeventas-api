@@ -82,7 +82,7 @@ class SaleController extends Controller
         $sale = Sale::find($id);
         $sale->save_current_acount = 1;
         $sale->save();
-        SaleHelper::attachCurrentAcountsAndCommissions($sale, $sale->client_id, $sale->discounts);
+        SaleHelper::attachCurrentAcountsAndCommissions($sale, $sale->client_id, $sale->discounts_id);
         CurrentAcountHelper::checkSaldos($sale->client_id);
         $sale = Sale::where('id', $id)
                         ->withAll()
@@ -150,6 +150,7 @@ class SaleController extends Controller
         SaleHelper::attachArticles($sale, $request->items, $request->dolar_blue);
         SaleHelper::attachCombos($sale, $request->items);
         SaleHelper::attachServices($sale, $request->items);
+        SaleHelper::attachDiscounts($sale, $request->discounts_id);
         $with_card = (bool)$request->with_card;
         if ($with_card) {
             $sale->percentage_card = $user->percentage_card;
@@ -192,9 +193,8 @@ class SaleController extends Controller
         SaleHelper::attachCombos($sale, $request->items);
         SaleHelper::attachServices($sale, $request->items);
 
-        $discounts = DiscountHelper::getDiscountsFromDiscountsId($request->discounts);
-        SaleHelper::attachDiscounts($sale, $discounts);
-        SaleHelper::attachCurrentAcountsAndCommissions($sale, $request->client_id, $discounts);
+        SaleHelper::attachDiscounts($sale, $request->discounts_id);
+        SaleHelper::attachCurrentAcountsAndCommissions($sale, $request->client_id, $request->discounts_id);
         $sale = Sale::where('id', $sale->id)
                     ->withAll()
                     ->first();

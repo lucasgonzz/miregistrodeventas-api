@@ -25,8 +25,8 @@ class SalesTableSeeder extends Seeder
     {
         $this->pinocho();
         $this->kasAberturas();
-        $this->withAllArticlesIva('colman');
-        // $this->colman();
+        // $this->withAllArticlesIva('colman');
+        $this->colman();
         return;
         $dias_no_ventas = [3,4,9,10,14,16,15,13];
         $now = Carbon::now();

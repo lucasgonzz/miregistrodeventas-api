@@ -25,13 +25,20 @@ class CurrentAcountAndCommissionHelper extends Controller {
     function __construct($sale, $discounts, $only_commissions, $index = null) {
         $this->user = UserHelper::getFullModel();
         $this->sale = $sale;
-        $this->discounts = $discounts;
+        $this->setDiscounts($discounts);
         $this->client = $sale->client;
         $this->only_commissions = $only_commissions;
         if ($index) {
             $this->index = $index;
         } else {
             $this->index = null;
+        }
+    }
+
+    function setDiscounts($discounts) {
+        $this->discounts = [];
+        foreach ($discounts as $discount) {
+            $this->discounts[] = Discount::find($discount['id']);
         }
     }
 

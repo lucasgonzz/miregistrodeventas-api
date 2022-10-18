@@ -39,7 +39,7 @@ class ProviderOrderController extends Controller
         ]);
         ProviderOrderHelper::attachArticles($request->articles, $provider_order);
         // ProviderOrderHelper::sendEmail($request->send_email, $provider_order);
-        $provider_order = $this->getFullModel($provider_order->id);
+        $provider_order = $this->fullModel('App\ProviderOrder', $provider_order->id);
         return response()->json(['model' => $provider_order], 201);
     }
 
@@ -49,7 +49,7 @@ class ProviderOrderController extends Controller
         $provider_order->save();
         ProviderOrderHelper::attachArticles($request->articles, $provider_order);
         // ProviderOrderHelper::sendEmail($request->send_email, $provider_order);
-        $provider_order = $this->getFullModel($provider_order->id);
+        $provider_order = $this->fullModel('App\ProviderOrder', $provider_order->id);
         return response()->json(['model' => $provider_order], 201);
     }
 
@@ -69,21 +69,12 @@ class ProviderOrderController extends Controller
         $pdf = new ProviderOrderPdf($provider_order);
     }
 
-    function getFullModel($id) {
-        $provider_order = ProviderOrder::where('id', $id)
-                                        ->with('articles')
-                                        ->with('provider')
-                                        ->first();
-        // $provider_order = ProviderOrderHelper::setArticles([$provider_order])[0];
-        return $provider_order;
-    }
-
     function destroy($id) {
         $model = ProviderOrder::find($id);
         ProviderOrderHelper::deleteCurrentAcount($model);
         $model->articles()->sync([]);
         $model->delete();
-        return response(null, 200);
+        return response(null, 200); 
     }
     
 }

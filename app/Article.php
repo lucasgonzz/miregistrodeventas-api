@@ -21,6 +21,10 @@ class Article extends Model
         return $this->belongsToMany('App\PricesList');
     }
 
+    function recipe() {
+        return $this->hasOne('App\Recipe');
+    }
+
     function discounts() {
         return $this->hasMany('App\ArticleDiscount');
     }

@@ -43,7 +43,7 @@ class ImportHelper {
 	}
 
 	static function getIvaId($row) {
-		if ($row['iva'] == '0' || $row['iva'] == 0 || $row['iva'] != '') {
+		if ($row['iva'] != '' || $row['iva'] == '0' || $row['iva'] == 0) {
 			$iva = Iva::where('percentage', $row['iva'])
 						->first();
 			if (is_null($iva)) {
@@ -51,6 +51,7 @@ class ImportHelper {
 					'percentage' => $row['iva'],
 				]);
 			}
+			return $iva->id;
 		}
 		return 2;
 	}

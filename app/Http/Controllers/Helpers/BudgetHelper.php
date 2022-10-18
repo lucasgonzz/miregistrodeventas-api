@@ -86,7 +86,7 @@ class BudgetHelper {
             'client_id'   => $budget->client_id,
             'budget_id'   => $budget->id,
             'description' => null,
-            'created_at'  => $budget->created_at,
+            'created_at'  => Carbon::now(),
         ]);
         Log::info('Se actualizo saldo a '.$debe);
         $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo('client', $budget->client_id, $current_acount) + $debe);

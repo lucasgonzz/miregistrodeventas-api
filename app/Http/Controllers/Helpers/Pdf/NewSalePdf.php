@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers\Pdf;
 
 use App\Http\Controllers\Helpers\BudgetHelper;
+use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\SaleHelper;
@@ -17,8 +18,8 @@ class NewSalePdf extends fpdf {
 		$this->SetAutoPageBreak(true, 50);
 		$this->start_x = 5;
 		$this->b = 0;
-		$this->line_height = 7;
-		$this->table_header_line_height = 10;
+		$this->line_height = 5;
+		$this->table_header_line_height = 7;
 		
 		$this->user = UserHelper::getFullModel();
 		$this->sales = $sales;
@@ -44,21 +45,23 @@ class NewSalePdf extends fpdf {
 
 	function Header() {
 		$this->logo();
-		$this->clientInfo();
 		$this->numSale();
 		$this->commerceInfo();
+		$this->clientInfo();
+		$this->currentAcountInfo();
 		$this->tableHeader();
 	}
 
 	function Footer() {
 		$this->total();
 		$this->discounts();
-		$this->comerciocityInfo();
+		// $this->comerciocityInfo();
 	}
 
 	function sales() {
 		foreach ($this->sales as $sale) {
 			$this->sale = $sale;
+			$this->total_sale = SaleHelper::getTotalSale($this->sale, false);
 			$this->AddPage();
 			$this->items();
 		}
@@ -66,8 +69,7 @@ class NewSalePdf extends fpdf {
 
 	function items() {
 		$this->SetFont('Arial', '', 10);
-		$this->SetDrawColor(150,150,150);
-		$this->SetLineWidth(.4);
+		$this->SetLineWidth(.1);
 		$index = 1;
 		// for ($i=0; $i < 30; $i++) { 
 			foreach ($this->sale->articles as $article) {
@@ -82,6 +84,7 @@ class NewSalePdf extends fpdf {
 	}
 
 	function printItem($index, $item) {
+		$this->SetFont('Arial', '', 8);
 		$this->Cell(
 			$this->widths['#'], 
 			$this->line_height, 
@@ -151,8 +154,8 @@ class NewSalePdf extends fpdf {
 		$this->x = $this->start_x;
 		$this->y = 60;
 		$this->SetFont('Arial', 'B', 12);
-		$this->SetLineWidth(.6);
-		$this->SetDrawColor(150,150,150);
+		$this->SetLineWidth(.5);
+		$this->SetDrawColor(0,0,0);
 		$this->Cell(
 			$this->widths['#'], 
 			$this->table_header_line_height, 
@@ -243,45 +246,45 @@ class NewSalePdf extends fpdf {
 			}
 
 			// Condicion frente al iva
-			if (!is_null($this->user->afip_information->iva_condition)) {
-				$this->x = 105;
-				$this->y += 5;
-				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(41, 5, 'Condicion frente al iva: ', $this->b, 0, 'L');
+			// if (!is_null($this->user->afip_information->iva_condition)) {
+			// 	$this->x = 105;
+			// 	$this->y += 5;
+			// 	$this->SetFont('Arial', 'B', 10);
+			// 	$this->Cell(41, 5, 'Condicion frente al iva: ', $this->b, 0, 'L');
 
-				$this->SetFont('Arial', '', 10);
-				$this->Cell(59, 5, $this->user->afip_information->iva_condition->name, $this->b, 0, 'L');
-			}
+			// 	$this->SetFont('Arial', '', 10);
+			// 	$this->Cell(59, 5, $this->user->afip_information->iva_condition->name, $this->b, 0, 'L');
+			// }
 
 			// Cuit
-			if (!is_null($this->user->afip_information->cuit)) {
-				$this->x = 105;
-				$this->y += 5;
-				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(10, 5, 'Cuit:', $this->b, 0, 'L');
-				$this->SetFont('Arial', '', 10);
-				$this->Cell(90, 5, $this->user->afip_information->cuit, $this->b, 0, 'L');
-			}
+			// if (!is_null($this->user->afip_information->cuit)) {
+			// 	$this->x = 105;
+			// 	$this->y += 5;
+			// 	$this->SetFont('Arial', 'B', 10);
+			// 	$this->Cell(10, 5, 'Cuit:', $this->b, 0, 'L');
+			// 	$this->SetFont('Arial', '', 10);
+			// 	$this->Cell(90, 5, $this->user->afip_information->cuit, $this->b, 0, 'L');
+			// }
 
 			// Ingresos Brutos
-			if (!is_null($this->user->afip_information->ingresos_brutos)) {
-				$this->x = 105;
-				$this->y += 5;
-				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(30, 5, 'Ingresos Brutos:', $this->b, 0, 'L');
-				$this->SetFont('Arial', '', 10);
-				$this->Cell(70, 5, $this->user->afip_information->ingresos_brutos, $this->b, 0, 'L');
-			}
+			// if (!is_null($this->user->afip_information->ingresos_brutos)) {
+			// 	$this->x = 105;
+			// 	$this->y += 5;
+			// 	$this->SetFont('Arial', 'B', 10);
+			// 	$this->Cell(30, 5, 'Ingresos Brutos:', $this->b, 0, 'L');
+			// 	$this->SetFont('Arial', '', 10);
+			// 	$this->Cell(70, 5, $this->user->afip_information->ingresos_brutos, $this->b, 0, 'L');
+			// }
 
 			// Inicio Actividades
-			if (!is_null($this->user->afip_information->inicio_actividades)) {
-				$this->x = 105;
-				$this->y += 5;
-				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(33, 5, 'Inicio Actividades:', $this->b, 0, 'L');
-				$this->SetFont('Arial', '', 10);
-				$this->Cell(67, 5, date_format($this->user->afip_information->inicio_actividades, 'd/m/Y'), $this->b, 0, 'L');
-			}
+			// if (!is_null($this->user->afip_information->inicio_actividades)) {
+			// 	$this->x = 105;
+			// 	$this->y += 5;
+			// 	$this->SetFont('Arial', 'B', 10);
+			// 	$this->Cell(33, 5, 'Inicio Actividades:', $this->b, 0, 'L');
+			// 	$this->SetFont('Arial', '', 10);
+			// 	$this->Cell(67, 5, date_format($this->user->afip_information->inicio_actividades, 'd/m/Y'), $this->b, 0, 'L');
+			// }
 		}
 
 		// Direccion
@@ -350,14 +353,25 @@ class NewSalePdf extends fpdf {
 				$this->SetFont('Arial', '', 10);
 				$this->Cell(80, 5, $this->sale->client->address, $this->b, 0, 'L');
 			} 
-			if (!is_null($this->sale->client->iva_condition)) {
+
+			if ($this->sale->client->phone != '') {
 				$this->y += 5;
 				$this->x = $this->start_x;
 				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(23, 5, 'Con. de IVA:', $this->b, 0, 'L');
+				$this->Cell(20, 5, 'Telefono:', $this->b, 0, 'L');
 				$this->SetFont('Arial', '', 10);
-				$this->Cell(77, 5, $this->sale->client->iva_condition->name, $this->b, 0, 'L');
-			}
+				$this->Cell(80, 5, $this->sale->client->phone, $this->b, 0, 'L');
+			} 
+			
+			// if (!is_null($this->sale->client->iva_condition)) {
+			// 	$this->y += 5;
+			// 	$this->x = $this->start_x;
+			// 	$this->SetFont('Arial', 'B', 10);
+			// 	$this->Cell(23, 5, 'Con. de IVA:', $this->b, 0, 'L');
+			// 	$this->SetFont('Arial', '', 10);
+			// 	$this->Cell(77, 5, $this->sale->client->iva_condition->name, $this->b, 0, 'L');
+			// }
+
 			if ($this->sale->client->cuit != '') {
 				$this->y += 5;
 				$this->x = $this->start_x;
@@ -370,14 +384,54 @@ class NewSalePdf extends fpdf {
 		}
 	}
 
+	function currentAcountInfo(){
+		if (!is_null($this->sale->client) && $this->sale->save_current_acount) {
+			$saldo_anterior = CurrentAcountHelper::getSaldo('client', $this->sale->client_id, $this->sale->current_acounts[0]);
+			$this->y = 35;
+			$this->x = 105;
+			$this->SetFont('Arial', 'B', 10);
+			$this->Cell(30, 5, 'Saldo anterior:', $this->b, 0, 'L');
+			$this->SetFont('Arial', '', 10);
+			$this->Cell(30, 5, '$'.Numbers::price($saldo_anterior), 0, 'L');
+
+			$total_sale = SaleHelper::getTotalSale($this->sale);
+			$this->x = 105;
+			$this->y += 5;
+			$this->SetFont('Arial', 'B', 10);
+			$this->Cell(30, 5, 'Compra actual:', $this->b, 0, 'L');
+			$this->SetFont('Arial', '', 10);
+			$this->Cell(30, 5, '$'.Numbers::price($total_sale), 0, 'L');
+
+			$this->x = 105;
+			$this->y += 5;
+			$this->SetFont('Arial', 'B', 10);
+			$this->Cell(30, 5, 'Saldo:', $this->b, 0, 'L');
+			$this->SetFont('Arial', '', 10);
+			$this->Cell(30, 5, '$'.Numbers::price($saldo_anterior + $total_sale), 0, 'L');
+
+			if (!is_null($this->sale->employee)) {
+				$vendedor = $this->sale->employee->name;
+			} else {
+				$vendedor = UserHelper::getFullModel()->name;
+			}
+			$this->x = 105;
+			$this->y += 5;
+			$this->SetFont('Arial', 'B', 10);
+			$this->Cell(30, 5, 'Vendedor:', $this->b, 0, 'L');
+			$this->SetFont('Arial', '', 10);
+			$this->Cell(30, 5, $vendedor, 0, 'L');
+
+		}
+	}
+
 	function total() {
 	    $this->x = $this->start_x;
-	    $this->y = 247;
+	    // $this->y = 247;
 	    $this->SetFont('Arial', 'B', 12);
 		$this->Cell(
 			100,
 			10,
-			'Total: $'. Numbers::price(SaleHelper::getTotalSale($this->sale, false)),
+			'Total: $'. Numbers::price($this->total_sale),
 			$this->b,
 			0,
 			'L'
@@ -389,7 +443,7 @@ class NewSalePdf extends fpdf {
 		if (count($this->sale->discounts) >= 1) {
 		    $this->x = $this->start_x;
 		    $this->SetFont('Arial', '', 9);
-		    $total_sale = SaleHelper::getTotalSale($this->sale, false);
+		    $total_sale = $this->total_sale;
 		    foreach ($this->sale->discounts as $discount) {
 		    	$text = '-'.$discount->pivot->percentage.'% '.$discount->name;
 		    	$descuento = $total_sale * floatval($discount->pivot->percentage) / 100;
@@ -431,9 +485,9 @@ class NewSalePdf extends fpdf {
 	}
 
 	function comerciocityInfo() {
-	    $this->y = 290;
+	    $this->y += 10;
 	    $this->x = $this->start_x;
-	    $this->SetFont('Arial', '', 10);
+	    $this->SetFont('Arial', '', 8);
 		$this->Cell(200, 5, 'Comprobante creado con el sistema de control de stock ComercioCity - comerciocity.com', $this->b, 0, 'C');
 	}
 

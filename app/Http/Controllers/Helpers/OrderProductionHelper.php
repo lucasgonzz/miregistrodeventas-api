@@ -3,38 +3,44 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Article;
+use App\Http\Controllers\Helpers\OrderProductionRecipe;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Notifications\OrderProductionNotification;
+use App\OrderProduction;
 use App\OrderProductionStatus;
 use Carbon\Carbon;
 
 class OrderProductionHelper {
 
-	static function setInfoFromBudget($order_productions) {
+	static function setArticles($order_productions) {
 		foreach ($order_productions as $order_production) {
-			if (!is_null($order_production->budget)) {
-				foreach ($order_production->budget->articles as $article) {
-					$order_production->articles[] = $article;
+			foreach ($order_production->articles as $article) {
+				foreach (Self::getStatuses() as $status) {
+					$article->pivot->{'order_production_status_'.$status->id} = Self::getArticleFinishedAmount($order_production, $article, $status);  
 				}
-			}
-			if (!is_null($order_production->budget->client)) {
-				$order_production->client = $order_production->budget->client;
-			}
-			if (!is_null($order_production->budget->start_at)) {
-				$order_production->start_at = $order_production->budget->start_at;
-			}
-			if (!is_null($order_production->budget->finish_at)) {
-				$order_production->finish_at = $order_production->budget->finish_at;
-			}
-			if (!is_null($order_production->budget->observations)) {
-				$order_production->observations .= ' '.$order_production->budget->observations;
 			}
 		}
 		return $order_productions;
+	} 
+
+	static function getArticleFinishedAmount($order_production, $article, $status) {
+		$article_finished_res = null;
+		foreach ($order_production->articles_finished as $article_finished) {
+			if ($article_finished->id == $article->id && $article_finished->pivot->order_production_status_id == $status->id) {
+				$article_finished_res = $article_finished;
+				break;
+			}
+		}
+		if (!is_null($article_finished_res)) {
+			return $article_finished_res->pivot->amount;
+		}
+		return 0;
 	}
 
 	static function attachArticles($order_production, $articles) {
+		// $cantidades_actuales = OrderProductionRecipe::getCantidadesActuales($order_production);
 		$order_production->articles()->detach();
+		// $order_production->articles_finished()->detach();
 		foreach ($articles as $article) {
 			if (isset($article['pivot']['delivered'])) {
 				$delivered = $article['pivot']['delivered'];
@@ -55,7 +61,23 @@ class OrderProductionHelper {
 											'location' 	=> $article['pivot']['location'],
 											'delivered' => $delivered,
 										]);
+		  	// $order_production_statuses = Self::getStatuses();
+		  	// foreach ($order_production_statuses as $status) {
+			  // 	$order_production->articles_finished()->attach($article['id'], [
+			  // 									'order_production_status_id' => $status->id,
+			  // 									'amount' 					 => $article['pivot']['order_production_status_'.$status->id]
+			  // 								]);
+		  	// }
 		}
+		// $order_production = OrderProduction::find($order_production->id);
+		// OrderProductionRecipe::checkRecipes($order_production, $cantidades_actuales);
+	}
+
+	static function getStatuses() {
+	  	return OrderProductionStatus::where('user_id', UserHelper::userId())
+									->whereNotNull('position')
+									->orderBy('position', 'ASC')
+									->get();
 	}
 
 	static function getFisrtStatus() {

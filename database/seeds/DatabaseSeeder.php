@@ -57,5 +57,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CuponSeeder::class);
         // $this->call(PriceTypeSeeder::class);
         $this->call(BudgetStatusSeeder::class);
+        $this->call(RecipeSeeder::class);
+        $this->call(OrderProductionSeeder::class);
     }
 }

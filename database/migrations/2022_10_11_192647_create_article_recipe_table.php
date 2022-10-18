@@ -18,7 +18,7 @@ class CreateArticleRecipeTable extends Migration
             $table->integer('article_id')->unsigned();
             $table->integer('recipe_id')->unsigned();
             $table->decimal('amount', 10,2)->nullable();
-            $table->string('notes')->nullable();
+            $table->text('notes')->nullable();
             $table->integer('order_production_status_id')->nullable();
         });
     }

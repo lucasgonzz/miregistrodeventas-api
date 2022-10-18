@@ -26,6 +26,7 @@ class OrderProductionController extends Controller
         $models = $models->withAll()
                         ->orderBy('created_at', 'DESC')
                         ->get();
+        // $models = OrderProductionHelper::setArticles($models);
         return response()->json(['models' => $models], 200);
     }
 
@@ -35,7 +36,7 @@ class OrderProductionController extends Controller
     }
 
     function store(Request $request) {
-        $order_production = OrderProduction::create([
+        $model = OrderProduction::create([
             'num'                           => $this->num('order_productions'),
             'client_id'                     => $request->client_id,
             'observations'                  => $request->observations,
@@ -44,19 +45,23 @@ class OrderProductionController extends Controller
             'order_production_status_id'    => OrderProductionHelper::getFisrtStatus(),
             'user_id'                       => $this->userId(), 
         ]);
-        OrderProductionHelper::attachArticles($order_production, $request->articles);
-        OrderProductionHelper::sendCreatedMail($order_production, $request->send_mail);
-        return response()->json(['model' => $this->getFullModel($order_production->id)], 201);
+        OrderProductionHelper::attachArticles($model, $request->articles);
+        OrderProductionHelper::sendCreatedMail($model, $request->send_mail);
+        return response()->json(['model' => $this->getFullModel($model->id)], 201);
+        // $model = OrderProductionHelper::setArticles([$this->getFullModel($model->id)])[0];
+        // return response()->json(['model' => $model], 201);
     }
 
     function update(Request $request) {
-        $order_production = OrderProduction::find($request->id);
-        $order_production->client_id                    = $request->client_id;
-        $order_production->order_production_status_id   = $request->order_production_status_id;
-        $order_production->save();
-        OrderProductionHelper::attachArticles($order_production, $request->articles);
-        OrderProductionHelper::sendUpdatedMail($order_production);
-        return response()->json(['model' => $this->getFullModel($order_production->id)], 200);
+        $model = OrderProduction::find($request->id);
+        $model->client_id                    = $request->client_id;
+        $model->order_production_status_id   = $request->order_production_status_id;
+        $model->save();
+        OrderProductionHelper::attachArticles($model, $request->articles);
+        OrderProductionHelper::sendUpdatedMail($model);
+        return response()->json(['model' => $this->getFullModel($model->id)], 200);
+        // $model = OrderProductionHelper::setArticles([$this->getFullModel($model->id)])[0];
+        // return response()->json(['model' => $model], 200);
     }
 
     function setPdf(Request $request) {

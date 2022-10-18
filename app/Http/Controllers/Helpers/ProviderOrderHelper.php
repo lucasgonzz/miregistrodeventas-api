@@ -24,7 +24,7 @@ class ProviderOrderHelper {
 	static function deleteCurrentAcount($provider_order) {
 		$current_acount = CurrentAcount::where('provider_order_id', $provider_order->id)->first();
 		if (!is_null($current_acount)) {
-			$current_acount->delete();
+			$current_acount->delete(); 
 			CurrentAcountHelper::updateProviderSaldos($current_acount);
 		}
 	}
@@ -56,6 +56,7 @@ class ProviderOrderHelper {
 			// Log::info('Se le sumaron las '.$_article['pivot']['received'].' que se recibieron y quedo en '.$article->stock);
 			if ($article->status == 'inactive') {
 				$article->status = 'active';
+				$article->apply_provider_percentage_gain = 1;
 				$article->created_at = Carbon::now();
 				// Log::info('Estaba en estado inactive, se activo');
 			}

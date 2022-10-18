@@ -150,27 +150,29 @@ class OrderProductionPdf extends fpdf {
 	}
 
 	function clientInfo() {
-		$this->SetFont('Arial', '', 10);
-		$this->x = 5;
-		$this->y = 58;
+		if (!is_null($this->order_production->client)) {
+			$this->SetFont('Arial', '', 10);
+			$this->x = 5;
+			$this->y = 58;
 
-		$this->Cell(100, 5, 'Nombre: '.$this->order_production->client->name.' '.$this->order_production->client->surname, $this->b, 0, 'L');
-		if ($this->order_production->client->address != '') {
-			$this->y += 5;
-			$this->x = 5;
-			$this->Cell(100, 5, 'Domicilio: '.$this->order_production->client->address, $this->b, 0, 'L');
-		} 
-		if (!is_null($this->order_production->client->iva_condition)) {
-			$this->y += 5;
-			$this->x = 5;
-			$this->Cell(100, 5, 'Con. de IVA: '.$this->order_production->client->iva_condition->name, $this->b, 0, 'L');
+			$this->Cell(100, 5, 'Nombre: '.$this->order_production->client->name.' '.$this->order_production->client->surname, $this->b, 0, 'L');
+			if ($this->order_production->client->address != '') {
+				$this->y += 5;
+				$this->x = 5;
+				$this->Cell(100, 5, 'Domicilio: '.$this->order_production->client->address, $this->b, 0, 'L');
+			} 
+			if (!is_null($this->order_production->client->iva_condition)) {
+				$this->y += 5;
+				$this->x = 5;
+				$this->Cell(100, 5, 'Con. de IVA: '.$this->order_production->client->iva_condition->name, $this->b, 0, 'L');
+			}
+			if ($this->order_production->client->cuit != '') {
+				$this->y += 5;
+				$this->x = 5;
+				$this->Cell(100, 5, 'CUIT: '.$this->order_production->client->cuit, $this->b, 0, 'L');
+			}
+			// $this->lineClient();
 		}
-		if ($this->order_production->client->cuit != '') {
-			$this->y += 5;
-			$this->x = 5;
-			$this->Cell(100, 5, 'CUIT: '.$this->order_production->client->cuit, $this->b, 0, 'L');
-		}
-		// $this->lineClient();
 	}
 
 	function dates() {

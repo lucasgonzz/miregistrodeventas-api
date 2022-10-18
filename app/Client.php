@@ -12,7 +12,7 @@ class Client extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('sales', 'iva_condition', 'price_type')
+        $query->with('sales', 'iva_condition', 'price_type', 'location')
             ->withCount('current_acounts');
     }
     
@@ -34,6 +34,10 @@ class Client extends Model
     
     public function price_type() {
         return $this->belongsTo('App\PriceType');
+    }
+    
+    public function location() {
+        return $this->belongsTo('App\Location');
     }
     
     // public function errors() {

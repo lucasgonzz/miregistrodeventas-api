@@ -80,16 +80,19 @@ class SaleHelper extends Controller {
         return null;
     }
 
-    static function attachDiscounts($sale, $discounts) {
+    static function attachDiscounts($sale, $discounts_id) {
+        $sale->discounts()->detach();
+        $discounts = DiscountHelper::getDiscountsFromDiscountsId($discounts_id);
         foreach ($discounts as $discount) {
-            $sale->discounts()->attach($discount->id, [
-                'percentage' => $discount->percentage
+            $sale->discounts()->attach($discount['id'], [
+                'percentage' => $discount['percentage']
             ]);
         }
     }
 
-    static function attachCurrentAcountsAndCommissions($sale, $client_id, $discounts) {
+    static function attachCurrentAcountsAndCommissions($sale, $client_id, $discounts_id) {
         if ($client_id && $sale->save_current_acount) {
+            $discounts = DiscountHelper::getDiscountsFromDiscountsId($discounts_id);
             $helper = new CurrentAcountAndCommissionHelper($sale, $discounts, false);
             $helper->attachCommissionsAndCurrentAcounts();
         }

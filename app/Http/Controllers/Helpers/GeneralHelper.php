@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Helpers;
 use App\Article;
 use App\Http\Controllers\Helpers\UserHelper;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class GeneralHelper {
 
@@ -44,6 +45,13 @@ class GeneralHelper {
             $index++;
         }
         return $result;
+    }
+
+    static function getPivotValue($model, $prop) {
+        if (isset($model['pivot'][$prop])) {
+            return $model['pivot'][$prop];
+        }
+        return null;
     }
 
 }

@@ -51,30 +51,36 @@ class ArticlesImport implements ToCollection, WithHeadingRow
                                         ->where('status', 'active')
                                         ->first();
                     $this->saveArticle($row, $article);
+                } else if ($row['codigo_de_proveedor'] != '') {
+                    $article = Article::where('user_id', UserHelper::userId())
+                                        ->where('provider_code', $row['codigo_de_proveedor'])
+                                        ->where('status', 'active')
+                                        ->first();
+                    $this->saveArticle($row, $article);
+                } else {
+                    $article = Article::where('user_id', UserHelper::userId())
+                                        ->whereNull('bar_code')
+                                        ->whereNull('provider_code')
+                                        ->where('name', $row['nombre'])
+                                        ->where('status', 'active')
+                                        ->first();
+                    $this->saveArticle($row, $article);
                 }
             } else {
-                Log::info('No se importo');
+                // Log::info('No se importo');
             }
         }
-        Log::info('Se termino de importar');
+        // Log::info('Se termino de importar');
     }
 
     function saveArticle($row, $article) {
         $iva_id = ImportHelper::getIvaId($row);
-        ImportHelper::saveProvider($row, $this->ct);
-        $data = [
-            'iva_id'   => $iva_id,
-        ];
-        if (!is_null($article)) {
-            Log::info('actulizando '.$article->name);
-            $article->update($data);
-        }
-
-        // Log::info('Se guardo '.$article->name);
+        $article->iva_id = $iva_id;
+        $article->save();
     }
 
     function getCostInDollars($row) {
-        if ($row['moneda'] == 'USD') {
+        if (isset($row['moneda']) && $row['moneda'] == 'USD') {
             return 1;
         }
         return 0;

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Article;
+use App\Http\Controllers\Helpers\GeneralHelper;
 use Carbon\Carbon;
 
 class RecipeHelper {
@@ -18,9 +19,9 @@ class RecipeHelper {
 				$art->save();
 			} 
 			$recipe->articles()->attach($article['id'], [
-											'amount' 	=> $article['pivot']['amount'],
-											'notes' 	=> $article['pivot']['notes'],
-											'order_production_status_id' => $article['pivot']['order_production_status_id'],
+											'amount' 	=> GeneralHelper::getPivotValue($article, 'amount'),
+											'notes' 	=> GeneralHelper::getPivotValue($article, 'notes'),
+											'order_production_status_id' => GeneralHelper::getPivotValue($article, 'order_production_status_id'),
 										]);
 		}
 	}

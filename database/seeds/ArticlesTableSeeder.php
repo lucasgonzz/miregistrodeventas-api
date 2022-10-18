@@ -58,7 +58,7 @@ class ArticlesTableSeeder extends Seeder
 
         $this->colman();
 
-        $this->articlesIva('colman');
+        // $this->articlesIva('colman');
 
         return;
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
@@ -468,7 +468,7 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => $article['stock'],
                 'stock_min'         => 1,
                 'percentage_gain'   => $article['percentage_gain'],
-                'sub_category_id'   => $this->getSubcategory($kas_aberturas, $article)->id,
+                'sub_category_id'   => $this->getSubcategoryId($kas_aberturas, $article),
                 'user_id'           => $kas_aberturas->id,
             ]);    
             foreach ($article['images'] as $url) { 
@@ -678,7 +678,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => $article['cost'],
                 'stock'             => $article['stock'] ,
                 'price'             => $article['price'],
-                'sub_category_id'   => $this->getSubcategory($user, $article)->id,
+                'sub_category_id'   => $this->getSubcategoryId($user, $article),
                 'user_id'           => $user->id,
             ]);    
             foreach ($article['images'] as $url) { 
@@ -771,7 +771,6 @@ class ArticlesTableSeeder extends Seeder
                             ->first();
         $articles = [
             [
-                'num'               => '1',
                 'bar_code'          => '123',
                 'name'              => 'Plaqueta de BSAS',
                 'stock'             => 10,
@@ -787,7 +786,6 @@ class ArticlesTableSeeder extends Seeder
                 'sizes'             => [],
             ],
             [
-                'num'               => '2',
                 'bar_code'          => '234',
                 'name'              => 'Plaqueta de Rosario',
                 'stock'             => 10,
@@ -803,7 +801,6 @@ class ArticlesTableSeeder extends Seeder
                 'sizes'             => [],
             ],
             [
-                'num'               => '3',
                 'bar_code'          => '345',
                 'name'              => 'Aire de BSAS',
                 'stock'             => 10,
@@ -819,7 +816,6 @@ class ArticlesTableSeeder extends Seeder
                 'sizes'             => [],
             ],
             [
-                'num'               => '4',
                 'bar_code'          => '456',
                 'name'              => 'Aire de Rosario',
                 'stock'             => 10,
@@ -834,10 +830,43 @@ class ArticlesTableSeeder extends Seeder
                 'colors'            => [],
                 'sizes'             => [],
             ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Tornillo num 6',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Boton chico blanco',
+                'stock'             => 100,
+                'cost'              => 4,
+                'price'             => 7,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Cable 10cm',
+                'stock'             => 100,
+                'cost'              => 10,
+                'price'             => 15,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'name'              => 'Carcaza negra',
+                'stock'             => 100,
+                'cost'              => 10,
+                'price'             => 30,
+                'provider_id'       => $rosario->id,
+            ],
         ];
+        $num = 1;
         foreach ($articles as $article) {
             $art = Article::create([
-                'num'               => $article['num'],
+                'num'               => $num,
                 'bar_code'          => $article['bar_code'],
                 'provider_code'     => 'p-'.$article['bar_code'],
                 'name'              => $article['name'],
@@ -845,16 +874,19 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => $article['cost'],
                 'stock'             => $article['stock'] ,
                 'price'             => $article['price'],
-                'sub_category_id'   => $this->getSubcategory($user, $article)->id,
+                'sub_category_id'   => $this->getSubcategoryId($user, $article),
                 'user_id'           => $user->id,
             ]);    
-            foreach ($article['images'] as $url) { 
-                Image::create([
-                    'article_id' => $art->id,
-                    'url'        => $url,
-                    'color_id'   => $this->getColorId($article),
-                ]);
-            }    
+            $num++;
+            if (isset($article['images'])) {
+                foreach ($article['images'] as $url) { 
+                    Image::create([
+                        'article_id' => $art->id,
+                        'url'        => $url,
+                        'color_id'   => $this->getColorId($article),
+                    ]);
+                }    
+            }
             $art->providers()->attach($article['provider_id'], [
                                         'cost'  => $article['cost'],
                                         'amount' => $article['stock'],
@@ -874,11 +906,14 @@ class ArticlesTableSeeder extends Seeder
         ]);
     }
 
-    function getSubcategory($user, $article) {
-        $sub_category = SubCategory::where('user_id', $user->id)
-                                    ->where('name', $article['sub_category_name'])
-                                    ->first();
-        return $sub_category;
+    function getSubcategoryId($user, $article) {
+        if (isset($article['sub_category_name'])) {
+            $sub_category = SubCategory::where('user_id', $user->id)
+                                        ->where('name', $article['sub_category_name'])
+                                        ->first();
+            return $sub_category->id;
+        }
+        return null;
     }
 
     function getColorId($article) {

@@ -17,7 +17,7 @@ class CreateOrderProductionsTable extends Migration
             $table->id();
             // $table->integer('budget_id')->unsigned()->nullable();
             $table->integer('num');
-            $table->integer('client_id')->unsigned()->nulalble();
+            $table->integer('client_id')->unsigned()->nullable();
             $table->integer('order_production_status_id')->unsigned();
 
             $table->string('pdf')->nullable();

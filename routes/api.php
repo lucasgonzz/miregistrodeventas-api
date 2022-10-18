@@ -607,7 +607,7 @@ Route::middleware('auth:sanctum')->group(function () {
 		'CurrentAcountController@notaCredito'
 	);
 	Route::post('/current-acount/saldo-inicial', 
-		'ClientController@saldoInicial'
+		'CurrentAcountController@saldoInicial'
 	);
 	Route::delete('/current-acount/{model_name}/{id}', 
 		'CurrentAcountController@delete'

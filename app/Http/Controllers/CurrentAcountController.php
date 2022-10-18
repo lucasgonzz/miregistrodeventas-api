@@ -28,7 +28,6 @@ class CurrentAcountController extends Controller
         $models = CurrentAcount::whereDate('created_at', '>=', $months_ago);
         if ($model_name == 'client') {
             $models = $models->where('client_id', $model_id)
-                            ->orderBy('created_at', 'ASC')
                             ->with(['budget' => function($q) {
                                 return $q->withAll();
                             }])
@@ -43,6 +42,7 @@ class CurrentAcountController extends Controller
         }
         $models = $models->with('payment_method')
                         ->with('checks')
+                        ->orderBy('created_at', 'ASC')
                         ->get();
         $models = CurrentAcountHelper::format($models);
         return response()->json(['models' => $models], 200);
@@ -77,6 +77,19 @@ class CurrentAcountController extends Controller
         return response(null, 200);
         // $client_controller = new ClientController();
         // $client_controller->checkSaldoss($current_acount->client_id);
+    }
+
+    function saldoInicial(Request $request) {
+        $current_acount = CurrentAcount::create([
+            'detalle'       => 'Saldo inicial',
+            'status'        => $request->is_for_debe ? 'sin_pagar' : 'pago_from_client',
+            'client_id'     => $request->model_name == 'client' ? $request->model_id : null,
+            'provider_id'   => $request->model_name == 'provider' ? $request->model_id : null,
+            'debe'          => $request->is_for_debe ? $request->saldo_inicial : null,
+            'haber'         => !$request->is_for_debe ? $request->saldo_inicial : null,
+            'saldo'         => $request->is_for_debe ? $request->saldo_inicial : -$request->saldo_inicial,
+        ]);
+        return response()->json(['current_acount' => $current_acount], 201);
     }
 
     function pdfFromModel($model_name, $model_id, $months_ago) {

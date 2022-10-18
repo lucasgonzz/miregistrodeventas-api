@@ -23,4 +23,16 @@ class RecipeController extends Controller
         RecipeHelper::attachArticles($model, $request->articles);
         return response()->json(['model' => $this->fullModel('App\Recipe', $model->id)], 200);
     }
+
+    function update(Request $request, $id) {
+        $model = Recipe::find($id);
+        RecipeHelper::attachArticles($model, $request->articles);
+        return response()->json(['model' => $this->fullModel('App\Recipe', $model->id)], 200);
+    }
+
+    function destroy($id) {
+        $model = Recipe::find($id);
+        $model->delete();
+        return response(null, 200);
+    }
 }

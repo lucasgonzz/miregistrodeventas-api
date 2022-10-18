@@ -12,6 +12,7 @@ class OrderProduction extends Model
 
     function scopeWithAll($query) {
         $query->with('articles', 'order_production_status', 'client');
+        // $query->with('articles', 'articles_finished', 'order_production_status', 'client');
     }
 
     function budget() {
@@ -24,6 +25,10 @@ class OrderProduction extends Model
 
     function articles() {
         return $this->belongsToMany('App\Article')->withPivot('price', 'amount', 'bonus', 'location', 'delivered');
+    }
+
+    function articles_finished() {
+        return $this->belongsToMany('App\Article', 'article_order_production_finished', 'article_id', 'order_production_id')->withPivot('order_production_status_id', 'amount');
     }
 
     function order_production_status() {
