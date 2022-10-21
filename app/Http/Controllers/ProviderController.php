@@ -2,10 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\ProvidersImport;
 use App\Provider;
+use App\User;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProviderController extends Controller
 {
@@ -60,6 +61,18 @@ class ProviderController extends Controller
         $provider->iva_condition_id = $request->iva_condition_id;
         $provider->save();
         return response()->json(['model' => $this->getFullModel($provider->id)], 200);
+    }
+
+    function setComercioCityUser(Request $request) {
+        $user = User::where('company_name', $request->company_name)
+                        ->first();
+        if (!is_null($user)) {
+            $provider = Provider::find($request->model_id);
+            $provider->comercio_city_user_id = $user->id;
+            $provider->save();
+            return response()->json(['user_finded' => true, 'model' => $this->fullModel('App\Provider', $provider->id), 200]);
+        }
+        return response()->json(['user_finded' => false, 200]);
     }
 
     function destroy($id) {

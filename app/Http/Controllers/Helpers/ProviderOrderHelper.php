@@ -14,8 +14,11 @@ use Illuminate\Support\Facades\Log;
 
 class ProviderOrderHelper {
 
-	static function getNum() {
-		$last = ProviderOrder::where('user_id', UserHelper::userId())
+	static function getNum($user_id = null) {
+		if (is_null($user_id)) {
+			$user_id = UserHelper::userId();
+		}
+		$last = ProviderOrder::where('user_id', $user_id)
 								->orderBy('id', 'DESC')
 								->first();
 		return is_null($last) ? 1 : $last->num + 1;
@@ -63,7 +66,8 @@ class ProviderOrderHelper {
 			$cant_providers = count($article->providers);
 			if ($cant_providers == 0 || ($cant_providers >= 1 && $article->providers[$cant_providers-1]->id != $provider_order->provider_id)) {
 				$article->providers()->attach($provider_order->provider_id, [
-										'amount' => $_article['pivot']['received']
+										'amount' => $_article['pivot']['received'],
+										'cost' 	 => $_article['pivot']['cost'],
 									]);
 				// Log::info('Se seteo el proveedor');
 			}

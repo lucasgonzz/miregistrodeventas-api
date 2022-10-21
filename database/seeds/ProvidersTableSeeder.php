@@ -17,6 +17,7 @@ class ProvidersTableSeeder extends Seeder
      */
     public function run()
     {
+        $this->mcElectronica();
         $this->colman();
     	$providers = [
             'Buenos Aires',
@@ -108,6 +109,31 @@ class ProvidersTableSeeder extends Seeder
     	}
     }
 
+    function mcElectronica() {
+        $ct = new Controller();
+        $user = User::where('company_name', 'mc electronica')->first();
+        $models = [
+            [
+                'name'              => 'Buenos Aires',
+                'percentage_gain'   => 50,
+            ],
+            [
+                'name'              => 'Rosario',
+                'percentage_gain'   => 100,
+            ],
+        ];
+        foreach ($models as $model) {
+            Provider::create([
+                'num'               => $ct->num('providers', $user->id), 
+                'name'              => $model['name'],
+                'percentage_gain'   => $model['percentage_gain'],
+                'email'             => 'lucasgonzalez5500@gmail.com',
+                'address'           => 'Calle 123',
+                'user_id'           => $user->id,
+            ]);
+        }
+    }
+
     function colman() {
         $ct = new Controller();
         $user = User::where('company_name', 'colman')->first();
@@ -118,6 +144,10 @@ class ProvidersTableSeeder extends Seeder
             ],
             [
                 'name'              => 'Rosario',
+                'percentage_gain'   => 100,
+            ],
+            [
+                'name'              => 'Mc Electronica',
                 'percentage_gain'   => 100,
             ],
         ];

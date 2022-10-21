@@ -31,6 +31,9 @@ class CurrentAcountController extends Controller
                             ->with(['budget' => function($q) {
                                 return $q->withAll();
                             }])
+                            ->with(['order_production' => function($q) {
+                                return $q->withAll();
+                            }])
                             ->with(['sale' => function($q) {
                                 return $q->withAll();
                             }]);

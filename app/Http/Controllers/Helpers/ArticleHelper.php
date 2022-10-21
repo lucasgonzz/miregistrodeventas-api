@@ -94,6 +94,52 @@ class ArticleHelper {
         return $articles;
     }
 
+    static function attachProvider($article, $request) {
+        if ($request->provider_id != 0) {
+            $article->providers()->attach($request->provider_id, [
+                                            'amount' => $request->stock,
+                                            'cost'   => $request->cost,
+                                            // 'price'  => $request->price
+                                        ]);
+        }
+    }
+
+    static function saveProvider($article, $request) {
+        Log::info('tiene stock de '.$article->stock);
+        Log::info('llego stock de '.$request->stock);
+        if (
+            // No tiene provedor y llega uno en request
+            (count($article->providers) == 0 && $request->provider_id != 0) ||
+
+            // Tiene provedores, llega provedor en request, y el ultimo proveedor que tiene es distinto del que llego
+            (count($article->providers) >= 1 && $request->provider_id != 0 && $article->providers[count($article->providers)-1]->id != $request->provider_id) ||
+
+            // Tiene proveedor, llega el mismo proveedor pero con otro costo
+            (count($article->providers) >= 1 && $article->providers[count($article->providers)-1]->id == $request->provider_id && $article->cost != $request->cost) ||
+
+            // Tiene proveedor, llega el mismo proveedor pero con otro stock
+            (count($article->providers) >= 1 && $article->providers[count($article->providers)-1]->id == $request->provider_id && $article->stock != $request->stock)
+        ) {
+            Log::info('entro a guardar proveedor');
+            $request_stock = (float)$request->stock;
+            if ($request_stock > 0) {
+                if (!is_null($article->stock)) {
+                    $stock_actual = $article->stock;
+                } else {
+                    $stock_actual = 0;
+                }
+                $amount = $request_stock - $stock_actual;
+            } else {
+                $amount = null;
+            }
+            $article->providers()->attach($request->provider_id, [
+                                    'amount'    => $amount,
+                                    'cost'      => $request->cost,
+                                    // 'price'     => $request->price,
+                                ]);
+        }
+    }
+
     static function setDiscount($articles) {
         foreach ($articles as $article) {
             if (count($article->discounts) >= 1) {
@@ -232,16 +278,6 @@ class ArticleHelper {
         if ($condition_id) {
             $article->condition_id = $condition_id;
             $article->save();
-        }
-    }
-
-    static function attachProvider($article, $request) {
-        if ($request->provider_id != 0) {
-            $article->providers()->attach($request->provider_id, [
-                                            'amount' => $request->stock,
-                                            'cost'   => $request->cost,
-                                            'price'  => $request->price
-                                        ]);
         }
     }
 

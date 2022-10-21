@@ -25,6 +25,7 @@ class CreateOrderProductionsTable extends Migration
             
             $table->timestamp('start_at')->nullable();
             $table->timestamp('finish_at')->nullable();
+            $table->boolean('finished')->default(0);
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

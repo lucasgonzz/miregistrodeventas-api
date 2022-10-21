@@ -24,16 +24,15 @@ class OrderProductionStatusSeeder extends Seeder
             ['name' => 'Colocación', 'optional' => true, 'position' => 4, 'user_id' => $kas->id],
             ['name' => 'Pintura', 'optional' => true, 'position' => 5, 'user_id' => $kas->id],
 
+            ['name' => 'Montaje', 'optional' => false, 'position' => 1, 'user_id' => $mc_electronica->id], 
+            ['name' => 'Armado', 'optional' => false, 'position' => 2, 'user_id' => $mc_electronica->id], 
+            ['name' => 'Embalaje', 'optional' => false, 'position' => 3, 'user_id' => $mc_electronica->id],
+            ['name' => 'Terminado', 'optional' => false, 'position' => 4, 'user_id' => $mc_electronica->id],
+
             ['name' => 'Montaje', 'optional' => false, 'position' => 1, 'user_id' => $colman->id], 
             ['name' => 'Armado', 'optional' => false, 'position' => 2, 'user_id' => $colman->id], 
             ['name' => 'Embalaje', 'optional' => false, 'position' => 3, 'user_id' => $colman->id],
             ['name' => 'Terminado', 'optional' => false, 'position' => 4, 'user_id' => $colman->id],
-
-            ['name' => 'MONTAJE', 'optional' => false, 'position' => 1, 'user_id' => $mc_electronica->id], 
-            ['name' => 'DEPOSITO', 'optional' => false, 'position' => 2, 'user_id' => $mc_electronica->id], 
-            ['name' => 'ARMADORES', 'optional' => false, 'position' => 3, 'user_id' => $mc_electronica->id], 
-            ['name' => 'EMBALAJE', 'optional' => false, 'position' => 4, 'user_id' => $mc_electronica->id],
-            ['name' => 'TERMINADO', 'optional' => false, 'position' => 5, 'user_id' => $mc_electronica->id],
         ];
 
         foreach ($statuses as $model) {

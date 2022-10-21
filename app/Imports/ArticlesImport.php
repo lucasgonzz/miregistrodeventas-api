@@ -87,9 +87,12 @@ class ArticlesImport implements ToCollection, WithHeadingRow
             'cost_in_dollars'   => $this->getCostInDollars($row),
             'percentage_gain'   => $row['margen_de_ganancia'],
             'price'             => $row['precio'],
+            'sub_category_id'   => ImportHelper::getSubcategoryId($row),
         ];
         if (!is_null($article)) {
-            Log::info('actulizando '.$article->name);
+            if ($article->name == 'Cable 10cm') {
+                Log::info($data);
+            }
             $data['slug'] = ArticleHelper::slug($row['nombre'], $article->id);
             $article->update($data);
         } else {

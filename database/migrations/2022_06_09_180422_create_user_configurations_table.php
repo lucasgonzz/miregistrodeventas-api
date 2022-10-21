@@ -22,6 +22,7 @@ class CreateUserConfigurationsTable extends Migration
             $table->boolean('set_articles_updated_at_always')->default(false);
             $table->integer('limit_items_in_sale_per_page')->nullable();
             $table->boolean('show_google_login')->default(true);
+            $table->boolean('apply_price_type_in_services')->default(false);
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

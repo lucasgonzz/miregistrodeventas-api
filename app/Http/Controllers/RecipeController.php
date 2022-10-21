@@ -11,6 +11,7 @@ class RecipeController extends Controller
     function index() {
         $models = Recipe::where('user_id', $this->userId())
                             ->withAll()
+                            ->orderBy('created_at', 'DESC')
                             ->get();
         return response()->json(['models' => $models], 200);
     }

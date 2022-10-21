@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\ClientHelper;
 use App\Http\Controllers\Helpers\GeneralHelper;
+use App\Http\Controllers\Helpers\OrderProductionCurrentAcountHelper;
 use App\Http\Controllers\Helpers\OrderProductionHelper;
-use App\Http\Controllers\Helpers\Pdf\OrderProductionPdf;
+use App\Http\Controllers\Helpers\OrderProductionProviderOrderHelper;
 use App\Http\Controllers\Helpers\Pdf\OrderProductionArticlesPdf;
+use App\Http\Controllers\Helpers\Pdf\OrderProductionPdf;
 use App\OrderProduction;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -26,7 +28,7 @@ class OrderProductionController extends Controller
         $models = $models->withAll()
                         ->orderBy('created_at', 'DESC')
                         ->get();
-        // $models = OrderProductionHelper::setArticles($models);
+        $models = OrderProductionHelper::setArticles($models);
         return response()->json(['models' => $models], 200);
     }
 
@@ -47,9 +49,9 @@ class OrderProductionController extends Controller
         ]);
         OrderProductionHelper::attachArticles($model, $request->articles);
         OrderProductionHelper::sendCreatedMail($model, $request->send_mail);
-        return response()->json(['model' => $this->getFullModel($model->id)], 201);
-        // $model = OrderProductionHelper::setArticles([$this->getFullModel($model->id)])[0];
-        // return response()->json(['model' => $model], 201);
+        // return response()->json(['model' => $this->getFullModel($model->id)], 201);
+        $model = OrderProductionHelper::setArticles([$this->getFullModel($model->id)])[0];
+        return response()->json(['model' => $model], 201);
     }
 
     function update(Request $request) {
@@ -59,9 +61,22 @@ class OrderProductionController extends Controller
         $model->save();
         OrderProductionHelper::attachArticles($model, $request->articles);
         OrderProductionHelper::sendUpdatedMail($model);
-        return response()->json(['model' => $this->getFullModel($model->id)], 200);
-        // $model = OrderProductionHelper::setArticles([$this->getFullModel($model->id)])[0];
-        // return response()->json(['model' => $model], 200);
+        // return response()->json(['model' => $this->getFullModel($model->id)], 200);
+        $model = OrderProductionHelper::setArticles([$this->getFullModel($model->id)])[0];
+        return response()->json(['model' => $model], 200);
+    }
+
+    function finish(Request $request, $id) {
+        $model = OrderProduction::find($id);
+        $model->finished = 1;
+        $model->save();
+        if ($request->save_current_acount) {
+            OrderProductionCurrentAcountHelper::saveCurrentAcount($model);
+        }
+        if ($request->save_provider_order) {
+            OrderProductionProviderOrderHelper::createProviderOrder($model);
+        }
+        return response()->json(['model' => $this->fullModel('App\OrderProduction', $model->id), 200]);
     }
 
     function setPdf(Request $request) {

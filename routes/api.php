@@ -203,6 +203,10 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/order-production/{id}', 
 		'OrderProductionController@delete'
 	);
+	Route::put('/order-production/finish/{id}', 
+		'OrderProductionController@finish'
+	);
+		
 
 	// Recetas - recipe
 	Route::resource('recipe', 'RecipeController');
@@ -272,30 +276,27 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 
 	// --------------------------------------------------------------------------------------
-	// INGRESAR
+	// ARTICLE
+		Route::get('/article/index/{status}', 
+			'ArticleController@index'
+		);
+		Route::get('/article/{id}', 
+			'ArticleController@show'
+		);
+		Route::put('/article', 
+			'ArticleController@update'
+		);
+		Route::put('/article/update-prop/{prop}', 
+			'ArticleController@updateProp'
+		);
+		Route::post('/article/delete', 
+			'ArticleController@delete'
+		);
 		Route::post('/article', 
 			'ArticleController@store'
 		);
 		Route::post('/article/new-article', 
 			'ArticleController@newArticle'
-		);
-		Route::put('/article/price', 
-			'ArticleController@updatePrice'
-		);
-		Route::get('/article/{id}', 
-			'ArticleController@show'
-		);
-		Route::get('/article/get-by-bar-code/{bar_code}', 
-			'ArticleController@getByBarCode'
-		);
-		Route::get('/article/bar-codes', 
-			'ArticleController@getBarCodes'
-		);
-		Route::get('/article/names', 
-			'ArticleController@names'
-		);
-		Route::get('/article/previus-next/{index}', 
-			'ArticleController@previusNext'
 		);
 		Route::post('/article/excel/import', 
 			'ArticleController@import'
@@ -304,6 +305,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 		// Provedores de comercios
 		Route::resource('provider', 'ProviderController');
+		Route::post('/provider/set-comercio-city-user', 'ProviderController@setComercioCityUser');
 		Route::post('/provider/excel/import', 
 			'ProviderController@import'
 		);
@@ -395,37 +397,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	// --------------------------------------------------------------------------------------
 
 	// VENDER
-		Route::post('/sales', 
-			'SaleController@store'
-		);
+	Route::post('/sales', 
+		'SaleController@store'
+	);
 
 	// --------------------------------------------------------------------------------------
-
-	// LISTADO
-	Route::get('/article', 
-		'ArticleController@index'
-	);
-	Route::get('/article/paginated', 
-		'ArticleController@paginated'
-	);
-	Route::get('/article/{id}', 
-		'ArticleController@show'
-	);
-	Route::get('/article/search/{query}', 
-		'ArticleController@search'
-	);
-	Route::put('/article', 
-		'ArticleController@update'
-	);
-	Route::put('/article/update-prop/{prop}', 
-		'ArticleController@updateProp'
-	);
-	Route::post('/article/filter', 
-		'ArticleController@filter'
-	);
-	Route::post('/article/delete', 
-		'ArticleController@delete'
-	);
 
 	// Ticket pdf
 	Route::get('/article/pdf/{ids}', 
@@ -531,11 +507,11 @@ Route::middleware('auth:sanctum')->group(function () {
 		'MarkerGroupController@addMarkerToGroup'
 	);
 	// Featured
-	Route::get('/articles/set-featured/{article_id}',
+	Route::get('/article/set-featured/{article_id}',
 		'ArticleController@setFeatured'
 	);
 	// Online
-	Route::get('/articles/set-online/{article_id}',
+	Route::get('/article/set-online/{article_id}',
 		'ArticleController@setOnline'
 	);
 
@@ -545,7 +521,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/sale/{from_date?}/{until_date?}', 
 		'SaleController@index'
 	);
-	Route::get('/sale/show/{id}', 
+	Route::get('/sale-show/{id}', 
 		'SaleController@show'
 	);
 	Route::put('/sale/save-current-acount/{id}', 
@@ -595,6 +571,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// Clientes
 	Route::resource('/client', 'ClientController');
+	Route::post('/client/set-comercio-city-user', 'ClientController@setComercioCityUser');
 
 	// CurrentAcounts
 	Route::get('/current-acount/{model_name}/{model_id}/{months_ago}', 

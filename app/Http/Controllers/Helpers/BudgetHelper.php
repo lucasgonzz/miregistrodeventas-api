@@ -55,7 +55,6 @@ class BudgetHelper {
 	}
 
 	static function checkStatus($budget) {
-		$new_total = Self::getTotal($budget);
 		if ($budget->budget_status->name == 'Confirmado') {
 			Self::deleteCurrentAcount($budget);
 			Self::saveCurrentAcount($budget);
@@ -80,7 +79,7 @@ class BudgetHelper {
 	static function saveCurrentAcount($budget) {
 		$debe = Self::getTotal($budget);
         $current_acount = CurrentAcount::create([
-            'detalle'     => 'Presupuesto '.$budget->num,
+            'detalle'     => 'Presupuesto N°'.$budget->num,
             'debe'        => $debe,
             'status'      => 'sin_pagar',
             'client_id'   => $budget->client_id,

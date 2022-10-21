@@ -93,13 +93,28 @@ class Article extends Model
         return $this->belongsToMany('App\Sale')->latest();
     }
 
+    public function budgets() {
+        return $this->belongsToMany('App\Budget')->latest();
+    }
+
+    public function order_productions() {
+        return $this->belongsToMany('App\OrderProduction')->latest();
+    }
+
+    public function provider_orders() {
+        return $this->belongsToMany('App\ProviderOrder')->latest();
+    }
+
+    public function recipes() {
+        return $this->belongsToMany('App\Recipe')->latest();
+    }
+
     public function specialPrices() {
         return $this->belongsToMany('App\SpecialPrice')->withPivot('price');
     }
     
     public function providers(){
-        return $this->belongsToMany('App\Provider')
-                                                    ->withPivot('amount', 'cost', 'price')
+        return $this->belongsToMany('App\Provider')->withPivot('amount', 'cost', 'price')
                                                     ->withTimestamps();
     }
 

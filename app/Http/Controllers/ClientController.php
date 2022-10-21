@@ -9,12 +9,13 @@ use App\Http\Controllers\Helpers\ClientHelper;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
-use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
 use App\Http\Controllers\Helpers\SaleHelper;
+use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
 use App\Http\Controllers\SaleController;
 use App\Imports\ClientsImport;
 use App\Sale;
 use App\Seller;
+use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
@@ -26,6 +27,7 @@ class ClientController extends Controller
     	$clients = Client::where('user_id', $this->userId())
                             ->withAll()
                             ->orderBy('id', 'DESC')
+                            ->where('status', 'active')
                             ->get();
         return response()->json(['models' => ClientHelper::setClientsSaldo($clients)], 200);
     }
@@ -69,6 +71,18 @@ class ClientController extends Controller
         $client->save();
         $client = ClientHelper::getFullModel($client->id);
         return response()->json(['model' => $client], 200);
+    }
+
+    function setComercioCityUser(Request $request) {
+        $user = User::where('company_name', $request->company_name)
+                        ->first();
+        if (!is_null($user)) {
+            $client = Client::find($request->model_id);
+            $client->comercio_city_user_id = $user->id;
+            $client->save();
+            return response()->json(['user_finded' => true, 'model' => $this->fullModel('App\Client', $client->id), 200]);
+        }
+        return response()->json(['user_finded' => false, 200]);
     }
 
     function pdf($seller_id) {

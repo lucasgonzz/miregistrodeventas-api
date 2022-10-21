@@ -33,6 +33,10 @@ class Sale extends Model
         return $this->belongsToMany('App\Commissioner')->withPivot('percentage', 'is_seller');
     }
 
+    public function user() {
+        return $this->belongsTo('App\User', 'user_id');
+    }
+
     public function employee() {
         return $this->belongsTo('App\User', 'employee_id');
     }

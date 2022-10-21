@@ -35,7 +35,7 @@ class UserController extends Controller
             'email'             => $request->email,
             'company_name'      => $request->company_name,
             'status'            => 'commerce',
-            'plan_id'           => 3,
+            'plan_id'           => 6,
             // 'type'              => 'commerce',
             'type'              => $request->type,
             'password'          => bcrypt($request->password),
@@ -86,6 +86,7 @@ class UserController extends Controller
         $configuration->iva_included                    = $request->configuration['iva_included'];
         $configuration->set_articles_updated_at_always  = $request->configuration['set_articles_updated_at_always'];
         $configuration->limit_items_in_sale_per_page    = $request->configuration['limit_items_in_sale_per_page'];
+        $configuration->apply_price_type_in_services    = $request->configuration['apply_price_type_in_services'];
         $configuration->save();
 
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);

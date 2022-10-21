@@ -19,13 +19,13 @@ class DiscountSeeder extends Seeder
 
         foreach ($users as $user) {
             Discount::create([
-            	'name' 		 => 'Personajes',
-            	'percentage' => 10,
+            	'name' 		 => 'Contado',
+            	'percentage' => 12,
             	'user_id'    => $user->id,
             ]);
             Discount::create([
-            	'name' 		 => 'Escolares',
-            	'percentage' => 20,
+            	'name' 		 => 'Placas',
+            	'percentage' => 5,
             	'user_id'    => $user->id,
             ]);
         }

@@ -16,6 +16,10 @@ class CurrentAcount extends Model
         return $this->belongsTo('App\Budget');
     }
 
+    public function order_production() {
+        return $this->belongsTo('App\OrderProduction');
+    }
+
     public function provider_order() {
         return $this->belongsTo('App\ProviderOrder');
     }

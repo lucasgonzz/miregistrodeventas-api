@@ -341,7 +341,7 @@ class NewSalePdf extends fpdf {
 			$this->x = $this->start_x;
 			$this->y = 35;
 			$this->SetFont('Arial', 'B', 10);
-			$this->Cell(15, 5, 'Cliente:', $this->b, 0, 'L');
+			$this->Cell(20, 5, 'Cliente:', $this->b, 0, 'L');
 			$this->SetFont('Arial', '', 10);
 			$this->Cell(85, 5, $this->sale->client->name, $this->b, 0, 'L');
 
@@ -372,20 +372,28 @@ class NewSalePdf extends fpdf {
 			// 	$this->Cell(77, 5, $this->sale->client->iva_condition->name, $this->b, 0, 'L');
 			// }
 
-			if ($this->sale->client->cuit != '') {
+			if (!is_null($this->sale->client->location)) {
 				$this->y += 5;
 				$this->x = $this->start_x;
 				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(12, 5, 'CUIT:', $this->b, 0, 'L');
+				$this->Cell(20, 5, 'Localidad:', $this->b, 0, 'L');
 				$this->SetFont('Arial', '', 10);
-				$this->Cell(88, 5, $this->sale->client->cuit, $this->b, 0, 'L');
+				$this->Cell(88, 5, $this->sale->client->location->name, $this->b, 0, 'L');
 			}
+			// if ($this->sale->client->cuit != '') {
+			// 	$this->y += 5;
+			// 	$this->x = $this->start_x;
+			// 	$this->SetFont('Arial', 'B', 10);
+			// 	$this->Cell(12, 5, 'CUIT:', $this->b, 0, 'L');
+			// 	$this->SetFont('Arial', '', 10);
+			// 	$this->Cell(88, 5, $this->sale->client->cuit, $this->b, 0, 'L');
+			// }
 			// $this->y += 5;
 		}
 	}
 
 	function currentAcountInfo(){
-		if (!is_null($this->sale->client) && $this->sale->save_current_acount) {
+		if (!is_null($this->sale->client) && $this->sale->save_current_acount && count($this->sale->current_acounts) >= 1) {
 			$saldo_anterior = CurrentAcountHelper::getSaldo('client', $this->sale->client_id, $this->sale->current_acounts[0]);
 			$this->y = 35;
 			$this->x = 105;
@@ -447,7 +455,7 @@ class NewSalePdf extends fpdf {
 		    foreach ($this->sale->discounts as $discount) {
 		    	$text = '-'.$discount->pivot->percentage.'% '.$discount->name;
 		    	$descuento = $total_sale * floatval($discount->pivot->percentage) / 100;
-		    	$total_sale = Numbers::redondear($total_sale - $descuento);
+		    	$total_sale = Numbers::price($total_sale - $descuento);
 		    	$text .= ' = $'.$total_sale;
 				$this->Cell(
 					50, 
@@ -470,7 +478,7 @@ class NewSalePdf extends fpdf {
 		    $this->Cell(
 				50, 
 				10, 
-				'Total: $'.SaleHelper::getTotalSale($this->sale), 
+				'Total: $'.Numbers::price(SaleHelper::getTotalSale($this->sale)), 
 				$this->b, 
 				0, 
 				'L'

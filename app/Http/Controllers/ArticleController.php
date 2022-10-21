@@ -29,10 +29,10 @@ use \Gumlet\ImageResize;
 class ArticleController extends Controller
 {
 
-    function index() {
+    function index($status = 'active') {
         $user = Auth()->user();
         $articles = Article::where('user_id',$this->userId())
-                            ->where('status', 'active')
+                            ->where('status', $status)
                             ->orderBy('created_at', 'DESC')
                             ->withAll()
                             ->get();
@@ -65,19 +65,12 @@ class ArticleController extends Controller
         return response()->json(['model' => $article], 200);
     }
 
-    function updatePrice(Request $request) {
-        $article = Article::find($request->id);
-        $article->price = $request->price;
-        $article->save();
-        $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['model' => $article], 200);
-    }
-
     function update(Request $request) {
         $article = Article::find($request->id);
         if (!UserHelper::getFullModel()->configuration->set_articles_updated_at_always) {
             $article->timestamps  = false;
         }
+        ArticleHelper::saveProvider($article, $request);
         $actual_price = $article->price;
         $actual_stock = $article->stock;
         $article->status          = 'active';
@@ -86,25 +79,14 @@ class ArticleController extends Controller
         $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
         $article->brand_id        = $request->brand_id != 0 ? $request->brand_id : null;
         $article->iva_id          = $request->iva_id;
-        // $article->with_dolar      = $request->with_dolar;
         $article->percentage_gain = $request->percentage_gain;
         if (!$article->apply_provider_percentage_gain && is_null($article->percentage_gain)) {
             $article->previus_price = $article->price;
             $article->price = $request->price;
             $article->timestamps = true;
-            Log::info('1Se actualizo precio a '.$article->name);
         } else {
             $article->price = null;
         }
-        // if (isset($request->original_price)) {
-        //     $article->price = $request->original_price;
-        // }
-        // if ($article->percentage_gain == '' && $article->price != $request->price && !isset($request->original_price)) {
-        //     $article->previus_price = $article->price;
-        //     $article->timestamps = true;
-        //     $article->price = $request->price;
-        //     Log::info('2Se actualizo precio a '.$article->name);
-        // }
         if (strtolower($article->name) != strtolower($request->name)) {
             $article->name = ucfirst($request->name);
             $article->slug = ArticleHelper::slug($request->name);
@@ -112,7 +94,7 @@ class ArticleController extends Controller
         $article->cost = $request->cost;
         $article->cost_in_dollars = $request->cost_in_dollars;
         $article->apply_provider_percentage_gain = $request->apply_provider_percentage_gain;
-        if (!$request->stock_null && $request->stock != '') {
+        if ($request->stock != '') {
             $article->stock = $request->stock;
             $article->stock += $request->new_stock;
             $article->stock_min = $request->stock_min;
@@ -121,23 +103,12 @@ class ArticleController extends Controller
         }
         ArticleHelper::checkAdvises($article);
         $article->save();
-        ArticleHelper::attachProvider($article, $request);
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDiscounts($article, $request->discounts);
         ArticleHelper::setDescriptions($article, $request->descriptions);
         ArticleHelper::setSizes($article, $request->sizes_id);
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
-        if ($request->save_provider && (count($article->providers) >= 1 && $request->provider_id != 0 && $request->provider_id != $article->providers[count($article->providers)-1]->id || $request->price != $actual_price)) {
-            $article->providers()
-                            ->attach(
-                                $request->provider_id, 
-                                [
-                                    'amount' => (float)$request->stock - $actual_stock,
-                                    'cost' => $request->cost,
-                                    'price' => $request->price,
-                                ]);
-        }
         ArticleHelper::setSpecialPrices($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
         $article->user->notify(new UpdatedArticle($article));
@@ -450,7 +421,13 @@ class ArticleController extends Controller
     function delete(Request $request) {
         foreach ($request->articles_id as $article_id) {
             $article = Article::find($article_id);
-            if (count($article->sales) >= 1) {
+            if (
+                count($article->sales) >= 1 
+                || count($article->budgets) >= 1 
+                || count($article->order_productions) >= 1
+                || count($article->provider_orders) >= 1
+                || count($article->recipes) >= 1
+            ) {
                 $article->status = 'inactive';
                 $article->save();
             } else {
@@ -465,85 +442,6 @@ class ArticleController extends Controller
         $article->offer_price = null;
         $article->save();
     }
-
-    // function filter(Request $request) {
-    //     $user = Auth()->user();
-    //     $mostrar = $request->mostrar;
-    //     $type = $request->type;
-    //     // $ordenar = $request->ordenar;
-    //     $precio_entre = $request->precio_entre;
-    //     $precio_minimo = (float)$request->precio_entre['min'];
-    //     $precio_maximo = (float)$request->precio_entre['max'];
-    //     $fecha_minimo = $request->fecha_entre['min'];
-    //     $fecha_maximo = $request->fecha_entre['max'];
-
-    //     $articles = Article::where('user_id', $this->userId());
-
-    //     // Ordenar
-    //     // if ($ordenar == 'nuevos-viejos') {
-    //     //     $articles = $articles->orderBy('created_at', 'DESC');
-    //     // }
-    //     // if ($ordenar == 'viejos-nuevos') {
-    //     //     $articles = $articles->orderBy('created_at', 'ASC');
-    //     // }
-    //     // if ($ordenar == 'caros-baratos') {
-    //     //     $articles = $articles->orderBy('price', 'DESC');
-    //     // }
-    //     // if ($ordenar == 'baratos-caros') {
-    //     //     $articles = $articles->orderBy('price', 'ASC');
-    //     // }
-
-    //     // Type
-    //     if ($type === 'markers') {
-    //         $articles = $articles->whereHas('marker');
-    //     } else if ($type === 'featured') {
-    //         $articles = $articles->whereNotNull('featured');
-    //     }
-
-    //     if ($user->hasRole('commerce')) {
-    //         $articles = $articles->with('providers');
-    //         // $provider = $request->provider;
-    //         // if ($provider != 0) {
-    //         //     $articles = $articles->whereHas('providers', function(Builder $q) use ($provider) {
-    //         //         $q->where('provider_id', $provider);
-    //         //     });
-    //         // }
-    //     }
-
-    //     // Categorias
-    //     $category = $request->category;
-    //     if ($category != 0) {
-    //         $articles = $articles->where('category_id', $category);
-    //     }
-
-    //     // Proveedores
-    //     // $provider = $request->provider;
-    //     // if ($provider != 0) {
-    //     //     $articles = $articles->whereHas('providers', function(Builder $q) use($provider) {
-    //     //         $q->where('provider_id', $provider);
-    //     //     });
-    //     // }
-
-    //     if ($precio_minimo != '' && $precio_maximo != '') {
-    //         $articles = $articles->whereBetween('offer_price', 
-    //                                                 [$precio_minimo, $precio_maximo]
-    //                                             )->orWhereBetween('price', 
-    //                                                 [$precio_minimo, $precio_maximo]
-    //                                             );
-    //     }
-
-    //     if ($fecha_minimo != '' && $fecha_maximo != '') {
-    //         $fecha_maximo = new Carbon($fecha_maximo);
-    //         $fecha_maximo->addDay();
-    //         $articles = $articles->whereBetween('created_at', 
-    //                                                 [$fecha_minimo, $fecha_maximo]
-    //                                             );
-    //     }
-
-    //     $articles->with('images');
-    //     $articles = $articles->get();
-    //     return response()->json(['models' => $articles], 200);
-    // }
 
     function export() {
         return Excel::download(new ArticlesExport, 'comerciocity-articulos.xlsx');

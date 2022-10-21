@@ -4,6 +4,7 @@ namespace App\Exports;
 
 use App\Article;
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\ExportHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -14,7 +15,7 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
 
     public function map($article): array
     {
-        return [
+        $map = [
             $article->bar_code,
             $article->provider_code,
             $article->name,
@@ -28,11 +29,14 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             $article->percentage_gain,
             $article->discounts_formated,
             $article->price,
+        ];
+        $map = ExportHelper::mapPriceTypes($map, $article);
+        $map = array_merge($map, [
             $article->created_at,
             $article->updated_at,
-            $this->getCostInDollars($article),
-            // Date::dateTimeToExcel($article->updated_at),
-        ];
+            $this->getCostInDollars($article)
+        ]);
+        return $map;
     }
 
 
@@ -53,12 +57,13 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
         $articles = ArticleHelper::setPrices($articles);
         $articles = $this->setDiscounts($articles);
         // $articles = ArticleHelper::setDiscount($articles);
+        $articles = ExportHelper::setPriceTypes($articles);
         return $articles;
     }
 
     public function headings(): array
     {
-        return [
+        $headings = [
             'Codigo de barras',
             'Codigo de proveedor',
             'Nombre',
@@ -72,10 +77,14 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             'Margen de ganancia',
             'Descuentos',
             'Precio',
+        ];
+        $headings = ExportHelper::setPriceTypesHeadings($headings);
+        $headings = array_merge($headings, [
             'Ingresado',
             'Actualizado',
             'Moneda',
-        ];
+        ]);
+        return $headings;
     }
 
     function getCostInDollars($article) {

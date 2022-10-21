@@ -11,12 +11,16 @@ class OrderProduction extends Model
     protected $dates = ['start_at', 'finish_at'];
 
     function scopeWithAll($query) {
-        $query->with('articles', 'order_production_status', 'client');
-        // $query->with('articles', 'articles_finished', 'order_production_status', 'client');
+        // $query->with('articles', 'order_production_status', 'client.comercio_city_user');
+        $query->with('articles.recipe.articles', 'articles_finished', 'order_production_status', 'client.comercio_city_user');
     }
 
     function budget() {
         return $this->belongsTo('App\Budget', 'budget_id');
+    }
+
+    function sale() {
+        return $this->hasOne('App\Sale');
     }
     
     function client() {

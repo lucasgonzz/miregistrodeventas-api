@@ -27,6 +27,7 @@ class CreateClientsTable extends Migration
             $table->integer('price_type_id')->unsigned()->nullable();
             $table->integer('location_id')->unsigned()->nullable();
             $table->text('description')->nullable();
+            $table->integer('comercio_city_user_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned();
             $table->bigInteger('seller_id')->nullable()->unsigned();
             $table->enum('status', ['active', 'inactive'])->default('active');

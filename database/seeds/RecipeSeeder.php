@@ -14,11 +14,11 @@ class RecipeSeeder extends Seeder
      */
     public function run()
     {
-        $this->colman();
+        $this->mcElectronica();
     }
 
-    function colman() {
-        $user = User::where('company_name', 'colman')->first();
+    function mcElectronica() {
+        $user = User::where('company_name', 'mc electronica')->first();
         $article = Article::where('user_id', $user->id)
                             ->where('name', 'plaqueta de rosario')
                             ->first();

@@ -29,6 +29,7 @@ class CreateSalesTable extends Migration
             $table->boolean('price_type_id')->nullable();
             $table->integer('employee_id')->unsigned()->nullable();
             $table->integer('budget_id')->unsigned()->nullable();
+            $table->integer('order_production_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned()->nullable();
 
             $table->foreign('user_id')

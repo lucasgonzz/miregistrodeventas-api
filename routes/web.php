@@ -47,6 +47,11 @@ Route::get('/clients/check-saldos/{client_id}',
 Route::get('/budgets/set-articles/{company_name}', 'HelperController@setArticlesFromBudgets');
 Route::get('/order-productions/set-articles/{company_name}', 'HelperController@setArticlesFromOrderProductions');
 
+Route::get('a', function() {
+	dd((float)'');
+});
+
+
 // Devuelve las comisiones de las ventas que le corresponden al vendedor
 Route::get('/slugs', function() {
 	$articles = Article::where('user_id', 1)->get();

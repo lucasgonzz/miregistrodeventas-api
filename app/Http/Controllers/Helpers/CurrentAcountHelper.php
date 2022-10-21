@@ -411,13 +411,16 @@ class CurrentAcountHelper {
                 // $current_acount->numero = 'ReciboPago'.Self::getFormatedNum($current_acount->num_receipt);
             }
             if (!is_null($current_acount->sale_id)) {
-                $current_acount->numero = 'Remito '.Self::getNum('sales', $current_acount->sale_id, 'num_sale');
+                $current_acount->numero = 'Remito N°'.Self::getNum('sales', $current_acount->sale_id, 'num_sale');
             }
             if (!is_null($current_acount->budget_id)) {
-                $current_acount->numero = 'Presupuesto '.Self::getNum('budgets', $current_acount->budget_id ,'num');
+                $current_acount->numero = 'Presupuesto N°'.Self::getNum('budgets', $current_acount->budget_id ,'num');
             }
             if (!is_null($current_acount->provider_order_id)) {
-                $current_acount->numero = 'Pedido '.Self::getNum('provider_orders', $current_acount->provider_order_id ,'num');
+                $current_acount->numero = 'Pedido N°'.Self::getNum('provider_orders', $current_acount->provider_order_id ,'num');
+            }
+            if (!is_null($current_acount->order_production_id)) {
+                $current_acount->numero = 'Orden de produccion N°'.Self::getNum('order_productions', $current_acount->order_production_id ,'num');
             }
             if ($current_acount->status == 'nota_credito') {
                 $current_acount->numero = 'NotaCredito';

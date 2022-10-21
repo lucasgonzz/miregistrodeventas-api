@@ -73,14 +73,16 @@ class ClientsTableSeeder extends Seeder
     function mcElectronica() {
         $mc_electronica = User::where('company_name', 'mc electronica')->first();
 
+        $colman = User::where('company_name', 'colman')->first();
         Client::create([
-            'name'              => 'Colman',
-            'address'           => 'San antonio 23 - Gualeguay, Entre Rios',
-            'cuit'              => '20242112025',
-            'razon_social'      => 'MARCOS SRL', 
-            'iva_condition_id'  => 1,
-            'user_id'           => $mc_electronica->id,
-            'seller_id'         => null,
+            'name'                  => 'Colman',
+            'address'               => 'San antonio 23 - Gualeguay, Entre Rios',
+            'cuit'                  => '20242112025',
+            'razon_social'          => 'MARCOS SRL', 
+            'iva_condition_id'      => 1,
+            'user_id'               => $mc_electronica->id,
+            'comercio_city_user_id' => $colman->id,
+            'seller_id'             => null,
         ]);
     }
 

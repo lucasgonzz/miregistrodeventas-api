@@ -18,6 +18,7 @@ use App\Http\Controllers\Helpers\Pdf\SaleAfipTicketPdf;
 use App\Http\Controllers\Helpers\Pdf\SaleTicketPdf;
 use App\Http\Controllers\Helpers\Pdf\Sale\Index as SalePdf;
 use App\Http\Controllers\Helpers\SaleHelper;
+use App\Notifications\CreatedSale;
 use App\Sale;
 use App\SaleTime;
 use Carbon\Carbon;
@@ -198,6 +199,7 @@ class SaleController extends Controller
         $sale = Sale::where('id', $sale->id)
                     ->withAll()
                     ->first();
+        $sale->user->notify(new CreatedSale($sale));
         return response()->json(['sale' => $sale], 201);
     }
 

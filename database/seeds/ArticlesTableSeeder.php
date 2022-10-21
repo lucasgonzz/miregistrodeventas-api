@@ -56,6 +56,8 @@ class ArticlesTableSeeder extends Seeder
 
         // $this->nebulaStore();
 
+        $this->mcElectronica();
+
         $this->colman();
 
         // $this->articlesIva('colman');
@@ -760,8 +762,8 @@ class ArticlesTableSeeder extends Seeder
         }
     }
 
-    function colman() {
-        $user = User::where('company_name', 'colman')
+    function mcElectronica() {
+        $user = User::where('company_name', 'mc electronica')
                     ->first();
         $bsas = Provider::where('user_id', $user->id)
                             ->where('name', 'Buenos Aires')
@@ -771,57 +773,12 @@ class ArticlesTableSeeder extends Seeder
                             ->first();
         $articles = [
             [
-                'bar_code'          => '123',
-                'name'              => 'Plaqueta de BSAS',
-                'stock'             => 10,
-                'cost'              => 100,
-                'price'             => null,
-                'sub_category_name' => 'lavarropa nuevo',
-                'provider_id'       => $bsas->id,
-                'images'            => [
-                    $this->iphone_images['cargador'],
-                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
-                ],
-                'colors'            => [],
-                'sizes'             => [],
-            ],
-            [
                 'bar_code'          => '234',
                 'name'              => 'Plaqueta de Rosario',
                 'stock'             => 10,
                 'cost'              => 100,
                 'price'             => null,
                 'sub_category_name' => 'lavarropa nuevo',
-                'provider_id'       => $rosario->id,
-                'images'            => [
-                    $this->iphone_images['cargador'],
-                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
-                ],
-                'colors'            => [],
-                'sizes'             => [],
-            ],
-            [
-                'bar_code'          => '345',
-                'name'              => 'Aire de BSAS',
-                'stock'             => 10,
-                'cost'              => 200,
-                'price'             => null,
-                'sub_category_name' => 'aire nuevo',
-                'provider_id'       => $bsas->id,
-                'images'            => [
-                    $this->iphone_images['cargador'],
-                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
-                ],
-                'colors'            => [],
-                'sizes'             => [],
-            ],
-            [
-                'bar_code'          => '456',
-                'name'              => 'Aire de Rosario',
-                'stock'             => 10,
-                'cost'              => 200,
-                'price'             => null,
-                'sub_category_name' => 'aire nuevo',
                 'provider_id'       => $rosario->id,
                 'images'            => [
                     $this->iphone_images['cargador'],
@@ -872,6 +829,161 @@ class ArticlesTableSeeder extends Seeder
                 'name'              => $article['name'],
                 'slug'              => ArticleHelper::slug($article['name']),
                 'cost'              => $article['cost'],
+                'stock'             => $article['stock'] ,
+                'price'             => $article['price'],
+                // 'sub_category_id'   => $this->getSubcategoryId($user, $article),
+                'user_id'           => $user->id,
+            ]);    
+            $num++;
+            if (isset($article['images'])) {
+                foreach ($article['images'] as $url) { 
+                    Image::create([
+                        'article_id' => $art->id,
+                        'url'        => $url,
+                        'color_id'   => $this->getColorId($article),
+                    ]);
+                }    
+            }
+            $art->providers()->attach($article['provider_id'], [
+                                        'cost'  => $article['cost'],
+                                        'amount' => $article['stock'],
+                                    ]);
+            $this->createDescriptions($art); 
+        }
+
+    }
+
+    function colman() {
+        $user = User::where('company_name', 'colman')
+                    ->first();
+        $bsas = Provider::where('user_id', $user->id)
+                            ->where('name', 'Buenos Aires')
+                            ->first();
+        $rosario = Provider::where('user_id', $user->id)
+                            ->where('name', 'Rosario')
+                            ->first();
+        $articles = [
+            [
+                'bar_code'          => '123',
+                'provider_code'     => 'p-123',
+                'name'              => 'Plaqueta de BSAS',
+                'stock'             => 10,
+                'cost'              => 100,
+                'price'             => null,
+                'sub_category_name' => 'lavarropa nuevo',
+                'provider_id'       => $bsas->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+            [
+                'bar_code'          => '234',
+                'provider_code'     => 'p-234',
+                'name'              => 'Plaqueta de Rosario',
+                'stock'             => 10,
+                'cost'              => 100,
+                'price'             => null,
+                'sub_category_name' => 'lavarropa nuevo',
+                'provider_id'       => $rosario->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+            [
+                'bar_code'          => '345',
+                'provider_code'     => 'p-345',
+                'name'              => 'Aire de BSAS',
+                'stock'             => 10,
+                'cost'              => 200,
+                'price'             => null,
+                'sub_category_name' => 'aire nuevo',
+                'provider_id'       => $bsas->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+            [
+                'bar_code'          => '456',
+                'provider_code'     => 'p-456',
+                'name'              => 'Aire de Rosario',
+                'stock'             => 10,
+                'cost'              => 200,
+                'price'             => null,
+                'sub_category_name' => 'aire nuevo',
+                'provider_id'       => $rosario->id,
+                'images'            => [
+                    $this->iphone_images['cargador'],
+                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                ],
+                'colors'            => [],
+                'sizes'             => [],
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Tornillo num 6',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Boton chico blanco',
+                'stock'             => 100,
+                'cost'              => 4,
+                'price'             => 7,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Cable 10cm',
+                'stock'             => 100,
+                'cost'              => 10,
+                'price'             => 15,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Carcaza negra',
+                'stock'             => 100,
+                'cost'              => 10,
+                'price'             => 30,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Inactivoo',
+                'status'            => 'inactive',
+                'stock'             => 100,
+                'cost'              => 10,
+                'price'             => 30,
+                'provider_id'       => $rosario->id,
+            ],
+        ];
+        $num = 1;
+        foreach ($articles as $article) {
+            $art = Article::create([
+                'num'               => $num,
+                'bar_code'          => $article['bar_code'],
+                'provider_code'     => $article['provider_code'],
+                'name'              => $article['name'],
+                'slug'              => ArticleHelper::slug($article['name']),
+                'cost'              => $article['cost'],
+                'status'            => isset($article['status']) ? $article['status'] : 'active',
                 'stock'             => $article['stock'] ,
                 'price'             => $article['price'],
                 'sub_category_id'   => $this->getSubcategoryId($user, $article),

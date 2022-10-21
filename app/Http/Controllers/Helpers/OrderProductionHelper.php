@@ -38,9 +38,9 @@ class OrderProductionHelper {
 	}
 
 	static function attachArticles($order_production, $articles) {
-		// $cantidades_actuales = OrderProductionRecipe::getCantidadesActuales($order_production);
+		$cantidades_actuales = OrderProductionRecipe::getCantidadesActuales($order_production);
 		$order_production->articles()->detach();
-		// $order_production->articles_finished()->detach();
+		$order_production->articles_finished()->detach();
 		foreach ($articles as $article) {
 			if (isset($article['pivot']['delivered'])) {
 				$delivered = $article['pivot']['delivered'];
@@ -61,16 +61,34 @@ class OrderProductionHelper {
 											'location' 	=> $article['pivot']['location'],
 											'delivered' => $delivered,
 										]);
-		  	// $order_production_statuses = Self::getStatuses();
-		  	// foreach ($order_production_statuses as $status) {
-			  // 	$order_production->articles_finished()->attach($article['id'], [
-			  // 									'order_production_status_id' => $status->id,
-			  // 									'amount' 					 => $article['pivot']['order_production_status_'.$status->id]
-			  // 								]);
-		  	// }
+		  	$order_production_statuses = Self::getStatuses();
+		  	foreach ($order_production_statuses as $status) {
+		  		if (isset($article['pivot']['order_production_status_'.$status->id])) {
+				  	$order_production->articles_finished()->attach($article['id'], [
+				  									'order_production_status_id' => $status->id,
+				  									'amount' 					 => $article['pivot']['order_production_status_'.$status->id]
+				  								]);
+		  		}
+		  	}
 		}
-		// $order_production = OrderProduction::find($order_production->id);
-		// OrderProductionRecipe::checkRecipes($order_production, $cantidades_actuales);
+		$order_production = OrderProduction::find($order_production->id);
+		OrderProductionRecipe::checkRecipes($order_production, $cantidades_actuales);
+	}
+
+	static function getTotal($order_production) {
+		$total = 0;
+		foreach ($order_production->articles as $article) {
+			$total += Self::totalArticle($article);
+		}
+		return $total;
+	}
+
+	static function totalArticle($article) {
+		$total = $article->pivot->price * $article->pivot->amount;
+		if (!is_null($article->pivot->bonus)) {
+			$total -= $total * (float)$article->pivot->bonus / 100;
+		}
+		return $total;
 	}
 
 	static function getStatuses() {
