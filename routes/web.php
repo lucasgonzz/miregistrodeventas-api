@@ -122,7 +122,7 @@ Route::post('/users', 'UserController@store');
 
 Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
 Route::get('/current-acounts/pdf/{model_name}/{model_id}/{months_ago}', 'CurrentAcountController@pdfFromModel');
-Route::get('/current-acounts/pdf/{ids}', 'CurrentAcountController@pdf');
+Route::get('/current-acounts/pdf/{ids}/{model_name}', 'CurrentAcountController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}/{afip_ticket?}', 'SaleController@pdf');
 Route::get('/sales/afip-ticket/pdf/{sale_id}', 'SaleController@pdfAfipTicket');
@@ -142,3 +142,6 @@ Route::get('/prices-lists/{id}', 'PricesListController@pdf');
 Route::get('/sales/cliente/{company_name}/{borders}/{sale_id}', 'PdfController@sale_client');
 Route::get('/sales/comercio/{company_name}/{borders}/{sale_id}', 'PdfController@sale_commerce');
 Route::get('/imprimir-precios/{articles_id}/{company_name}', 'PdfController@printTicket');
+
+// SuperBudget
+Route::get('/pdf/super-budget/{id}', 'SuperBudgetController@pdf');

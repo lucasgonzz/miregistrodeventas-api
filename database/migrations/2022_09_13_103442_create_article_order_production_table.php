@@ -20,6 +20,7 @@ class CreateArticleOrderProductionTable extends Migration
             $table->decimal('bonus', 10,2)->nullable();
             $table->string('location')->nullable();
             $table->integer('delivered')->nullable();
+            $table->integer('employee_id')->unsigned()->nullable();
 
             $table->integer('article_id')->unsigned();
             $table->integer('order_production_id')->unsigned();

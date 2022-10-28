@@ -59,5 +59,6 @@ class DatabaseSeeder extends Seeder
         $this->call(BudgetStatusSeeder::class);
         $this->call(RecipeSeeder::class);
         $this->call(OrderProductionSeeder::class);
+        $this->call(SuperBudgetSeeder::class);
     }
 }

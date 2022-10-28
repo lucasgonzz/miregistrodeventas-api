@@ -64,6 +64,14 @@ class SaleController extends Controller
         return response()->json(['sale' => null]);
     }
 
+    function getIndexPreviusNext($id) {
+        $sale = Sale::find($id);
+        $models = Sale::where('user_id', $this->userId())
+                        ->where('created_at', '>=', $sale->created_at)
+                        ->pluck('id');
+        return response()->json(['index' => count($models)], 200);
+    }
+
     function saleClient($client_id) {
         $sales = Sale::where('user_id', $this->userId())
                         ->where('client_id', $client_id)
@@ -152,6 +160,7 @@ class SaleController extends Controller
         SaleHelper::attachCombos($sale, $request->items);
         SaleHelper::attachServices($sale, $request->items);
         SaleHelper::attachDiscounts($sale, $request->discounts_id);
+        SaleHelper::checkNotaCredito($sale, $request);
         $with_card = (bool)$request->with_card;
         if ($with_card) {
             $sale->percentage_card = $user->percentage_card;

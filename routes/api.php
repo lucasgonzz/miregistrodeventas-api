@@ -14,7 +14,7 @@ Route::get('/plans',
 
 Route::middleware('auth:sanctum')->group(function () {
 
-	Route::get('/user', 'UserController@user');
+	Route::get('/auth-user', 'UserController@user');
 
 
 	// -----------------------CONFIGURACION------------------------------------------
@@ -77,21 +77,19 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::resource('platelets', 'PlateletController');
 
 	// -----------------------SUPER--------------------------------------------------
-	Route::get('super/admins', 
-		'SuperController@admins'
-	);
-	Route::get('super/commerces', 
-		'SuperController@commerces'
-	);
-	Route::put('super/commerces', 
-		'SuperController@updateCommerce'
-	);
-	Route::get('super/plans', 
+	Route::resource('super-user', 'SuperUserController');
+
+	// Extencions
+	Route::get('extencion', 'ExtencionController@index');
+
+
+	Route::get('plans', 
 		'SuperController@plans'
 	);
-	Route::put('super/plans', 
-		'SuperController@updatePlan'
-	);
+
+	// SuperBudget
+	Route::resource('super-budget', 'SuperBudgetController');
+
 	Route::get('super/permissions', 
 		'SuperController@permissions'
 	);
@@ -260,19 +258,16 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/sales', 
 		'SaleController@store'
 	);
-
-	// Tarjeta
-	Route::put('/users/set-percentage-card', 
-		'UserController@setPercentageCard'
-	);
 	
-
 	// Actualizar venta
 	Route::get('/sales/previus-next/{index}', 
 		'SaleController@previusNext'
 	);
 	Route::put('/sales/{id}', 
 		'SaleController@update'
+	);
+	Route::get('/sale/get-previus-next-index/{created_at}', 
+		'SaleController@getIndexPreviusNext'
 	);
 
 	// --------------------------------------------------------------------------------------
@@ -582,6 +577,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::post('/current-acount/nota-credito', 
 		'CurrentAcountController@notaCredito'
+	);
+	Route::post('/current-acount/nota-debito', 
+		'CurrentAcountController@notaDebito'
 	);
 	Route::post('/current-acount/saldo-inicial', 
 		'CurrentAcountController@saldoInicial'

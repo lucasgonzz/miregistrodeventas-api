@@ -15,16 +15,16 @@ class OrderProductionSeeder extends Seeder
      */
     public function run()
     {
-        $user = User::where('company_name', 'mc electronica')->first();
+        $user = User::where('company_name', 'colman')->first();
         $article = Article::where('user_id', $user->id)
                             ->where('name', 'plaqueta de rosario')
                             ->first();
         $client = Client::where('user_id', $user->id)
-                            ->where('name', 'colman')
+                            ->where('name', 'Lucas ResIns')
                             ->first();
         $order_production = OrderProduction::create([
             'num'                           => 1,
-            'order_production_status_id'    => 6,
+            'order_production_status_id'    => 10,
             'client_id'                     => $client->id,
             'user_id'                       => $user->id,
         ]);

@@ -360,7 +360,9 @@ class ArticleController extends Controller
         $article->apply_provider_percentage_gain   = $request->apply_provider_percentage_gain;
         $article->price             = $request->price;
         $article->percentage_gain   = $request->percentage_gain;
-        $article->iva_id            = $request->iva_id;
+        if (isset($request->iva_id)) {
+            $article->iva_id            = $request->iva_id;
+        }
         // if ($request->stock != '') {
         //     $article->stock = $request->stock;
         // }

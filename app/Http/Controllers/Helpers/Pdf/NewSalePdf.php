@@ -454,8 +454,9 @@ class NewSalePdf extends fpdf {
 		    $total_sale = $this->total_sale;
 		    foreach ($this->sale->discounts as $discount) {
 		    	$text = '-'.$discount->pivot->percentage.'% '.$discount->name;
-		    	$descuento = $total_sale * floatval($discount->pivot->percentage) / 100;
-		    	$total_sale = Numbers::price($total_sale - $descuento);
+		    	// $res = $total_sale * floatval($discount->pivot->percentage);
+		    	$descuento = floatval($total_sale) * floatval($discount->pivot->percentage) / 100;
+		    	$total_sale = Numbers::price(floatval($total_sale) - $descuento);
 		    	$text .= ' = $'.$total_sale;
 				$this->Cell(
 					50, 

@@ -11,6 +11,7 @@ use App\Http\Controllers\Helpers\PdfArticleHelper;
 use App\Http\Controllers\Helpers\PdfPrintArticles;
 use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\StringHelper;
+use App\Http\Controllers\Helpers\UserHelper;
 use App\Impression;
 use App\Sale;
 use fpdf;
@@ -25,6 +26,7 @@ class SaleAfipTicketPdf extends fpdf {
 		$this->client = $this->sale->client;
 		$this->borders = 'B';
         $this->printing_duplicate = false;
+        $this->user = UserHelper::getFullModel();
 
 		$widths = [];
 		$widths['codigo'] = 23;
@@ -759,12 +761,15 @@ class SaleAfipTicketPdf extends fpdf {
 		$this->SetFont('Arial', 'B', 9);
 		$this->Cell(30,5,'Ingresos Brutos:',0,0,'L');
 		$this->Cell(25,5,Auth()->user()->ingresos_brutos,0,0,'L');
+		
 		// Inicio actividades
-		$this->SetY(55);
-		$this->SetX(118);
-		$this->SetFont('Arial', 'B', 9);
-		$this->Cell(52,5,'Fecha de Inicio de Actividades:',0,0,'L');
-		$this->Cell(25,5,date_format(Auth()->user()->afip_information->inicio_actividades, 'd/m/Y'),0,0,'L');
+		if ($this->user->afip_information->inicio_actividades != '') {
+			$this->SetY(55);
+			$this->SetX(118);
+			$this->SetFont('Arial', 'B', 9);
+			$this->Cell(52,5,'Fecha de Inicio de Actividades:',0,0,'L');
+			$this->Cell(25,5,date_format($this->user->afip_information->inicio_actividades, 'd/m/Y'),0,0,'L');
+		}
 	}
 
 	function printCommerceLines() {

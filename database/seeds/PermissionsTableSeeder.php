@@ -144,6 +144,10 @@ class PermissionsTableSeeder extends Seeder
                 'slug' => 'order_production.index',
             ],
             [
+                'name' => 'Ver Precio de los articulos de las Ordenes de Produccion',
+                'slug' => 'order_production.article.price',
+            ],
+            [
                 'name' => 'Ver Recetas',
                 'slug' => 'recipe.index',
             ],

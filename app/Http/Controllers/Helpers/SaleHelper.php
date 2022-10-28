@@ -80,6 +80,19 @@ class SaleHelper extends Controller {
         return null;
     }
 
+    static function checkNotaCredito($sale, $request) {
+        if ($request->save_nota_credito) {
+            $haber = 0;
+            foreach ($request->items as $item) {
+                if (isset($item['is_article']) && $item['returned_amount'] > 0) {
+                    $haber += $item['price_vender'] * $item['returned_amount'];
+                }
+            }
+            CurrentAcountHelper::notaCredito($haber, $request->nota_credito_description, 'client', $request->client_id);
+            CurrentAcountHelper::checkSaldos('client', $request->client_id);
+        }
+    }
+
     static function attachDiscounts($sale, $discounts_id) {
         $sale->discounts()->detach();
         $discounts = DiscountHelper::getDiscountsFromDiscountsId($discounts_id);
@@ -127,15 +140,13 @@ class SaleHelper extends Controller {
         foreach ($articles as $article) {
             if (isset($article['is_article'])) {
                 $sale->articles()->attach($article['id'], [
-                                                            'amount' => (float)$article['amount'],
-                                                            'cost' => isset($article['cost'])
-                                                                        ? (float)$article['cost']
-                                                                        : null,
-                                                            'price' => $article['price_vender'],
-                                                            // 'price' => Self::getArticleSalePrice($sale, $article),
-                                                            'discount' => Self::getDiscount($article),
-                                                            'with_dolar' => Self::getDolar($article, $dolar_blue),
-                                                            'created_at' => Carbon::now(),
+                                                            'amount'            => (float)$article['amount'],
+                                                            'cost'              => Self::getCost($article),
+                                                            'price'             => $article['price_vender'],
+                                                            'returned_amount'   => Self::getReturnedAmount($article),
+                                                            'discount'          => Self::getDiscount($article),
+                                                            'with_dolar'        => Self::getDolar($article, $dolar_blue),
+                                                            'created_at'        => Carbon::now(),
                                                         ]);
                 ArticleHelper::discountStock($article['id'], $article['amount']);
             }
@@ -195,6 +206,20 @@ class SaleHelper extends Controller {
     static function getDiscount($item) {
         if (isset($item['discount'])) {
             return $item['discount'];
+        }
+        return null;
+    }
+
+    static function getReturnedAmount($item) {
+        if (isset($item['returned_amount'])) {
+            return $item['returned_amount'];
+        }
+        return null;
+    }
+
+    static function getCost($item) {
+        if (isset($item['cost'])) {
+            return $item['cost'];
         }
         return null;
     }

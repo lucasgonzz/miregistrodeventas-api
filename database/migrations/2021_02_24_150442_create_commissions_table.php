@@ -24,8 +24,8 @@ class CreateCommissionsTable extends Migration
             $table->string('detalle')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
             $table->boolean('is_seller')->default(false);
-            $table->foreign('commissioner_id')->references('id')->on('commissioners');
-            $table->foreign('sale_id')->references('id')->on('sales');
+            // $table->foreign('commissioner_id')->references('id')->on('commissioners');
+            // $table->foreign('sale_id')->references('id')->on('sales');
             $table->timestamps();
         });
     }

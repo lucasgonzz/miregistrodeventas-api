@@ -12,6 +12,7 @@ use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintCurrentAcounts;
 use App\Http\Controllers\Helpers\SaleHelper;
+use App\Http\Controllers\Helpers\UserHelper;
 use App\Imports\CurrentAcountsImport;
 use App\Sale;
 use App\Seller;
@@ -52,25 +53,44 @@ class CurrentAcountController extends Controller
     }
 
     public function pago(Request $request) {
-        $data = [
+        $pago = CurrentAcount::create([
             'haber'                             => $request->haber,
-            'current_date'                      => $request->current_date,
-            'created_at'                        => $request->created_at,
-            'current_acount_payment_method_id'  => $request->current_acount_payment_method_id,
-            'checks'                            => $request->checks,
-            'to_pay'                            => $request->to_pay,
-            'model_name'                        => $request->model_name,
-            'model_id'                          => $request->model_id,
+            'description'                       => $request->description,
+            'status'                            => 'pago_from_client',
+            'user_id'                           => $this->userId(),
+            'num_receipt'                       => CurrentAcountHelper::getNumReceipt(),
             'client_id'                         => $request->model_name == 'client' ? $request->model_id : null,
             'provider_id'                       => $request->model_name == 'provider' ? $request->model_id : null,
-        ];
-        $pago = CurrentAcountHelper::savePago($data);
+            'current_acount_payment_method_id'  => $request->current_acount_payment_method_id,
+            'created_at'                        => $request->current_date ? Carbon::now() : $request->created_at,
+        ]);
+        $to_pay_id = !is_null($request->to_pay) ? $request->to_pay['id'] : null;
+        $pago->saldo = CurrentAcountHelper::getSaldo($request->model_name, $request->model_id, $pago) - $request->haber;
+        $pago->detalle = CurrentAcountHelper::procesarPago($request->model_name, $request->model_id, $request->haber, $pago, $to_pay_id);
+        $pago->save();
+        CurrentAcountHelper::saveCheck($pago, $request->checks);
         return response()->json(['current_acount' => $pago], 201);
     }
 
     public function notaCredito(Request $request) {
-        $nota_credito = CurrentAcountHelper::notaCredito($request->form['nota_credito'], $request->form['description'], $request->model_id);
+        $nota_credito = CurrentAcountHelper::notaCredito($request->form['nota_credito'], $request->form['description'], $request->model_name, $request->model_id);
         return response()->json(['current_acount' => $nota_credito], 201);
+    }
+
+
+    public function notaDebito(Request $request) {
+        $nota_debito = CurrentAcount::create([
+            'detalle'       => 'Nota de debito',
+            'description'   => $request->description,
+            'debe'          => $request->debe,
+            'status'        => 'sin_pagar',
+            'client_id'     => $request->model_name == 'client' ? $request->model_id : null,
+            'provider_id'   => $request->model_name == 'provider' ? $request->model_id : null,
+            'user_id'       => $this->userId(),
+        ]);
+        $nota_debito->saldo = CurrentAcountHelper::getSaldo($request->model_name, $request->model_id, $nota_debito) + $request->debe;
+        $nota_debito->save();
+        return response()->json(['current_acount' => $nota_debito], 201);
     }
 
     function updateDebe(Request $request) {
@@ -100,8 +120,8 @@ class CurrentAcountController extends Controller
         $pdf->printCurrentAcounts();
     }
 
-    function pdf($ids) {
-        $pdf = new PdfPrintCurrentAcounts(explode('-', $ids));
+    function pdf($ids, $model_name) {
+        $pdf = new PdfPrintCurrentAcounts(explode('-', $ids), $model_name);
         $pdf->printCurrentAcounts();
     }
 

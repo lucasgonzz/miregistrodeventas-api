@@ -23,7 +23,7 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             !is_null($article->sub_category) ? $article->sub_category->name : '',
             $article->stock,
             $article->stock_min,
-            $article->iva->percentage,
+            !is_null($article->iva) ? $article->iva->percentage : '',
             count($article->providers) >= 1 ? $article->providers[count($article->providers)-1]->name : '',
             $article->cost,
             $article->percentage_gain,

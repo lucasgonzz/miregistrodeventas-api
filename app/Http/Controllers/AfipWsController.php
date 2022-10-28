@@ -16,8 +16,10 @@ use Illuminate\Support\Facades\Log;
 class AfipWsController extends Controller
 {
 
-    function __construct() {
-        $this->testing = UserHelper::getFullModel()->afip_information->afip_ticket_production;
+    function define() {
+        // $this->testing = !UserHelper::getFullModel()->afip_information->afip_ticket_production;
+        $this->testing = !UserHelper::getFullModel()->afip_information->afip_ticket_production;
+        // $this->testing = 1;
         define ('TRA_xml', public_path().'/afip/wsaa/TRA.xml'); 
         define ('TRA_tmp', public_path().'/afip/wsaa/TRA.tmp'); 
         define ('TA_file', public_path().'/afip/wsaa/TA.xml'); 
@@ -34,6 +36,7 @@ class AfipWsController extends Controller
     }
 
     function init(Request $request, $sale_id) {
+        $this->define();
         $service = 'wsfe';
         $this->checkWsaa($service);
         $sale = $this->wsfe($sale_id);
@@ -183,8 +186,8 @@ class AfipWsController extends Controller
         }
         // Se visualiza el resultado con el CAE correspondiente al comprobante.
         $result = $wsfe->FECAESolicitar($invoice);
-        $this->saveAfipTicket($result, $sale, $cbte_nro, $importes['total'], $moneda_id);
         print_r($result);
+        $this->saveAfipTicket($result, $sale, $cbte_nro, $importes['total'], $moneda_id);
         $sale = SaleHelper::getFullModel($sale->id);
         return $sale;
     }

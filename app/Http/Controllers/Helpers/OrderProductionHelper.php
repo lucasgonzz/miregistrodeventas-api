@@ -9,6 +9,7 @@ use App\Notifications\OrderProductionNotification;
 use App\OrderProduction;
 use App\OrderProductionStatus;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class OrderProductionHelper {
 
@@ -39,8 +40,13 @@ class OrderProductionHelper {
 
 	static function attachArticles($order_production, $articles) {
 		$cantidades_actuales = OrderProductionRecipe::getCantidadesActuales($order_production);
-		$order_production->articles()->detach();
-		$order_production->articles_finished()->detach();
+		$ids = array_map(function($item) {
+			return $item['id'];
+		}, $articles);
+
+		$order_production->articles()->detach($ids);
+		$order_production->articles_finished()->detach($ids);
+		
 		foreach ($articles as $article) {
 			if (isset($article['pivot']['delivered'])) {
 				$delivered = $article['pivot']['delivered'];
@@ -55,11 +61,12 @@ class OrderProductionHelper {
 				$art->save();
 			}
 			$order_production->articles()->attach($article['id'], [
-											'amount' 	=> $article['pivot']['amount'],
-											'price' 	=> $article['pivot']['price'],
-											'bonus' 	=> $article['pivot']['bonus'],
-											'location' 	=> $article['pivot']['location'],
-											'delivered' => $delivered,
+											'amount' 		=> $article['pivot']['amount'],
+											'price' 		=> $article['pivot']['price'],
+											'bonus' 		=> $article['pivot']['bonus'],
+											'location' 		=> $article['pivot']['location'],
+											'employee_id'   => isset($article['pivot']['employee_id']) ? $article['pivot']['employee_id'] : null,
+											'delivered' 	=> $delivered,
 										]);
 		  	$order_production_statuses = Self::getStatuses();
 		  	foreach ($order_production_statuses as $status) {

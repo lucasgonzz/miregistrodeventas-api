@@ -115,26 +115,6 @@ class CurrentAcountHelper {
         Log::info('Se creo remito para venta sin articulos: '.$current_acount->detalle);
     }
 
-    static function savePago($data) {
-        $haber = $data['haber'];
-        $pago = CurrentAcount::create([
-            'haber'                             => $haber,
-            'status'                            => 'pago_from_client',
-            'user_id'                           => UserHelper::userId(),
-            'num_receipt'                       => Self::getNumReceipt(),
-            'client_id'                         => $data['client_id'],
-            'provider_id'                       => $data['provider_id'],
-            'current_acount_payment_method_id'  => $data['current_acount_payment_method_id'],
-            'created_at'                        => $data['current_date'] ? Carbon::now() : $data['created_at'],
-        ]);
-        $to_pay_id = !is_null($data['to_pay']) ? $data['to_pay']['id'] : null;
-        $pago->saldo = Self::getSaldo($data['model_name'], $data['model_id'], $pago) - $haber;
-        $pago->detalle = Self::procesarPago($data['model_name'], $data['model_id'], $haber, $pago, $to_pay_id);
-        $pago->save();
-        Self::saveCheck($pago, $data['checks']);
-        return $pago;
-    }
-
     static function procesarPago($model_name, $model_id, $haber, $until_pago, $to_pay_id = null) {
         if (!is_null($to_pay_id)) {
             $until_pago->to_pay_id = $to_pay_id;
@@ -163,17 +143,18 @@ class CurrentAcountHelper {
         }
     }
 
-    static function notaCredito($haber, $description, $client_id) {
+    static function notaCredito($haber, $description, $model_name, $model_id) {
         $nota_credito = CurrentAcount::create([
             // 'detalle'       => 'N.C. '.$detalle,
             'description'   => $description,
             'haber'         => $haber,
             'status'        => 'nota_credito',
-            'client_id'     => $client_id,
+            'client_id'     => $model_name == 'client' ? $model_id : null,
+            'provider_id'   => $model_name == 'provider' ? $model_id : null,
             'user_id'       => UserHelper::userId(),
         ]);
-        $nota_credito->saldo = Self::getSaldo('client', $nota_credito->client_id, $nota_credito) - $haber;
-        $nota_credito->detalle = 'N.C '.Self::procesarPago('client', $nota_credito->haber, $nota_credito->client_id, $nota_credito);
+        $nota_credito->saldo = Self::getSaldo($model_name, $model_id, $nota_credito) - $haber;
+        $nota_credito->detalle = 'N.C '.Self::procesarPago($model_name, $model_id, $nota_credito->haber, $nota_credito);
         $nota_credito->save();
         return $nota_credito;
     }
@@ -188,26 +169,14 @@ class CurrentAcountHelper {
             $haber = $res['haber'];
             $sin_pagar = Self::getFirstSinPagar($model_name, $model_id, $until_pago);
             $pagandose = Self::getFirstPagandose($model_name, $model_id, $until_pago);
-            Log::info('Cuenta sin pagar despues de haber saldado la que estaba:');
-            Log::info($sin_pagar);
         }
         while (!is_null($pagandose) && $haber > 0) {
-            Log::info('Cuenta pagandose:');
-            Log::info($pagandose->detalle);
-            Log::info('Hay disponibles '.$haber.' y tiene '.$pagandose->pagandose.' a favor');
-            
             $haber += $pagandose->pagandose;
             $pagandose->pagandose = 0;
             $pagandose->save();
-            
-            Log::info('Ahora hay '.$haber);
-            
             $res = Self::saldarCurrentAcount($pagandose, $haber);
             $detalle .= $res['detalle'];
             $haber = $res['haber'];
-            
-            Log::info('Ahora hay '.$haber);
-            
             $pagandose = Self::getFirstPagandose($model_name, $model_id, $until_pago);
         }
         return [
@@ -234,10 +203,12 @@ class CurrentAcountHelper {
 
     static function saldarSpecificCurrentAcount($to_pay_id, $haber) {
         $current_acount = CurrentAcount::find($to_pay_id);
-        Log::info('Pagando especificamente '.$current_acount->detalle.' con $'.$haber);
-        $res = Self::saldarCurrentAcount($current_acount, $haber);
-        $detalle = $res['detalle'];
-        return $detalle;
+        if (!is_null($current_acount)) {
+            $res = Self::saldarCurrentAcount($current_acount, $haber);
+            $detalle = $res['detalle'];
+            return $detalle;
+        }
+        return '';
     }
 
     static function saldarCurrentAcount($current_acount, $haber) {
@@ -249,11 +220,14 @@ class CurrentAcountHelper {
             if (Self::isSaldoInicial($current_acount)) {
                 $detalle .= Self::pagadoDetails().' Saldo inicial ';
             } else if (!is_null($current_acount->sale_id)) {
-                $detalle .= Self::pagadoDetails().' Rto '.SaleHelper::getNumSaleFromSaleId($current_acount->sale_id).' pag '.$current_acount->page.' ';
+                $detalle .= Self::pagadoDetails().' Rto '.SaleHelper::getNumSaleFromSaleId($current_acount->sale_id).' pag '.$current_acount->page.'. ';
+            } else if ($current_acount->detalle == 'Nota de debito') {
+                $detalle .= Self::pagadoDetails().' Nota de debito de '.$current_acount->debe.'. ';
+                Log::info('se pago nota debito');
             } else if (!is_null($current_acount->budget_id)) {
-                $detalle .= Self::pagadoDetails().' Presupuesto '.$current_acount->budget->num;
+                $detalle .= Self::pagadoDetails().' Presupuesto '.$current_acount->budget->num.'. ';
             } else if (!is_null($current_acount->provider_order_id)) {
-                $detalle .= Self::pagadoDetails().' Pedido '.$current_acount->provider_order->num;
+                $detalle .= Self::pagadoDetails().' Pedido '.$current_acount->provider_order->num.'. ';
             }
         } else { 
             if ($current_acount->status == 'pagandose') {
@@ -268,6 +242,9 @@ class CurrentAcountHelper {
                 $detalle .= Self::pagandoseDetails().' Saldo inicial ($'.Numbers::price($current_acount->pagandose).')';
             } else if (!is_null($current_acount->sale_id)) {
                 $detalle .= Self::pagandoseDetails().' Rto '.SaleHelper::getNumSaleFromSaleId($current_acount->sale_id).' pag '.$current_acount->page.' ($'.Numbers::price($current_acount->pagandose).') ';
+            } else if ($current_acount->detalle == 'Nota de debito') {
+                Log::info('pagandose nota debito');
+                $detalle .= Self::pagandoseDetails().' Nota de debito de '.$current_acount->debe.'. ';
             } else if (!is_null($current_acount->budget_id)) {
                 $detalle .= Self::pagandoseDetails().' Presupuesto '.$current_acount->budget->num.' ($'.Numbers::price($current_acount->pagandose).') ';
             } else if (!is_null($current_acount->provider_order_id)) {
@@ -290,7 +267,6 @@ class CurrentAcountHelper {
             $first = $first->where('provider_id', $model_id);
         }
         $first = $first->first();
-        // Log::info('saldo de la primera sin pagar = '.$first->saldo);
         return $first;
     }
 
@@ -336,7 +312,11 @@ class CurrentAcountHelper {
                 $current_acount->save();
             }
             if (!is_null($current_acount->haber)) {
-                $detalle = Self::procesarPago($model_name, $model_id, $current_acount->haber, $current_acount, $current_acount->to_pay_id);
+                $detalle = '';
+                if ($current_acount->status == 'nota_credito') {
+                    $detalle = 'Nota Credito ';
+                } 
+                $detalle .= Self::procesarPago($model_name, $model_id, $current_acount->haber, $current_acount, $current_acount->to_pay_id);
                 $current_acount->saldo = Numbers::redondear($saldo - $current_acount->haber);
                 $current_acount->detalle = $detalle;
                 $current_acount->save();
@@ -427,6 +407,9 @@ class CurrentAcountHelper {
             }
             if ($current_acount->detalle == 'Saldo inicial') {
                 $current_acount->numero = 'Saldo inicial';
+            }
+            if ($current_acount->detalle == 'Nota de debito') {
+                $current_acount->numero = 'Nota debito';
             }
         }
         return $current_acounts;

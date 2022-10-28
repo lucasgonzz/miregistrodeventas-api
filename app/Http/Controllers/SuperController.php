@@ -17,14 +17,6 @@ class SuperController extends Controller
     //                 ->get();
     // }
 
-    function commerces() {
-        $commerces = User::where('status', 'commerce')
-                    ->whereNull('owner_id')
-                    ->with('plan.permissions')
-                    ->get();
-        return response()->json(['commerces' => $commerces], 200);
-    }
-
     function plans() {
         $plans = Plan::with('permissions')
                         ->get();
