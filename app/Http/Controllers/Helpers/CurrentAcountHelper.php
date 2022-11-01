@@ -145,7 +145,6 @@ class CurrentAcountHelper {
 
     static function notaCredito($haber, $description, $model_name, $model_id) {
         $nota_credito = CurrentAcount::create([
-            // 'detalle'       => 'N.C. '.$detalle,
             'description'   => $description,
             'haber'         => $haber,
             'status'        => 'nota_credito',

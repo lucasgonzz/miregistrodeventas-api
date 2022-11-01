@@ -34,9 +34,16 @@ class ArticleHelper {
             }
             $price = 0;
             if (is_null($article->price) || $article->price == '') {
-                if (!is_null($last_provider_percentage_gain) && $article->apply_provider_percentage_gain) {
-                    $price = Numbers::redondear($cost + ($cost * Numbers::percentage($last_provider_percentage_gain)));
+
+                if ($article->apply_provider_percentage_gain) {
+                    if (!is_null($article->provider_price_list_id)) {
+                        Log::info($article->provider_price_list_id);
+                        $price = Numbers::redondear($cost + ($cost * Numbers::percentage($article->provider_price_list->percentage)));
+                    } else if (!is_null($last_provider_percentage_gain)) {
+                        $price = Numbers::redondear($cost + ($cost * Numbers::percentage($last_provider_percentage_gain)));
+                    }
                 }
+
                 if (!is_null($article->percentage_gain)) {
                     if ($price == 0) {
                         $price = Numbers::redondear($cost + ($cost * Numbers::percentage($article->percentage_gain)));
@@ -62,6 +69,14 @@ class ArticleHelper {
             }
         }
         return $articles;
+    }
+
+    static function getById($articles_ids) {
+        $models = [];
+        foreach ($articles_ids as $id) {
+            $models[] = ArticleHelper::getFullArticle($id);
+        }
+        return $models;
     }
 
     static function lastProviderPercentageGain($article) {

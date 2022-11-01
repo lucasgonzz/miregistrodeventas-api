@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Helpers\ProviderHelper;
 use App\Imports\ProvidersImport;
 use App\Provider;
 use App\User;
@@ -30,7 +31,7 @@ class ProviderController extends Controller
     }
 
     function store(Request $request) {
-        $provider = Provider::create([
+        $model = Provider::create([
             'num'               => $this->num('providers'),
             'name'              => ucwords($request->name),
             'phone'             => $request->phone,
@@ -44,23 +45,25 @@ class ProviderController extends Controller
             'iva_condition_id'  => $request->iva_condition_id,
             'user_id'           => $this->getArticleOwnerId(),
         ]);
-        return response()->json(['model' => $this->getFullModel($provider->id)], 201);
+        ProviderHelper::attachProviderPriceLists($model, $request->provider_price_lists);
+        return response()->json(['model' => $this->getFullModel($model->id)], 201);
     }
 
     function update(Request $request, $id) {
-        $provider = Provider::find($id);
-        $provider->name = ucwords($request->name);
-        $provider->phone = ucwords($request->phone);
-        $provider->address = ucwords($request->address);
-        $provider->email = $request->email;
-        $provider->razon_social = $request->razon_social;
-        $provider->cuit = $request->cuit;
-        $provider->observations = $request->observations;
-        $provider->percentage_gain = $request->percentage_gain;
-        $provider->location_id = $request->location_id;
-        $provider->iva_condition_id = $request->iva_condition_id;
-        $provider->save();
-        return response()->json(['model' => $this->getFullModel($provider->id)], 200);
+        $model = Provider::find($id);
+        $model->name = ucwords($request->name);
+        $model->phone = ucwords($request->phone);
+        $model->address = ucwords($request->address);
+        $model->email = $request->email;
+        $model->razon_social = $request->razon_social;
+        $model->cuit = $request->cuit;
+        $model->observations = $request->observations;
+        $model->percentage_gain = $request->percentage_gain;
+        $model->location_id = $request->location_id;
+        $model->iva_condition_id = $request->iva_condition_id;
+        $model->save();
+        ProviderHelper::attachProviderPriceLists($model, $request->provider_price_lists);
+        return response()->json(['model' => $this->getFullModel($model->id)], 200);
     }
 
     function setComercioCityUser(Request $request) {

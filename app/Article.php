@@ -10,7 +10,7 @@ class Article extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('images.color', 'iva', 'sizes', 'colors', 'condition', 'descriptions', 'sub_category', 'variants', 'tags', 'brand', 'discounts', 'specialPrices', 'providers');
+        $query->with('images.color', 'iva', 'sizes', 'colors', 'condition', 'descriptions', 'sub_category', 'variants', 'tags', 'brand', 'discounts', 'specialPrices', 'providers', 'provider_price_list');
     }
 
     function views() {
@@ -19,6 +19,10 @@ class Article extends Model
 
     function prices_lists() {
         return $this->belongsToMany('App\PricesList');
+    }
+
+    function provider_price_list() {
+        return $this->belongsTo('App\ProviderPriceList');
     }
 
     function recipe() {

@@ -16,6 +16,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	Route::get('/auth-user', 'UserController@user');
 
+	// Generals
+	Route::post('search/{model_name}', 'SearchController@search');
+
 
 	// -----------------------CONFIGURACION------------------------------------------
 	Route::put('/user/password', 
@@ -283,6 +286,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		);
 		Route::put('/article/update-prop/{prop}', 
 			'ArticleController@updateProp'
+		);
+		Route::put('/article/update-props', 
+			'ArticleController@updateProps'
 		);
 		Route::post('/article/delete', 
 			'ArticleController@delete'

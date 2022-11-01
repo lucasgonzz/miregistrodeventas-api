@@ -4,15 +4,24 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Provider;
+use App\ProviderPriceList;
 use Carbon\Carbon;
 
 class ProviderHelper {
 
-	static function getProvider($name) {
-		$provider = Provider::where('name', $name)
-							->where('user_id', UserHelper::userId())
-							->first();
-		return $provider;
+	static function attachProviderPriceLists($model, $provider_price_lists) {
+		foreach ($provider_price_lists as $prices_list) {
+			if (!isset($prices_list['id'])) {
+				$_price_list = ProviderPriceList::create([
+					'provider_id' => $model->id,
+				]);
+			} else {
+				$_price_list = ProviderPriceList::find($prices_list['id']);
+			}
+			$_price_list->name 			= $prices_list['name'];
+			$_price_list->percentage 	= $prices_list['percentage'];
+			$_price_list->save();
+		}
 	}
 
 }

@@ -6,6 +6,7 @@ use App\Article;
 use App\BarCode;
 use App\Description;
 use App\Exports\ArticlesExport;
+use App\Http\Controllers\Helpers\ArticleFilterHelper;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\Pdf\ArticleTicketPdf;
 use App\Http\Controllers\Helpers\UserHelper;
@@ -20,8 +21,8 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use \Gumlet\ImageResize;
@@ -73,13 +74,14 @@ class ArticleController extends Controller
         ArticleHelper::saveProvider($article, $request);
         $actual_price = $article->price;
         $actual_stock = $article->stock;
-        $article->status          = 'active';
-        $article->bar_code        = $request->bar_code;
-        $article->provider_code   = $request->provider_code;
-        $article->sub_category_id = $request->sub_category_id != 0 ? $request->sub_category_id : null;
-        $article->brand_id        = $request->brand_id != 0 ? $request->brand_id : null;
-        $article->iva_id          = $request->iva_id;
-        $article->percentage_gain = $request->percentage_gain;
+        $article->status                            = 'active';
+        $article->bar_code                          = $request->bar_code;
+        $article->provider_code                     = $request->provider_code;
+        $article->sub_category_id                   = $request->sub_category_id != 0 ? $request->sub_category_id : null;
+        $article->brand_id                          = $request->brand_id != 0 ? $request->brand_id : null;
+        $article->iva_id                            = $request->iva_id;
+        $article->percentage_gain                   = $request->percentage_gain;
+        $article->provider_price_list_id            = $request->provider_price_list_id != 0 ? $request->provider_price_list_id : null;
         if (!$article->apply_provider_percentage_gain && is_null($article->percentage_gain)) {
             $article->previus_price = $article->price;
             $article->price = $request->price;
@@ -115,26 +117,30 @@ class ArticleController extends Controller
         return response()->json(['model' => $article], 200);
     }
 
-    function setVariants(Request $request, $article_id) {
-        $article = Article::find($article_id);
-        ArticleHelper::deleteVariants($article);
-        foreach ($request->variants as $variant) {
-            Variant::create([
-                'article_id'  => $article->id,
-                'description' => $variant['description'],
-                'stock'       => ArticleHelper::getStockVariantToAdd($variant),
-                'url'         => $variant['url'],
-            ]);
+    function updateProps(Request $request) {
+        if ($request->from_filter) {
+            $models = ArticleFilterHelper::filter($request->filter);
+        } else {
+            $models = ArticleHelper::getById($request->articles_ids);
         }
-        $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['model' => $article], 200);
-    }
-
-    function deleteVariants($article_id) {
-        $article = Article::find($article_id);
-        ArticleHelper::deleteVariants($article);
-        $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['model' => $article], 200);
+        $result = [];
+        foreach ($models as $model) {
+            if ($request->form['iva_id'] != 0) {
+                $model->iva_id = $request->form['iva_id'];
+            }
+            if ($request->form['percentage_cost'] != '') {
+                $model->cost += $model->cost * floatval($request->form['percentage_cost']) / 100;
+            }
+            if ($request->form['percentage_price'] != '') {
+                $model->price += $model->price * floatval($request->form['percentage_price']) / 100;
+            }
+            if ($request->form['sub_category_id'] != 0) {
+                $model->sub_category_id = $request->form['sub_category_id'];
+            }
+            $model->save();
+            $result[] = ArticleHelper::getFullArticle($model->id);
+        }
+        return response()->json(['models' => $models], 200);
     }
 
     function updateProp(Request $request, $prop) {
@@ -352,16 +358,17 @@ class ArticleController extends Controller
         // if ($request->brand_id != 0) {
         //     $article->brand_id = $request->brand_id;
         // }
-        $article->brand_id          = $request->brand_id;
-        $article->name              = ucfirst($request->name);
-        $article->slug              = ArticleHelper::slug($request->name);
-        $article->cost              = $request->cost;
-        $article->cost_in_dollars   = $request->cost_in_dollars;
-        $article->apply_provider_percentage_gain   = $request->apply_provider_percentage_gain;
-        $article->price             = $request->price;
-        $article->percentage_gain   = $request->percentage_gain;
+        $article->brand_id                          = $request->brand_id;
+        $article->name                              = ucfirst($request->name);
+        $article->slug                              = ArticleHelper::slug($request->name);
+        $article->cost                              = $request->cost;
+        $article->cost_in_dollars                   = $request->cost_in_dollars;
+        $article->apply_provider_percentage_gain    = $request->apply_provider_percentage_gain;
+        $article->price                             = $request->price;
+        $article->percentage_gain                   = $request->percentage_gain;
+        $article->provider_price_list_id            = $request->provider_price_list_id != 0 ? $request->provider_price_list_id : null;
         if (isset($request->iva_id)) {
-            $article->iva_id            = $request->iva_id;
+            $article->iva_id = $request->iva_id;
         }
         // if ($request->stock != '') {
         //     $article->stock = $request->stock;

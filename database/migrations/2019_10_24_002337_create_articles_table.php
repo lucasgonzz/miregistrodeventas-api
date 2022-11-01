@@ -35,6 +35,7 @@ class CreateArticlesTable extends Migration
             $table->enum('status', ['active', 'inactive', 'from_provider_order', 'from_budget'])->default('active');
             $table->bigInteger('condition_id')->nullable()->unsigned();
             $table->integer('featured')->nullable();
+            $table->integer('provider_price_list_id')->unsigned()->nullable();
             $table->boolean('cost_in_dollars')->default(0)->nullable();
             $table->boolean('apply_provider_percentage_gain')->default(1)->nullable();
 
