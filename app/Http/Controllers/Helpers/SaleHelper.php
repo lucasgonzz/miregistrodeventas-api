@@ -88,7 +88,8 @@ class SaleHelper extends Controller {
                     $haber += $item['price_vender'] * $item['returned_amount'];
                 }
             }
-            CurrentAcountHelper::notaCredito($haber, $request->nota_credito_description, 'client', $request->client_id);
+            Log::info('Entro en nota_credito');
+            CurrentAcountHelper::notaCredito($haber, $request->nota_credito_description, 'client', $request->client_id, $sale->id);
             CurrentAcountHelper::checkSaldos('client', $request->client_id);
         }
     }

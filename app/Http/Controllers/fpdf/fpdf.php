@@ -33,7 +33,7 @@ protected $tMargin;            // top margin
 protected $rMargin;            // right margin
 protected $bMargin;            // page break margin
 protected $cMargin;            // cell margin
-protected $x, $y;              // current position in user unit
+public $x, $y;              // current position in user unit
 protected $lasth;              // height of last printed cell
 protected $LineWidth;          // line width in user unit
 protected $fontpath;           // path containing fonts

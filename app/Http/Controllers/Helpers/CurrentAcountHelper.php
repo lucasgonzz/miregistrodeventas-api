@@ -143,15 +143,17 @@ class CurrentAcountHelper {
         }
     }
 
-    static function notaCredito($haber, $description, $model_name, $model_id) {
+    static function notaCredito($haber, $description, $model_name, $model_id, $sale_id = null) {
         $nota_credito = CurrentAcount::create([
             'description'   => $description,
             'haber'         => $haber,
             'status'        => 'nota_credito',
             'client_id'     => $model_name == 'client' ? $model_id : null,
             'provider_id'   => $model_name == 'provider' ? $model_id : null,
+            'sale_id'       => $sale_id,
             'user_id'       => UserHelper::userId(),
         ]);
+        Log::info('Se guardo nota_credito con id = '.$nota_credito->id.' y sale_id = '.$sale_id);
         $nota_credito->saldo = Self::getSaldo($model_name, $model_id, $nota_credito) - $haber;
         $nota_credito->detalle = 'N.C '.Self::procesarPago($model_name, $model_id, $nota_credito->haber, $nota_credito);
         $nota_credito->save();

@@ -6,6 +6,7 @@ use App\Http\Controllers\Helpers\BudgetHelper;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\Numbers;
+use App\Http\Controllers\Helpers\Pdf\PdfHelper;
 use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use fpdf;
@@ -47,8 +48,11 @@ class NewSalePdf extends fpdf {
 		$this->logo();
 		$this->numSale();
 		$this->commerceInfo();
-		$this->clientInfo();
-		$this->currentAcountInfo();
+		PdfHelper::clientInfo($this, $this->sale->client);
+		if (!is_null($this->sale->client) && $this->sale->save_current_acount && count($this->sale->current_acounts) >= 1) {
+			$total_sale = SaleHelper::getTotalSale($this->sale);
+			PdfHelper::currentAcountInfo($this, $this->sale->current_acounts[0], $this->sale->client_id, $total_sale);
+		}
 		$this->tableHeader();
 	}
 
@@ -333,103 +337,6 @@ class NewSalePdf extends fpdf {
 		$this->SetFont('Arial', '', 10);
 		$this->Cell(88, 5, $this->user->email, $this->b, 0, 'L');
 		$this->y += 10;
-	}
-
-	function clientInfo() {
-		if ($this->sale->client) {
-			$this->SetFont('Arial', '', 10);
-			$this->x = $this->start_x;
-			$this->y = 35;
-			$this->SetFont('Arial', 'B', 10);
-			$this->Cell(20, 5, 'Cliente:', $this->b, 0, 'L');
-			$this->SetFont('Arial', '', 10);
-			$this->Cell(85, 5, $this->sale->client->name, $this->b, 0, 'L');
-
-			if ($this->sale->client->address != '') {
-				$this->y += 5;
-				$this->x = $this->start_x;
-				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(20, 5, 'Direccion:', $this->b, 0, 'L');
-				$this->SetFont('Arial', '', 10);
-				$this->Cell(80, 5, $this->sale->client->address, $this->b, 0, 'L');
-			} 
-
-			if ($this->sale->client->phone != '') {
-				$this->y += 5;
-				$this->x = $this->start_x;
-				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(20, 5, 'Telefono:', $this->b, 0, 'L');
-				$this->SetFont('Arial', '', 10);
-				$this->Cell(80, 5, $this->sale->client->phone, $this->b, 0, 'L');
-			} 
-			
-			// if (!is_null($this->sale->client->iva_condition)) {
-			// 	$this->y += 5;
-			// 	$this->x = $this->start_x;
-			// 	$this->SetFont('Arial', 'B', 10);
-			// 	$this->Cell(23, 5, 'Con. de IVA:', $this->b, 0, 'L');
-			// 	$this->SetFont('Arial', '', 10);
-			// 	$this->Cell(77, 5, $this->sale->client->iva_condition->name, $this->b, 0, 'L');
-			// }
-
-			if (!is_null($this->sale->client->location)) {
-				$this->y += 5;
-				$this->x = $this->start_x;
-				$this->SetFont('Arial', 'B', 10);
-				$this->Cell(20, 5, 'Localidad:', $this->b, 0, 'L');
-				$this->SetFont('Arial', '', 10);
-				$this->Cell(88, 5, $this->sale->client->location->name, $this->b, 0, 'L');
-			}
-			// if ($this->sale->client->cuit != '') {
-			// 	$this->y += 5;
-			// 	$this->x = $this->start_x;
-			// 	$this->SetFont('Arial', 'B', 10);
-			// 	$this->Cell(12, 5, 'CUIT:', $this->b, 0, 'L');
-			// 	$this->SetFont('Arial', '', 10);
-			// 	$this->Cell(88, 5, $this->sale->client->cuit, $this->b, 0, 'L');
-			// }
-			// $this->y += 5;
-		}
-	}
-
-	function currentAcountInfo(){
-		if (!is_null($this->sale->client) && $this->sale->save_current_acount && count($this->sale->current_acounts) >= 1) {
-			$saldo_anterior = CurrentAcountHelper::getSaldo('client', $this->sale->client_id, $this->sale->current_acounts[0]);
-			$this->y = 35;
-			$this->x = 105;
-			$this->SetFont('Arial', 'B', 10);
-			$this->Cell(30, 5, 'Saldo anterior:', $this->b, 0, 'L');
-			$this->SetFont('Arial', '', 10);
-			$this->Cell(30, 5, '$'.Numbers::price($saldo_anterior), 0, 'L');
-
-			$total_sale = SaleHelper::getTotalSale($this->sale);
-			$this->x = 105;
-			$this->y += 5;
-			$this->SetFont('Arial', 'B', 10);
-			$this->Cell(30, 5, 'Compra actual:', $this->b, 0, 'L');
-			$this->SetFont('Arial', '', 10);
-			$this->Cell(30, 5, '$'.Numbers::price($total_sale), 0, 'L');
-
-			$this->x = 105;
-			$this->y += 5;
-			$this->SetFont('Arial', 'B', 10);
-			$this->Cell(30, 5, 'Saldo:', $this->b, 0, 'L');
-			$this->SetFont('Arial', '', 10);
-			$this->Cell(30, 5, '$'.Numbers::price($saldo_anterior + $total_sale), 0, 'L');
-
-			if (!is_null($this->sale->employee)) {
-				$vendedor = $this->sale->employee->name;
-			} else {
-				$vendedor = UserHelper::getFullModel()->name;
-			}
-			$this->x = 105;
-			$this->y += 5;
-			$this->SetFont('Arial', 'B', 10);
-			$this->Cell(30, 5, 'Vendedor:', $this->b, 0, 'L');
-			$this->SetFont('Arial', '', 10);
-			$this->Cell(30, 5, $vendedor, 0, 'L');
-
-		}
 	}
 
 	function total() {

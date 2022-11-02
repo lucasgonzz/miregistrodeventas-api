@@ -11,6 +11,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintCurrentAcounts;
+use App\Http\Controllers\Helpers\Pdf\PagoPdf;
 use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Imports\CurrentAcountsImport;
@@ -121,8 +122,20 @@ class CurrentAcountController extends Controller
     }
 
     function pdf($ids, $model_name) {
-        $pdf = new PdfPrintCurrentAcounts(explode('-', $ids), $model_name);
-        $pdf->printCurrentAcounts();
+        $ids = explode('-', $ids);
+        if (count($ids) == 1) {
+            $model = CurrentAcount::find($ids[0]);
+            if ($model->status == 'pago_from_client') {
+                $pdf = new PagoPdf($model);
+                $pdf->printCurrentAcounts();
+            } else if ($model->status == 'nota_credito') {
+                $pdf = new NotaCreditoPdf($model);
+                $pdf->printCurrentAcounts();
+            }
+        } else {
+            $pdf = new PdfPrintCurrentAcounts($ids, $model_name);
+            $pdf->printCurrentAcounts();
+        }
     }
 
     function checkPagos($client_id) {
@@ -156,6 +169,7 @@ class CurrentAcountController extends Controller
 
     function deleteFromSale($sale) {
         $current_acounts = CurrentAcount::where('sale_id', $sale->id)
+                                        ->whereNull('haber')
                                         ->pluck('id');
         CurrentAcount::destroy($current_acounts);
     }

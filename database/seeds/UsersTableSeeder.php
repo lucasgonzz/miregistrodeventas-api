@@ -1,5 +1,6 @@
 <?php
 
+use App\Address;
 use App\AfipInformation;
 use App\User;
 use App\UserConfiguration;
@@ -304,6 +305,16 @@ class UsersTableSeeder extends Seeder
             'online'            => 'http://kioscoverde.local:8080',
             'order_description' => 'Observaciones',
             'created_at'        => Carbon::now()->subMonths(2),
+        ]);
+
+        Address::create([
+            'street'        => 'Parana con chocolate',
+            'street_number' => 3322,
+            'city'          => 'Gualeguay',
+            'lat'           => '1',
+            'lng'           => '1',
+            'province'      => 'Entre Rios',
+            'user_id'       => $commerce->id,
         ]);
 
         $commerce->extencions()->attach([1, 2, 3, 4, 7, 8]);

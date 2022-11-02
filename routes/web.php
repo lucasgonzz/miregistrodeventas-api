@@ -38,7 +38,7 @@ Route::get('/budgets/pdf/{id}', 'BudgetController@pdf');
 Route::get('/order-productions/print-pdf/{id}', 'OrderProductionController@pdf');
 Route::get('/order-productions/articles-pdf/{id}', 'OrderProductionController@articlesPdf');
 
-Route::get('/provider-orders/pdf/{id}', 'ProviderOrderController@pdf');
+Route::get('/provider-order/pdf/{id}', 'ProviderOrderController@pdf');
 
 Route::get('/clients/check-saldos/{client_id}', 
 	'ClientController@checkCurrentAcounts'
