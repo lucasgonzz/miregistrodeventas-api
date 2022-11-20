@@ -28,13 +28,12 @@ class MessageHelper {
         // TwilioHelper::sendNotification($order->buyer_id, $title, $confirmation_message);
     }
 
-    static function sendOrderCanceledMessage($cancel_description, $order) {
-        // $description = OrderHelper::getCanceledDescription($articulos_faltantes, $order);
-        $canceled_message = OrderNotificationHelper::getCanceledMessage($cancel_description);
+    static function sendOrderCanceledMessage($description, $order) {
+        $description = 'Tuvimos que cancelar tu pedido por la siguiente razon: '.$description;
         $message = Message::create([
             'user_id' => UserHelper::userId(),
             'buyer_id' => $order->buyer_id,
-            'text' => $canceled_message,
+            'text' => $description,
             'type' => 'order_canceled',
             'order_id' => $order->id,
         ]);
@@ -42,8 +41,6 @@ class MessageHelper {
         $title = 'Cancelamos tu pedido';
         $order->buyer->notify(new MessageSend($message, false, $title));
         $order->user->notify(new MessageSend($message, true));
-        // Push Notification
-        // TwilioHelper::sendNotification($order->buyer_id, $title, $canceled_message);
     }
 
     static function sendOrderFinishedMessage($order) {

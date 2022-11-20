@@ -10,11 +10,15 @@ class Article extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('images.color', 'iva', 'sizes', 'colors', 'condition', 'descriptions', 'sub_category', 'variants', 'tags', 'brand', 'discounts', 'specialPrices', 'providers', 'provider_price_list');
+        $query->with('images.color', 'iva', 'sizes', 'colors', 'condition', 'descriptions', 'sub_category', 'variants', 'tags', 'brand', 'discounts', 'specialPrices', 'providers', 'provider_price_list', 'deposits');
     }
 
     function views() {
         return $this->morphMany('App\View', 'viewable');
+    }
+
+    function deposits() {
+        return $this->belongsToMany('App\Deposit')->withPivot('value');
     }
 
     function prices_lists() {

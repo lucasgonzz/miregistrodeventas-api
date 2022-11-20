@@ -19,6 +19,7 @@ class CreateImagesTable extends Migration
             // $table->integer('user_id')->unsigned();
             $table->bigInteger('article_id')->unsigned();
             $table->string('url', 128);
+            $table->string('hosting_url', 128)->nullable();
             $table->integer('color_id')->unsigned()->nullable();
             $table->boolean('first')->default(false);
 

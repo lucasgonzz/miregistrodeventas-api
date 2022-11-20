@@ -5,7 +5,11 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Budget;
 use App\BudgetStatus;
+use App\Client;
+use App\CurrentAcount;
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\CurrentAcountHelper;
+use App\Http\Controllers\Helpers\ImageHelper;
 use App\OrderProduction;
 use App\User;
 use Illuminate\Http\Request;
@@ -26,23 +30,43 @@ class HelperController extends Controller
                 echo 'Se puso en CONFIRMADO </br>';
             }
             $budget->save();
-            // $budget->articles()->detach();
-            // foreach ($budget->products as $product) {
-            //     $article = Article::create([
-            //         'bar_code'  => $product->bar_code,
-            //         'name'      => $product->name,
-            //         'slug'      => ArticleHelper::slug($product->name),
-            //         'status'    => 'inactive',
-            //         'user_id'   => $user->id,
-            //     ]);
-            //     echo "Se creo articulo: ".$article->name.'. Con precio: '.$product->price.', cantidad: '.$product->amount.', bonus: '.$product->bonus.' y locacion: '.$product->location;
-            //     $budget->articles()->attach($article->id, [
-            //                             'amount'    => $product->amount,
-            //                             'price'     => $product->price,
-            //                             'bonus'     => $product->bonus,
-            //                             'location'  => $product->location,
-            //                         ]);
-            // }
+        }
+    }
+
+    function setClientsSaldos($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+        $clients = Client::where('user_id', $user->id)->get();
+        foreach ($clients as $client) {
+            $last_current_acount = CurrentAcount::where('client_id', $client->id)
+                                                ->orderBy('created_at', 'DESC')
+                                                ->first();
+            if (!is_null($last_current_acount)) {
+                $client->saldo = $last_current_acount->saldo;
+            } else {
+                echo($client->name.' no tenia current_acount </br>');
+                $client->saldo = 0;
+            }
+            $client->save();
+            echo('Setenado saldo de '.$client->name.' a $'.$client->saldo.'</br>');
+            echo('------------------------------------------------------------------</br>');
+        }
+    }
+
+    function setArticlesHostingImages($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+        $articles = Article::where('user_id', $user->id)
+                            ->get();
+        foreach ($articles as $article) {
+            if (!is_null($article->images)) {
+                foreach ($article->images as $image) {
+                    if (is_null($image->hosting_url)) {
+                        $image->hosting_url = ImageHelper::saveHostingImage($image->url);
+                        $image->save();
+                        echo 'Articulo: '.$article->name.'. Hosting_image: '.$image->hosting_url.' </br>';
+                        echo('------------------------------------------------------------------</br>');
+                    }
+                }
+            }
         }
     }
 

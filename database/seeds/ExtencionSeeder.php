@@ -45,6 +45,10 @@ class ExtencionSeeder extends Seeder
                 'name' => 'Servicios',
                 'slug' => 'services',
             ],
+            [
+                'name' => 'Acopios',
+                'slug' => 'acopios',
+            ],
         ];
         foreach ($extencions as $extencion) {
             Extencion::create([

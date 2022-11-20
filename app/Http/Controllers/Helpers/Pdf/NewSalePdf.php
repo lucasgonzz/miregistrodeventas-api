@@ -14,7 +14,7 @@ require(__DIR__.'/../../fpdf/fpdf.php');
 
 class NewSalePdf extends fpdf {
 
-	function __construct($sales) {
+	function __construct($sale) {
 		parent::__construct();
 		$this->SetAutoPageBreak(true, 50);
 		$this->start_x = 5;
@@ -23,74 +23,94 @@ class NewSalePdf extends fpdf {
 		$this->table_header_line_height = 7;
 		
 		$this->user = UserHelper::getFullModel();
-		$this->sales = $sales;
+		$this->sale = $sale;
+		$this->total_sale = SaleHelper::getTotalSale($this->sale, false);
+		$this->AddPage();
+		$this->items();
 
-		$this->initWiths();
-
-		$this->sales();
         $this->Output();
         exit;
 	}
 
-	function initWiths() {
-		$this->widths = [
+
+	function getFields() {
+		return [
 			'#' 		=> 5,
-			'bar_code' 	=> 40,
-			'name' 		=> 75,
-			'price' 	=> 25,
-			'amount' 	=> 15,
-			'discount' 	=> 13,
-			'sub_total' => 27,
-		]; 
+			'Codigo' 	=> 40,
+			'Nombre' 	=> 75,
+			'Precio' 	=> 25,
+			'Cant' 		=> 15,
+			'Des' 		=> 13,
+			'Sub total' => 27,
+		];
+	}
+
+	function getModelProps() {
+		return [
+			[
+				'text' 	=> 'Cliente',
+				'key'	=> 'name',
+			],
+			[
+				'text' 	=> 'Telefono',
+				'key'	=> 'phone',
+			],
+			[
+				'text' 	=> 'Localidad',
+				'key'	=> 'location.name',
+			],
+			[
+				'text' 	=> 'Cuit',
+				'key'	=> 'cuit',
+			],
+		];
 	}
 
 	function Header() {
-		$this->logo();
-		$this->numSale();
-		$this->commerceInfo();
-		PdfHelper::clientInfo($this, $this->sale->client);
+		$data = [
+			'num' 				=> $this->sale->num_sale,
+			'date'				=> $this->sale->created_at,
+			'title' 			=> 'Venta',
+			'model_info'		=> $this->sale->client,
+			'model_props' 		=> $this->getModelProps(),
+			'fields' 			=> $this->getFields(),
+		];
 		if (!is_null($this->sale->client) && $this->sale->save_current_acount && count($this->sale->current_acounts) >= 1) {
-			$total_sale = SaleHelper::getTotalSale($this->sale);
-			PdfHelper::currentAcountInfo($this, $this->sale->current_acounts[0], $this->sale->client_id, $total_sale);
+			$data = array_merge($data, [
+				'current_acount' 	=> $this->sale->current_acounts[0],
+				'client_id'			=> $this->sale->client_id,
+				'compra_actual'		=> $this->total_sale,
+			]);
 		}
-		$this->tableHeader();
+		PdfHelper::header($this, $data);
+		return;
 	}
 
 	function Footer() {
 		$this->total();
 		$this->discounts();
-		// $this->comerciocityInfo();
-	}
-
-	function sales() {
-		foreach ($this->sales as $sale) {
-			$this->sale = $sale;
-			$this->total_sale = SaleHelper::getTotalSale($this->sale, false);
-			$this->AddPage();
-			$this->items();
-		}
+		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
 	function items() {
 		$this->SetFont('Arial', '', 10);
 		$this->SetLineWidth(.1);
 		$index = 1;
-		// for ($i=0; $i < 30; $i++) { 
-			foreach ($this->sale->articles as $article) {
-				$this->printItem($index, $article);
-				$index++;
-			}
-			foreach ($this->sale->services as $service) {
-				$this->printItem($index, $service);
-				$index++;
-			}
-		// }
+		foreach ($this->sale->articles as $article) {
+			$this->printItem($index, $article);
+			$index++;
+		}
+		foreach ($this->sale->services as $service) {
+			$this->printItem($index, $service);
+			$index++;
+		}
 	}
 
 	function printItem($index, $item) {
 		$this->SetFont('Arial', '', 8);
+		$this->x = 5;
 		$this->Cell(
-			$this->widths['#'], 
+			$this->getFields()['#'], 
 			$this->line_height, 
 			$index, 
 			$this->b, 
@@ -98,7 +118,7 @@ class NewSalePdf extends fpdf {
 			'C'
 		);
 		$this->Cell(
-			$this->widths['bar_code'], 
+			$this->getFields()['Codigo'], 
 			$this->line_height, 
 			$item->bar_code, 
 			$this->b, 
@@ -106,8 +126,8 @@ class NewSalePdf extends fpdf {
 			'C'
 		);
 		$y_1 = $this->y;
-	    $this->MultiCell(
-			$this->widths['name'], 
+	    $this->MultiCell( 
+			$this->getFields()['Nombre'], 
 			$this->line_height, 
 			$item->name, 
 	    	$this->b, 
@@ -116,9 +136,9 @@ class NewSalePdf extends fpdf {
 	    );
 	    $y_2 = $this->y;
 	    $this->y = $y_1;
-	    $this->x = $this->start_x + $this->widths['#'] + $this->widths['bar_code'] + $this->widths['name'];
+	    $this->x = $this->start_x + $this->getFields()['#'] + $this->getFields()['Codigo'] + $this->getFields()['Nombre'];
 		$this->Cell(
-			$this->widths['price'], 
+			$this->getFields()['Precio'], 
 			$this->line_height, 
 			'$'.$item->pivot->price, 
 			$this->b, 
@@ -126,7 +146,7 @@ class NewSalePdf extends fpdf {
 			'C'
 		);
 		$this->Cell(
-			$this->widths['amount'], 
+			$this->getFields()['Cant'], 
 			$this->line_height, 
 			$item->pivot->amount, 
 			$this->b, 
@@ -134,7 +154,7 @@ class NewSalePdf extends fpdf {
 			'C'
 		);
 		$this->Cell(
-			$this->widths['discount'], 
+			$this->getFields()['Des'], 
 			$this->line_height, 
 			$item->pivot->discount, 
 			$this->b, 
@@ -142,7 +162,7 @@ class NewSalePdf extends fpdf {
 			'C'
 		);
 		$this->Cell(
-			$this->widths['sub_total'], 
+			$this->getFields()['Sub total'], 
 			$this->line_height, 
 			'$'.SaleHelper::getTotalItem($item), 
 			$this->b, 
@@ -248,47 +268,6 @@ class NewSalePdf extends fpdf {
 				$this->SetFont('Arial', '', 10);
 				$this->Cell(75, 5, $this->user->afip_information->razon_social, $this->b, 0, 'L');
 			}
-
-			// Condicion frente al iva
-			// if (!is_null($this->user->afip_information->iva_condition)) {
-			// 	$this->x = 105;
-			// 	$this->y += 5;
-			// 	$this->SetFont('Arial', 'B', 10);
-			// 	$this->Cell(41, 5, 'Condicion frente al iva: ', $this->b, 0, 'L');
-
-			// 	$this->SetFont('Arial', '', 10);
-			// 	$this->Cell(59, 5, $this->user->afip_information->iva_condition->name, $this->b, 0, 'L');
-			// }
-
-			// Cuit
-			// if (!is_null($this->user->afip_information->cuit)) {
-			// 	$this->x = 105;
-			// 	$this->y += 5;
-			// 	$this->SetFont('Arial', 'B', 10);
-			// 	$this->Cell(10, 5, 'Cuit:', $this->b, 0, 'L');
-			// 	$this->SetFont('Arial', '', 10);
-			// 	$this->Cell(90, 5, $this->user->afip_information->cuit, $this->b, 0, 'L');
-			// }
-
-			// Ingresos Brutos
-			// if (!is_null($this->user->afip_information->ingresos_brutos)) {
-			// 	$this->x = 105;
-			// 	$this->y += 5;
-			// 	$this->SetFont('Arial', 'B', 10);
-			// 	$this->Cell(30, 5, 'Ingresos Brutos:', $this->b, 0, 'L');
-			// 	$this->SetFont('Arial', '', 10);
-			// 	$this->Cell(70, 5, $this->user->afip_information->ingresos_brutos, $this->b, 0, 'L');
-			// }
-
-			// Inicio Actividades
-			// if (!is_null($this->user->afip_information->inicio_actividades)) {
-			// 	$this->x = 105;
-			// 	$this->y += 5;
-			// 	$this->SetFont('Arial', 'B', 10);
-			// 	$this->Cell(33, 5, 'Inicio Actividades:', $this->b, 0, 'L');
-			// 	$this->SetFont('Arial', '', 10);
-			// 	$this->Cell(67, 5, date_format($this->user->afip_information->inicio_actividades, 'd/m/Y'), $this->b, 0, 'L');
-			// }
 		}
 
 		// Direccion
@@ -388,7 +367,7 @@ class NewSalePdf extends fpdf {
 				10, 
 				'Total: $'.Numbers::price(SaleHelper::getTotalSale($this->sale)), 
 				$this->b, 
-				0, 
+				1, 
 				'L'
 			);
 		}

@@ -14,7 +14,7 @@ class Sale extends Model
     }
 
     function scopeWithAll($query) {
-        $query->with('client.iva_condition', 'client.price_type', 'buyer', 'articles', 'impressions', 'special_price', 'commissions', 'discounts', 'afip_ticket', 'combos', 'order.cupon', 'services', 'employee', 'budget.articles', 'budget.client');
+        $query->with('client.iva_condition', 'client.price_type', 'buyer.comercio_city_client', 'articles', 'impressions', 'special_price', 'commissions', 'discounts', 'afip_ticket', 'combos', 'order.cupon', 'services', 'employee', 'budget.articles', 'budget.client');
     }
 
     public function budget() {
@@ -58,7 +58,7 @@ class Sale extends Model
     }
 
     public function articles() {
-        return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'price', 'returned_amount', 'discount', 'with_dolar');
+        return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'price', 'returned_amount', 'delivered_amount', 'discount', 'with_dolar');
     }
 
     public function combos() {

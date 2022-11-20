@@ -21,7 +21,8 @@ class PagoPdf extends fpdf {
 
 		$this->AddPage();
 		$this->printPago();
-		$this->firma();
+		$this->description();
+		PdfHelper::firma($this);
 		$this->pesos();
         $this->Output();
         exit;
@@ -45,11 +46,12 @@ class PagoPdf extends fpdf {
 		$this->Cell(200, 7, 'la cantidad de pesos '.$this->model->haber, $this->b, 1, 'L');
 	}
 
-	function firma() {
-		$this->x = 75;
-		$this->y += 10;
-		$this->SetFont('Arial', '', 11);
-		$this->Cell(50, 7, 'Firma', 'T', 0, 'C');
+	function description() {
+		if (!is_null($this->model->description)) {
+			$this->x = 5;
+			$this->SetFont('Arial', '', 11);
+			$this->Cell(200, 7, 'Aclaraciones: '.$this->model->description, $this->b, 1, 'L');
+		}
 	}
 
 	function pesos() {

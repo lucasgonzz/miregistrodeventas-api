@@ -18,6 +18,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// Generals
 	Route::post('search/{model_name}', 'SearchController@search');
+	Route::post('set-comercio-city-user', 'GeneralController@setComercioCityUser');
 
 
 	// -----------------------CONFIGURACION------------------------------------------
@@ -27,8 +28,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::put('/user', 
 		'UserController@update'
 	);
-	Route::put('/users/image/{id}', 
+	Route::put('/user/image/{id}', 
 		'UserController@updateImage'
+	);
+	Route::put('/user/default_article_image_url', 
+		'UserController@defautlArticleImage'
 	);
 	Route::get('/user/trial/contratar-servicio', 
 		'UserController@contratarServicio'
@@ -68,16 +72,19 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 
 	// PaymentMethods
-	Route::resource('payment-methods', 'PaymentMethodController');
+	Route::resource('payment-method', 'PaymentMethodController');
 
 	// PaymentMethodTypes
 	Route::get('payment-method-types', 'PaymentMethodTypeController@index');
 
 	// DeliveryZones
-	Route::resource('delivery-zones', 'DeliveryZoneController');
+	Route::resource('delivery-zone', 'DeliveryZoneController');
 
 	// Platelets
-	Route::resource('platelets', 'PlateletController');
+	Route::resource('platelet', 'PlateletController');
+
+	// CreditCards
+	Route::resource('credit-card', 'CreditCardController');
 
 	// -----------------------SUPER--------------------------------------------------
 	Route::resource('super-user', 'SuperUserController');
@@ -250,8 +257,16 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::post('/provider-order/received', 
 		'ProviderOrderController@setReceived'
 	);
+	Route::post('/provider-order/excel/import', 
+		'ProviderOrderController@import'
+	);
 	Route::delete('/provider-order/{id}', 
 		'ProviderOrderController@destroy'
+	);
+
+	// ProviderOrderStatuses
+	Route::get('/provider-order-status', 
+		'ProviderOrderStatusController@index'
 	);
 
 
@@ -268,6 +283,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 	Route::put('/sales/{id}', 
 		'SaleController@update'
+	);
+	Route::put('/sale/update-prices/{id}', 
+		'SaleController@updatePrices'
 	);
 	Route::get('/sale/get-previus-next-index/{created_at}', 
 		'SaleController@getIndexPreviusNext'
@@ -303,10 +321,11 @@ Route::middleware('auth:sanctum')->group(function () {
 			'ArticleController@import'
 		);
 
+		// Deposits
+		Route::resource('deposit', 'DepositController');
 
 		// Provedores de comercios
 		Route::resource('provider', 'ProviderController');
-		Route::post('/provider/set-comercio-city-user', 'ProviderController@setComercioCityUser');
 		Route::post('/provider/excel/import', 
 			'ProviderController@import'
 		);
@@ -572,7 +591,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// Clientes
 	Route::resource('/client', 'ClientController');
-	Route::post('/client/set-comercio-city-user', 'ClientController@setComercioCityUser');
 
 	// CurrentAcounts
 	Route::get('/current-acount/{model_name}/{model_id}/{months_ago}', 
@@ -682,9 +700,8 @@ Route::middleware('auth:sanctum')->group(function () {
 		'QuestionController@delete'
 	);
 	// Buyers
-	Route::get('/buyers', 
-		'BuyerController@index'
-	);
+	Route::resource('/buyer', 'BuyerController');
+	
 	// Messages
 	Route::get('/messages/{buyer_id}', 
 		'MessageController@fromBuyer'
@@ -707,23 +724,24 @@ Route::middleware('auth:sanctum')->group(function () {
 		'AnswerController@store'
 	);
 	// Orders
-	Route::get('/orders/unconfirmed', 
-		'OrderController@unconfirmed'
+	Route::get('/order/{from_date}/{until_date?}', 
+		'OrderController@index'
 	);
-	Route::get('/orders/confirmed-finished', 
-		'OrderController@confirmedFinished'
+	Route::get('/order-previus-days/{index}', 
+		'OrderController@previusDays'
 	);
-	Route::get('/orders/confirm/{order_id}', 
-		'OrderController@confirm'
+	Route::get('/order-show/{id}', 
+		'OrderController@show'
 	);
-	Route::put('/orders/cancel', 
+	Route::put('/order/update-status/{order_id}', 
+		'OrderController@updateStatus'
+	);
+	Route::put('/order/cancel/{order_id}', 
 		'OrderController@cancel'
 	);
-	Route::get('/orders/finish/{order_id}', 
-		'OrderController@finish'
-	);
-	Route::get('/orders/deliver/{order_id}', 
-		'OrderController@deliver'
+	// OrderStats
+	Route::get('/order-status', 
+		'OrderStatusController@index'
 	);
 
 	// MercadoPago
@@ -741,20 +759,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		'SubCategoryController@mostViewed'
 	);
 	// Title
-	Route::get('/titles', 
-		'TitleController@index'
-	);
-	Route::put('/titles/image/{id}', 
+	Route::resource('/title', 'TitleController');
+	Route::put('/title/image/{id}', 
 		'TitleController@updateImage'
-	);
-	Route::put('/titles', 
-		'TitleController@update'
-	);
-	Route::post('/titles', 
-		'TitleController@store'
-	);
-	Route::delete('/titles/{id}', 
-		'TitleController@delete'
 	);
 	// Brands
 	Route::get('/brand', 

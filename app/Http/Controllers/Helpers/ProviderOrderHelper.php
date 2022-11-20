@@ -9,6 +9,7 @@ use App\Http\Controllers\Helpers\UserHelper;
 use App\Notifications\ProviderOrderCreated;
 use App\Notifications\UpdatedArticle;
 use App\ProviderOrder;
+use App\ProviderOrderAfipTicket;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 
@@ -40,28 +41,21 @@ class ProviderOrderHelper {
 
 	static function updateArticleStock($_article, $last_received, $provider_order) {
 		if ($_article['pivot']['received'] > 0) {
-			// Log::info('Se recivieron '.$_article['pivot']['received'].' unidades de '.$_article['name']);
 			$article = Article::find($_article['id']);
 			if (is_null($article->stock)) {
 				$article->stock = 0;
-				// Log::info('El stock estaba NULL, se puso en 0');
 			}
 			if ($_article['pivot']['cost'] != '') {
 				$article->cost = $_article['pivot']['cost'];
 			}
 			if (isset($last_received[$article->id])) {
-				// Log::info('Ya se habian recivido '.$last_received[$article->id]);
-				// Log::info('El stock estaba en '.$article->stock);
 				$article->stock -= $last_received[$article->id];
-				// Log::info('Se le restaron y quedo en '.$article->stock);
 			}
 			$article->stock += $_article['pivot']['received'];
-			// Log::info('Se le sumaron las '.$_article['pivot']['received'].' que se recibieron y quedo en '.$article->stock);
 			if ($article->status == 'inactive') {
 				$article->status = 'active';
 				$article->apply_provider_percentage_gain = 1;
 				$article->created_at = Carbon::now();
-				// Log::info('Estaba en estado inactive, se activo');
 			}
 			$cant_providers = count($article->providers);
 			if ($cant_providers == 0 || ($cant_providers >= 1 && $article->providers[$cant_providers-1]->id != $provider_order->provider_id)) {
@@ -69,7 +63,6 @@ class ProviderOrderHelper {
 										'amount' => $_article['pivot']['received'],
 										'cost' 	 => $_article['pivot']['cost'],
 									]);
-				// Log::info('Se seteo el proveedor');
 			}
 			$article->save();
         	$article->user->notify(new UpdatedArticle($article));
@@ -77,6 +70,8 @@ class ProviderOrderHelper {
 	}
 
 	static function attachArticles($articles, $provider_order) {
+		Log::info('llegaron estos articlos');
+		Log::info($articles);
 		$last_received = Self::getLastReceived($provider_order);
 		$provider_order->articles()->sync([]);
 		foreach ($articles as $article) {
@@ -96,6 +91,22 @@ class ProviderOrderHelper {
 			Self::updateArticleStock($article, $last_received, $provider_order);
 		}
 		Self::saveCurrentAcount($provider_order);
+	}
+
+	static function attachAfipTickets($afip_tickets, $model) {
+		foreach ($afip_tickets as $afip_ticket) {
+			if (!isset($afip_ticket['id'])) {
+				$_afip_ticket = ProviderOrderAfipTicket::create([
+					'provider_order_id' => $model->id,
+				]);
+			} else {
+				$_afip_ticket = ProviderOrderAfipTicket::find($afip_ticket['id']);
+			}
+			$_afip_ticket->issued_at 	= $afip_ticket['issued_at'];
+			$_afip_ticket->code 		= $afip_ticket['code'];
+			$_afip_ticket->total 		= $afip_ticket['total'];
+			$_afip_ticket->save();
+		}
 	}
 
 	static function saveCurrentAcount($provider_order) {

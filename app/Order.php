@@ -9,11 +9,15 @@ class Order extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('articles.images', 'articles.variants', 'articles.colors', 'articles.sizes', 'address', 'cupon', 'buyer', 'payment_method.type', 'delivery_zone');
+        $query->with('order_status', 'articles.images', 'articles.colors', 'articles.sizes', 'address', 'cupon', 'buyer', 'payment_method.type', 'delivery_zone');
     }
 
     function articles() {
         return $this->belongsToMany('App\Article')->withPivot('cost', 'price', 'amount', 'variant_id', 'color_id', 'size_id', 'with_dolar');
+    }
+
+    function order_status() {
+        return $this->belongsTo('App\OrderStatus');
     }
 
     function cupon() {

@@ -26,14 +26,51 @@ class OrderProductionPdf extends fpdf {
         exit;
 	}
 
-	function Header() {
-		$this->logo();
-		$this->num();
-		$this->commerceInfo();
-		$this->clientInfo();
-		$this->dates();
-		$this->tableHeader();
+	function getFields() {
+		return [
+			'Codigo'		=> 20,
+			'Cant'			=> 20,
+			'Producto'		=> 60,
+			'Precio'		=> 30,
+			'Bonif'			=> 20,
+			'Importe'		=> 20,
+			'U Entregadas'	=> 30,
+		];
 	}
+
+	function getModelProps() {
+		return [
+			[
+				'text' 	=> 'Cliente',
+				'key'	=> 'name',
+			],
+			[
+				'text' 	=> 'Telefono',
+				'key'	=> 'phone',
+			],
+			[
+				'text' 	=> 'Localidad',
+				'key'	=> 'location.name',
+			],
+			[
+				'text' 	=> 'Cuit',
+				'key'	=> 'cuit',
+			],
+		];
+	}
+
+	function Header() {
+		$data = [
+			'num' 			=> $this->order_production->num,
+			'date'			=> $this->order_production->created_at,
+			'title' 		=> 'Orden de produccion',
+			'model_info'	=> $this->order_production->client,
+			'model_props' 	=> $this->getModelProps(),
+			'fields' 		=> $this->getFields(),
+		];
+		PdfHelper::header($this, $data);
+	}
+
 
 	function Footer() {
 		$y = 230;

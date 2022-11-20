@@ -18,6 +18,7 @@ class CreateTitlesTable extends Migration
             $table->text('header')->nullable();
             $table->text('lead')->nullable();
             $table->string('image_url')->nullable();
+            $table->string('hosting_image_url')->nullable();
             $table->string('color')->nullable();
             $table->integer('user_id')->unsigned();
             $table->timestamps();

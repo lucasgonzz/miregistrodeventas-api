@@ -12,7 +12,7 @@ class DeliveryZoneController extends Controller
         $models = DeliveryZone::where('user_Id', $this->userId())
                                 ->orderBy('created_at', 'DESC')
                                 ->get();
-        return response()->json(['delivery_zones' => $models], 200);
+        return response()->json(['models' => $models], 200);
     }
 
 
@@ -23,7 +23,7 @@ class DeliveryZoneController extends Controller
             'price'         => $request->price,
             'user_id'       => $this->userId(),
         ]);
-        return response()->json(['delivery_zone' => $model], 201);
+        return response()->json(['model' => $model], 201);
     }
 
     
@@ -33,7 +33,7 @@ class DeliveryZoneController extends Controller
         $model->description = $request->description;
         $model->price = $request->price;
         $model->save();
-        return response()->json(['delivery_zone' => $model], 200);
+        return response()->json(['model' => $model], 200);
     }
 
     public function destroy($id) {

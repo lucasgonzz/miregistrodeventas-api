@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
         $this->call(PermissionsTableSeeder::class);
         $this->call(FeaturesSeeder::class);
         $this->call(PlansSeeder::class);
+        $this->call(OrderStatusSeeder::class);
+        $this->call(ProviderOrderStatusSeeder::class);
         // $this->call(RoleTableSeeder::class);
         $this->call(UsersTableSeeder::class);
         $this->call(IconsTableSeeder::class);
@@ -24,6 +26,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ProvidersTableSeeder::class);
         $this->call(ColorSeeder::class);
         $this->call(IvaSeeder::class);
+        $this->call(DepositSeeder::class);
         $this->call(ArticlesTableSeeder::class);
         $this->call(IvaConditionSeeder::class);
         $this->call(ClientsTableSeeder::class);
@@ -60,5 +63,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RecipeSeeder::class);
         $this->call(OrderProductionSeeder::class);
         $this->call(SuperBudgetSeeder::class);
+        $this->call(CreditCardSeeder::class);
+        $this->call(CreditCardPaymentPlanSeeder::class);
     }
 }

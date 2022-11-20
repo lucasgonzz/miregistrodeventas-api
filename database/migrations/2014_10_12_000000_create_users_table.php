@@ -19,6 +19,7 @@ class CreateUsersTable extends Migration
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->string('image_url')->nullable();
+            $table->string('hosting_image_url')->nullable();
             $table->string('company_name', 128)->nullable();
             $table->enum('type', ['commerce', 'provider'])->default('commerce');
             $table->string('password', 128);
@@ -37,6 +38,9 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('online')->nullable();
             $table->text('online_description')->nullable();
+            $table->boolean('show_articles_without_images')->default(0);
+            $table->string('default_article_image_url')->nullable();
+            $table->boolean('from_cloudinary')->default(0);
             $table->rememberToken();
 
             $table->enum('status', ['commerce', 'admin', 'super']);

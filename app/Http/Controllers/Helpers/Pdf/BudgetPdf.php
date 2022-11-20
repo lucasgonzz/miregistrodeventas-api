@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Helpers\Pdf;
 use App\Http\Controllers\Helpers\BudgetHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\Numbers;
+use App\Http\Controllers\Helpers\Pdf\PdfHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use fpdf;
 require(__DIR__.'/../../fpdf/fpdf.php');
@@ -26,24 +27,52 @@ class BudgetPdf extends fpdf {
         exit;
 	}
 
+	function getFields() {
+		return [
+			'Codigo' 	=> 20,
+			'Producto' 	=> 80,
+			'Precio' 	=> 30,
+			'Cant' 		=> 20,
+			'Bonif' 	=> 20,
+			'Importe' 	=> 30,
+		];
+	}
+
+	function getModelProps() {
+		return [
+			[
+				'text' 	=> 'Cliente',
+				'key'	=> 'name',
+			],
+			[
+				'text' 	=> 'Telefono',
+				'key'	=> 'phone',
+			],
+			[
+				'text' 	=> 'Cuit',
+				'key'	=> 'cuit',
+			],
+		];
+	}
+
 	function Header() {
-		$this->logo();
-		$this->budgetNum();
-		$this->commerceInfo();
-		$this->clientInfo();
-		$this->budgetDates();
-		$this->tableHeader();
+		$data = [
+			'num' 				=> $this->budget->num,
+			'date'				=> $this->budget->created_at,
+			'title' 			=> 'Orden de produccion',
+			'model_info'		=> $this->budget->client,
+			'model_props' 		=> $this->getModelProps(),
+			'fields' 			=> $this->getFields(),
+		];
+		PdfHelper::header($this, $data);
 	}
 
 	function Footer() {
-		$y = 230;
-		$this->SetLineWidth(.4);
-		// $this->Line(5, $y, 205, $y);
-		$this->y = $y;
+		// $y = 230;
+		// $this->SetLineWidth(.4);
 		$this->observations();
-		$this->y = $y;
 		$this->total();
-		$this->comerciocityInfo();
+		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
 	function logo() {
@@ -203,8 +232,6 @@ class BudgetPdf extends fpdf {
 	function articles() {
 		$this->SetFont('Arial', '', 10);
 		$this->x = 5;
-		$this->y = 90;
-
 		foreach ($this->budget->articles as $article) {
 			if ($this->y < 210) {
 				$this->printArticle($article);
@@ -228,17 +255,18 @@ class BudgetPdf extends fpdf {
 
 	function printArticle($article) {
 		$this->x = 5;
-		$this->Cell(20, $this->line_height, $article->bar_code, 'T', 0, 'C');
-		$this->Cell(20, $this->line_height, $article->pivot->amount, 'T', 0, 'C');
+		$this->Cell(20, $this->line_height, $article->bar_code, $this->b, 0, 'C');
 		$y_1 = $this->y;
-		$this->MultiCell(80, $this->line_height, $article->name, 'T', 'C', false);
+		$this->MultiCell(80, $this->line_height, $article->name, $this->b, 'C', false);
 		$this->x = 125;
 
 	    $y_2 = $this->y;
 		$this->y = $y_1;
-		$this->Cell(30, $this->line_height, '$'.Numbers::price($article->pivot->price), 'T', 0, 'C');
-		$this->Cell(20, $this->line_height, $this->getBonus($article), 'T', 0, 'C');
-		$this->Cell(30, $this->line_height, '$'.Numbers::price(BudgetHelper::totalArticle($article)), 'T', 0, 'C');
+		$this->x = 105;
+		$this->Cell(30, $this->line_height, '$'.Numbers::price($article->pivot->price), $this->b, 0, 'C');
+		$this->Cell(20, $this->line_height, $article->pivot->amount, $this->b, 0, 'C');
+		$this->Cell(20, $this->line_height, $this->getBonus($article), $this->b, 0, 'C');
+		$this->Cell(30, $this->line_height, '$'.Numbers::price(BudgetHelper::totalArticle($article)), $this->b, 0, 'C');
 		$this->y = $y_2;
 	}
 
@@ -284,14 +312,7 @@ class BudgetPdf extends fpdf {
 	function total() {
 	    $this->x = 105;
 	    $this->SetFont('Arial', 'B', 14);
-		$this->Cell(100, 10, 'Total: $'. Numbers::price(BudgetHelper::getTotal($this->budget)), 1, 0, 'R');
-	}
-
-	function comerciocityInfo() {
-	    $this->y = 290;
-	    $this->x = 5;
-	    $this->SetFont('Arial', '', 10);
-		$this->Cell(200, 5, 'Comprobante creado con el sistema de control de stock ComercioCity - comerciocity.com', $this->b, 0, 'C');
+		$this->Cell(100, 10, 'Total: $'. Numbers::price(BudgetHelper::getTotal($this->budget)), 0, 1, 'R');
 	}
 
 	function getHeight($product) {

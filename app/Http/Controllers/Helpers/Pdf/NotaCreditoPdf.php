@@ -16,9 +16,9 @@ class NotaCreditoPdf extends fpdf {
 		$this->SetAutoPageBreak(true, 1);
 		$this->b = 0;
 		$this->line_height = 7;
+		$this->total = 0;
 		
 		$this->model = $model;
-
 		$this->setFields();
 		$this->AddPage();
 		$this->printItems();
@@ -28,22 +28,11 @@ class NotaCreditoPdf extends fpdf {
 
 	function setFields() {
 		$this->fields = [
-			[
-				'text'  => 'Codigo',
-				'width' => 40,
-			],
-			[
-				'text'  => 'Cant',
-				'width' => 20,
-			],
-			[
-				'text'  => 'Producto',
-				'width' => 110,
-			],
-			[
-				'text'  => 'Total',
-				'width' => 30,
-			],
+			'Codigo' 	=> 40, 
+			'Producto' 	=> 90, 
+			'Precio' 	=> 20, 
+			'Cant' 		=> 20,
+			'Total' 	=> 30,
 		];
 	}
 
@@ -52,38 +41,35 @@ class NotaCreditoPdf extends fpdf {
 		PdfHelper::numeroFecha($this, '', $this->model->created_at);
 		PdfHelper::title($this, 'Nota de Credito');
 		PdfHelper::commerceInfo($this);
+		PdfHelper::clientInfo($this, $this->model->client);
 		PdfHelper::tableHeader($this, $this->fields);
 		// PdfHelper::comerciocityInfo($this, 90);
 	}
 
 	function printItems() {
 		$this->x = 5;
-		$this->y = 50;
-		foreach ($this->model->articles as $key => $value) {
-			// code...
+		$this->SetFont('Arial', '', 8);
+		foreach ($this->model->articles as $article) {
+			$this->Cell($this->fields['Codigo'], 5, $article->bar_code, $this->b, 0, 'C');
+			$this->Cell($this->fields['Producto'], 5, $article->name, $this->b, 0, 'C');
+			$this->Cell($this->fields['Precio'], 5, '$'.Numbers::price($article->pivot->price), $this->b, 0, 'C');
+			$this->Cell($this->fields['Cant'], 5, $article->pivot->amount, $this->b, 0, 'C');
+			$this->Cell($this->fields['Total'], 5, $this->getTotal($article), $this->b, 0, 'C');
+			$this->y += 5;
+			$this->x = 5;
+			$this->Line(5, $this->y, 205, $this->y);
 		}
-		$this->SetFont('Arial', 'B', 11);
-		$this->Cell(200, 7, 'Recibimos de '.$this->model->client->name, $this->b, 1, 'L');
-		$this->x = 5;
-		$this->Cell(200, 7, 'la cantidad de pesos '.$this->model->haber, $this->b, 1, 'L');
 	}
 
-	function firma() {
-		$this->x = 75;
-		$this->y += 10;
-		$this->SetFont('Arial', '', 11);
-		$this->Cell(50, 7, 'Firma', 'T', 0, 'C');
-	}
-
-	function pesos() {
-		$this->x = 155;
-		$this->y -= 5;
-		$this->SetFont('Arial', '', 11);
-		$this->Cell(50, 7, 'Son $'.$this->model->haber, 1, 0, 'L');
+	function getTotal($article) {
+		$total = (float)$article->pivot->amount * $article->pivot->price;
+		$this->total += $total;
+		return '$'.Numbers::price($total);
 	}
 
 	function Footer() {
-		PdfHelper::comerciocityInfo($this);
+		PdfHelper::total($this, $this->total);
+		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
 }

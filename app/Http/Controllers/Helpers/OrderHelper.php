@@ -13,31 +13,21 @@ use App\Events\PaymentSuccess as PaymentSuccessEvent;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\OrderNotificationHelper;
+use App\Http\Controllers\Helpers\SaleHelper;
+use App\Http\Controllers\Helpers\UserHelper;
 use App\Http\Controllers\PaymentController;
 use App\Listerners\OrderConfirmedListene;
 use App\Notifications\OrderConfirmed as OrderConfirmedNotification;
 use App\Notifications\OrderFinished as OrderFinishedNotification;
 use App\Notifications\PaymentError as PaymentErrorNotification;
 use App\Notifications\PaymentSuccess as PaymentSuccessNotification;
+use App\Sale;
 use App\Size;
 use App\Variant;
 
 
 class OrderHelper {
-	static function setArticlesKey($orders) {
-		foreach ($orders as $order) {
-			$order->articles = ArticleHelper::setArticlesKey($order->articles);
-		}
-		return $orders;
-	}
-
-    static function setArticlesKeyAndVariant($orders) {
-        foreach ($orders as $order) {
-            $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
-        }
-        return $orders;
-    }
-
+    
     static function setArticlesColor($orders) {
         $colors = Color::all();
         foreach ($orders as $order) {
@@ -88,35 +78,63 @@ class OrderHelper {
         }
     }
 
-    static function procesarPago($order) {
-        if ($order->payment_method == 'tarjeta') {
-            $payment_controller = new PaymentController();
-            $payment_controller->procesarPago($order);
+    static function sendMail($model) {
+        if ($model->order_status->name == 'Confirmado') {
+            MessageHelper::sendOrderConfirmedMessage($model);
+        } else if ($model->order_status->name == 'Terminado') {
+            MessageHelper::sendOrderFinishedMessage($model);
+        } else if ($model->order_status->name == 'Entregado') {
+            MessageHelper::sendOrderDeliveredMessage($model);
         }
     }
 
-    static function discountArticleStock($articles) {
-        foreach ($articles as $article) {
-            $article_ = Article::find($article->id);
-            if (!is_null($article->pivot->variant_id)) {
-                $variant = Variant::find($article->pivot->variant_id);
-                $stock_resultante = $variant->stock - $article->pivot->amount;
-                if ($stock_resultante > 0) {
-                    $variant->stock = $stock_resultante;
-                } else {
-                    $variant->stock = 0;
+    static function discountArticleStock($model) {
+        if ($model->order_status->name == 'Sin confirmar') {
+            foreach ($model->articles as $article) {
+                $_article = Article::find($article->id);
+                if (!is_null($_article->stock)) {
+                    $stock_resultante = $_article->stock - $article->pivot->amount;
+                    if ($stock_resultante > 0) {
+                        $_article->stock = $stock_resultante;
+                    } else {
+                        $_article->stock = 0;
+                    }
+                    $_article->timestamps = false;
+                    $_article->save();
                 }
-                // $variant->description = 'hola';
-                $variant->save();
-            } else if (!is_null($article_->stock)) {
-                $stock_resultante = $article_->stock - $article->pivot->amount;
-                if ($stock_resultante > 0) {
-                    $article_->stock = $stock_resultante;
-                } else {
-                    $article_->stock = 0;
-                }
-                $article_->timestamps = false;
-                $article_->save();
+            }
+        }
+    }
+
+    static function restartArticleStock($model) {
+        foreach ($model->articles as $article) {
+            $_article = Article::find($article->id);
+            if (!is_null($_article->stock)) {
+                $_article->stock += $article->pivot->amount;
+                $_article->timestamps = false;
+                $_article->save();
+            }
+        }
+    }
+
+    static function saveSale($order) {
+        if ($order->order_status->name == 'Entregado') {
+            $num_sale = SaleHelper::numSale(UserHelper::userId());
+            $client_id = null;
+            if (!is_null($order->buyer->comercio_city_client)) {
+                $client_id = $order->buyer->comercio_city_client_id;
+            }
+            $sale = Sale::create([
+                'user_id'  => UserHelper::userId(),
+                'buyer_id' => $order->buyer_id,
+                'client_id' => $client_id,
+                'num_sale' => $num_sale,
+                'save_current_acount' => 1,
+                'order_id' => $order->id,
+            ]);
+            SaleHelper::attachArticlesFromOrder($sale, $order->articles);
+            if (!is_null($order->buyer->comercio_city_client)) {
+                SaleHelper::attachCurrentAcountsAndCommissions($sale, $order->buyer->comercio_city_client_id, []);
             }
         }
     }

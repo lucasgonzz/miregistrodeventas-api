@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Helpers\ImageHelper;
 use App\Title;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class TitleController extends Controller
@@ -14,7 +15,7 @@ class TitleController extends Controller
     	if (!count($titles) >= 1) {
     		$titles = $this->createTitle();
     	}
-    	return response()->json(['titles' => $titles], 200);
+    	return response()->json(['models' => $titles], 200);
     }
 
     function createTitle() {
@@ -26,16 +27,15 @@ class TitleController extends Controller
 
     function store() {
         $title = $this->createTitle()[0];
-        return response()->json(['title' => $title], 200);
+        return response()->json(['model' => $title], 200);
     }
 
     function updateImage(Request $request, $id) {
-        Log::info('asdasd: ');
-        Log::info('Id: '.$id);
         $title = Title::find($id);
         $title->image_url = $request->image_url;
+        $title->hosting_image_url = ImageHelper::saveHostingImage($request->image_url);
         $title->save();
-        return response()->json(['title' => $title], 200); 
+        return response()->json(['model' => $title], 200); 
     }
 
     function update(Request $request) {
@@ -44,10 +44,10 @@ class TitleController extends Controller
         $title->lead = !empty($request->lead) ? ucfirst($request->lead) : null;
     	$title->color = !empty($request->color) ? $request->color : null;
     	$title->save();
-        return response()->json(['title' => $title], 200); 
+        return response()->json(['model' => $title], 200); 
     }
 
-    function delete($id) {
+    function destroy($id) {
         $title = Title::find($id);
         $title->delete();
         return response(null, 200);

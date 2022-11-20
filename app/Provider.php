@@ -12,7 +12,7 @@ class Provider extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('iva_condition', 'comercio_city_user', 'provider_price_lists')
+        $query->with('iva_condition', 'comercio_city_user', 'provider_price_lists', 'location')
             ->withCount('current_acounts');
     }
 
@@ -30,5 +30,9 @@ class Provider extends Model
 
     public function current_acounts() {
         return $this->hasMany('App\CurrentAcount');
+    }
+
+    public function location() {
+        return $this->belongsTo('App\Location');
     }
 }

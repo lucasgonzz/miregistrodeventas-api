@@ -16,6 +16,7 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
     public function map($article): array
     {
         $map = [
+            $article->num,
             $article->bar_code,
             $article->provider_code,
             $article->name,
@@ -29,13 +30,11 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             $article->percentage_gain,
             $article->discounts_formated,
             $article->price,
-        ];
-        $map = ExportHelper::mapPriceTypes($map, $article);
-        $map = array_merge($map, [
+            $this->getCostInDollars($article),
             $article->created_at,
             $article->updated_at,
-            $this->getCostInDollars($article)
-        ]);
+        ];
+        $map = ExportHelper::mapPriceTypes($map, $article);
         return $map;
     }
 
@@ -64,6 +63,7 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
     public function headings(): array
     {
         $headings = [
+            'Codigo',
             'Codigo de barras',
             'Codigo de proveedor',
             'Nombre',
@@ -77,13 +77,11 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             'Margen de ganancia',
             'Descuentos',
             'Precio',
-        ];
-        $headings = ExportHelper::setPriceTypesHeadings($headings);
-        $headings = array_merge($headings, [
             'Ingresado',
             'Actualizado',
             'Moneda',
-        ]);
+        ];
+        $headings = ExportHelper::setPriceTypesHeadings($headings);
         return $headings;
     }
 

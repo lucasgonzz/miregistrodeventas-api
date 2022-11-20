@@ -44,8 +44,10 @@ Route::get('/clients/check-saldos/{client_id}',
 	'ClientController@checkCurrentAcounts'
 );
 
+Route::get('/clients/set-saldos/{company_name}', 'HelperController@setClientsSaldos');
 Route::get('/budgets/set-articles/{company_name}', 'HelperController@setArticlesFromBudgets');
 Route::get('/order-productions/set-articles/{company_name}', 'HelperController@setArticlesFromOrderProductions');
+Route::get('/articles/set-hosting-images/{company_name}', 'HelperController@setArticlesHostingImages');
 
 Route::get('a', function() {
 	dd((float)'');
@@ -123,12 +125,14 @@ Route::post('/users', 'UserController@store');
 Route::get('/clients/pdf/{seller_id}', 'ClientController@pdf');
 Route::get('/current-acounts/pdf/{model_name}/{model_id}/{months_ago}', 'CurrentAcountController@pdfFromModel');
 Route::get('/current-acounts/pdf/{ids}/{model_name}', 'CurrentAcountController@pdf');
+
 Route::get('/sales/pdf/{sales_id}/{for_commerce}', 'SaleController@pdf');
 Route::get('/sales/pdf/{sales_id}/{for_commerce}/{afip_ticket?}', 'SaleController@pdf');
 Route::get('/sales/afip-ticket/pdf/{sale_id}', 'SaleController@pdfAfipTicket');
 
 
-Route::get('/sales/new-pdf/{ids}', 'SaleController@newPdf');
+Route::get('/sale/new-pdf/{id}', 'SaleController@newPdf');
+Route::get('/sale/pdf/delivered-articles/{id}', 'SaleController@deliveredArticlesPdf');
 
 Route::get('/sales/tickets/pdf/{sale_id}/{address_id?}', 'SaleController@ticketPdf');
 

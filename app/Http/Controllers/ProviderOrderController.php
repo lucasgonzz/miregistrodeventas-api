@@ -6,8 +6,11 @@ use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\Pdf\ProviderOrderPdf;
 use App\Http\Controllers\Helpers\ProviderOrderHelper;
+use App\Imports\ProviderOrderImport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\ProviderOrder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class ProviderOrderController extends Controller
 {
@@ -33,11 +36,13 @@ class ProviderOrderController extends Controller
 
     function store(Request $request) {
         $provider_order = ProviderOrder::create([
-            'num'         => ProviderOrderHelper::getNum(),
-            'provider_id' => $request->provider_id,
-            'user_id'     => $this->userId(),
+            'num'                       => ProviderOrderHelper::getNum(),
+            'provider_id'               => $request->provider_id,
+            'provider_order_status_id'  => $request->provider_order_status_id,
+            'user_id'                   => $this->userId(),
         ]);
         ProviderOrderHelper::attachArticles($request->articles, $provider_order);
+        ProviderOrderHelper::attachAfipTickets($request->provider_order_afip_tickets, $provider_order);
         // ProviderOrderHelper::sendEmail($request->send_email, $provider_order);
         $provider_order = $this->fullModel('App\ProviderOrder', $provider_order->id);
         return response()->json(['model' => $provider_order], 201);
@@ -45,28 +50,27 @@ class ProviderOrderController extends Controller
 
     function update(Request $request, $id) {
         $provider_order = ProviderOrder::find($id);
-        $provider_order->provider_id = $request->provider_id;
+        $provider_order->provider_id                = $request->provider_id;
+        $provider_order->provider_order_status_id   = $request->provider_order_status_id;
         $provider_order->save();
         ProviderOrderHelper::attachArticles($request->articles, $provider_order);
+        ProviderOrderHelper::attachAfipTickets($request->provider_order_afip_tickets, $provider_order);
         // ProviderOrderHelper::sendEmail($request->send_email, $provider_order);
         $provider_order = $this->fullModel('App\ProviderOrder', $provider_order->id);
         return response()->json(['model' => $provider_order], 201);
     }
 
-    // function setReceived(Request $request) {
-    //     $provider_order = ProviderOrder::find($request->provider_order_id);
-    //     ProviderOrderHelper::updateArticleStock($provider_order, $request->article);
-    //     $provider_order->articles()->updateExistingPivot($request->article['id'], [
-    //                                     'received' => $request->article['received']
-    //                                 ]);
-    //     $article = ArticleHelper::getFullArticle($request->article['id']);
-    //     $article->from_provider_order = true;
-    //     return response()->json(['article' => $article], 200);
-    // }
-
     function pdf($id) {
         $provider_order = ProviderOrder::find($id);
         $pdf = new ProviderOrderPdf($provider_order);
+    }
+
+    function import(Request $request) {
+        Log::info('llegoooo');
+        $columns = GeneralHelper::getImportColumns($request);
+        Log::info('columns:');
+        Log::info($columns);
+        Excel::import(new ProviderOrderImport($columns, $this->fullModel('App\ProviderOrder', $request->model_id)), $request->file('models'));
     }
 
     function destroy($id) {

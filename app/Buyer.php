@@ -14,10 +14,17 @@ class Buyer extends Model
     
     protected $guarded = [];
 
-    public function routeNotificationForWhatsApp()
-	{
-		return $this->phone;
-	}
+    public function scopeWithAll($query){
+        $query->with('addresses', 'comercio_city_client')
+               ->with(['messages' => function($q) {
+                    $q->orderBy('id', 'DESC')
+                    ->with('article.images');
+                }]);
+    }
+
+    public function comercio_city_client() {
+        return $this->belongsTo('App\Client', 'comercio_city_client_id');
+    }
 
     public function messages() {
         return $this->hasMany('App\Message');

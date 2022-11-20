@@ -6,6 +6,7 @@ use App\Buyer;
 use App\Events\OrderCanceled as OrderCanceledEvent;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\CartHelper;
+use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\OrderHelper;
 use App\Http\Controllers\Helpers\SaleHelper;
@@ -16,63 +17,49 @@ use App\Order;
 use App\Sale;
 use Illuminate\Http\Request;
 
-class OrderController extends Controller
-{
-    function unconfirmed() {
-        $orders = Order::where('user_id', $this->userId())
-                        ->where('status', 'unconfirmed')
-                        ->withAll()
+class OrderController extends Controller {
+
+    function index($from_date, $until_date = null) {
+        $models = Order::where('user_id', $this->userId());
+        if (!is_null($until_date)) {
+            $models = $models->whereDate('created_at', '>=', $from_date)
+                            ->whereDate('created_at', '<=', $until_date);
+        } else {
+            $models = $models->whereDate('created_at', $from_date);
+        }
+        $models = $models->withAll()
+                        ->orderBy('created_at', 'DESC')
                         ->get();
-        $orders = OrderHelper::setArticlesKeyAndVariant($orders);
-        $orders = OrderHelper::setArticlesColor($orders);
-        $orders = OrderHelper::setArticlesSize($orders);
-        return response()->json(['orders' => $orders], 200);
-    }
-    
-    function confirmedFinished() {
-        $orders = Order::where('user_id', $this->userId())
-                        ->where(function($query) {
-                            return $query->where('status', 'confirmed')
-                                        ->orWhere('status', 'finished');
-                        })
-                        // ->where('status', 'confirmed')
-                        // ->orWhere('status', 'finished')
-                        ->withAll()
-                        ->get();
-        $orders = OrderHelper::setArticlesKeyAndVariant($orders);
-        $orders = OrderHelper::setArticlesColor($orders);
-        $orders = OrderHelper::setArticlesSize($orders);
-        return response()->json(['orders' => $orders], 200);
+        return response()->json(['models' => $models], 200);
     }
 
-    function confirm($order_id) {
-        $order = Order::find($order_id);
-        $order->status = 'confirmed';
-        $order->save();
-        // $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
-        $orders = OrderHelper::setArticlesKeyAndVariant([$order]);
-        $orders = OrderHelper::setArticlesColor([$order]);
-        $orders = OrderHelper::setArticlesSize([$order]);
-        // OrderHelper::procesarPago($order);
-        MessageHelper::sendOrderConfirmedMessage($order);
-        // OrderHelper::checkPaymentMethodError($order);
-        OrderHelper::discountArticleStock($order->articles);
-        return response(null, 200);
+    function show($id) {
+        return response()->json(['model' => $this->fullModel('App\Order', $id)], 200);
     }
 
-    function cancel(Request $request) {
-        $order = Order::find($request->order['id']);
-        $order->status = 'canceled';
-        $order->save();
-        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
-        // CartHelper::detachArticulosFaltantes($request->articulos_faltantes, $order);
-        MessageHelper::sendOrderCanceledMessage($request->order['cancel_description'], $order);
-        // OrderHelper::updateCuponsStatus($order);
-        // $buyer = Buyer::find($order->buyer_id);
-        // $message = OrderHelper::getCanceledDescription($request->articulos_faltantes, $request->order);
-        // $buyer->notify(new OrderCanceledNotification($order, $message));
-        // event(new OrderCanceledEvent($order, $message));
-        return response(null, 200);
+    function previusDays($index) {
+        $days = GeneralHelper::previusDays('App\Order', $index);
+        return response()->json(['days' => $days], 200);
+    }
+
+    function updateStatus(Request $request, $id) {
+        $model = Order::find($id);
+        OrderHelper::discountArticleStock($model);
+        $model->order_status_id = $request->order_status_id;
+        $model->save();
+        $model = Order::find($id);
+        OrderHelper::sendMail($model);
+        OrderHelper::saveSale($model);
+        return response()->json(['model' => $this->fullModel('App\Order', $model->id)], 200);
+    }
+
+    function cancel(Request $request, $id) {
+        $model = Order::find($id);
+        $model->status = 'canceled';
+        $model->save();
+        OrderHelper::restartArticleStock($model);
+        MessageHelper::sendOrderCanceledMessage($request->description, $model);
+        return response()->json(['model' => $this->fullModel('App\Order', $model->id)], 200);
     }
 
     function finish($order_id) {
@@ -102,20 +89,5 @@ class OrderController extends Controller
 
         $sale = $this->saveSale($order);
         return response()->json(['sale' => $sale], 201);
-    }
-
-    function saveSale($order) {
-        $num_sale = SaleHelper::numSale($this->userId());
-        $sale = Sale::create([
-            'user_id'  => $this->userId(),
-            'buyer_id' => $order->buyer_id,
-            'num_sale' => $num_sale,
-            'order_id' => $order->id,
-        ]);
-        SaleHelper::attachArticlesFromOrder($sale, $order->articles);
-        $sale = Sale::where('id', $sale->id)
-                    ->withAll()
-                    ->first();
-        return $sale;
     }
 }

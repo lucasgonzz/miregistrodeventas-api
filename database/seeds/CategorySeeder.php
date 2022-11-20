@@ -57,7 +57,7 @@ class CategorySeeder extends Seeder
 
     function colman() {
         $user = User::where('company_name', 'colman')->first();
-        $categories = ['Lava ropas', 'Aires acondicionados'];
+        $categories = ['Lava ropas', 'Aires acondicionados', 'Computacion', 'Tanques de oxigeno', 'cosas para la casa', 'Repuestos de lavarropas', 'repuestos de aires acondicionados', 'repuestos de muchas cosas'];
         foreach ($categories as $category) {
             Category::create([
                 'name'    => $category,

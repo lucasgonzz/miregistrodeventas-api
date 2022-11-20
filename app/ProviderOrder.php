@@ -9,7 +9,11 @@ class ProviderOrder extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('articles', 'provider');
+        $query->with('articles', 'provider', 'provider_order_afip_tickets');
+    }
+
+    function provider_order_afip_tickets() {
+        return $this->hasMany('App\ProviderOrderAfipTicket');
     }
 
     function current_acount() {

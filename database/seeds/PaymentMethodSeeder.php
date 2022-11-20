@@ -17,6 +17,7 @@ class PaymentMethodSeeder extends Seeder
         $users = User::where('company_name', 'pinocho')
                         ->orWhere('company_name', 'kas aberturas')
                         ->orWhere('company_name', 'nebulaStore')
+                        ->orWhere('company_name', 'colman')
                         ->get();
         $payment_methods = [
             [

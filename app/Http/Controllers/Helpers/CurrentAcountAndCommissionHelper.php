@@ -137,6 +137,9 @@ class CurrentAcountAndCommissionHelper extends Controller {
             ]);
             $current_acount->saldo = Numbers::redondear(CurrentAcountHelper::getSaldo('client', $this->sale->client_id, $current_acount) + $this->debe);
             $current_acount->save();
+            $client = Client::find($this->sale->client_id);
+            $client->saldo = $current_acount->saldo;
+            $client->save();
         }
     }
 

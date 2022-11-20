@@ -27,6 +27,7 @@ class CreateProvidersTable extends Migration
             $table->integer('location_id')->unsigned()->default(0);
             $table->integer('iva_condition_id')->unsigned()->default(0);
             $table->decimal('percentage_gain', 8,2)->nullable();
+            $table->decimal('saldo', 12,2)->nullable();
             $table->integer('comercio_city_user_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned();
             // $table->softDeletes();

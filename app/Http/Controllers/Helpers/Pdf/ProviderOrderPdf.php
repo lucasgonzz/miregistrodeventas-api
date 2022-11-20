@@ -17,9 +17,7 @@ class ProviderOrderPdf extends fpdf {
 		$this->b = 0;
 		$this->line_height = 7;
 		
-		$this->user = UserHelper::getFullModel();
 		$this->provider_order = $provider_order;
-		$this->setFields();
 
 		$this->AddPage();
 		$this->articles();
@@ -27,34 +25,42 @@ class ProviderOrderPdf extends fpdf {
         exit;
 	}
 
-	function setFields() {
-		$this->fields = [
+	function getFields() {
+		return [
+			'Codigo'		=> 40,
+			'Cant'			=> 20,
+			'Producto'		=> 110,
+			'Recibidos'		=> 30,
+		];
+	}
+
+	function getModelProps() {
+		return [
 			[
-				'text'  => 'Codigo',
-				'width' => 40,
+				'text' 	=> 'Proveedor',
+				'key'	=> 'name',
 			],
 			[
-				'text'  => 'Cant',
-				'width' => 20,
+				'text' 	=> 'Telefono',
+				'key'	=> 'phone',
 			],
 			[
-				'text'  => 'Producto',
-				'width' => 110,
-			],
-			[
-				'text'  => 'Recibidos',
-				'width' => 30,
+				'text' 	=> 'Localidad',
+				'key'	=> 'location.name',
 			],
 		];
 	}
 
 	function Header() {
-		PdfHelper::logo($this);
-		PdfHelper::numeroFecha($this, $this->getNum(), $this->provider_order->created_at);
-		PdfHelper::title($this, 'Pedido a Proveedor');
-		PdfHelper::commerceInfo($this);
-		$this->providerInfo();
-		PdfHelper::tableHeader($this, $this->fields);
+		$data = [
+			'num' 			=> $this->getNum(),
+			'date'			=> $this->provider_order->created_at,
+			'title' 		=> 'Pedido a Proveedor',
+			'model_info'	=> $this->provider_order->provider,
+			'model_props' 	=> $this->getModelProps(),
+			'fields' 		=> $this->getFields(),
+		];
+		PdfHelper::header($this, $data);
 	}
 
 	function Footer() {
@@ -97,14 +103,14 @@ class ProviderOrderPdf extends fpdf {
 	}
 
 	function printArticle($article) {
-		$this->Cell(40, $this->line_height, $article->bar_code, 0, 0, 'C');
-		$this->Cell(20, $this->line_height, $article->pivot->amount, 0, 0, 'C');
+		$this->Cell($this->getFields()['Codigo'], $this->line_height, $article->bar_code, 0, 0, 'C');
+		$this->Cell($this->getFields()['Cant'], $this->line_height, $article->pivot->amount, 0, 0, 'C');
 		$y_1 = $this->y;
-		$this->MultiCell(110, $this->line_height, $article->name, 0, 'C', false);
+		$this->MultiCell($this->getFields()['Producto'], $this->line_height, $article->name, 0, 'C', false);
 		$y_2 = $this->y;
 		$this->y = $y_1;
 		$this->x = 175;
-		$this->Cell(30, $this->line_height, $article->pivot->received, 0, 0, 'C');
+		$this->Cell($this->getFields()['Recibidos'], $this->line_height, $article->pivot->received, 0, 0, 'C');
 		$this->y = $y_2;
 		$this->Line(5, $this->y, 205, $this->y);
 	}

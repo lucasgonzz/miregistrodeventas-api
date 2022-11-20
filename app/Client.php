@@ -12,12 +12,16 @@ class Client extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('sales', 'iva_condition', 'price_type', 'location', 'comercio_city_user')
+        $query->with('sales', 'iva_condition', 'price_type', 'location', 'comercio_city_user', 'buyer')
             ->withCount('current_acounts');
     }
     
     public function sales() {
         return $this->hasMany('App\Sale');
+    }
+    
+    public function buyer() {
+        return $this->hasOne('App\Buyer', 'comercio_city_client_id');
     }
     
     public function comercio_city_user() {

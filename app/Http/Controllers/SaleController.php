@@ -15,6 +15,7 @@ use App\Http\Controllers\Helpers\PdfPrintArticle;
 use App\Http\Controllers\Helpers\PdfPrintSale;
 use App\Http\Controllers\Helpers\Pdf\NewSalePdf;
 use App\Http\Controllers\Helpers\Pdf\SaleAfipTicketPdf;
+use App\Http\Controllers\Helpers\Pdf\SaleDeliveredArticlesPdf;
 use App\Http\Controllers\Helpers\Pdf\SaleTicketPdf;
 use App\Http\Controllers\Helpers\Pdf\Sale\Index as SalePdf;
 use App\Http\Controllers\Helpers\SaleHelper;
@@ -186,6 +187,15 @@ class SaleController extends Controller
         return response()->json(['sale' => $sale], 200);
     }
 
+    function updatePrices(Request $request, $id) {
+        $model = Sale::find($id);
+        SaleHelper::updateArticlesPrices($model, $request->articles);
+        if ($model->client_id) {
+            SaleHelper::updateCurrentAcountsAndCommissions($model);
+        }
+        return response()->json(['model' => $this->fullModel('App\Sale', $id)], 200);
+    }
+
     function store(Request $request) {
         $sale = Sale::create([
             'user_id'               => $this->userId(),
@@ -223,12 +233,14 @@ class SaleController extends Controller
         $pdf->printSales();
     }
 
-    function newPdf($ids) {
-        $sales = [];
-        foreach (explode('-', $ids) as $id) {
-            $sales[] = Sale::find($id);
-        }
-        $pdf = new NewSalePdf($sales);
+    function newPdf($id) {
+        $sale = Sale::find($id);
+        $pdf = new NewSalePdf($sale);
+    }
+
+    function deliveredArticlesPdf($id) {
+        $sale = Sale::find($id);
+        $pdf = new SaleDeliveredArticlesPdf($sale);
     }
 
     function ticketPdf($id, $address_id = null) {

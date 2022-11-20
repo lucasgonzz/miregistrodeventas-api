@@ -17,35 +17,12 @@ use Illuminate\Support\Facades\Log;
 
 class ArticlesTableSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
 
 
     public $images = [
-            'v1628604855/articles/zsirpaost45zyjkclsbn.jpg', 
-            'v1628344265/articles/ih96nbu0i6ahnta8nnxd.jpg', 
-            'v1628723149/articles/rkqnanzvxakybqkatajc.jpg', 
-            'v1628192113/articles/ezleh2tpnosmmx7chfw5.jpg',
-            'v1627484681/articles/rjexmxcyndhxxt7lc3vo.jpg',
-            'v1627310032/articles/ya9xayo6ze60mslhmt3u.jpg',
-            'v1627420021/articles/eeucqaqmz4541s6immuv.jpg'
-        ];
+        'arma' => 'http://miregistrodeventas.local:8001/storage/r5xgfbxwxvqf6mefhcbj.jpeg',
+    ];
 
-    public $iphone_images = [
-            'iphone 7'              => 'v1630938818/articles/e8cm0xcpskcyjdby1zmd.jpg', 
-            'iphone 7 plus'         => 'v1630938881/articles/v6uuldxjofumcv9uqgc1.jpg', 
-            'iphone xr'             => 'v1633540148/articles/ulycltnzdx2plkcjbm1e.jpg',
-            'iphone se'             => 'v1633540062/articles/jpdgffh05cvd91msekde.jpg',
-            'iphone 11'             => 'v1633540438/articles/ebefqutk8fmotvnutpbi.jpg',
-            'iphone 12'             => 'v1633539825/articles/i4zwmy46xduh1wbvsctw.jpg',
-            'cargador'              => 'v1630940250/articles/agfts1knzv9fwwxhvwms.jpg',
-            'cable'                 => 'v1630940210/articles/ygdg6bng12atpnzkr0a7.jpg',
-            'auricular con cable'   => 'v1630940478/articles/u4uyisxw3ylq5jkdmnbr.jpg', 
-            'auricular inalambrico' => 'v1630940431/articles/qkhnteqfgpnfjkcrquqz.jpg',
-        ];
     public function run()
     {
         // $this->candy();
@@ -65,169 +42,6 @@ class ArticlesTableSeeder extends Seeder
         return;
         $names = ['campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada','campera grande', 'campera grande', 'pantalon azul grande con cosas', 'sombrero', 'campera boca azul', 'campera boca blanca', 'campera river roja', 'campera river roja', 'cargador usb', 'escritorio para pc', 'funda iphone bordo', 'funda iphone celeste', 'funda iphone xr roja', 'linterna', 'mochila topper', 'mouse con luz', 'peluche de unicornio', 'remera deportiva', 'remera running', 'silla de comedor', 'silla de madera', 'silla de plastico', 'zapatilla adidas', 'zapatilla fila', 'mochila floreada',];
 
-        $iphones = [
-            [
-                'name'              => 'Iphone 7 pesos',
-                'brand_id'          => 1,
-                'cost'              => 45000,
-                'price'             => 60000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'with_dolar'        => false,
-                'images'            => [
-                    $this->iphone_images['iphone 7'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Iphone 7 Plus',
-                'brand_id'          => 1,
-                'cost'              => 400,
-                'price'             => 900,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'with_dolar'        => true,
-                'images'            => [
-                    $this->iphone_images['iphone 7 plus'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Iphone Xr',
-                'brand_id'          => 1,
-                'cost'              => 500,
-                'price'             => 1000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'with_dolar'        => true,
-                'featured'          => 1,
-                'images'            => [
-                    $this->iphone_images['iphone xr'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Iphone Se',
-                'brand_id'          => 1,
-                'cost'              => 1000,
-                'price'             => 2000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'with_dolar'        => true,
-                'images'            => [
-                    $this->iphone_images['iphone se'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Iphone 11',
-                'brand_id'          => 1,
-                'cost'              => 2000,
-                'price'             => 3000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'featured'          => 1,
-                'with_dolar'        => true,
-                'images'            => [
-                    $this->iphone_images['iphone 11'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Iphone 11 Pro',
-                'brand_id'          => 1,
-                'cost'              => 1100,
-                'price'             => 2100,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'with_dolar'        => true,
-                'images'            => [
-                    $this->iphone_images['iphone 11'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Iphone 12',
-                'brand_id'          => 1,
-                'cost'              => 2000,
-                'price'             => 3000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'featured'          => 1,
-                'with_dolar'        => true,
-                'images'            => [
-                    $this->iphone_images['iphone 12'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Iphone 12 Pro',
-                'brand_id'          => 1,
-                'cost'              => 2100,
-                'price'             => 3100,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'with_dolar'        => true,
-                'images'            => [
-                    $this->iphone_images['iphone 12'],
-                    $this->iphone_images['iphone 7'],
-                ]
-            ],
-            [
-                'name'              => 'Cargador con cable',
-                'brand_id'           => 2,
-                'cost'              => 1000,
-                'price'             => 1500,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 7,
-                'featured'          => 1,
-                'with_dolar'        => false,
-                'images'            => [
-                    $this->iphone_images['cable'],
-                    $this->iphone_images['cargador'],
-                ]
-            ],
-            [
-                'name'              => 'Cargador cabezal',
-                'brand_id'           => 2,
-                'cost'              => 700,
-                'price'             => 1000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 8,
-                'with_dolar'        => false,
-                'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
-                ]
-            ],
-            [
-                'name'              => 'Auricular Bluetooth',
-                'brand_id'          => 2,
-                'cost'              => 2000,
-                'price'             => 3000,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'featured'          => 1,
-                'with_dolar'        => false,
-                'images'            => [
-                    $this->iphone_images['auricular inalambrico'],
-                    $this->iphone_images['auricular con cable'],
-                ]
-            ],
-            [
-                'name'              => 'Auricular con cable',
-                'brand_id'          => 2,
-                'cost'              => 1900,
-                'price'             => 2400,
-                'stock'             => rand(4,7),
-                'sub_category_id'   => 6,
-                'with_dolar'        => false,
-                'images'            => [
-                    $this->iphone_images['auricular con cable'],
-                    $this->iphone_images['auricular inalambrico'],
-                ]
-            ],
-        ];
 
         $articles_iva = [
             [
@@ -372,8 +186,8 @@ class ArticlesTableSeeder extends Seeder
                 'percentage_gain'   => 50,
                 'sub_category_name' => 'de exterior',
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -385,8 +199,8 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'industriales',
                 'percentage_gain'   => 30,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -398,8 +212,8 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'de otras cosas',
                 'percentage_gain'   => 50,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -411,8 +225,8 @@ class ArticlesTableSeeder extends Seeder
                 'percentage_gain'   => 50,
                 'sub_category_name' => 'puertas',
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -424,8 +238,8 @@ class ArticlesTableSeeder extends Seeder
                 'percentage_gain'   => 50,
                 'sub_category_name' => 'portones',
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -437,8 +251,8 @@ class ArticlesTableSeeder extends Seeder
                 'percentage_gain'   => 50,
                 'sub_category_name' => 'nacionales',
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -450,8 +264,8 @@ class ArticlesTableSeeder extends Seeder
                 'percentage_gain'   => 50,
                 'sub_category_name' => 'importados',
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
         ];
@@ -494,8 +308,8 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 50,
                 'sub_category_id'   => 1,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -509,8 +323,8 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_id'   => 2,
                 'stock'             => 0,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -523,8 +337,8 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_id'   => 3,
                 'stock'             => null,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -537,8 +351,8 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_id'   => 4,
                 'stock'             => null,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
             [
@@ -551,8 +365,8 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_id'   => 5,
                 'stock'             => null,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    $this->iphone_images['cable'],
+                    $this->images['arma'],
+                    $this->images['arma'],
                 ]
             ],
         ];
@@ -593,7 +407,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 700,
                 'sub_category_name' => 'Inflables',
                 'images'            => [
-                    $this->iphone_images['cargador'],
+                    $this->images['arma'],
                     'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [],
@@ -607,7 +421,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 800,
                 'sub_category_name' => 'De lana',
                 'images'            => [
-                    $this->iphone_images['cargador'],
+                    $this->images['arma'],
                     'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [1, 2],
@@ -621,7 +435,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 800,
                 'sub_category_name' => 'Jeans',
                 'images'            => [
-                    $this->iphone_images['cargador'],
+                    $this->images['arma'],
                     'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [1],
@@ -635,7 +449,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 800,
                 'sub_category_name' => 'De cuero',
                 'images'            => [
-                    $this->iphone_images['cargador'],
+                    $this->images['arma'],
                     'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [],
@@ -649,7 +463,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 800,
                 'sub_category_name' => 'Deportivas',
                 'images'            => [
-                    $this->iphone_images['cargador'],
+                    $this->images['arma'],
                     'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [1],
@@ -663,7 +477,7 @@ class ArticlesTableSeeder extends Seeder
                 'price'             => 800,
                 'sub_category_name' => 'Urbanas',
                 'images'            => [
-                    $this->iphone_images['cargador'],
+                    $this->images['arma'],
                     'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [],
@@ -781,7 +595,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'lavarropa nuevo',
                 'provider_id'       => $rosario->id,
                 'images'            => [
-                    $this->iphone_images['cargador'],
+                    $this->images['arma'],
                     'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
                 ],
                 'colors'            => [],
@@ -873,8 +687,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'lavarropa nuevo',
                 'provider_id'       => $bsas->id,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                    $this->images['arma'],
                 ],
                 'colors'            => [],
                 'sizes'             => [],
@@ -886,11 +699,10 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => 10,
                 'cost'              => 100,
                 'price'             => null,
-                'sub_category_name' => 'lavarropa nuevo',
+                'sub_category_name' => 'lavarropas usados',
                 'provider_id'       => $rosario->id,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                    $this->images['arma'],
                 ],
                 'colors'            => [],
                 'sizes'             => [],
@@ -905,8 +717,7 @@ class ArticlesTableSeeder extends Seeder
                 'sub_category_name' => 'aire nuevo',
                 'provider_id'       => $bsas->id,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                    $this->images['arma'],
                 ],
                 'colors'            => [],
                 'sizes'             => [],
@@ -918,14 +729,93 @@ class ArticlesTableSeeder extends Seeder
                 'stock'             => 10,
                 'cost'              => 200,
                 'price'             => null,
-                'sub_category_name' => 'aire nuevo',
+                'sub_category_name' => 'aires acondicionados usados',
                 'provider_id'       => $rosario->id,
                 'images'            => [
-                    $this->iphone_images['cargador'],
-                    'v1661975918/articles/nolwz6b1otbjdrynafib.jpg',
+                    $this->images['arma'],
                 ],
                 'colors'            => [],
                 'sizes'             => [],
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Computadora lenovo',
+                'sub_category_name' => 'computacion 1',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Computadora ACME',
+                'sub_category_name' => 'computacion 2',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Tanques de oxigeno',
+                'sub_category_name' => 'Tanques de oxigeno 1',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Tanques de oxigeno',
+                'sub_category_name' => 'Tanques de oxigeno 2',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'cosas para la casa A',
+                'sub_category_name' => 'cosas para la casa 1',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'cosas para la casa B',
+                'sub_category_name' => 'cosas para la casa 2',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Repuestos de lavarropas A',
+                'sub_category_name' => 'Repuestos de lavarropas 1',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
+            ],
+            [
+                'bar_code'          => '',
+                'provider_code'     => '',
+                'name'              => 'Repuestos de lavarropas B',
+                'sub_category_name' => 'Repuestos de lavarropas 2',
+                'stock'             => 100,
+                'cost'              => 5,
+                'price'             => 10,
+                'provider_id'       => $rosario->id,
             ],
             [
                 'bar_code'          => '',
@@ -993,9 +883,9 @@ class ArticlesTableSeeder extends Seeder
             if (isset($article['images'])) {
                 foreach ($article['images'] as $url) { 
                     Image::create([
-                        'article_id' => $art->id,
-                        'url'        => $url,
-                        'color_id'   => $this->getColorId($article),
+                        'article_id'    => $art->id,
+                        'url'           => $url,
+                        'hosting_url'   => $url,
                     ]);
                 }    
             }
@@ -1080,25 +970,4 @@ class ArticlesTableSeeder extends Seeder
         }
     }
 
-    function imageUrl($user_id, $i, $j) {
-        if ($user_id < 3) {
-            if ($i <= 10) {
-                return $this->iphone_images[$j];
-            }
-            if ($i == 11 || $i == 13) {
-                return $this->iphone_images[2];
-            }
-            if ($i == 12 || $i == 14) {
-                return $this->iphone_images[3];
-            }
-            if ($i == 15 || $i == 17) {
-                return $this->iphone_images[4];
-            }
-            if ($i == 16 || $i == 18) {
-                return $this->iphone_images[5];
-            }
-        } else {
-            return $this->images[rand(0,6)];
-        }
-    }
 }

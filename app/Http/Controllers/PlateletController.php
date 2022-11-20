@@ -12,7 +12,7 @@ class PlateletController extends Controller
         $models = Platelet::where('user_Id', $this->userId())
                                 ->orderBy('created_at', 'DESC')
                                 ->get();
-        return response()->json(['platelets' => $models], 200);
+        return response()->json(['models' => $models], 200);
     }
 
 
@@ -22,7 +22,7 @@ class PlateletController extends Controller
             'description'     => $request->description,
             'user_id'  => $this->userId(),
         ]);
-        return response()->json(['platelet' => $model], 201);
+        return response()->json(['model' => $model], 201);
     }
 
     
@@ -31,7 +31,7 @@ class PlateletController extends Controller
         $model->name = $request->name;
         $model->description = $request->description;
         $model->save();
-        return response()->json(['platelet' => $model], 200);
+        return response()->json(['model' => $model], 200);
     }
 
     public function destroy($id) {

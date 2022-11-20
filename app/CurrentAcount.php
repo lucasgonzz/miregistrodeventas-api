@@ -12,6 +12,10 @@ class CurrentAcount extends Model
         return $this->belongsTo('App\Sale');
     }
 
+    public function articles() {
+        return $this->belongsToMany('App\Article')->withPivot('amount', 'price');
+    }
+
     public function budget() {
         return $this->belongsTo('App\Budget');
     }
@@ -28,8 +32,8 @@ class CurrentAcount extends Model
         return $this->hasMany('App\Check');
     }
 
-    public function payment_method() {
-        return $this->belongsTo('App\CurrentAcountPaymentMethod', 'current_acount_payment_method_id');
+    public function current_acount_payment_methods() {
+        return $this->belongsToMany('App\CurrentAcountPaymentMethod')->withPivot('amount', 'bank', 'num', 'payment_date', 'credit_card_id', 'credit_card_payment_plan_id');
     }
 
     public function client() {

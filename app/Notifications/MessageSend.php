@@ -61,14 +61,15 @@ class MessageSend extends Notification
 
     public function toMail($notifiable)
     {
-        Log::info('Enviando correo a '.$notifiable->email);
+        $logo_url = ImageHelper::image();
+        Log::info('logo_url: '.$logo_url);
         return (new MailMessage)
                     ->from(Auth()->user()->email, Auth()->user()->company_name)
                     ->subject($this->title)
                     ->markdown('emails.message-send', [
                         'commerce'  => Auth()->user(),
                         'message'   => $this->message->text,
-                        'logo_url'  => ImageHelper::image(Auth()->user()),
+                        'logo_url'  => $logo_url,
                     ]);
         // if (!is_null($this->url)) {
         //     $mail_message->action('Ver producto en la tienda', $this->url);

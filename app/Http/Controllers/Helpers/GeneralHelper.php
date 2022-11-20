@@ -47,11 +47,40 @@ class GeneralHelper {
         return $result;
     }
 
-    static function getPivotValue($model, $prop) {
-        if (isset($model['pivot'][$prop])) {
+    static function getPivotValue($model, $prop, $ignore_0 = false) {
+        if ($ignore_0) {
+            if (isset($model['pivot'][$prop]) && $model['pivot'][$prop] != 0) {
+                Log::info('retornando '.$model['pivot'][$prop].' para '.$prop);
+                return $model['pivot'][$prop];
+            }
+            Log::info('no se retorno valor para '.$prop);
+        } else if (isset($model['pivot'][$prop])) {
             return $model['pivot'][$prop];
         }
         return null;
+    }
+
+    static function getModelName($model_name) {
+        $model_name = 'App\-'.ucfirst($model_name);
+        $model_name = str_replace('-', '', $model_name);
+        if (str_contains($model_name, '_')) {
+            $pos = strpos($model_name, '_');
+            $sub_str = substr($model_name, $pos+1);
+            $model_name = substr($model_name, 0, $pos).ucfirst($sub_str);
+        }
+        return $model_name;
+    }
+
+    static function getImportColumns($request) {
+        $props = [];
+        foreach ($request->all() as $key => $value) {
+            if (str_contains($key, 'prop_')) {
+                if ($value != '' && $value != -1) {
+                    $props[strtolower(substr($key, strpos($key, '_')+1))] = (int)$value-1;
+                } 
+            }
+        }
+        return $props;
     }
 
 }

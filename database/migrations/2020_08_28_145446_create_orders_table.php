@@ -26,6 +26,7 @@ class CreateOrdersTable extends Migration
             $table->decimal('percentage_card', 8, 2)->nullable();
             $table->integer('cupon_id')->unsigned()->nullable();
             $table->integer('buyer_id')->unsigned();
+            $table->integer('order_status_id')->unsigned();
             $table->integer('user_id')->unsigned();
 
             $table->timestamps();

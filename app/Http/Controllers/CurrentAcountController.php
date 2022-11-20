@@ -11,6 +11,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintCurrentAcounts;
+use App\Http\Controllers\Helpers\Pdf\NotaCreditoPdf;
 use App\Http\Controllers\Helpers\Pdf\PagoPdf;
 use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
@@ -45,7 +46,7 @@ class CurrentAcountController extends Controller
                                 return $q->withAll();
                             }]);
         }
-        $models = $models->with('payment_method')
+        $models = $models->with('current_acount_payment_methods')
                         ->with('checks')
                         ->orderBy('created_at', 'ASC')
                         ->get();
@@ -62,14 +63,19 @@ class CurrentAcountController extends Controller
             'num_receipt'                       => CurrentAcountHelper::getNumReceipt(),
             'client_id'                         => $request->model_name == 'client' ? $request->model_id : null,
             'provider_id'                       => $request->model_name == 'provider' ? $request->model_id : null,
-            'current_acount_payment_method_id'  => $request->current_acount_payment_method_id,
+            // 'current_acount_payment_method_id'  => $request->current_acount_payment_method_id,
             'created_at'                        => $request->current_date ? Carbon::now() : $request->created_at,
         ]);
         $to_pay_id = !is_null($request->to_pay) ? $request->to_pay['id'] : null;
+        CurrentAcountHelper::attachPaymentMethods($pago, $request->current_acount_payment_methods);
         $pago->saldo = CurrentAcountHelper::getSaldo($request->model_name, $request->model_id, $pago) - $request->haber;
         $pago->detalle = CurrentAcountHelper::procesarPago($request->model_name, $request->model_id, $request->haber, $pago, $to_pay_id);
         $pago->save();
-        CurrentAcountHelper::saveCheck($pago, $request->checks);
+        if (!$request->current_date) {
+            CurrentAcountHelper::checkSaldos($request->model_name, $request->model_id);
+        }
+        CurrentAcountHelper::updateModelSaldo($pago, $request->model_name, $request->model_id);
+        // CurrentAcountHelper::saveCheck($pago, $request->checks);
         return response()->json(['current_acount' => $pago], 201);
     }
 
@@ -91,6 +97,7 @@ class CurrentAcountController extends Controller
         ]);
         $nota_debito->saldo = CurrentAcountHelper::getSaldo($request->model_name, $request->model_id, $nota_debito) + $request->debe;
         $nota_debito->save();
+        CurrentAcountHelper::updateModelSaldo($nota_debito, $request->model_name, $request->model_id);
         return response()->json(['current_acount' => $nota_debito], 201);
     }
 
@@ -113,6 +120,7 @@ class CurrentAcountController extends Controller
             'haber'         => !$request->is_for_debe ? $request->saldo_inicial : null,
             'saldo'         => $request->is_for_debe ? $request->saldo_inicial : -$request->saldo_inicial,
         ]);
+        CurrentAcountHelper::updateModelSaldo($current_acount, $request->model_name, $request->model_id);
         return response()->json(['current_acount' => $current_acount], 201);
     }
 

@@ -32,6 +32,7 @@ class CreateBuyersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 128)->nullable();
             $table->string('remember_token', 128)->nullable();
+            $table->integer('comercio_city_client_id')->unsigned()->nullable();
             $table->integer('user_id')->unsigned()->nullable();
             
             $table->timestamps();

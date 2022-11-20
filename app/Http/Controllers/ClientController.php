@@ -29,7 +29,7 @@ class ClientController extends Controller
                             ->orderBy('id', 'DESC')
                             ->where('status', 'active')
                             ->get();
-        return response()->json(['models' => ClientHelper::setClientsSaldo($clients)], 200);
+        return response()->json(['models' => $clients], 200);
     }
 
     function show($id) {
@@ -49,6 +49,7 @@ class ClientController extends Controller
             'razon_social'      => $request->razon_social,
             'iva_condition_id'  => $request->iva_condition_id,
             'price_type_id'     => $request->price_type_id,
+            'saldo'             => 0,
             'seller_id'         => $seller_id,
             'user_id'           => $this->userId(),
         ]);

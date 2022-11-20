@@ -9,30 +9,36 @@ use Illuminate\Support\Facades\Log;
 
 class ImportHelper {
 
-	static function getSubcategoryId($row) {
-		if ($row['categoria'] != '' && $row['sub_categoria'] != '') {
+	static function getSubcategoryId($categoria, $sub_categoria) {
+		if ($categoria != '' && $sub_categoria != '') {
 			$category = Category::where('user_id', UserHelper::userId())
-								->where('name', $row['categoria'])
+								->where('name', $categoria)
 								->first();
 			if (is_null($category)) {
 				$category = Category::create([
-					'name' 		=> $row['categoria'],
+					'name' 		=> $categoria,
 					'user_id' 	=> UserHelper::userId(),
 				]);
 			}
 			$sub_category = SubCategory::where('user_id', UserHelper::userId())
-										->where('name', $row['sub_categoria'])
+										->where('name', $sub_categoria)
 										->where('category_id', $category->id)
 										->first();
 			if (is_null($sub_category)) {
 				$sub_category = SubCategory::create([
-					'name' 			=> $row['sub_categoria'],
+					'name' 			=> $sub_categoria,
 					'category_id' 	=> $category->id,
 					'user_id'		=> UserHelper::userId(),
 				]);
 			}
-			Log::info('Retornando '.$sub_category->name.' con id: '.$sub_category->id.' para '.$row['nombre']);
 			return $sub_category->id;
+		}
+		return null;
+	}
+
+	static function getColumnValue($row, $key, $columns) {
+		if (isset($columns[$key])) {
+			return $row[$columns[$key]];
 		}
 		return null;
 	}
@@ -47,13 +53,13 @@ class ImportHelper {
 	    }
 	}
 
-	static function saveProvider($row, $ct) {
-		if ($row['proveedor'] != 'Sin especificar' && $row['proveedor'] != '') {
+	static function saveProvider($proveedor, $ct) {
+		if ($proveedor != 'Sin especificar' && $proveedor != '') {
 	        $data = [
-                'name'      => $row['proveedor'],
+                'name'      => $proveedor,
                 'user_id'   => $ct->userId(),
             ];
-	        $ct->createIfNotExist('providers', 'name', $row['proveedor'], $data);
+	        $ct->createIfNotExist('providers', 'name', $proveedor, $data);
 	    }
 	}
 
@@ -67,16 +73,19 @@ class ImportHelper {
 	    }
 	}
 
-	static function getIvaId($row) {
-		if ($row['iva'] != '' || $row['iva'] == '0' || $row['iva'] == 0) {
-			$iva = Iva::where('percentage', $row['iva'])
-						->first();
-			if (is_null($iva)) {
-				$iva = Iva::create([
-					'percentage' => $row['iva'],
-				]);
+	static function getIvaId($iva) {
+		// Log::info('Llego iva: '.$iva);
+		if (!is_null($iva)) {
+			if ($iva != '' || $iva == '0' || $iva == 0) {
+				$_iva = Iva::where('percentage', $iva)
+							->first();
+				if (is_null($_iva)) {
+					$_iva = Iva::create([
+						'percentage' => $iva,
+					]);
+				}
+				return $_iva->id;
 			}
-			return $iva->id;
 		}
 		return 2;
 	}

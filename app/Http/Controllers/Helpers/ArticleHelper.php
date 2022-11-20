@@ -184,11 +184,12 @@ class ArticleHelper {
         $article = Article::find($id);
         if (!is_null($article->stock)) {
             $stock_resultante = $article->stock - $amount;
-            if ($stock_resultante > 0) {
-                $article->stock = $stock_resultante;
-            } else {
-                $article->stock = 0;
-            }
+            $article->stock = $stock_resultante;
+            // if ($stock_resultante > 0) {
+            //     $article->stock = $stock_resultante;
+            // } else {
+            //     $article->stock = 0;
+            // }
             $article->timestamps = false;
             $article->save();
         }
@@ -220,6 +221,19 @@ class ArticleHelper {
                         $special_price->id, 
                         ['price' => (double)$request->{$special_price->name}]
                     );
+                }
+            }
+        }
+    }
+
+    static function setDeposits($article, $request) {
+        $article->deposits()->detach();
+        if (isset($request->deposits)) {
+            foreach ($request->deposits as $id => $value) {
+                if ($value != '') {
+                    $article->deposits()->attach($id, [
+                                                    'value' => $value
+                                                ]);
                 }
             }
         }

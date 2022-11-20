@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AfipInformation;
 use App\Collection;
+use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\StringHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Recommendation;
@@ -78,6 +79,7 @@ class UserController extends Controller
         $user->online_prices        = $request->online_prices;
         $user->dollar               = $request->dollar;
         $user->order_description    = $request->order_description;
+        $user->show_articles_without_stock    = $request->show_articles_without_stock;
         $user->save();
 
         $configuration = UserConfiguration::where('user_id', $this->userId())
@@ -105,10 +107,17 @@ class UserController extends Controller
 
     function updateImage(Request $request, $id) {
         $user = User::find($id);
-        $user->image_url = $request->image_url;
+        $user->image_url = ImageHelper::saveHostingImage($request->image_url);
         $user->save();
         return response()->json(['user' => UserHelper::getFullModel($id)], 200);
     } 
+
+    function defautlArticleImage(Request $request) {
+        $user = User::find($this->userId());
+        $user->default_article_image_url = ImageHelper::saveHostingImage($request->image_url);
+        $user->save();
+        return response()->json(['user' => UserHelper::getFullModel()], 200);
+    }
 
     function isCompanyNameRepeated($company_name) {
         $user = User::where('company_name', $company_name)

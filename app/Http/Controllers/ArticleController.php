@@ -8,6 +8,8 @@ use App\Description;
 use App\Exports\ArticlesExport;
 use App\Http\Controllers\Helpers\ArticleFilterHelper;
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\GeneralHelper;
+use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\Pdf\ArticleTicketPdf;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Image;
@@ -22,7 +24,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Maatwebsite\Excel\Facades\Excel;
 use \Gumlet\ImageResize;
@@ -112,6 +113,7 @@ class ArticleController extends Controller
         ArticleHelper::setColors($article, $request->colors);
         ArticleHelper::setCondition($article, $request->condition_id);
         ArticleHelper::setSpecialPrices($article, $request);
+        ArticleHelper::setDeposits($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
         $article->user->notify(new UpdatedArticle($article));
         return response()->json(['model' => $article], 200);
@@ -178,8 +180,9 @@ class ArticleController extends Controller
 
     function addImage(Request $request, $id) {
         $image = Image::create([
-            'article_id' => $id,
-            'url'        => $request->image_url,
+            'article_id'    => $id,
+            'url'           => $request->image_url,
+            'hosting_url'   => ImageHelper::saveHostingImage($request->image_url),
         ]);
         $article = ArticleHelper::getFullArticle($id);
         return response()->json(['model' => $article], 201);
@@ -388,13 +391,17 @@ class ArticleController extends Controller
         ArticleHelper::setCondition($article, $request->condition_id);
         ArticleHelper::attachProvider($article, $request);
         ArticleHelper::setSpecialPrices($article, $request);
+        ArticleHelper::setDeposits($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
         $article->user->notify(new CreatedArticle($article));
         return response()->json(['model' => $article], 201);
     }
 
     function import(Request $request) {
-        Excel::import(new ArticlesImport($request->percentage, $request->provider_id), $request->file('articles'));
+        $columns = GeneralHelper::getImportColumns($request);
+        Log::info('columns:');
+        Log::info($columns);
+        Excel::import(new ArticlesImport($columns, $request->percentage, $request->provider_id), $request->file('models'));
     }
 
     function pdf($ids) {

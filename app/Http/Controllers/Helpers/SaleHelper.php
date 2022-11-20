@@ -83,13 +83,15 @@ class SaleHelper extends Controller {
     static function checkNotaCredito($sale, $request) {
         if ($request->save_nota_credito) {
             $haber = 0;
+            $articles = [];
             foreach ($request->items as $item) {
                 if (isset($item['is_article']) && $item['returned_amount'] > 0) {
                     $haber += $item['price_vender'] * $item['returned_amount'];
+                    $articles[] = $item;
                 }
             }
             Log::info('Entro en nota_credito');
-            CurrentAcountHelper::notaCredito($haber, $request->nota_credito_description, 'client', $request->client_id, $sale->id);
+            CurrentAcountHelper::notaCredito($haber, $request->nota_credito_description, 'client', $request->client_id, $sale->id, $articles);
             CurrentAcountHelper::checkSaldos('client', $request->client_id);
         }
     }
@@ -145,12 +147,21 @@ class SaleHelper extends Controller {
                                                             'cost'              => Self::getCost($article),
                                                             'price'             => $article['price_vender'],
                                                             'returned_amount'   => Self::getReturnedAmount($article),
+                                                            'delivered_amount'   => Self::getDeliveredAmount($article),
                                                             'discount'          => Self::getDiscount($article),
-                                                            'with_dolar'        => Self::getDolar($article, $dolar_blue),
+                                                            // 'with_dolar'        => Self::getDolar($article, $dolar_blue),
                                                             'created_at'        => Carbon::now(),
                                                         ]);
                 ArticleHelper::discountStock($article['id'], $article['amount']);
             }
+        }
+    }
+
+    static function updateArticlesPrices($sale, $articles) {
+        foreach ($articles as $article) {
+            $sale->articles()->updateExistingPivot($article['id'], [
+                                                    'price' => $article['price_vender'],
+                                                ]);
         }
     }
 
@@ -214,6 +225,13 @@ class SaleHelper extends Controller {
     static function getReturnedAmount($item) {
         if (isset($item['returned_amount'])) {
             return $item['returned_amount'];
+        }
+        return null;
+    }
+
+    static function getDeliveredAmount($item) {
+        if (isset($item['delivered_amount'])) {
+            return $item['delivered_amount'];
         }
         return null;
     }

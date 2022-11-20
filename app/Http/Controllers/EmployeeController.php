@@ -24,6 +24,7 @@ class EmployeeController extends Controller
                         ->first();
 
         $model->permissions()->sync($request->permissions_id);
+        $model->dni = $request->dni;
         // $model->password = bcrypt($request->password);
         $model->save();
 

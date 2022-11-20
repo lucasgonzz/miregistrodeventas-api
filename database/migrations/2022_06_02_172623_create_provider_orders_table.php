@@ -16,6 +16,7 @@ class CreateProviderOrdersTable extends Migration
         Schema::create('provider_orders', function (Blueprint $table) {
             $table->id();
             $table->integer('num');
+            $table->integer('provider_order_status_id')->unsigned();
             $table->integer('provider_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->timestamps();
