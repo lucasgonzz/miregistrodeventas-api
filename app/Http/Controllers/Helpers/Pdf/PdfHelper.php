@@ -34,7 +34,12 @@ class PdfHelper {
         // Logo
         $user = UserHelper::getFullModel();
         if (!is_null($user->hosting_image_url)) {
-        	$instance->Image('https://images.hola.com/imagenes/bloques/videoloop-portada-tematica/egenia-silva-oscura-2t.jpg', 5, 5, 40, 25);
+        	$image = $user->image_url;
+        	if (!$user->from_cloudinary) {
+        		$image = $user->hosting_image_url;
+        	}
+        	$instance->Image($image, 5, 5, 40, 25);
+        	// $instance->Image('https://images.hola.com/imagenes/bloques/videoloop-portada-tematica/egenia-silva-oscura-2t.jpg', 5, 5, 40, 25);
         }
 		
 		$instance->SetFont('Arial', 'B', 10);

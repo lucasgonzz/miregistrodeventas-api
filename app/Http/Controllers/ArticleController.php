@@ -10,6 +10,7 @@ use App\Http\Controllers\Helpers\ArticleFilterHelper;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
+use App\Http\Controllers\Helpers\NotificationHelper;
 use App\Http\Controllers\Helpers\Pdf\ArticleTicketPdf;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Image;
@@ -115,6 +116,7 @@ class ArticleController extends Controller
         ArticleHelper::setSpecialPrices($article, $request);
         ArticleHelper::setDeposits($article, $request);
         $article = ArticleHelper::getFullArticle($article->id);
+        // NotificationHelper::updatedArticle($article);
         $article->user->notify(new UpdatedArticle($article));
         return response()->json(['model' => $article], 200);
     }

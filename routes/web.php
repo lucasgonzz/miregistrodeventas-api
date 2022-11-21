@@ -48,6 +48,7 @@ Route::get('/clients/set-saldos/{company_name}', 'HelperController@setClientsSal
 Route::get('/budgets/set-articles/{company_name}', 'HelperController@setArticlesFromBudgets');
 Route::get('/order-productions/set-articles/{company_name}', 'HelperController@setArticlesFromOrderProductions');
 Route::get('/articles/set-hosting-images/{company_name}', 'HelperController@setArticlesHostingImages');
+Route::get('/user/set-hosting-image/{company_name}', 'HelperController@setUserHostingImage');
 
 Route::get('a', function() {
 	dd((float)'');

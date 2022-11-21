@@ -70,6 +70,16 @@ class HelperController extends Controller
         }
     }
 
+    function setUserHostingImage($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+        if (is_null($user->hosting_image_url)) {
+            $user->hosting_image_url = ImageHelper::saveHostingImage($user->image_url);
+            $user->save();
+            echo 'Usuario: '.$user->company_name.'. Hosting_image: '.$user->hosting_image_url.' </br>';
+            echo('------------------------------------------------------------------</br>');
+        }
+    }
+
     function setArticlesFromOrderProductions($company_name) {
         $user = User::where('company_name', $company_name)->first();
         $order_productions = OrderProduction::where('user_id', $user->id)->get();

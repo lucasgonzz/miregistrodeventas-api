@@ -359,10 +359,12 @@ class CurrentAcountHelper {
                 $current_acount->save();
             }
         }
-        $app_model_name = GeneralHelper::getModelName($model_name);
-        $model = $app_model_name::find($model_id);
-        $model->saldo = $current_acounts[count($current_acounts)-1]->saldo;
-        $model->save();
+        if (count($current_acounts) >= 1) {
+            $app_model_name = GeneralHelper::getModelName($model_name);
+            $model = $app_model_name::find($model_id);
+            $model->saldo = $current_acounts[count($current_acounts)-1]->saldo;
+            $model->save();
+        }
     }
 
     static function checkSaldoInicial($client_id) {
