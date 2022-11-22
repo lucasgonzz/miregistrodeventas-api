@@ -68,6 +68,7 @@ class HelperController extends Controller
                 }
             }
         }
+        echo('------------------- TERMINO ----------------------');
     }
 
     function setUserHostingImage($company_name) {

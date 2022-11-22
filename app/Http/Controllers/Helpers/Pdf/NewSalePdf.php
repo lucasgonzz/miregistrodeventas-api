@@ -79,7 +79,7 @@ class NewSalePdf extends fpdf {
 			$data = array_merge($data, [
 				'current_acount' 	=> $this->sale->current_acounts[0],
 				'client_id'			=> $this->sale->client_id,
-				'compra_actual'		=> $this->total_sale,
+				'compra_actual'		=> SaleHelper::getTotalSale($this->sale),
 			]);
 		}
 		PdfHelper::header($this, $data);

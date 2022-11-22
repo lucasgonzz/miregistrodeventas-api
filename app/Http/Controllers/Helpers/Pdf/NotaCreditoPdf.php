@@ -19,43 +19,73 @@ class NotaCreditoPdf extends fpdf {
 		$this->total = 0;
 		
 		$this->model = $model;
-		$this->setFields();
 		$this->AddPage();
 		$this->printItems();
         $this->Output();
         exit;
 	}
 
-	function setFields() {
-		$this->fields = [
-			'Codigo' 	=> 40, 
-			'Producto' 	=> 90, 
-			'Precio' 	=> 20, 
+	function getFields() {
+		return [
+			'Codigo' 	=> 40,
+			'Producto' 	=> 90,
+			'Precio' 	=> 20,
 			'Cant' 		=> 20,
 			'Total' 	=> 30,
 		];
 	}
 
+	function getModelProps() {
+		return [
+			[
+				'text' 	=> 'Cliente',
+				'key'	=> 'name',
+			],
+			[
+				'text' 	=> 'Telefono',
+				'key'	=> 'phone',
+			],
+			[
+				'text' 	=> 'Cuit',
+				'key'	=> 'cuit',
+			],
+		];
+	}
+
 	function Header() {
-		PdfHelper::logo($this);
-		PdfHelper::numeroFecha($this, '', $this->model->created_at);
-		PdfHelper::title($this, 'Nota de Credito');
-		PdfHelper::commerceInfo($this);
-		PdfHelper::clientInfo($this, $this->model->client);
-		PdfHelper::tableHeader($this, $this->fields);
-		// PdfHelper::comerciocityInfo($this, 90);
+		$data = [
+			'num' 				=> '',
+			'date'				=> $this->model->created_at,
+			'title' 			=> 'Nota de Credito',
+			'model_info'		=> $this->model->client,
+			'model_props' 		=> $this->getModelProps(),
+			'fields' 			=> $this->getFields(),
+		];
+		PdfHelper::header($this, $data);
 	}
 
 	function printItems() {
 		$this->x = 5;
 		$this->SetFont('Arial', '', 8);
 		foreach ($this->model->articles as $article) {
-			$this->Cell($this->fields['Codigo'], 5, $article->bar_code, $this->b, 0, 'C');
-			$this->Cell($this->fields['Producto'], 5, $article->name, $this->b, 0, 'C');
-			$this->Cell($this->fields['Precio'], 5, '$'.Numbers::price($article->pivot->price), $this->b, 0, 'C');
-			$this->Cell($this->fields['Cant'], 5, $article->pivot->amount, $this->b, 0, 'C');
-			$this->Cell($this->fields['Total'], 5, $this->getTotal($article), $this->b, 0, 'C');
-			$this->y += 5;
+			$this->Cell($this->getFields()['Codigo'], 5, $article->bar_code, $this->b, 0, 'C');
+
+			$y_1 = $this->y;
+		    $this->MultiCell( 
+				$this->getFields()['Producto'], 
+				5, 
+				$article->name, 
+		    	$this->b, 
+		    	'L', 
+		    	false
+		    );
+		    $y_2 = $this->y;
+		    $this->y = $y_1;
+	    	$this->x = 5 + $this->getFields()['Codigo'] + $this->getFields()['Producto'];
+			$this->Cell($this->getFields()['Precio'], 5, '$'.Numbers::price($article->pivot->price), $this->b, 0, 'C');
+			$this->Cell($this->getFields()['Cant'], 5, $article->pivot->amount, $this->b, 0, 'C');
+			$this->Cell($this->getFields()['Total'], 5, $this->getTotal($article), $this->b, 0, 'C');
+			$this->y = $y_2;
 			$this->x = 5;
 			$this->Line(5, $this->y, 205, $this->y);
 		}

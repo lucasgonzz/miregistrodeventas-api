@@ -247,6 +247,7 @@ class AfipWsController extends Controller
         $cuit_negocio = $user->afip_information->cuit;
         // $cuit_cliente = '20242112025';
         $cuit_cliente = $sale->client->cuit;
+        $cuit_cliente = $this->getCuitCliente($sale);
         $cbte_tipo = 1;
         $wsfe = new WSFE(['testing'=> false, 'cuit_representada' => $cuit_negocio]);
         $wsmtxca = new WSMTXCA(['testing'=> false, 'cuit_representada' => $cuit_negocio]);
@@ -324,6 +325,17 @@ class AfipWsController extends Controller
         $result = $wsmtxca->autorizarComprobante($invoice);
         file_put_contents(public_path().'/afip/result.xml', $result);
         dd($result);
+    }
+
+    function getCuitCliente($sale) {
+        $cuit = '';
+        if (!is_null($sale->client->iva_condition)) {
+            if ($client->iva_condition->name == 'Consumidor final') {
+                if (is_null($client->cuit)) {
+                    $cuit = '00000000000';
+                }
+            }
+        }
     }
 
 }

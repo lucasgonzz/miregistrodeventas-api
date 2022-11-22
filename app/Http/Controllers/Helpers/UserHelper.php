@@ -57,6 +57,8 @@ class UserHelper {
         $employee->owner_extencions = $user_owner->extencions;
         $employee->owner_configuration = $user_owner->configuration;
         $employee->owner_addresses = $user_owner->addresses;
+        $employee->from_cloudinary = $user_owner->from_cloudinary;
+        $employee->default_article_image_url = $user_owner->default_article_image_url;
         return $employee;
     }
 

@@ -59,7 +59,7 @@ class BudgetPdf extends fpdf {
 		$data = [
 			'num' 				=> $this->budget->num,
 			'date'				=> $this->budget->created_at,
-			'title' 			=> 'Orden de produccion',
+			'title' 			=> 'Presupuesto',
 			'model_info'		=> $this->budget->client,
 			'model_props' 		=> $this->getModelProps(),
 			'fields' 			=> $this->getFields(),

@@ -42,7 +42,7 @@ class PdfHelper {
         	// $instance->Image('https://images.hola.com/imagenes/bloques/videoloop-portada-tematica/egenia-silva-oscura-2t.jpg', 5, 5, 40, 25);
         }
 		
-		$instance->SetFont('Arial', 'B', 10);
+		$instance->SetFont('Arial', 'B', 9);
 
 		// Razon social
 		$instance->y = 5;

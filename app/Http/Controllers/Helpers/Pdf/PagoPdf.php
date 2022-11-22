@@ -28,13 +28,32 @@ class PagoPdf extends fpdf {
         exit;
 	}
 
+	function getModelProps() {
+		return [
+			[
+				'text' 	=> 'Cliente',
+				'key'	=> 'name',
+			],
+			[
+				'text' 	=> 'Telefono',
+				'key'	=> 'phone',
+			],
+			[
+				'text' 	=> 'Cuit',
+				'key'	=> 'cuit',
+			],
+		];
+	}
 
 	function Header() {
-		PdfHelper::logo($this);
-		PdfHelper::numeroFecha($this, $this->model->num_receipt, $this->model->created_at);
-		PdfHelper::title($this, 'Recibo de Pago');
-		PdfHelper::commerceInfo($this);
-		PdfHelper::comerciocityInfo($this, 90);
+		$data = [
+			'num' 				=> $this->model->num_receipt,
+			'date'				=> $this->model->created_at,
+			'title' 			=> 'Recibo de Pago',
+			'model_info'		=> $this->model->client,
+			'model_props' 		=> $this->getModelProps(),
+		];
+		PdfHelper::header($this, $data);
 	}
 
 	function printPago() {
@@ -58,11 +77,11 @@ class PagoPdf extends fpdf {
 		$this->x = 155;
 		$this->y -= 5;
 		$this->SetFont('Arial', '', 11);
-		$this->Cell(50, 7, 'Son $'.$this->model->haber, 1, 0, 'L');
+		$this->Cell(50, 7, 'Son $'.$this->model->haber, 1, 1, 'L');
 	}
 
 	function Footer() {
-		PdfHelper::comerciocityInfo($this);
+		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
 }

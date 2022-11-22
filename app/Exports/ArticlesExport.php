@@ -77,9 +77,9 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             'Margen de ganancia',
             'Descuentos',
             'Precio',
+            'Moneda',
             'Ingresado',
             'Actualizado',
-            'Moneda',
         ];
         $headings = ExportHelper::setPriceTypesHeadings($headings);
         return $headings;
