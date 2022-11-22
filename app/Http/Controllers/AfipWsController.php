@@ -130,8 +130,10 @@ class AfipWsController extends Controller
         $cuit_negocio = $user->afip_information->cuit;
         if ($sale->client) {
             $cuit_cliente = $sale->client->cuit;
+            $doc_type = AfipHelper::getDocType('Cuit');
         } else {
-            $cuit_cliente = '';
+            $cuit_cliente = "NR";
+            $doc_type = '99';
         }
         $cbte_tipo = $this->getTipoCbte($sale->client);
         $wsfe = new WSFE(['testing'=> $this->testing, 'cuit_representada' => $cuit_negocio, 'for_wsfe' => true]);
@@ -154,7 +156,7 @@ class AfipWsController extends Controller
                 'FeDetReq' => array(
                     'FECAEDetRequest' => array(
                         'Concepto'     => 1,                
-                        'DocTipo'      => AfipHelper::getDocType('Cuit'),           
+                        'DocTipo'      => $doc_type,           
                         'DocNro'       => $cuit_cliente,
                         'CbteDesde'    => $cbte_nro,
                         'CbteHasta'    => $cbte_nro,
@@ -236,106 +238,4 @@ class AfipWsController extends Controller
             return 'C';
         }
     }
-
-    function wsmtxca($sale_id) {
-        // $punto_venta = 4;
-        $user = Auth()->user();
-        $sale = Sale::where('id', $sale_id)->with('articles')->first();
-        $punto_venta = $user->afip_information->punto_venta;
-        // $cuit_negocio = '20423548984';
-        // $cuit_negocio = '20175018841';
-        $cuit_negocio = $user->afip_information->cuit;
-        // $cuit_cliente = '20242112025';
-        $cuit_cliente = $sale->client->cuit;
-        $cuit_cliente = $this->getCuitCliente($sale);
-        $cbte_tipo = 1;
-        $wsfe = new WSFE(['testing'=> false, 'cuit_representada' => $cuit_negocio]);
-        $wsmtxca = new WSMTXCA(['testing'=> false, 'cuit_representada' => $cuit_negocio]);
-        // $wsmtxca = new WSMTXCA(['testing'=> false, 'cuit_representada' => $this->user()->cuit]);
-        $wsmtxca->setXmlTa(file_get_contents(TA_file));
-        $pto_vta = [
-            'consultaUltimoComprobanteAutorizadoRequest' => [
-                'numeroPuntoVenta'    => $punto_venta,
-                'codigoTipoComprobante'  => $cbte_tipo    
-            ]
-        ];
-        $result = $wsmtxca->consultarUltimoComprobanteAutorizado($pto_vta);
-        dd($result);
-        $cbte_nro = $result->numeroComprobante + 1;
-        Log::info('Numero comprobante: '.$cbte_nro);
-        $importes = AfipHelper::getImportes($sale);
-        $invoice = [
-            'comprobanteCAERequest' => [
-                'codigoTipoComprobante'     => 1,                    
-                // 'codigoTipoComprobante'     => AfipHelper::getTipoComprobante($sale),                    
-                'numeroPuntoVenta'          => $punto_venta,              
-                // 'numeroPuntoVenta'          => $this->user()->punto_venta,              
-                'numeroComprobante'         => 1,
-                // 'numeroComprobante'         => $cbte_nro,
-                'fechaEmision'              => date('c'),
-                // 'codigoTipoAutorizacion'    => 'E',
-                'codigoTipoDocumento'       => AfipHelper::getDocType('Cuit'),
-                'numeroDocumento'           => $cuit_cliente,
-                // 'numeroDocumento'           => $sale->client->cuit,
-                'importeGravado'            => $importes['importe_gravado'],
-                'importeNoGravado'          => 0,
-                'importeExento'             => 0,
-                'importeSubtotal'           => $importes['importe_subtotal'],
-                // 'importeOtrosTributos'      => 0,
-                'importeTotal'              => $importes['importe_total'], 
-                'codigoMoneda'              => 'PES',
-                'cotizacionMoneda'          => 1,
-                'observaciones'             => '',
-                'codigoConcepto'            => 1,  #Productos
-                // 'arrayOtrosTributos' => [
-                    // 'otroTributo' => [
-                    //     'codigo' => 99,
-                    //     'descripcion' => 'Otro Tributo',
-                    //     'baseImponible' => 100.00,
-                    //     'importe' => 1.00,
-                    // ],
-                // ],
-                // 'arrayItems' => [
-                //     'item' => [
-                //         'unidadesMtx' => 123456,
-                //         'codigoMtx' => '0123456789913',
-                //         'codigo' => 'P0001',
-                //         'descripcion' => 'Descripción del producto P0001',
-                //         'cantidad' => 1.00,
-                //         'codigoUnidadMedida' => 7,
-                //         'precioUnitario' => 100.00,
-                //         'importeBonificacion' => 0,
-                //         'codigoCondicionIVA' => 5,
-                //         'importeIVA' => 21.00,
-                //         'importeItem' => 121.00,
-                //     ],
-                // ],
-                'arraySubtotalesIVA' => [
-                    'subtotalIVA' => [
-                        'codigo' => 5,
-                        'importe' => $importes['importe_iva'],
-                    ],
-                ],
-            ],
-        ];
-        $invoice['comprobanteCAERequest']['arrayItems'] = $items;
-        // dd($invoice);
-
-        // Se visualiza el resultado con el CAE correspondiente al comprobante.
-        $result = $wsmtxca->autorizarComprobante($invoice);
-        file_put_contents(public_path().'/afip/result.xml', $result);
-        dd($result);
-    }
-
-    function getCuitCliente($sale) {
-        $cuit = '';
-        if (!is_null($sale->client->iva_condition)) {
-            if ($client->iva_condition->name == 'Consumidor final') {
-                if (is_null($client->cuit)) {
-                    $cuit = '00000000000';
-                }
-            }
-        }
-    }
-
 }

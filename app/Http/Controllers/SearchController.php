@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\GeneralHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
-    function search(Request $request, $model_name) {
-        $model_name = GeneralHelper::getModelName($model_name);
+    function search(Request $request, $model_name_param) {
+        $model_name = GeneralHelper::getModelName($model_name_param);
         $models = $model_name::where('user_id', $this->userId());
         foreach ($request->filters as $filter) {
             if ($filter['type'] == 'number') {
@@ -35,6 +36,9 @@ class SearchController extends Controller
         }
         $models = $models->withAll()
                         ->get();
+        if ($model_name_param == 'article') {
+            $models = ArticleHelper::setPrices($models);
+        }
         return response()->json(['models' => $models], 200);
     }
 }

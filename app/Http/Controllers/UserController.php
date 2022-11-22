@@ -79,7 +79,6 @@ class UserController extends Controller
         $user->online_prices        = $request->online_prices;
         $user->dollar               = $request->dollar;
         $user->order_description    = $request->order_description;
-        $user->show_articles_without_stock    = $request->show_articles_without_stock;
         $user->save();
 
         $configuration = UserConfiguration::where('user_id', $this->userId())

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\CreditCard;
+use App\CreditCardPaymentPlan;
 use App\Http\Controllers\Helpers\CreditCardHelper;
 use Illuminate\Http\Request;
 
@@ -30,5 +31,16 @@ class CreditCardController extends Controller
         $model->save();
         CreditCardHelper::attachCreditCardPaymentPlans($model, $request->credit_card_payment_plans);
         return response()->json(['model' => $this->fullModel('App\CreditCard', $model->id)], 201);
+    }
+
+    function destroy($id) {
+        $model = CreditCard::find($id);
+        $payment_plans = CreditCardPaymentPlan::where('credit_card_id', $model->id)
+                                            ->get();
+        foreach ($payment_plans as $payment_plan) {
+            $payment_plan->delete();
+        }
+        $model->delete();
+        return response(null, 200);
     }
 }
