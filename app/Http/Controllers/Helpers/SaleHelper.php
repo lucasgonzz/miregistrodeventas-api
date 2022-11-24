@@ -6,6 +6,7 @@ use App\Article;
 use App\Client;
 use App\Commissioner;
 use App\Discount;
+use App\Http\Controllers\AfipWsController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\CommissionController;
 use App\Http\Controllers\Controller;
@@ -54,6 +55,17 @@ class SaleHelper extends Controller {
         return null;
     }
 
+    static function saveAfipTicket($sale, $save_afip_ticket) {
+        if ($save_afip_ticket) {
+            Log::info('guardando afip ticket');
+            $ct = new AfipWsController();
+            $ct->init($sale->id);
+        } else {
+            Log::info('No se guardo, vino esto');
+            Log::info($save_afip_ticket);
+        }
+    }
+
     static function getPercentageCard($request) {
         return (bool)$request->with_card ? Auth()->user()->percentage_card : null;
     }
@@ -83,6 +95,7 @@ class SaleHelper extends Controller {
     static function checkNotaCredito($sale, $request) {
         if ($request->save_nota_credito) {
             $haber = 0;
+            $total_article = 0;
             $articles = [];
             foreach ($request->items as $item) {
                 if (isset($item['is_article']) && $item['returned_amount'] > 0) {
@@ -90,7 +103,11 @@ class SaleHelper extends Controller {
                     $articles[] = $item;
                 }
             }
-            Log::info('Entro en nota_credito');
+            if (count($sale->discounts) >= 1) {
+                foreach ($sale->discounts as $discount) {
+                    $haber -= (float)$discount->pivot->percentage * $haber / 100;
+                }
+            }
             CurrentAcountHelper::notaCredito($haber, $request->nota_credito_description, 'client', $request->client_id, $sale->id, $articles);
             CurrentAcountHelper::checkSaldos('client', $request->client_id);
         }

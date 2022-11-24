@@ -14,8 +14,8 @@ class ImageController extends Controller
     	$image = Image::find($id);
         $this->deleteVariant($image);
     	$image->delete();
-        $article = ArticleHelper::getFullArticle($image->article_id);
-    	return response()->json(['article' => $article], 200);
+        $model = ArticleHelper::getFullArticle($image->article_id);
+    	return response()->json(['model' => $model], 200);
     }
 
     function setColor(Request $request) {

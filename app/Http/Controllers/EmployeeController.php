@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Helpers\UserHelper;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class EmployeeController extends Controller
                 'dni'               => $request->dni,
         		'company_name'      => $user->company_name,
         		'password'          => Hash::make($request->password),
-                'owner_id'          => $user->id,
+                'owner_id'          => UserHelper::userId(),
                 'percentage_card'   => $user->percentage_card,
                 'type'              => $user->type,
         		'status'            => 'commerce',

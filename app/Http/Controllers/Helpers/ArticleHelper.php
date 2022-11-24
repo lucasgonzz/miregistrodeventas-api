@@ -66,6 +66,15 @@ class ArticleHelper {
                     $article->price = Numbers::redondear($article->price - ($article->price * Numbers::percentage($discount->percentage)));
                 }
             }
+            $cost = substr($article->cost, 0, strpos($article->cost, '.'));
+            $decimals = substr($article->cost, strpos($article->cost, '.')+1);
+            // Log::info('cost: '.$cost);
+            // Log::info('decimals: '.$decimals);
+            if (substr($decimals, 2) == '0000') {
+                $decimals = substr($decimals, 0, 2);
+            }
+            $article->cost = floatval($cost.'.'.$decimals);
+            // Log::info('nuevo cost: '.$article->cost);
         }
         return $articles;
     }

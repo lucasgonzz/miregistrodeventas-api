@@ -215,6 +215,7 @@ class SaleController extends Controller
 
         SaleHelper::attachDiscounts($sale, $request->discounts_id);
         SaleHelper::attachCurrentAcountsAndCommissions($sale, $request->client_id, $request->discounts_id);
+        SaleHelper::saveAfipTicket($sale, $request->save_afip_ticket);
         $sale = Sale::where('id', $sale->id)
                     ->withAll()
                     ->first();

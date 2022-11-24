@@ -35,7 +35,7 @@ class AfipWsController extends Controller
         }
     }
 
-    function init(Request $request, $sale_id) {
+    function init($sale_id) {
         $this->define();
         $service = 'wsfe';
         $this->checkWsaa($service);
@@ -188,7 +188,7 @@ class AfipWsController extends Controller
         }
         // Se visualiza el resultado con el CAE correspondiente al comprobante.
         $result = $wsfe->FECAESolicitar($invoice);
-        print_r($result);
+        // print_r($result);
         $this->saveAfipTicket($result, $sale, $cbte_nro, $importes['total'], $moneda_id);
         $sale = SaleHelper::getFullModel($sale->id);
         return $sale;

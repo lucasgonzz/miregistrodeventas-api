@@ -20,8 +20,8 @@ class CreateArticlesTable extends Migration
             $table->string('provider_code', 128)->nullable();
             $table->text('name')->nullable();
             $table->string('slug')->nullable();
-            $table->decimal('cost', 12, 2)->nullable();
-            $table->decimal('price', 12, 2)->nullable();
+            $table->decimal('cost', 16, 6)->nullable();
+            $table->decimal('price', 16, 6)->nullable();
             $table->decimal('percentage_gain', 8, 2)->nullable();
             $table->decimal('previus_price', 12, 2)->nullable();
             $table->integer('stock')->nullable();

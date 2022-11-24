@@ -34,12 +34,15 @@ class PdfHelper {
         // Logo
         $user = UserHelper::getFullModel();
         if (!is_null($user->hosting_image_url)) {
-        	$image = $user->image_url;
-        	if (!$user->from_cloudinary) {
-        		$image = $user->hosting_image_url;
+        	if (env('APP_ENV') == 'local') {
+        		$instance->Image('https://images.hola.com/imagenes/bloques/videoloop-portada-tematica/egenia-silva-oscura-2t.jpg', 5, 5, 40, 25);
+        	} else {
+	        	$image = $user->image_url;
+	        	if (!$user->from_cloudinary) {
+	        		$image = $user->hosting_image_url;
+	        	}
+	        	$instance->Image($image, 5, 5, 40, 25);
         	}
-        	$instance->Image($image, 5, 5, 40, 25);
-        	// $instance->Image('https://images.hola.com/imagenes/bloques/videoloop-portada-tematica/egenia-silva-oscura-2t.jpg', 5, 5, 40, 25);
         }
 		
 		$instance->SetFont('Arial', 'B', 9);
@@ -161,17 +164,19 @@ class PdfHelper {
 	}
 
 	static function modelInfo($instance, $model, $props) {
-	    $instance->x = 5;
-	    $start_y = $instance->y;
-	    $instance->SetFont('Arial', '', 10);
-	    foreach ($props as $prop) {
-	    	$instance->x = 5;
-			$instance->Cell(100, 5, $prop['text'].': '.Self::getPropValue($model, $prop), $instance->b, 1, 'L');
-	    }
-	    $instance->Line(5, $start_y, 105, $start_y);
-	    $instance->Line(105, $start_y, 105, $instance->y);
-	    $instance->Line(105, $instance->y, 5, $instance->y);
-	    $instance->Line(5, $instance->y, 5, $start_y);
+		if (!is_null($model)) {
+		    $instance->x = 5;
+		    $start_y = $instance->y;
+		    $instance->SetFont('Arial', '', 10);
+		    foreach ($props as $prop) {
+		    	$instance->x = 5;
+				$instance->Cell(100, 5, $prop['text'].': '.Self::getPropValue($model, $prop), $instance->b, 1, 'L');
+		    }
+		    $instance->Line(5, $start_y, 105, $start_y);
+		    $instance->Line(105, $start_y, 105, $instance->y);
+		    $instance->Line(105, $instance->y, 5, $instance->y);
+		    $instance->Line(5, $instance->y, 5, $start_y);
+		}
 	}
 
 	static function getPropValue($model, $prop) {
