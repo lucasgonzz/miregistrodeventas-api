@@ -45,8 +45,13 @@ class ProviderOrderHelper {
 			if (is_null($article->stock)) {
 				$article->stock = 0;
 			}
-			if ($_article['pivot']['cost'] != '') {
+			if ($_article['pivot']['received_cost'] != '') {
+				$article->cost = $_article['pivot']['received_cost'];
+			} else if ($_article['pivot']['cost'] != '') {
 				$article->cost = $_article['pivot']['cost'];
+			}
+			if (!is_null($_article['pivot']['iva_id']) && $_article['pivot']['iva_id'] != 0) {
+				$article->iva_id = $_article['pivot']['iva_id'];
 			}
 			if (isset($last_received[$article->id])) {
 				$article->stock -= $last_received[$article->id];
@@ -83,10 +88,12 @@ class ProviderOrderHelper {
 				$art->save();
 			} 
 			$provider_order->articles()->attach($article['id'], [
-											'amount' 	=> $article['pivot']['amount'],
-											'notes' 	=> $article['pivot']['notes'],
-											'received' 	=> $article['pivot']['received'],
-											'cost' 		=> $article['pivot']['cost'],
+											'amount' 		=> $article['pivot']['amount'],
+											'notes' 		=> $article['pivot']['notes'],
+											'received' 		=> $article['pivot']['received'],
+											'cost' 			=> $article['pivot']['cost'],
+											'received_cost' => $article['pivot']['received_cost'],
+											'iva_id'    	=> $article['pivot']['iva_id'],
 										]);
 			Self::updateArticleStock($article, $last_received, $provider_order);
 		}
@@ -95,17 +102,20 @@ class ProviderOrderHelper {
 
 	static function attachAfipTickets($afip_tickets, $model) {
 		foreach ($afip_tickets as $afip_ticket) {
-			if (!isset($afip_ticket['id'])) {
+			$_afip_ticket = null;
+			if (!isset($afip_ticket['id']) && ($afip_ticket['code'] != '' || $afip_ticket['issued_at'] != '' || $afip_ticket['total'] != '')) {
 				$_afip_ticket = ProviderOrderAfipTicket::create([
 					'provider_order_id' => $model->id,
 				]);
-			} else {
+			} else if (isset($afip_ticket['id'])) {
 				$_afip_ticket = ProviderOrderAfipTicket::find($afip_ticket['id']);
 			}
-			$_afip_ticket->issued_at 	= $afip_ticket['issued_at'];
-			$_afip_ticket->code 		= $afip_ticket['code'];
-			$_afip_ticket->total 		= $afip_ticket['total'];
-			$_afip_ticket->save();
+			if (!is_null($_afip_ticket)) {
+				$_afip_ticket->issued_at 	= $afip_ticket['issued_at'];
+				$_afip_ticket->code 		= $afip_ticket['code'];
+				$_afip_ticket->total 		= $afip_ticket['total'];
+				$_afip_ticket->save();
+			}
 		}
 	}
 

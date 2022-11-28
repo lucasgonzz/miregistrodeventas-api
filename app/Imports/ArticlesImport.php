@@ -19,14 +19,11 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 class ArticlesImport implements ToCollection
 {
     
-    public function __construct($props, $percentage_for_prices, $provider_id) {
+    public function __construct($props, $start_row, $finish_row, $provider_id) {
         $this->columns = $props;
+        $this->start_row = $start_row;
+        $this->finish_row = $finish_row;
         $this->ct = new Controller();
-        if ($percentage_for_prices != '') {
-            $this->percentage_for_prices = $percentage_for_prices;
-        } else {
-            $this->percentage_for_prices = null;
-        }
         $this->provider_id = $provider_id;
         $this->provider = null;
         $this->initProvider();
@@ -39,53 +36,47 @@ class ArticlesImport implements ToCollection
     }
 
     function checkRow($row) {
-        Log::info($row);
-        if (!is_null(ImportHelper::getColumnValue($row, 'nombre', $this->columns))) {
-            Log::info('Tiene algo en el nombre');
-            if ($this->isFirstRow($row)) {
-                Log::info('Es la columna del titulo');
-                return false;
-            } else {
-                Log::info('NO es la columna del titulo');
-                return true;
-            }
-        } else {
-            Log::info('El nombre esta vacio');
-            return false;
-        }
+        return !is_null(ImportHelper::getColumnValue($row, 'nombre', $this->columns));
     }
 
     public function collection(Collection $rows) {
+        $num_row = 1;
+        if (is_null($this->finish_row) || $this->finish_row == '') {
+            $this->finish_row = count($rows);
+        } 
         foreach ($rows as $row) {
-            if ($this->checkRow($row)) {
-                if (!is_null(ImportHelper::getColumnValue($row, 'codigo', $this->columns))) {
-                    $article = Article::where('user_id', UserHelper::userId())
-                                        ->where('num', ImportHelper::getColumnValue($row, 'codigo', $this->columns))
-                                        ->where('status', 'active')
-                                        ->first();
-                    $this->saveArticle($row, $article);
-                } else if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))) {
-                    $article = Article::where('user_id', UserHelper::userId())
-                                        ->where('bar_code', ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))
-                                        ->where('status', 'active')
-                                        ->first();
-                    $this->saveArticle($row, $article);
-                } else if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))) {
-                    $article = Article::where('user_id', UserHelper::userId())
-                                        ->where('provider_code', ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))
-                                        ->where('status', 'active')
-                                        ->first();
-                    $this->saveArticle($row, $article);
-                } else {
-                    $article = Article::where('user_id', UserHelper::userId())
-                                        ->whereNull('bar_code')
-                                        ->whereNull('provider_code')
-                                        ->where('name', ImportHelper::getColumnValue($row, 'nombre', $this->columns))
-                                        ->where('status', 'active')
-                                        ->first();
-                    $this->saveArticle($row, $article);
-                }
-            } 
+            if ($num_row >= $this->start_row && $num_row <= $this->finish_row) {
+                if ($this->checkRow($row)) {
+                    if (!is_null(ImportHelper::getColumnValue($row, 'codigo', $this->columns))) {
+                        $article = Article::where('user_id', UserHelper::userId())
+                                            ->where('num', ImportHelper::getColumnValue($row, 'codigo', $this->columns))
+                                            ->where('status', 'active')
+                                            ->first();
+                        $this->saveArticle($row, $article);
+                    } else if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))) {
+                        $article = Article::where('user_id', UserHelper::userId())
+                                            ->where('bar_code', ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))
+                                            ->where('status', 'active')
+                                            ->first();
+                        $this->saveArticle($row, $article);
+                    } else if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))) {
+                        $article = Article::where('user_id', UserHelper::userId())
+                                            ->where('provider_code', ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))
+                                            ->where('status', 'active')
+                                            ->first();
+                        $this->saveArticle($row, $article);
+                    } else {
+                        $article = Article::where('user_id', UserHelper::userId())
+                                            ->whereNull('bar_code')
+                                            ->whereNull('provider_code')
+                                            ->where('name', ImportHelper::getColumnValue($row, 'nombre', $this->columns))
+                                            ->where('status', 'active')
+                                            ->first();
+                        $this->saveArticle($row, $article);
+                    }
+                } 
+            }
+            $num_row++;
         }
     }
 
@@ -108,7 +99,7 @@ class ArticlesImport implements ToCollection
         if (!is_null($article)) {
             $data['slug'] = ArticleHelper::slug(ImportHelper::getColumnValue($row, 'nombre', $this->columns), $article->id);
             $article->update($data);
-            Log::info('se actualizo '.$article->name);
+            Log::info('se actualizo '.$article->name.' con costo de '.$article->cost);
         } else {
             if (!is_null(ImportHelper::getColumnValue($row, 'codigo', $this->columns))) {
                 $data['num'] = ImportHelper::getColumnValue($row, 'codigo', $this->columns);
@@ -158,21 +149,6 @@ class ArticlesImport implements ToCollection
                                             'cost'   => ImportHelper::getColumnValue($row, 'costo', $this->columns),
                                             'price'  => ImportHelper::getColumnValue($row, 'precio', $this->columns),
                                         ]);
-        }
-        // if ($this->provider_id != 0) {
-        //     $article->providers()->attach($this->provider_id, [
-        //                                     'amount' => ImportHelper::getColumnValue($row, 'stock_actual', $this->columns),
-        //                                     'cost' => ImportHelper::getColumnValue($row, 'costo', $this->columns),
-        //                                     'price' => ImportHelper::getColumnValue($row, 'price', $this->columns),
-        //                                 ]);
-        // }
-    }
-
-    function getPrice($row) {
-        if (!is_null($this->percentage_for_prices)) {
-            return ImportHelper::getColumnValue($row, 'costo', $this->columns) + (ImportHelper::getColumnValue($row, 'costo', $this->columns) * $this->percentage_for_prices / 100);
-        } else {
-            return ImportHelper::getColumnValue($row, 'precio', $this->columns);
         }
     }
 }

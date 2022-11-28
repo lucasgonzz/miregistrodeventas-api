@@ -35,7 +35,7 @@ class PdfHelper {
         $user = UserHelper::getFullModel();
         if (!is_null($user->hosting_image_url)) {
         	if (env('APP_ENV') == 'local') {
-        		$instance->Image('https://images.hola.com/imagenes/bloques/videoloop-portada-tematica/egenia-silva-oscura-2t.jpg', 5, 5, 40, 25);
+        		$instance->Image('https://img.freepik.com/vector-gratis/fondo-plantilla-logo_1390-55.jpg', 5, 5, 40, 25);
         	} else {
 	        	$image = $user->image_url;
 	        	if (!$user->from_cloudinary) {
@@ -102,7 +102,12 @@ class PdfHelper {
 		$instance->x = 120;
 		// Numero
 		$instance->Cell(40, 10, 'N° '.$num, $instance->b, 0, 'L');
-		$instance->Cell(40, 10, date_format($date, 'd/m/Y'), $instance->b, 1, 'R');
+		$instance->Cell(45, 10, date_format($date, 'd/m/Y'), $instance->b, 1, 'R');
+		
+		// Num pag
+		$instance->SetFont('Arial', '', 10);
+		$instance->x = 120;
+		$instance->Cell(85, 5, 'Pag '.$instance->PageNo(), $instance->b, 0, 'R');
 	}
 
 	static function title($instance, $title) {
@@ -207,12 +212,13 @@ class PdfHelper {
 	static function tableHeader($instance, $fields) {
 		$instance->SetFont('Arial', 'B', 12);
 		$instance->x = 5;
-		$instance->y += 5;
+		$instance->y += 2;
 		$instance->SetLineWidth(.4);
 		foreach ($fields as $text => $width) {
-			$instance->Cell($width, 10, $text, 'BT', 0, 'C');
+			$instance->Cell($width, 7, $text, 1, 0, 'C');
 		}
-		$instance->y += 10;
+		$instance->y += 7;
+		$instance->x = 5;
 	}
 
 	static function clientInfo($instance, $client) {

@@ -401,9 +401,7 @@ class ArticleController extends Controller
 
     function import(Request $request) {
         $columns = GeneralHelper::getImportColumns($request);
-        Log::info('columns:');
-        Log::info($columns);
-        Excel::import(new ArticlesImport($columns, $request->percentage, $request->provider_id), $request->file('models'));
+        Excel::import(new ArticlesImport($columns, $request->start_row, $request->finish_row, $request->provider_id), $request->file('models'));
     }
 
     function pdf($ids) {

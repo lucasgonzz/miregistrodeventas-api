@@ -14,8 +14,9 @@ use Maatwebsite\Excel\Concerns\ToCollection;
 class ProviderOrderImport implements ToCollection
 {
     
-    public function __construct($columns, $provider_order) {
+    public function __construct($columns, $first_row, $provider_order) {
         $this->columns = $columns;
+        $this->first_row = $first_row;
         $this->provider_order = $provider_order;
         $this->provider_order->articles()->detach();
         $this->ct = new Controller();
@@ -23,30 +24,34 @@ class ProviderOrderImport implements ToCollection
 
     public function collection(Collection $rows) {
         $articles = [];
+        $index = 1;
         foreach ($rows as $row) {
-            if ($this->checkRow($row)) {
-                if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))) {
-                    $article = Article::where('user_id', UserHelper::userId())
-                                        ->where('bar_code', ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))
-                                        ->where('status', 'active')
-                                        ->first();
-                    $articles[] = $this->saveArticle($row, $article);
-                } else if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))) {
-                    $article = Article::where('user_id', UserHelper::userId())
-                                        ->where('provider_code', ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))
-                                        ->where('status', 'active')
-                                        ->first();
-                    $articles[] = $this->saveArticle($row, $article);
-                } else {
-                    $article = Article::where('user_id', UserHelper::userId())
-                                        ->whereNull('bar_code')
-                                        ->whereNull('provider_code')
-                                        ->where('name', ImportHelper::getColumnValue($row, 'nombre', $this->columns))
-                                        ->where('status', 'active')
-                                        ->first();
-                    $articles[] = $this->saveArticle($row, $article);
+            if ($index >= $this->first_row) {
+                if ($this->checkRow($row)) {
+                    if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))) {
+                        $article = Article::where('user_id', UserHelper::userId())
+                                            ->where('bar_code', ImportHelper::getColumnValue($row, 'codigo_de_barras', $this->columns))
+                                            ->where('status', 'active')
+                                            ->first();
+                        $articles[] = $this->saveArticle($row, $article);
+                    } else if (!is_null(ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))) {
+                        $article = Article::where('user_id', UserHelper::userId())
+                                            ->where('provider_code', ImportHelper::getColumnValue($row, 'codigo_de_proveedor', $this->columns))
+                                            ->where('status', 'active')
+                                            ->first();
+                        $articles[] = $this->saveArticle($row, $article);
+                    } else {
+                        $article = Article::where('user_id', UserHelper::userId())
+                                            // ->whereNull('bar_code')
+                                            // ->whereNull('provider_code')
+                                            ->where('name', ImportHelper::getColumnValue($row, 'nombre', $this->columns))
+                                            ->where('status', 'active')
+                                            ->first();
+                        $articles[] = $this->saveArticle($row, $article);
+                    }
                 }
             }
+            $index++;
         }
         ProviderOrderHelper::attachArticles($articles, $this->provider_order);
     }
@@ -74,10 +79,12 @@ class ProviderOrderImport implements ToCollection
             'bar_code'      => $article->bar_code,
             'provider_code' => $article->provider_code,
             'pivot'         => [
-                'amount'        => ImportHelper::getColumnValue($row, 'cantidad', $this->columns),
-                'notes'         => ImportHelper::getColumnValue($row, 'notas', $this->columns),
-                'received'      => $recibidas,
-                'cost'          => ImportHelper::getColumnValue($row, 'costo', $this->columns),
+                'amount'            => ImportHelper::getColumnValue($row, 'cantidad', $this->columns),
+                'notes'             => ImportHelper::getColumnValue($row, 'notas', $this->columns),
+                'received'          => $recibidas,
+                'cost'              => ImportHelper::getColumnValue($row, 'costo', $this->columns),
+                'received_cost'     => ImportHelper::getColumnValue($row, 'costo_recibido', $this->columns),
+                'iva_id'            => ImportHelper::getIvaId(ImportHelper::getColumnValue($row, 'iva', $this->columns), $article),
             ],
         ];
         return $saved_article;

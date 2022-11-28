@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         // $this->call(CollectionsSeeder::class);
         // $this->call(ImageSeeder::class);
         $this->call(DiscountSeeder::class);
+        $this->call(SurchageSeeder::class);
         $this->call(CommissionerSeeder::class);
         $this->call(SaleTypeSeeder::class);
         $this->call(CurrentAcountSeeder::class);

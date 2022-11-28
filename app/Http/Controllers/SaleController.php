@@ -92,7 +92,7 @@ class SaleController extends Controller
         $sale = Sale::find($id);
         $sale->save_current_acount = 1;
         $sale->save();
-        SaleHelper::attachCurrentAcountsAndCommissions($sale, $sale->client_id, $sale->discounts_id);
+        SaleHelper::attachCurrentAcountsAndCommissions($sale, $sale->client_id, $sale->discounts_id, $sale->surchages_id);
         CurrentAcountHelper::checkSaldos($sale->client_id);
         $sale = Sale::where('id', $id)
                         ->withAll()
@@ -161,6 +161,7 @@ class SaleController extends Controller
         SaleHelper::attachCombos($sale, $request->items);
         SaleHelper::attachServices($sale, $request->items);
         SaleHelper::attachDiscounts($sale, $request->discounts_id);
+        SaleHelper::attachSurchages($sale, $request->surchages_id);
         SaleHelper::checkNotaCredito($sale, $request);
         $with_card = (bool)$request->with_card;
         if ($with_card) {
@@ -214,7 +215,8 @@ class SaleController extends Controller
         SaleHelper::attachServices($sale, $request->items);
 
         SaleHelper::attachDiscounts($sale, $request->discounts_id);
-        SaleHelper::attachCurrentAcountsAndCommissions($sale, $request->client_id, $request->discounts_id);
+        SaleHelper::attachSurchages($sale, $request->surchages_id);
+        SaleHelper::attachCurrentAcountsAndCommissions($sale, $request->client_id, $request->discounts_id, $request->surchages_id);
         SaleHelper::saveAfipTicket($sale, $request->save_afip_ticket);
         $sale = Sale::where('id', $sale->id)
                     ->withAll()
@@ -234,9 +236,9 @@ class SaleController extends Controller
         $pdf->printSales();
     }
 
-    function newPdf($id) {
+    function newPdf($id, $with_prices) {
         $sale = Sale::find($id);
-        $pdf = new NewSalePdf($sale);
+        $pdf = new NewSalePdf($sale, $with_prices);
     }
 
     function deliveredArticlesPdf($id) {

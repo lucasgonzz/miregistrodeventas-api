@@ -264,6 +264,9 @@ Route::middleware('auth:sanctum')->group(function () {
 		'ProviderOrderController@destroy'
 	);
 
+	// ProviderOrderAfipTickets
+	Route::delete('provider-order-afip-ticket/{id}', 'ProviderOrderAfipTicketController@destroy');
+
 	// ProviderOrderStatuses
 	Route::get('/provider-order-status', 
 		'ProviderOrderStatusController@index'
@@ -324,15 +327,13 @@ Route::middleware('auth:sanctum')->group(function () {
 		// Deposits
 		Route::resource('deposit', 'DepositController');
 
-		// Provedores de comercios
+		// Provedores 
 		Route::resource('provider', 'ProviderController');
 		Route::post('/provider/excel/import', 
 			'ProviderController@import'
 		);
-		// Icons
-		Route::get('/icons', 
-			'IconController@index'
-		);
+		// Provider-prices-list
+		Route::delete('provider-price-list/{id}', 'ProviderPriceListController@destroy');
 		// Categorias
 		Route::get('/categories', 
 			'CategoryController@index'
@@ -558,6 +559,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	// Descuentos
 	Route::resource('/discount', 'DiscountController');
 
+	// Recargos
+	Route::resource('/surchage', 'SurchageController');
+
 	// Vendedores
 	Route::get('/seller', 
 		'SellerController@index'
@@ -683,15 +687,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// ONLINE
 	// Cupons
-	Route::get('cupons', 
-		'CuponController@index',
-	);
-	Route::post('cupons', 
-		'CuponController@store',
-	);
-	Route::delete('cupons/{id}', 
-		'CuponController@delete',
-	);
+	Route::resource('cupon', 'CuponController',);
 	// Questions
 	Route::get('/questions', 
 		'QuestionController@index'
@@ -703,13 +699,13 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::resource('/buyer', 'BuyerController');
 	
 	// Messages
-	Route::get('/messages/{buyer_id}', 
+	Route::get('/message/{buyer_id}', 
 		'MessageController@fromBuyer'
 	);
-	Route::get('/messages/set-read/{buyer_id}', 
+	Route::get('/message/set-read/{buyer_id}', 
 		'MessageController@setRead'
 	);
-	Route::post('/messages', 
+	Route::post('/message', 
 		'MessageController@store'
 	);
 	// Calls

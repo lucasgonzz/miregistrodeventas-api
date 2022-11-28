@@ -49,6 +49,8 @@ Route::get('/budgets/set-articles/{company_name}', 'HelperController@setArticles
 Route::get('/order-productions/set-articles/{company_name}', 'HelperController@setArticlesFromOrderProductions');
 Route::get('/articles/set-hosting-images/{company_name}', 'HelperController@setArticlesHostingImages');
 Route::get('/user/set-hosting-image/{company_name}', 'HelperController@setUserHostingImage');
+Route::get('/titles/set-hosting-image/{company_name}', 'HelperController@setTitlesHostingImages');
+Route::get('/orders/set-status/{company_name}', 'HelperController@setOrdersStatus');
 
 Route::get('a', function() {
 	dd((float)'');
@@ -132,7 +134,7 @@ Route::get('/sales/pdf/{sales_id}/{for_commerce}/{afip_ticket?}', 'SaleControlle
 Route::get('/sales/afip-ticket/pdf/{sale_id}', 'SaleController@pdfAfipTicket');
 
 
-Route::get('/sale/new-pdf/{id}', 'SaleController@newPdf');
+Route::get('/sale/new-pdf/{id}/{with_prices}', 'SaleController@newPdf');
 Route::get('/sale/pdf/delivered-articles/{id}', 'SaleController@deliveredArticlesPdf');
 
 Route::get('/sales/tickets/pdf/{sale_id}/{address_id?}', 'SaleController@ticketPdf');

@@ -17,7 +17,7 @@ class Buyer extends Model
     public function scopeWithAll($query){
         $query->with('addresses', 'comercio_city_client')
                ->with(['messages' => function($q) {
-                    $q->orderBy('id', 'DESC')
+                    $q->orderBy('id', 'ASC')
                     ->with('article.images');
                 }]);
     }

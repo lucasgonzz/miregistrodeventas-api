@@ -36,7 +36,7 @@ class ArticleHelper {
             if (is_null($article->price) || $article->price == '') {
 
                 if ($article->apply_provider_percentage_gain) {
-                    if (!is_null($article->provider_price_list_id)) {
+                    if (!is_null($article->provider_price_list_id) && !is_null($article->provider_price_list)) {
                         $price = Numbers::redondear($cost + ($cost * Numbers::percentage($article->provider_price_list->percentage)));
                     } else if (!is_null($last_provider_percentage_gain)) {
                         $price = Numbers::redondear($cost + ($cost * Numbers::percentage($last_provider_percentage_gain)));

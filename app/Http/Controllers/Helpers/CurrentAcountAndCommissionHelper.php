@@ -22,10 +22,11 @@ use App\SaleType;
 
 class CurrentAcountAndCommissionHelper extends Controller {
 
-    function __construct($sale, $discounts, $only_commissions, $index = null) {
+    function __construct($sale, $discounts, $surchages, $only_commissions, $index = null) {
         $this->user = UserHelper::getFullModel();
         $this->sale = $sale;
-        $this->setDiscounts($discounts);
+        $this->discounts = $discounts;
+        $this->surchages = $surchages;
         $this->client = $sale->client;
         $this->only_commissions = $only_commissions;
         if ($index) {
@@ -35,14 +36,6 @@ class CurrentAcountAndCommissionHelper extends Controller {
         }
     }
 
-    function setDiscounts($discounts) {
-        $this->discounts = [];
-        foreach ($discounts as $discount) {
-            $this->discounts[] = Discount::find($discount['id']);
-        }
-    }
-
-    // function detachCommissionersAndCurrentAcounts() {
     function detachCommissioners() {
         foreach ($this->sale->commissions as $commission) {
             $commission->delete();
@@ -92,9 +85,9 @@ class CurrentAcountAndCommissionHelper extends Controller {
     function proccessCurrentAcount() {
         $this->pagina++;
         $this->debe_sin_descuentos = $this->debe;
-        if ($this->hasSaleDiscounts()) {
-            $this->debe = SaleHelper::getTotalMenosDescuentos($this->sale, $this->debe);
-        }
+        // if ($this->hasSaleDiscounts()) {
+            $this->debe = SaleHelper::getTotalWithDiscountsAndSurchages($this->sale, $this->debe);
+        // }
         $this->createCurrentAcount();
         if ($this->isProvider()) {
             if ($this->isSaleFromSeller()) {

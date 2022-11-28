@@ -73,91 +73,10 @@ class OrderProductionPdf extends fpdf {
 
 
 	function Footer() {
-		$y = 230;
 		$this->SetLineWidth(.4);
-		// $this->Line(5, $y, 205, $y);
-		$this->y = $y;
 		$this->observations();
-		$this->y = $y;
 		$this->total();
-		$this->comerciocityInfo();
-	}
-
-	function logo() {
-        // Logo
-        if (!is_null($this->user->image_url)) {
-        	$this->Image(ImageHelper::image($this->user), 5, 5, 0, 27);
-        }
-		
-        // Company name
-		$this->SetFont('Arial', 'B', 10);
-		$this->x = 5;
-		$this->y = 30;
-		$this->Cell(100, 5, $this->user->company_name, $this->b, 0, 'C');
-
-		// Info
-		$this->SetFont('Arial', '', 10);
-		$address = null;
-		if (count($this->user->addresses) >= 1) {
-			$address = $this->user->addresses[0];
-		}
-		$info = $this->user->afip_information->razon_social;
-		$info .= ' / '. $this->user->afip_information->iva_condition->name;
-		if (!is_null($address)) {
-			$info .= ' / '. $address->street.' N° '.$address->street_number;
-			$info .= ' / '. $address->city.' / '.$address->province;
-		}
-		$info .= ' / '. $this->user->phone;
-		$info .= ' / '. $this->user->email;
-		$info .= ' / '. $this->user->online;
-		$this->x = 5;
-		$this->y += 5;
-	    $this->MultiCell(100, 5, $info, $this->b, 'L', false);
-	    // $this->lineInfo();
-	}
-
-	function lineInfo() {
-		// Left
-		$this->Line(5, 37, 5, 52);
-		// Right
-		$this->Line(102, 37, 102, 52);
-		// Top
-		$this->Line(5, 37, 102, 37);
-		// bottom
-		$this->Line(5, 52, 102, 52);
-	}
-
-	function lineClient() {
-		// Left
-		$this->Line(5, 55, 5, 75);
-		// Right
-		$this->Line(102, 55, 102, 75);
-		// Top
-		$this->Line(5, 55, 102, 55);
-		// bottom
-		$this->Line(5, 75, 102, 75);
-	}
-
-	function lineCommerce() {
-		// Left
-		$this->Line(105, 37, 105, 52);
-		// Right
-		$this->Line(205, 37, 205, 52);
-		// Top
-		$this->Line(105, 37, 205, 37);
-		// bottom
-		$this->Line(105, 52, 205, 52);
-	}
-
-	function lineDates() {
-		// Left
-		$this->Line(105, 55, 105, 65);
-		// Right
-		$this->Line(205, 55, 205, 65);
-		// Top
-		$this->Line(105, 55, 205, 55);
-		// bottom
-		$this->Line(105, 65, 205, 65);
+		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
 	function num() {
@@ -170,46 +89,6 @@ class OrderProductionPdf extends fpdf {
 		$this->y += 10;
 		$this->x = 105;
 		$this->Cell(100, 10, date_format($this->order_production->created_at, 'd/m/Y'), $this->b, 0, 'L');
-	}
-
-	function commerceInfo() {
-		$this->SetFont('Arial', '', 10);
-		$this->x = 105;
-		$this->y = 35;
-		$this->Cell(100, 5, 'Cuit: '.$this->user->afip_information->cuit, $this->b, 0, 'L');
-		$this->x = 105;
-		$this->y += 5;
-		$this->Cell(100, 5, 'Ingresos Brutos: '.$this->user->afip_information->ingresos_brutos, $this->b, 0, 'L');
-		$this->x = 105;
-		$this->y += 5;
-		$this->Cell(100, 5, 'Inicio Actividades: '.date_format($this->user->afip_information->inicio_actividades, 'd/m/Y'), $this->b, 0, 'L');
-		// $this->lineCommerce();
-	}
-
-	function clientInfo() {
-		if (!is_null($this->order_production->client)) {
-			$this->SetFont('Arial', '', 10);
-			$this->x = 5;
-			$this->y = 58;
-
-			$this->Cell(100, 5, 'Nombre: '.$this->order_production->client->name.' '.$this->order_production->client->surname, $this->b, 0, 'L');
-			if ($this->order_production->client->address != '') {
-				$this->y += 5;
-				$this->x = 5;
-				$this->Cell(100, 5, 'Domicilio: '.$this->order_production->client->address, $this->b, 0, 'L');
-			} 
-			if (!is_null($this->order_production->client->iva_condition)) {
-				$this->y += 5;
-				$this->x = 5;
-				$this->Cell(100, 5, 'Con. de IVA: '.$this->order_production->client->iva_condition->name, $this->b, 0, 'L');
-			}
-			if ($this->order_production->client->cuit != '') {
-				$this->y += 5;
-				$this->x = 5;
-				$this->Cell(100, 5, 'CUIT: '.$this->order_production->client->cuit, $this->b, 0, 'L');
-			}
-			// $this->lineClient();
-		}
 	}
 
 	function dates() {
@@ -226,36 +105,14 @@ class OrderProductionPdf extends fpdf {
 		}
 	}
 
-	function tableHeader() {
-		$this->SetFont('Arial', 'B', 12);
-		$this->x = 5;
-		$this->y = 80;
-
-		$this->SetLineWidth(.4);
-
-		$this->Cell(20, 10, 'Codigo', 1, 0, 'C');
-		$this->Cell(20, 10, 'Cant.', 1, 0, 'C');
-		$this->Cell(60, 10, 'Producto', 1, 0, 'C');
-		$this->Cell(30, 10, 'Precio', 1, 0, 'C');
-		$this->Cell(20, 10, 'Bonif.', 1, 0, 'C');
-		$this->Cell(20, 10, 'Importe', 1, 0, 'C');
-		$this->Cell(30, 10, 'U Entregadas', 1, 0, 'C');
-	}
-
 	function articles() {
 		$this->SetFont('Arial', '', 10);
-		$this->x = 5;
-		$this->y = 90;
-
 		foreach ($this->order_production->articles as $article) {
-			if ($this->y < 210) {
-				$this->printArticle($article);
-			} else {
+			$this->x = 5;
+			if ($this->y > 280) {
 				$this->AddPage();
-				$this->x = 5;
-				$this->y = 90;
-				$this->printArticle($article);
-			}
+			} 
+			$this->printArticle($article);
 		}
 	}
 
@@ -300,7 +157,7 @@ class OrderProductionPdf extends fpdf {
 	function total() {
 	    $this->x = 105;
 	    $this->SetFont('Arial', 'B', 14);
-		$this->Cell(100, 10, 'Total: $'. Numbers::price(BudgetHelper::getTotal($this->order_production)), 1, 0, 'R');
+		$this->Cell(100, 10, 'Total: $'. Numbers::price(BudgetHelper::getTotal($this->order_production)), 0, 1, 'R');
 	}
 
 	function comerciocityInfo() {

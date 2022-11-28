@@ -23,6 +23,7 @@ class CreateUserConfigurationsTable extends Migration
             $table->integer('limit_items_in_sale_per_page')->nullable();
             $table->boolean('show_google_login')->default(true);
             $table->boolean('apply_price_type_in_services')->default(false);
+            $table->boolean('can_make_afip_tickets')->default(0);
             $table->integer('user_id')->unsigned();
             $table->timestamps();
         });

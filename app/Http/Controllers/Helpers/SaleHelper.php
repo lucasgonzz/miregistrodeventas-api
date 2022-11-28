@@ -15,6 +15,7 @@ use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\CurrentAcountAndCommissionHelper;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
+use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Http\Controllers\SaleController;
@@ -123,10 +124,21 @@ class SaleHelper extends Controller {
         }
     }
 
-    static function attachCurrentAcountsAndCommissions($sale, $client_id, $discounts_id) {
+    static function attachSurchages($sale, $surchages_id) {
+        $sale->surchages()->detach();
+        $surchages = GeneralHelper::getModelsFromId('Surchage', $surchages_id);
+        foreach ($surchages as $surchage) {
+            $sale->surchages()->attach($surchage['id'], [
+                'percentage' => $surchage['percentage']
+            ]);
+        }
+    }
+
+    static function attachCurrentAcountsAndCommissions($sale, $client_id, $discounts_id, $surchages_id) {
         if ($client_id && $sale->save_current_acount) {
-            $discounts = DiscountHelper::getDiscountsFromDiscountsId($discounts_id);
-            $helper = new CurrentAcountAndCommissionHelper($sale, $discounts, false);
+            $discounts = GeneralHelper::getModelsFromId('Discount', $discounts_id);
+            $surchages = GeneralHelper::getModelsFromId('Surchage', $surchages_id);
+            $helper = new CurrentAcountAndCommissionHelper($sale, $discounts, $surchages, false);
             $helper->attachCommissionsAndCurrentAcounts();
         }
     }
@@ -217,7 +229,7 @@ class SaleHelper extends Controller {
         $commission_ct = new CommissionController();
         $commission_ct->deleteFromSale($sale);
 
-        $helper = new CurrentAcountAndCommissionHelper($sale, $sale->discounts, $only_commissions);
+        $helper = new CurrentAcountAndCommissionHelper($sale, $sale->discounts, $sale->surchages, $only_commissions);
         $helper->attachCommissionsAndCurrentAcounts();
 
         CurrentAcountHelper::checkSaldos('client', $sale->client_id);
@@ -294,7 +306,7 @@ class SaleHelper extends Controller {
         $sale->services()->detach();
     }
 
-    static function getTotalSale($sale, $with_discount = true) {
+    static function getTotalSale($sale, $with_discount = true, $with_surchages = true) {
         $total = 0;
         foreach ($sale->articles as $article) {
             $total += Self::getTotalItem($article);
@@ -308,6 +320,11 @@ class SaleHelper extends Controller {
         if ($with_discount) {
             foreach ($sale->discounts as $discount) {
                 $total -= $total * Numbers::percentage($discount->pivot->percentage); 
+            }
+        }
+        if ($with_surchages) {
+            foreach ($sale->surchages as $surchage) {
+                $total += $total * Numbers::percentage($surchage->pivot->percentage); 
             }
         }
         if (!is_null($sale->percentage_card)) {
@@ -377,6 +394,16 @@ class SaleHelper extends Controller {
             }
         }
         return $total - ($total * Numbers::percentage($discount));
+    }
+
+    static function getTotalWithDiscountsAndSurchages($sale, $total) {
+        foreach ($sale->discounts as $discount) {
+            $total -= $total * Numbers::percentage($discount->pivot->percentage);
+        }
+        foreach ($sale->surchages as $surchage) {
+            $total += $total * Numbers::percentage($surchage->pivot->percentage);
+        }
+        return $total;
     }
 
     static function getTotalMenosDescuentos($sale, $total) {

@@ -1,10 +1,10 @@
 <?php
 
-use App\Discount;
+use App\Surchage;
 use App\User;
 use Illuminate\Database\Seeder;
 
-class DiscountSeeder extends Seeder
+class SurchageSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,18 +16,18 @@ class DiscountSeeder extends Seeder
         $users = User::where('company_name', 'kas aberturas')
                     ->orWhere('company_name', 'colman')
                     ->orWhere('company_name', 'la barraca')
-        			->get();
+                    ->get();
 
         foreach ($users as $user) {
-            Discount::create([
-            	'name' 		 => 'Contado',
-            	'percentage' => 12,
-            	'user_id'    => $user->id,
+            Surchage::create([
+                'name'       => 'Iva 21',
+                'percentage' => 21,
+                'user_id'    => $user->id,
             ]);
-            Discount::create([
-            	'name' 		 => 'Placas',
-            	'percentage' => 5,
-            	'user_id'    => $user->id,
+            Surchage::create([
+                'name'       => 'Envio',
+                'percentage' => 50,
+                'user_id'    => $user->id,
             ]);
         }
     }

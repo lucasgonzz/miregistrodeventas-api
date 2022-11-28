@@ -3,13 +3,13 @@
     &lt;header&gt;
         &lt;source&gt;CN=wsaahomo, O=AFIP, C=AR, SERIALNUMBER=CUIT 33693450239&lt;/source&gt;
         &lt;destination&gt;SERIALNUMBER=CUIT 20423548984, CN=lucasdn&lt;/destination&gt;
-        &lt;uniqueId&gt;3428140697&lt;/uniqueId&gt;
-        &lt;generationTime&gt;2022-11-23T15:34:31.187-03:00&lt;/generationTime&gt;
-        &lt;expirationTime&gt;2022-11-24T03:34:31.187-03:00&lt;/expirationTime&gt;
+        &lt;uniqueId&gt;2889366710&lt;/uniqueId&gt;
+        &lt;generationTime&gt;2022-11-24T10:34:33.366-03:00&lt;/generationTime&gt;
+        &lt;expirationTime&gt;2022-11-24T22:34:33.366-03:00&lt;/expirationTime&gt;
     &lt;/header&gt;
     &lt;credentials&gt;
-        &lt;token&gt;PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8c3NvIHZlcnNpb249IjIuMCI+CiAgICA8aWQgc3JjPSJDTj13c2FhaG9tbywgTz1BRklQLCBDPUFSLCBTRVJJQUxOVU1CRVI9Q1VJVCAzMzY5MzQ1MDIzOSIgZHN0PSJDTj13c2ZlLCBPPUFGSVAsIEM9QVIiIHVuaXF1ZV9pZD0iNDE3MTczNDc3OCIgZ2VuX3RpbWU9IjE2NjkyMjg0MTEiIGV4cF90aW1lPSIxNjY5MjcxNjcxIi8+CiAgICA8b3BlcmF0aW9uIHR5cGU9ImxvZ2luIiB2YWx1ZT0iZ3JhbnRlZCI+CiAgICAgICAgPGxvZ2luIGVudGl0eT0iMzM2OTM0NTAyMzkiIHNlcnZpY2U9IndzZmUiIHVpZD0iU0VSSUFMTlVNQkVSPUNVSVQgMjA0MjM1NDg5ODQsIENOPWx1Y2FzZG4iIGF1dGhtZXRob2Q9ImNtcyIgcmVnbWV0aG9kPSIyMiI+CiAgICAgICAgICAgIDxyZWxhdGlvbnM+CiAgICAgICAgICAgICAgICA8cmVsYXRpb24ga2V5PSIyMDE3NTAxODg0MSIgcmVsdHlwZT0iNCIvPgogICAgICAgICAgICAgICAgPHJlbGF0aW9uIGtleT0iMjA0MjM1NDg5ODQiIHJlbHR5cGU9IjQiLz4KICAgICAgICAgICAgPC9yZWxhdGlvbnM+CiAgICAgICAgPC9sb2dpbj4KICAgIDwvb3BlcmF0aW9uPgo8L3Nzbz4K&lt;/token&gt;
-        &lt;sign&gt;kPwbmyeBSIPpk8qflSf4FeIwlPlgysPIfwI79kBzHZtns+rWbiK4wp3WD1Pa1WlouVI2MLKkpWkCXw4rgAh1F3nirUK2i4Ti6Tc5skOgZ8n83jeHRJ+fm2r7lEDt7k8xkXcnRhU91iohyBTXRt1wqVJuM6af6Kxq3+CdHB2KiZg=&lt;/sign&gt;
+        &lt;token&gt;PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9InllcyI/Pgo8c3NvIHZlcnNpb249IjIuMCI+CiAgICA8aWQgc3JjPSJDTj13c2FhaG9tbywgTz1BRklQLCBDPUFSLCBTRVJJQUxOVU1CRVI9Q1VJVCAzMzY5MzQ1MDIzOSIgZHN0PSJDTj13c2ZlLCBPPUFGSVAsIEM9QVIiIHVuaXF1ZV9pZD0iNDE1OTA3MjQxNiIgZ2VuX3RpbWU9IjE2NjkyOTY4MTMiIGV4cF90aW1lPSIxNjY5MzQwMDczIi8+CiAgICA8b3BlcmF0aW9uIHR5cGU9ImxvZ2luIiB2YWx1ZT0iZ3JhbnRlZCI+CiAgICAgICAgPGxvZ2luIGVudGl0eT0iMzM2OTM0NTAyMzkiIHNlcnZpY2U9IndzZmUiIHVpZD0iU0VSSUFMTlVNQkVSPUNVSVQgMjA0MjM1NDg5ODQsIENOPWx1Y2FzZG4iIGF1dGhtZXRob2Q9ImNtcyIgcmVnbWV0aG9kPSIyMiI+CiAgICAgICAgICAgIDxyZWxhdGlvbnM+CiAgICAgICAgICAgICAgICA8cmVsYXRpb24ga2V5PSIyMDE3NTAxODg0MSIgcmVsdHlwZT0iNCIvPgogICAgICAgICAgICAgICAgPHJlbGF0aW9uIGtleT0iMjA0MjM1NDg5ODQiIHJlbHR5cGU9IjQiLz4KICAgICAgICAgICAgPC9yZWxhdGlvbnM+CiAgICAgICAgPC9sb2dpbj4KICAgIDwvb3BlcmF0aW9uPgo8L3Nzbz4K&lt;/token&gt;
+        &lt;sign&gt;BD46oylhot6Kf4tWIGYEBXUN7jT36X7jvOssTTDRKqqtkyTF640QO7OtIQguaefNTB3EYVXgLrShLab7a2nkzevVmEAo9ygdnGSfPMc56H9ewzRlg/iigo88SqXcQOAPMCzYrvSzYQrkzTd2rSo/NiLqwW5qruqkGY+kjKfq5jk=&lt;/sign&gt;
     &lt;/credentials&gt;
 &lt;/loginTicketResponse&gt;
 </loginCmsReturn></loginCmsResponse></soapenv:Body></soapenv:Envelope>

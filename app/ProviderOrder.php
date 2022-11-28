@@ -25,6 +25,6 @@ class ProviderOrder extends Model
     }
 
     function articles() {
-        return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'notes', 'received');
+        return $this->belongsToMany('App\Article')->withPivot('amount', 'cost', 'notes', 'received', 'iva_id', 'received_cost');
     }
 }

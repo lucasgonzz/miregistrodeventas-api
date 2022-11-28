@@ -73,8 +73,7 @@ class ImportHelper {
 	    }
 	}
 
-	static function getIvaId($iva) {
-		// Log::info('Llego iva: '.$iva);
+	static function getIvaId($iva, $article = null) {
 		if (!is_null($iva)) {
 			if ($iva != '' || $iva == '0' || $iva == 0) {
 				$_iva = Iva::where('percentage', $iva)
@@ -85,6 +84,10 @@ class ImportHelper {
 					]);
 				}
 				return $_iva->id;
+			}
+		} else if (!is_null($article)) {
+			if (!is_null($article->iva_id)) {
+				return $article->iva_id;
 			}
 		}
 		return 2;

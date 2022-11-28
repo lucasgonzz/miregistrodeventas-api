@@ -66,11 +66,8 @@ class ProviderOrderController extends Controller
     }
 
     function import(Request $request) {
-        Log::info('llegoooo');
         $columns = GeneralHelper::getImportColumns($request);
-        Log::info('columns:');
-        Log::info($columns);
-        Excel::import(new ProviderOrderImport($columns, $this->fullModel('App\ProviderOrder', $request->model_id)), $request->file('models'));
+        Excel::import(new ProviderOrderImport($columns, $request->start_row, $this->fullModel('App\ProviderOrder', $request->model_id)), $request->file('models'));
     }
 
     function destroy($id) {

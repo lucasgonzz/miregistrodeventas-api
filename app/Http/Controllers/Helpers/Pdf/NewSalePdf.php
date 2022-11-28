@@ -14,7 +14,7 @@ require(__DIR__.'/../../fpdf/fpdf.php');
 
 class NewSalePdf extends fpdf {
 
-	function __construct($sale) {
+	function __construct($sale, $with_prices) {
 		parent::__construct();
 		$this->SetAutoPageBreak(true, 50);
 		$this->start_x = 5;
@@ -24,7 +24,8 @@ class NewSalePdf extends fpdf {
 		
 		$this->user = UserHelper::getFullModel();
 		$this->sale = $sale;
-		$this->total_sale = SaleHelper::getTotalSale($this->sale, false);
+		$this->with_prices = $with_prices;
+		$this->total_sale = SaleHelper::getTotalSale($this->sale, false, false);
 		$this->AddPage();
 		$this->items();
 
@@ -34,15 +35,22 @@ class NewSalePdf extends fpdf {
 
 
 	function getFields() {
-		return [
+		$fields = [
 			'#' 		=> 5,
 			'Codigo' 	=> 40,
 			'Nombre' 	=> 75,
-			'Precio' 	=> 25,
 			'Cant' 		=> 15,
-			'Des' 		=> 13,
-			'Sub total' => 27,
 		];
+
+		// dd($this->with_prices);
+		if ($this->with_prices) {
+			$fields = array_merge($fields, [
+				'Precio' 	=> 25,
+				'Des' 		=> 13,
+				'Sub total' => 27,
+			]);
+		}
+		return $fields;
 	}
 
 	function getModelProps() {
@@ -87,8 +95,12 @@ class NewSalePdf extends fpdf {
 	}
 
 	function Footer() {
-		$this->total();
-		$this->discounts();
+		if ($this->with_prices) {
+			$this->total();
+			$this->discounts();
+			$this->surchages();
+			$this->totalFinal();
+		}
 		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
@@ -138,14 +150,6 @@ class NewSalePdf extends fpdf {
 	    $this->y = $y_1;
 	    $this->x = $this->start_x + $this->getFields()['#'] + $this->getFields()['Codigo'] + $this->getFields()['Nombre'];
 		$this->Cell(
-			$this->getFields()['Precio'], 
-			$this->line_height, 
-			'$'.$item->pivot->price, 
-			$this->b, 
-			0, 
-			'C'
-		);
-		$this->Cell(
 			$this->getFields()['Cant'], 
 			$this->line_height, 
 			$item->pivot->amount, 
@@ -153,25 +157,40 @@ class NewSalePdf extends fpdf {
 			0, 
 			'C'
 		);
-		$this->Cell(
-			$this->getFields()['Des'], 
-			$this->line_height, 
-			$item->pivot->discount, 
-			$this->b, 
-			0, 
-			'C'
-		);
-		$this->Cell(
-			$this->getFields()['Sub total'], 
-			$this->line_height, 
-			'$'.SaleHelper::getTotalItem($item), 
-			$this->b, 
-			0, 
-			'C'
-		);
+		if ($this->with_prices) {
+			$this->Cell(
+				$this->getFields()['Precio'], 
+				$this->line_height, 
+				'$'.$item->pivot->price, 
+				$this->b, 
+				0, 
+				'C'
+			);
+			$this->Cell(
+				$this->getFields()['Des'], 
+				$this->line_height, 
+				$item->pivot->discount, 
+				$this->b, 
+				0, 
+				'C'
+			);
+			$this->Cell(
+				$this->getFields()['Sub total'], 
+				$this->line_height, 
+				'$'.SaleHelper::getTotalItem($item), 
+				$this->b, 
+				0, 
+				'C'
+			);
+		}
 		$this->x = $this->start_x;
 		$this->y = $y_2;
-		$this->Line($this->start_x, $this->y, 210-$this->start_x, $this->y);
+		if ($this->with_prices) {
+			$this->Line($this->start_x, $this->y, 210-$this->start_x, $this->y);
+		} else {
+			$width = 5 + $this->getFields()['#'] + $this->getFields()['Codigo'] + $this->getFields()['Nombre'] + $this->getFields()['Cant'];
+			$this->Line($this->start_x, $this->y, $width, $this->y);
+		}
 	}
 
 	function tableHeader() {
@@ -335,33 +354,60 @@ class NewSalePdf extends fpdf {
 
 	function discounts() {
 		if (count($this->sale->discounts) >= 1) {
-		    $this->x = $this->start_x;
 		    $this->SetFont('Arial', '', 9);
 		    $total_sale = $this->total_sale;
 		    foreach ($this->sale->discounts as $discount) {
+		    	$this->x = $this->start_x;
 		    	$text = '-'.$discount->pivot->percentage.'% '.$discount->name;
-		    	// $res = $total_sale * floatval($discount->pivot->percentage);
 		    	$descuento = floatval($total_sale) * floatval($discount->pivot->percentage) / 100;
-		    	$total_sale = Numbers::price(floatval($total_sale) - $descuento);
-		    	$text .= ' = $'.$total_sale;
+		    	$total_sale = floatval($total_sale) - $descuento;
+		    	$text .= ' = $'.Numbers::price($total_sale);
 				$this->Cell(
 					50, 
 					5, 
 					$text, 
 					$this->b, 
-					0, 
+					1, 
 					'L'
 				);
-				if ($this->x > 55) {
-					$this->x = $this->start_x;
-					$this->y += 5;
-				}
+				// if ($this->x > 55) {
+				// 	$this->x = $this->start_x;
+				// 	$this->y += 5;
+				// }
 		    }
-		    if ($this->x == 55) {
-				$this->x = $this->start_x;
-				$this->y += 5;
+		}
+	}
+
+	function surchages() {
+		if (count($this->sale->surchages) >= 1) {
+		    $this->SetFont('Arial', '', 9);
+		    $total_sale = SaleHelper::getTotalSale($this->sale, true, false);
+		    foreach ($this->sale->surchages as $surchage) {
+		    	$this->x = $this->start_x;
+		    	$text = '+'.$surchage->pivot->percentage.'% '.$surchage->name;
+		    	$recargo = floatval($total_sale) * floatval($surchage->pivot->percentage) / 100;
+		    	$total_sale = floatval($total_sale) + $recargo;
+		    	$text .= ' = $'.Numbers::price($total_sale);
+				$this->Cell(
+					50, 
+					5, 
+					$text, 
+					$this->b, 
+					1, 
+					'L'
+				);
+				// if ($this->x > 55) {
+				// 	$this->x = $this->start_x;
+				// 	$this->y += 5;
+				// }
 		    }
+		}
+	}
+
+	function totalFinal() {
+		if (count($this->sale->discounts) >= 1 || count($this->sale->surchages) >= 1) {
 	    	$this->SetFont('Arial', 'B', 12);
+	    	$this->x = 5;
 		    $this->Cell(
 				50, 
 				10, 

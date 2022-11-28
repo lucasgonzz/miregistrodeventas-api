@@ -29,7 +29,8 @@ class ProviderOrderPdf extends fpdf {
 		return [
 			'Codigo'		=> 40,
 			'Cant'			=> 20,
-			'Producto'		=> 110,
+			'Producto'		=> 80,
+			'Notas'			=> 30,
 			'Recibidos'		=> 30,
 		];
 	}
@@ -64,14 +65,7 @@ class ProviderOrderPdf extends fpdf {
 	}
 
 	function Footer() {
-		$y = 220;
-		$this->SetLineWidth(.4);
-		// $this->Line(5, $y, 205, $y);
-		$this->y = $y;
-		// $this->observations();
-		$this->y = $y;
-		// $this->total();
-		$this->comerciocityInfo();
+		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
 	function providerInfo() {
@@ -88,93 +82,37 @@ class ProviderOrderPdf extends fpdf {
 
 	function articles() {
 		$this->SetFont('Arial', '', 10);
-		$this->x = 5;
 		foreach ($this->provider_order->articles as $article) {
-			if ($this->y < 210) {
-				$this->printArticle($article);
-			} else {
-				$this->AddPage();
-				$this->x = 5;
-				$this->y = 90;
-				$this->printArticle($article);
-			}
 			$this->x = 5;
+			if ($this->y > 280) {
+				$this->AddPage();
+			}
+			$this->printArticle($article);
 		}
 	}
 
 	function printArticle($article) {
-		$this->Cell($this->getFields()['Codigo'], $this->line_height, $article->bar_code, 0, 0, 'C');
-		$this->Cell($this->getFields()['Cant'], $this->line_height, $article->pivot->amount, 0, 0, 'C');
+		$fields = $this->getFields();
+		$this->Cell($fields['Codigo'], $this->line_height, $article->bar_code, 0, 0, 'C');
+		$this->Cell($fields['Cant'], $this->line_height, $article->pivot->amount, 0, 0, 'C');
+		
 		$y_1 = $this->y;
-		$this->MultiCell($this->getFields()['Producto'], $this->line_height, $article->name, 0, 'C', false);
+		$this->MultiCell($fields['Producto'], $this->line_height, $article->name, 0, 'C', false);
 		$y_2 = $this->y;
 		$this->y = $y_1;
-		$this->x = 175;
-		$this->Cell($this->getFields()['Recibidos'], $this->line_height, $article->pivot->received, 0, 0, 'C');
+		$this->x = 5 + $fields['Codigo'] + $fields['Cant'] +  $fields['Producto'];
+		
+		$y_1 = $this->y;
+		$this->MultiCell($fields['Notas'], $this->line_height, $article->pivot->notes, 0, 'C', false);
+		if ($this->y > $y_2) {
+			$y_2 = $this->y;
+		}
+		$this->y = $y_1;
+		$this->x = 5 + $fields['Codigo'] + $fields['Cant'] +  $fields['Producto'] + $fields['Notas'];
+
+		$this->Cell($fields['Recibidos'], $this->line_height, $article->pivot->received, 0, 0, 'C');
 		$this->y = $y_2;
 		$this->Line(5, $this->y, 205, $this->y);
-	}
-
-	function observations() {
-		// $this->SetLineWidth(.2);
-		if (count($this->budget->observations)) {
-		    $this->x = 5;
-	    	$this->SetFont('Arial', 'B', 12);
-			$this->Cell(100, 10, 'Observaciones', 'BTL', 0, 'L');
-			$this->y += 10;
-		    $this->x = 5;
-	    	$this->SetFont('Arial', '', 10);
-			foreach ($this->budget->observations as $observation) {
-		    	$this->MultiCell(200, $this->line_height, $observation->text, $this->b, 'LTB', false);
-		    	$this->x = 5;
-			}
-		}
-	}
-
-	function getBonus($product) {
-		if (!is_null($product->bonus)) {
-			return $product->bonus.'%';
-		}
-		return '';
-	}
-
-	function totalProduct($product) {
-		$total = $product->price * $product->amount;
-		if (!is_null($product->bonus)) {
-			$total -= $total * (float)$product->bonus / 100;
-		}
-		return $total;
-	}
-
-	function total() {
-	    $this->x = 105;
-	    $this->SetFont('Arial', 'B', 14);
-		$this->Cell(100, 10, 'Total: $'. Numbers::price($this->getTotal()), 1, 0, 'R');
-	}
-
-	function comerciocityInfo() {
-	    $this->y = 290;
-	    $this->x = 5;
-	    $this->SetFont('Arial', '', 10);
-		$this->Cell(200, 5, 'Comprobante creado con el sistema de control de stock ComercioCity - comerciocity.com', $this->b, 0, 'C');
-	}
-
-	function getTotal() {
-		$total = 0;
-		foreach ($this->budget->products as $product) {
-			$total += $this->totalProduct($product);
-		}
-		return $total;
-	}
-
-	function getHeight($article) {
-    	$lines = 1;
-    	$letras = strlen($article->name);
-    	while ($letras > 41) {
-    		$lines++;
-    		$letras -= 41;
-    	}
-    	return $this->line_height * $lines;
 	}
 
 	function getNum() {
