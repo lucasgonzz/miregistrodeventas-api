@@ -60,7 +60,8 @@ class PricesListsPdf extends AlphaPDF {
 	function printArticles() {
 		$this->Y = 27;
 		$this->setFont('Arial', '', 12);
-		foreach ($this->prices_list->articles as $article) {
+		$articles = ArticleHelper::setPrices($this->prices_list->articles);
+		foreach ($articles as $article) {
 			$this->article = $article;
 			$this->printArticle();
 		}
@@ -70,13 +71,16 @@ class PricesListsPdf extends AlphaPDF {
 		$next_y = $this->getNextY();
 		if ($next_y < 290) {
 			$image = ArticleHelper::getFirstImage($this->article);
+			// dd($image);
 			// $image = null;
 	        $this->setY($this->Y);
 			if (!is_null($image)) {
 	        	$this->Image($image, 10, $this->Y+5, 60);
+	        	$this->Line(80, $this->y, 80, $this->y+80);
 		        $this->SetX(80);
-				$this->Cell(95,$this->getLineHeight(),ArticleHelper::getShortName($this->article->name, 47),'L',0,'C');
-				$this->Cell(35,$this->getLineHeight(),ArticleHelper::price($this->getLineHeight()),'L',0,'C');
+				$this->Cell(95,$this->getLineHeight(),ArticleHelper::getShortName($this->article->name, 47), 0,0,'C');
+				$this->Cell(35,$this->getLineHeight(),ArticleHelper::price($this->article->price),0 ,0,'C');
+	        	$this->Line(175, $this->y, 175, $this->y+80);
 	        	$this->Y += 80;
 			} else {
 				$this->setX(0);

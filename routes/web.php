@@ -51,6 +51,9 @@ Route::get('/articles/set-hosting-images/{company_name}', 'HelperController@setA
 Route::get('/user/set-hosting-image/{company_name}', 'HelperController@setUserHostingImage');
 Route::get('/titles/set-hosting-image/{company_name}', 'HelperController@setTitlesHostingImages');
 Route::get('/orders/set-status/{company_name}', 'HelperController@setOrdersStatus');
+Route::get('/articles/set-provider/{company_name}', 'HelperController@setArticlesProvider');
+Route::get('/articles/set-category/{company_name}', 'HelperController@setArticlesCategory');
+Route::get('/articles/set-final-price/{company_name}', 'Helpers\ArticleHelper@setArticlesFinalPrice');
 
 Route::get('a', function() {
 	dd((float)'');
@@ -144,7 +147,7 @@ Route::get('/articles/excel/export', 'ArticleController@export');
 
 // Imprimir articulos
 Route::get('/pdf/{columns}/{articles_ids}/{orientation}/{header?}', 'PdfController@articles');
-Route::get('/prices-lists/{id}', 'PricesListController@pdf');
+Route::get('/prices-list/pdf/{id}', 'PricesListController@pdf');
 
 Route::get('/sales/cliente/{company_name}/{borders}/{sale_id}', 'PdfController@sale_client');
 Route::get('/sales/comercio/{company_name}/{borders}/{sale_id}', 'PdfController@sale_commerce');

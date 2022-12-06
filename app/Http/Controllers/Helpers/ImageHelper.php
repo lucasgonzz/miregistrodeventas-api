@@ -18,6 +18,12 @@ class ImageHelper {
 			$image_url = $model->{$from_model}->hosting_image_url;
 		}
 		if ($image_url) {
+			if (env('APP_ENV') == 'production') {
+                $position = strpos($image_url, 'storage');
+                $first = substr($image_url, 0, $position);
+                $end = substr($image_url, $position);
+                return $first.'public/'.$end;
+			}
 			return $image_url;
 		}
 	}

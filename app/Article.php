@@ -10,7 +10,7 @@ class Article extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('images.color', 'iva', 'sizes', 'colors', 'condition', 'descriptions', 'sub_category', 'variants', 'tags', 'brand', 'discounts', 'specialPrices', 'providers', 'provider_price_list', 'deposits');
+        $query->with('images.color', 'iva', 'sizes', 'colors', 'condition', 'descriptions', 'sub_category', 'variants', 'tags', 'brand', 'discounts', 'specialPrices', 'providers', 'provider_price_list', 'deposits', 'provider');
     }
 
     function views() {
@@ -124,6 +124,10 @@ class Article extends Model
     public function providers(){
         return $this->belongsToMany('App\Provider')->withPivot('amount', 'cost', 'price')
                                                     ->withTimestamps();
+    }
+    
+    public function provider(){
+        return $this->belongsTo('App\Provider');
     }
 
     public function questions() {

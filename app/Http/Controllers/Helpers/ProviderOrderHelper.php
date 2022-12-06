@@ -45,10 +45,12 @@ class ProviderOrderHelper {
 			if (is_null($article->stock)) {
 				$article->stock = 0;
 			}
-			if ($_article['pivot']['received_cost'] != '') {
-				$article->cost = $_article['pivot']['received_cost'];
-			} else if ($_article['pivot']['cost'] != '') {
-				$article->cost = $_article['pivot']['cost'];
+			if ($_article['pivot']['update_cost']) {
+				if ($_article['pivot']['received_cost'] != '') {
+					$article->cost = $_article['pivot']['received_cost'];
+				} else if ($_article['pivot']['cost'] != '') {
+					$article->cost = $_article['pivot']['cost'];
+				}
 			}
 			if (!is_null($_article['pivot']['iva_id']) && $_article['pivot']['iva_id'] != 0) {
 				$article->iva_id = $_article['pivot']['iva_id'];
@@ -75,8 +77,6 @@ class ProviderOrderHelper {
 	}
 
 	static function attachArticles($articles, $provider_order) {
-		Log::info('llegaron estos articlos');
-		Log::info($articles);
 		$last_received = Self::getLastReceived($provider_order);
 		$provider_order->articles()->sync([]);
 		foreach ($articles as $article) {
@@ -93,11 +93,19 @@ class ProviderOrderHelper {
 											'received' 		=> $article['pivot']['received'],
 											'cost' 			=> $article['pivot']['cost'],
 											'received_cost' => $article['pivot']['received_cost'],
-											'iva_id'    	=> $article['pivot']['iva_id'],
+											'update_cost' 	=> $article['pivot']['update_cost'],
+											'iva_id'    	=> Self::getIvaId($article),
 										]);
 			Self::updateArticleStock($article, $last_received, $provider_order);
 		}
 		Self::saveCurrentAcount($provider_order);
+	}
+
+	static function getIvaId($article) {
+		if ($article['status'] == 'active' && $article['pivot']['iva_id'] == 0) {
+			return $article['iva_id'];
+		}
+		return $article['pivot']['iva_id'];
 	}
 
 	static function attachAfipTickets($afip_tickets, $model) {

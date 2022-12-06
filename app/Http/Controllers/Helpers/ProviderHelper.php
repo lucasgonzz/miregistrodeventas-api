@@ -11,16 +11,19 @@ class ProviderHelper {
 
 	static function attachProviderPriceLists($model, $provider_price_lists) {
 		foreach ($provider_price_lists as $prices_list) {
-			if (!isset($prices_list['id'])) {
+			$_price_list = null;
+			if (!isset($prices_list['id']) && ($prices_list['name'] != '' || $prices_list['percentage'] != '')) {
 				$_price_list = ProviderPriceList::create([
 					'provider_id' => $model->id,
 				]);
-			} else {
+			} else if (isset($prices_list['id'])) {
 				$_price_list = ProviderPriceList::find($prices_list['id']);
 			}
-			$_price_list->name 			= $prices_list['name'];
-			$_price_list->percentage 	= $prices_list['percentage'];
-			$_price_list->save();
+			if (!is_null($_price_list)) {
+				$_price_list->name 			= $prices_list['name'];
+				$_price_list->percentage 	= $prices_list['percentage'];
+				$_price_list->save();
+			}
 		}
 	}
 

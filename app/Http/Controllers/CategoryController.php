@@ -11,35 +11,35 @@ class CategoryController extends Controller
 {
 
     function index() {
-    	$categories = Category::where('user_id', $this->userId())
+    	$models = Category::where('user_id', $this->userId())
                                 ->where('status', 'active')
                                 ->orderBy('name', 'ASC')
     					       ->get();
-        return response()->json(['categories' => $categories], 200);
+        return response()->json(['models' => $models], 200);
     }
 
     function store(Request $request) {
-        $category = Category::create([
+        $model = Category::create([
             'name'              => $request->name,
             'user_id'           => $this->userId(),
         ]);
-        $category = Category::where('id', $category->id)
+        $model = Category::where('id', $model->id)
                                 ->first();
-        return response()->json(['category' => $category], 201);
+        return response()->json(['model' => $model], 201);
     }
 
     function update(Request $request) {
-        $category = Category::find($request->id);
-        $category->name = $request->name;
-        $category->save();
-        $category = Category::where('id', $category->id)
+        $model = Category::find($request->id);
+        $model->name = $request->name;
+        $model->save();
+        $model = Category::where('id', $model->id)
                                 ->first();
-        return response()->json(['category' => $category], 200);
+        return response()->json(['model' => $model], 200);
     }
 
-    function delete($id) {
-        $category = Category::find($id);
-        $category->status = 'inactive';
-        $category->save();
+    function destroy($id) {
+        $model = Category::find($id);
+        $model->status = 'inactive';
+        $model->save();
     }
 }

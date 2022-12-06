@@ -11,44 +11,38 @@ class PricesListController extends Controller
 {
 
     function index() {
-        $prices_lists = PricesList::where('user_id', $this->userId())
-                                    ->with('articles.images')
+        $models = PricesList::where('user_id', $this->userId())
+                                    ->withAll()
                                     ->get();
-        return response()->json(['prices_lists' => $prices_lists], 200);
+        return response()->json(['models' => $models], 200);
     }
 
     function store(Request $request) {
-        $prices_list = new PricesList();
-        $prices_list->name = StringHelper::modelName($request->name);
-        $prices_list->user_id = $this->userId();
-        $prices_list->save();
+        $model = new PricesList();
+        $model->name = StringHelper::modelName($request->name);
+        $model->user_id = $this->userId();
+        $model->save();
         foreach ($request->articles as $article) {
-            $prices_list->articles()->attach($article['id']);
+            $model->articles()->attach($article['id']);
         }
-        $prices_list = PricesList::where('id', $prices_list->id)
+        $model = PricesList::where('id', $model->id)
                                     ->with('articles.images')
                                     ->first();
-        return response()->json(['prices_list' => $prices_list], 200);
+        return response()->json(['model' => $model], 200);
     }
 
-    function update($id, Request $request) {
-        $prices_list = PricesList::where('id', $id)
-                                    ->with('articles')
-                                    ->first();
+    function update(Request $request, $id) {
+        $model = PricesList::find($id);
+        $model->articles()->detach();
         foreach ($request->articles as $article) {
-            if (!$this->hasArticle($prices_list, $article)) {
-                $prices_list->articles()->attach($article['id']);
-            }
+            $model->articles()->attach($article['id']);
         }
-        $prices_list = PricesList::where('id', $id)
-                                    ->with('articles')
-                                    ->first();
-        return response()->json(['prices_list' => $prices_list], 200);
+        return response()->json(['model' => $this->fullModel('App\PricesList', $id)], 200);
     }
 
-    function hasArticle($prices_list, $_article) {
+    function hasArticle($model, $_article) {
         $has_article = false;
-        foreach ($prices_list->articles as $article) {
+        foreach ($model->articles as $article) {
             if ($article->id == $_article['id']) {
                 $has_article = true;
                 break;
@@ -57,16 +51,14 @@ class PricesListController extends Controller
         return $has_article;
     }
 
-    function delete($id) {
-        $prices_list = PricesList::find($id);
-        $prices_list->delete();
+    function destroy($id) {
+        $model = PricesList::find($id);
+        $model->delete();
         return response(null, 200);
     }
 
     function pdf($id) {
-        $prices_list = PricesList::where('id', $id)
-                                    ->with('articles.images')
-                                    ->first();
-        $pdf = new PricesListsPdf($prices_list);
+        $model = PricesList::find($id);
+        $pdf = new PricesListsPdf($model);
     }
 }

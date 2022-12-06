@@ -10,74 +10,68 @@ use Illuminate\Http\Request;
 class SubCategoryController extends Controller
 {
     function index() {
-    	$sub_categories = SubCategory::where('user_id', $this->userId())
+    	$models = SubCategory::where('user_id', $this->userId())
     								->where('status', 'active')
                                     ->with('category')
+                                    ->orderBy('created_at', 'DESC')
     								->get();
-    	return response()->json(['sub_categories' => $sub_categories], 200);
+    	return response()->json(['models' => $models], 200);
     }
 
     function forVender($ids) {
-        $sub_categories = [];
+        $models = [];
         foreach (explode('-', $ids) as $id) {
-            $sub_category = SubCategory::where('id', $id)
+            $model = SubCategory::where('id', $id)
                                     ->with(['articles' => function($q) {
                                         $q->withAll();
                                     }])
                                     ->first();
-            $sub_category->articles = ArticleHelper::setPrices($sub_category->articles);
-            $sub_categories[] = $sub_category;
+            $model->articles = ArticleHelper::setPrices($model->articles);
+            $models[] = $model;
         }
-        return response()->json(['sub_categories' => $sub_categories], 200);
+        return response()->json(['models' => $models], 200);
     }
 
     function mostViewed($weeks_ago) {
-        $sub_categories = SubCategory::where('user_id', $this->userId())
+        $models = SubCategory::where('user_id', $this->userId())
                                 ->where('status', 'active')
-                                // ->with(['views' => function($q) use($weeks_ago) {
-                                //     $q->where('created_at', '>', Carbon::now()->subWeeks($weeks_ago));
-                                // }])
-                                // ->withCount('articles')
-                                // ->with('views')
-                                // ->with('views.buyer')
-                                // ->withCount('views')
                                 ->get();  
-        $sub_categories = SubCategory::where('user_id', $this->userId())
+        $models = SubCategory::where('user_id', $this->userId())
                                     ->where('status', 'active')
                                     ->with('category')
                                     ->get();
-        return response()->json(['sub_categories' => $sub_categories], 200);
+        return response()->json(['models' => $models], 200);
     }
 
     function store(Request $request) {
-    	$sub_category = SubCategory::create([
+    	$model = SubCategory::create([
     		'name' 		        => $request->name,
     		'category_id'       => $request->category_id,
             'show_in_vender'    => $request->show_in_vender,
     		'user_id' 	        => $this->userId(),
     	]);
-        $sub_category = SubCategory::where('id', $sub_category->id)
+        $model = SubCategory::where('id', $model->id)
                                     ->with('category')
                                     ->first();
-    	return response()->json(['sub_category' => $sub_category], 201);
+    	return response()->json(['model' => $model], 201);
     }
 
     function update(Request $request) {
-        $sub_category = SubCategory::find($request->id);
-        $sub_category->name = $request->name;
-        $sub_category->category_id = $request->category_id;
-        $sub_category->show_in_vender = $request->show_in_vender;
-        $sub_category->save();
-        $sub_category = SubCategory::where('id', $sub_category->id)
+        $model = SubCategory::find($request->id);
+        $model->name = $request->name;
+        $model->category_id = $request->category_id;
+        $model->show_in_vender = $request->show_in_vender;
+        $model->save();
+        $model = SubCategory::where('id', $model->id)
                                     ->with('category')
                                     ->first();
-        return response()->json(['sub_category' => $sub_category], 200);
+        return response()->json(['model' => $model], 200);
     }
 
-    function delete($id) {
-        $sub_category = SubCategory::find($id);
-    	$sub_category->status = 'inactive';
-    	$sub_category->save();
+    function destroy($id) {
+        $model = SubCategory::find($id);
+    	$model->status = 'inactive';
+    	$model->save();
     	return response(null, 200);
     }
 }

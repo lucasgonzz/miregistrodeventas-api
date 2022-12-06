@@ -403,6 +403,13 @@ class SaleHelper extends Controller {
         foreach ($sale->surchages as $surchage) {
             $total += $total * Numbers::percentage($surchage->pivot->percentage);
         }
+        if (!is_null($sale->order) && !is_null($sale->order->cupon)) {
+            if (!is_null($sale->order->cupon->percentage)) {
+                $total -= $total * $sale->order->cupon->percentage / 100;
+            } else if (!is_null($sale->order->cupon->amount)) {
+                $total -= $sale->order->cupon->amount;
+            }
+        }
         return $total;
     }
 

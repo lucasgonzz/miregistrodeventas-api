@@ -17,6 +17,7 @@ class BuyerSeeder extends Seeder
                         ->orWhere('company_name', 'kas aberturas')
                         ->orWhere('company_name', 'nebulaStore')
                         ->orWhere('company_name', 'colman')
+                        ->orWhere('company_name', 'la barraca')
                         ->get();
         foreach ($users as $user) {
             $lucas = Buyer::create([

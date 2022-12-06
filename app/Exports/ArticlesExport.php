@@ -31,6 +31,7 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             $article->discounts_formated,
             $article->price,
             $this->getCostInDollars($article),
+            $article->final_price,
             $article->created_at,
             $article->updated_at,
         ];
@@ -53,7 +54,7 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
                         ->with('sub_category')
                         ->orderBy('created_at', 'DESC')
                         ->get();
-        $articles = ArticleHelper::setPrices($articles);
+        // $articles = ArticleHelper::setPrices($articles);
         $articles = $this->setDiscounts($articles);
         // $articles = ArticleHelper::setDiscount($articles);
         $articles = ExportHelper::setPriceTypes($articles);
@@ -78,6 +79,7 @@ class ArticlesExport implements FromCollection, WithHeadings, WithMapping
             'Descuentos',
             'Precio',
             'Moneda',
+            'Precio Final',
             'Ingresado',
             'Actualizado',
         ];

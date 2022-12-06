@@ -79,32 +79,6 @@ class OrderProductionPdf extends fpdf {
 		PdfHelper::comerciocityInfo($this, $this->y);
 	}
 
-	function num() {
-		$this->SetFont('Arial', 'B', 14);
-		$this->x = 105;
-		$this->y = 5;
-
-		// Numero
-		$this->Cell(100, 10, 'N° '.$this->order_production->num, $this->b, 0, 'L');
-		$this->y += 10;
-		$this->x = 105;
-		$this->Cell(100, 10, date_format($this->order_production->created_at, 'd/m/Y'), $this->b, 0, 'L');
-	}
-
-	function dates() {
-		if (!is_null($this->order_production->start_at) && !is_null($this->order_production->finish_at)) {
-			$this->SetFont('Arial', '', 10);
-			$this->x = 105;
-			$this->y = 58;
-			$this->Cell(100, 5, 'Fecha de entrega', $this->b, 0, 'L');
-			$this->y += 5;
-			$this->x = 105;
-			$date = 'Entre el '.date_format($this->order_production->start_at, 'd/m/Y').' y el '.date_format($this->order_production->finish_at, 'd/m/Y');
-			$this->Cell(100, 5, $date, $this->b, 0, 'L');
-			// $this->lineDates();
-		}
-	}
-
 	function articles() {
 		$this->SetFont('Arial', '', 10);
 		foreach ($this->order_production->articles as $article) {
@@ -118,18 +92,18 @@ class OrderProductionPdf extends fpdf {
 
 	function printArticle($article) {
 		$this->x = 5;
-		$this->Cell(20, $this->line_height, $article->bar_code, 'T', 0, 'C');
-		$this->Cell(20, $this->line_height, $article->pivot->amount, 'T', 0, 'C');
+		$this->Cell(20, $this->line_height, $article->bar_code, 'T', 0, 'L');
+		$this->Cell(20, $this->line_height, $article->pivot->amount, 'T', 0, 'L');
 		$y_1 = $this->y;
-		$this->MultiCell(60, $this->line_height, $article->name, 'T', 'C', false);
+		$this->MultiCell(60, $this->line_height, $article->name, 'T', 'L', false);
 		$this->x = 105;
 
 	    $y_2 = $this->y;
 		$this->y = $y_1;
-		$this->Cell(30, $this->line_height, '$'.Numbers::price($article->pivot->price), 'T', 0, 'C');
-		$this->Cell(20, $this->line_height, $this->getBonus($article), 'T', 0, 'C');
-		$this->Cell(20, $this->line_height, '$'.Numbers::price(BudgetHelper::totalArticle($article)), 'T', 0, 'C');
-		$this->Cell(30, $this->line_height, $article->pivot->delivered, 'T', 0, 'C');
+		$this->Cell(30, $this->line_height, '$'.Numbers::price($article->pivot->price), 'T', 0, 'L');
+		$this->Cell(20, $this->line_height, $this->getBonus($article), 'T', 0, 'L');
+		$this->Cell(20, $this->line_height, '$'.Numbers::price(BudgetHelper::totalArticle($article)), 'T', 0, 'L');
+		$this->Cell(30, $this->line_height, $article->pivot->delivered, 'T', 0, 'L');
 		$this->y = $y_2;
 	}
 

@@ -16,6 +16,7 @@ class CreateOrdersTable extends Migration
         Schema::create('orders', function (Blueprint $table) {
             $table->bigIncrements('id');
 
+            $table->integer('num')->nullable();
             $table->enum('status', ['unconfirmed', 'canceled', 'confirmed', 'finished', 'delivered']);
             $table->boolean('deliver');
             $table->integer('address_id')->unsigned()->nullable();

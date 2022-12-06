@@ -14,6 +14,7 @@ use App\Mail\Advise as AdviseMail;
 use App\Mail\ArticleAdvise;
 use App\PriceType;
 use App\SpecialPrice;
+use App\User;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
@@ -28,7 +29,7 @@ class ArticleHelper {
                 $cost = $cost * $user->dollar;
             }
             $last_provider_percentage_gain = Self::lastProviderPercentageGain($article);
-            if ((!is_null($last_provider_percentage_gain) && $article->apply_provider_percentage_gain) || $article->percentage_gain) {
+            if ((!is_null($last_provider_percentage_gain) && $article->apply_provider_percentage_gain) || ($article->percentage_gain)) {
                 $article->price = null;
                 $article->save();
             }
@@ -68,15 +69,101 @@ class ArticleHelper {
             }
             $cost = substr($article->cost, 0, strpos($article->cost, '.'));
             $decimals = substr($article->cost, strpos($article->cost, '.')+1);
-            // Log::info('cost: '.$cost);
-            // Log::info('decimals: '.$decimals);
             if (substr($decimals, 2) == '0000') {
                 $decimals = substr($decimals, 0, 2);
             }
             $article->cost = floatval($cost.'.'.$decimals);
-            // Log::info('nuevo cost: '.$article->cost);
         }
         return $articles;
+    }
+
+    static function setArticlesFinalPrice($company_name = null) {
+        if (!is_null($company_name)) {
+            // echo ('company_name: '.$company_name);
+            $user_id = User::where('company_name', $company_name)
+                            ->first()->id;
+        } else {
+            $user_id = UserHelper::userId();
+        }
+        $articles = Article::where('user_id', $user_id)
+                            ->get();
+        $index = 1;
+        foreach ($articles as $article) {
+            // echo('articulo '.$index.'</br>');
+            Self::setFinalPrice($article, $user_id);
+            $index++;
+        }
+    }
+
+    static function setFinalPrice($article, $user_id = null) {
+        if (is_null($user_id)) {
+            $user = UserHelper::user();
+        } else {
+            $user = User::find($user_id);
+        }
+        if (is_null($article->price) || $article->price == '') {
+            $cost = $article->cost;
+            if ($article->cost_in_dollars) {
+                $cost = $cost * $user->dollar;
+            }
+            $final_price = $cost;
+            if ($article->apply_provider_percentage_gain) {
+                if (!is_null($article->provider_price_list)) {
+                    // Log::info('sumando provider_price_list de '.$article->provider_price_list->percentage);
+                    // Log::info('final_price esta en '.$final_price);
+                    $final_price = $cost + ($cost * $article->provider_price_list->percentage / 100);
+                    // Log::info('final_price quedo en '.$final_price);
+                } else if ((!is_null($article->provider) && $article->provider->percentage_gain)) {
+                    // Log::info('sumando provider->percentage_gain de '.$article->provider->percentage_gain);
+                    // Log::info('final_price esta en '.$final_price);
+                    $final_price = $cost + ($cost * $article->provider->percentage_gain / 100);
+                    // Log::info('final_price quedo en '.$final_price);
+                } else {
+                    // Log::info('no se sumo ningun marguen de ganancia de proveedor');
+                    $final_price = $cost;
+                    // Log::info('final_price quedo en '.$final_price);
+                }
+            }
+            if (!is_null($article->percentage_gain)) {
+                // Log::info('sumando article->percentage_gain de '.$article->percentage_gain);
+                // Log::info('final_price esta en '.$final_price);
+                $final_price += $final_price * $article->percentage_gain / 100; 
+                // if ($final_price > 0) {
+                //     $final_price += $final_price * $article->percentage_gain / 100; 
+                // } else {
+                //     $final_price += $cost * $article->percentage_gain / 100; 
+                // }
+                // Log::info('final_price quedo en '.$final_price);
+            }
+        } else {
+            $final_price = $article->price;
+        }
+
+        if (!$user->configuration->iva_included && Self::hasIva($article)) {
+            // Log::info('sumando iva de '.$article->iva->percentage);
+            // Log::info('final_price esta en '.$final_price);
+            $final_price += $final_price * $article->iva->percentage / 100;
+            // Log::info('final_price quedo en '.$final_price);
+        }
+        if (count($article->discounts) >= 1) {
+            foreach ($article->discounts as $discount) {
+                $final_price -= $final_price * $discount->percentage / 100;
+            }
+        }
+        $article->final_price = $final_price;
+
+        // echo($article->name.' final_price: '.$article->final_price.' </br>');
+        // echo('-------------------------------------------------------------- </br>');
+        $article->save();
+    }
+
+    static function clearCost($article) {
+        $cost = substr($article->cost, 0, strpos($article->cost, '.'));
+        $decimals = substr($article->cost, strpos($article->cost, '.')+1);
+        if (substr($decimals, 2) == '0000') {
+            $decimals = substr($decimals, 0, 2);
+        }
+        $article->cost = floatval($cost.'.'.$decimals);
     }
 
     static function getById($articles_ids) {
@@ -88,11 +175,15 @@ class ArticleHelper {
     }
 
     static function lastProviderPercentageGain($article) {
-        $last_provider = Self::lastProvider($article);
-        if (!is_null($last_provider) && !is_null($last_provider->percentage_gain)) {
-            return $last_provider->percentage_gain;
-        }
+        if (!is_null($article->provider) && $article->provider->percentage_gain) {
+            return $article->provider->percentage_gain;
+        } 
         return null;
+        // $last_provider = Self::lastProvider($article);
+        // if (!is_null($last_provider) && !is_null($last_provider->percentage_gain)) {
+        //     return $last_provider->percentage_gain;
+        // }
+        // return null;
     }
 
     static function lastProvider($article) {
@@ -128,8 +219,6 @@ class ArticleHelper {
     }
 
     static function saveProvider($article, $request) {
-        Log::info('tiene stock de '.$article->stock);
-        Log::info('llego stock de '.$request->stock);
         if (
             // No tiene provedor y llega uno en request
             (count($article->providers) == 0 && $request->provider_id != 0) ||
@@ -405,13 +494,19 @@ class ArticleHelper {
 
     static function getFirstImage($article) {
         if (count($article->images) >= 1) {
-            $first_image = $article->images[0]->url;
+            $first_image = $article->images[0]->hosting_url;
             foreach ($article->images as $image) {
                 if ($image->first != 0) {
-                    $first_image = $image->url;
+                    $first_image = $image->hosting_url;
                 }
             }
-            return 'https://res.cloudinary.com/lucas-cn/image/upload/c_crop,g_custom/r_20/co_rgb:6F6F6F,e_shadow:50,x_-20,y_20/'.$first_image;
+            if (env('APP_ENV') == 'production') {
+                $position = strpos($first_image, 'storage');
+                $first = substr($first_image, 0, $position);
+                $end = substr($first_image, $position);
+                return $first.'public/'.$end;
+            }
+            return $first_image;
         }
         return null;
     }

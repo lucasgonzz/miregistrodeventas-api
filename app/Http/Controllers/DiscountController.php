@@ -39,7 +39,7 @@ class DiscountController extends Controller
     }
 
     // TERMINAR
-    function delete($id) {
+    function destroy($id) {
         $model = Discount::find($id);
         $model->delete();
     }

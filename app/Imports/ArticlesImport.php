@@ -19,8 +19,8 @@ use Maatwebsite\Excel\Concerns\WithHeadingRow;
 class ArticlesImport implements ToCollection
 {
     
-    public function __construct($props, $start_row, $finish_row, $provider_id) {
-        $this->columns = $props;
+    public function __construct($columns, $start_row, $finish_row, $provider_id) {
+        $this->columns = $columns;
         $this->start_row = $start_row;
         $this->finish_row = $finish_row;
         $this->ct = new Controller();
@@ -75,6 +75,8 @@ class ArticlesImport implements ToCollection
                         $this->saveArticle($row, $article);
                     }
                 } 
+            } else if ($num_row > $this->finish_row) {
+                break;
             }
             $num_row++;
         }
@@ -99,7 +101,6 @@ class ArticlesImport implements ToCollection
         if (!is_null($article)) {
             $data['slug'] = ArticleHelper::slug(ImportHelper::getColumnValue($row, 'nombre', $this->columns), $article->id);
             $article->update($data);
-            Log::info('se actualizo '.$article->name.' con costo de '.$article->cost);
         } else {
             if (!is_null(ImportHelper::getColumnValue($row, 'codigo', $this->columns))) {
                 $data['num'] = ImportHelper::getColumnValue($row, 'codigo', $this->columns);
@@ -109,13 +110,10 @@ class ArticlesImport implements ToCollection
             $data['slug'] = ArticleHelper::slug(ImportHelper::getColumnValue($row, 'nombre', $this->columns));
             $data['user_id'] = UserHelper::userId();
             $article = Article::create($data);
-            Log::info('se creo '.$article->name);
         }
-
         $this->setDiscounts($row, $article);
-
         $this->setProvider($row, $article);
-        // Log::info('Se guardo '.$article->name);
+        ArticleHelper::setFinalPrice($article);
     }
 
     function isFirstRow($row) {
@@ -144,7 +142,10 @@ class ArticlesImport implements ToCollection
 
     function setProvider($row, $article) {
         if (!is_null(ImportHelper::getColumnValue($row, 'proveedor', $this->columns))) {
-            $article->providers()->attach($this->ct->getModelBy('providers', 'name', ImportHelper::getColumnValue($row, 'proveedor', $this->columns), true, 'id'), [
+            $provider_id = $this->ct->getModelBy('providers', 'name', ImportHelper::getColumnValue($row, 'proveedor', $this->columns), true, 'id');
+            $article->provider_id = $provider_id;
+            $article->save();
+            $article->providers()->attach($provider_id, [
                                             'amount' => ImportHelper::getColumnValue($row, 'stock_actual', $this->columns),
                                             'cost'   => ImportHelper::getColumnValue($row, 'costo', $this->columns),
                                             'price'  => ImportHelper::getColumnValue($row, 'precio', $this->columns),

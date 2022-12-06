@@ -13,6 +13,10 @@ class SuperBudget extends Model
         $query->with('super_budget_features');
     }
 
+    function super_budget_titles() {
+        return $this->hasMany('App\SuperBudgetTitle');
+    }
+
     function super_budget_features() {
         return $this->hasMany('App\SuperBudgetFeature');
     }

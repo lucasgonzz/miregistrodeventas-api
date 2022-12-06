@@ -43,13 +43,13 @@ class ImportHelper {
 		return null;
 	}
 
-	static function saveLocation($row, $ct) {
-		if ($row['localidad'] != 'Sin especificar' && $row['localidad'] != '') {
+	static function saveLocation($localidad, $ct) {
+		if (!is_null($localidad) && $localidad != 'Sin especificar') {
 	        $data = [
-                'name'      => $row['localidad'],
+                'name'      => $localidad,
                 'user_id'   => $ct->userId(),
             ];
-	        $ct->createIfNotExist('locations', 'name', $row['localidad'], $data);
+	        $ct->createIfNotExist('locations', 'name', $localidad, $data);
 	    }
 	}
 

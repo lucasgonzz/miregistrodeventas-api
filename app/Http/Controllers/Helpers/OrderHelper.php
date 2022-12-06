@@ -134,7 +134,7 @@ class OrderHelper {
             ]);
             SaleHelper::attachArticlesFromOrder($sale, $order->articles);
             if (!is_null($order->buyer->comercio_city_client)) {
-                SaleHelper::attachCurrentAcountsAndCommissions($sale, $order->buyer->comercio_city_client_id, []);
+                SaleHelper::attachCurrentAcountsAndCommissions($sale, $order->buyer->comercio_city_client_id, [], []);
             }
         }
     }

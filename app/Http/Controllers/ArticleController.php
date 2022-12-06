@@ -34,13 +34,12 @@ class ArticleController extends Controller
 
     function index($status = 'active') {
         $user = Auth()->user();
-        $articles = Article::where('user_id',$this->userId())
+        $models = Article::where('user_id', $this->userId())
                             ->where('status', $status)
                             ->orderBy('created_at', 'DESC')
                             ->withAll()
-                            ->get();
-        $articles = ArticleHelper::setPrices($articles);
-        return response()->json(['models' => $articles], 200);
+                            ->paginate(5);
+        return response()->json(['models' => $models], 200);
     }
 
     function mostViewed($weeks_ago) {
@@ -64,8 +63,46 @@ class ArticleController extends Controller
     }
 
     function show($id) {
-        $article = ArticleHelper::getFullArticle($id);
-        return response()->json(['model' => $article], 200);
+        return response()->json(['model' => $this->fullModel('App\Article', $id)], 200);
+    }
+
+    function store(Request $request) {
+        $article = new Article();
+        $article->num                               = $this->num('articles');
+        $article->bar_code                          = $request->bar_code;
+        $article->provider_code                     = $request->provider_code;
+        $article->provider_id                       = $request->provider_id;
+        $article->category_id                       = $request->category_id;
+        $article->sub_category_id                   = $request->sub_category_id;
+        $article->brand_id                          = $request->brand_id;
+        $article->name                              = ucfirst($request->name);
+        $article->slug                              = ArticleHelper::slug($request->name);
+        $article->cost                              = $request->cost;
+        $article->cost_in_dollars                   = $request->cost_in_dollars;
+        $article->apply_provider_percentage_gain    = $request->apply_provider_percentage_gain;
+        $article->price                             = $request->price;
+        $article->percentage_gain                   = $request->percentage_gain;
+        $article->provider_price_list_id            = $request->provider_price_list_id;
+        $article->iva_id                            = $request->iva_id;
+        $article->stock = $request->stock;
+        $article->stock_min = $request->stock_min;
+        $article->user_id = $this->userId();
+        if (isset($request->status)) {
+            $article->status = $request->status;
+        }
+        $article->save();
+        ArticleHelper::setTags($article, $request->tags);
+        ArticleHelper::setDiscounts($article, $request->discounts);
+        ArticleHelper::setDescriptions($article, $request->descriptions);
+        ArticleHelper::setSizes($article, $request->sizes_id);
+        ArticleHelper::setColors($article, $request->colors);
+        ArticleHelper::setCondition($article, $request->condition_id);
+        ArticleHelper::attachProvider($article, $request);
+        ArticleHelper::setSpecialPrices($article, $request);
+        ArticleHelper::setDeposits($article, $request);
+        ArticleHelper::setFinalPrice($article);
+        $article->user->notify(new CreatedArticle($article));
+        return response()->json(['model' => $this->fullModel('App\Article', $article->id)], 201);
     }
 
     function update(Request $request) {
@@ -79,34 +116,26 @@ class ArticleController extends Controller
         $article->status                            = 'active';
         $article->bar_code                          = $request->bar_code;
         $article->provider_code                     = $request->provider_code;
-        $article->sub_category_id                   = $request->sub_category_id != 0 ? $request->sub_category_id : null;
-        $article->brand_id                          = $request->brand_id != 0 ? $request->brand_id : null;
+        $article->provider_id                       = $request->provider_id;
+        $article->category_id                       = $request->category_id;
+        $article->sub_category_id                   = $request->sub_category_id;
+        $article->cost                              = $request->cost;
+        $article->cost_in_dollars                   = $request->cost_in_dollars;
+        $article->brand_id                          = $request->brand_id;
         $article->iva_id                            = $request->iva_id;
         $article->percentage_gain                   = $request->percentage_gain;
-        $article->provider_price_list_id            = $request->provider_price_list_id != 0 ? $request->provider_price_list_id : null;
-        if (!$article->apply_provider_percentage_gain && is_null($article->percentage_gain)) {
-            $article->previus_price = $article->price;
-            $article->price = $request->price;
-            $article->timestamps = true;
-        } else {
-            $article->price = null;
-        }
+        $article->provider_price_list_id            = $request->provider_price_list_id;
+        $article->price                             = $request->price;
+        $article->apply_provider_percentage_gain    = $request->apply_provider_percentage_gain;
+        $article->stock                             = $request->stock;
+        $article->stock                             += $request->new_stock;
+        $article->stock_min                         = $request->stock_min;
         if (strtolower($article->name) != strtolower($request->name)) {
             $article->name = ucfirst($request->name);
             $article->slug = ArticleHelper::slug($request->name);
         }
-        $article->cost = $request->cost;
-        $article->cost_in_dollars = $request->cost_in_dollars;
-        $article->apply_provider_percentage_gain = $request->apply_provider_percentage_gain;
-        if ($request->stock != '') {
-            $article->stock = $request->stock;
-            $article->stock += $request->new_stock;
-            $article->stock_min = $request->stock_min;
-        } else {
-            $article->stock = null;
-        }
-        ArticleHelper::checkAdvises($article);
         $article->save();
+        ArticleHelper::checkAdvises($article);
         ArticleHelper::setTags($article, $request->tags);
         ArticleHelper::setDiscounts($article, $request->discounts);
         ArticleHelper::setDescriptions($article, $request->descriptions);
@@ -115,10 +144,9 @@ class ArticleController extends Controller
         ArticleHelper::setCondition($article, $request->condition_id);
         ArticleHelper::setSpecialPrices($article, $request);
         ArticleHelper::setDeposits($article, $request);
-        $article = ArticleHelper::getFullArticle($article->id);
-        // NotificationHelper::updatedArticle($article);
+        ArticleHelper::setFinalPrice($article);
         $article->user->notify(new UpdatedArticle($article));
-        return response()->json(['model' => $article], 200);
+        return response()->json(['model' => $this->fullModel('App\Article', $article->id)], 200);
     }
 
     function updateProps(Request $request) {
@@ -351,57 +379,15 @@ class ArticleController extends Controller
         }
     }
 
-    function store(Request $request) {
-        $article = new Article();
-        $article->num = $this->num('articles');
-        $article->bar_code = $request->bar_code;
-        $article->provider_code = $request->provider_code;
-        // if ($request->sub_category_id != 0) {
-        //     $article->sub_category_id = $request->sub_category_id;
-        // }
-        $article->sub_category_id = $request->sub_category_id;
-        // if ($request->brand_id != 0) {
-        //     $article->brand_id = $request->brand_id;
-        // }
-        $article->brand_id                          = $request->brand_id;
-        $article->name                              = ucfirst($request->name);
-        $article->slug                              = ArticleHelper::slug($request->name);
-        $article->cost                              = $request->cost;
-        $article->cost_in_dollars                   = $request->cost_in_dollars;
-        $article->apply_provider_percentage_gain    = $request->apply_provider_percentage_gain;
-        $article->price                             = $request->price;
-        $article->percentage_gain                   = $request->percentage_gain;
-        $article->provider_price_list_id            = $request->provider_price_list_id != 0 ? $request->provider_price_list_id : null;
-        if (isset($request->iva_id)) {
-            $article->iva_id = $request->iva_id;
-        }
-        // if ($request->stock != '') {
-        //     $article->stock = $request->stock;
-        // }
-        $article->stock = $request->stock;
-        $article->stock_min = $request->stock_min;
-        $article->user_id = $this->userId();
-        if (isset($request->status)) {
-            $article->status = $request->status;
-        }
-        $article->save();
-        ArticleHelper::setTags($article, $request->tags);
-        ArticleHelper::setDiscounts($article, $request->discounts);
-        ArticleHelper::setDescriptions($article, $request->descriptions);
-        ArticleHelper::setSizes($article, $request->sizes_id);
-        ArticleHelper::setColors($article, $request->colors);
-        ArticleHelper::setCondition($article, $request->condition_id);
-        ArticleHelper::attachProvider($article, $request);
-        ArticleHelper::setSpecialPrices($article, $request);
-        ArticleHelper::setDeposits($article, $request);
-        $article = ArticleHelper::getFullArticle($article->id);
-        $article->user->notify(new CreatedArticle($article));
-        return response()->json(['model' => $article], 201);
-    }
-
     function import(Request $request) {
         $columns = GeneralHelper::getImportColumns($request);
         Excel::import(new ArticlesImport($columns, $request->start_row, $request->finish_row, $request->provider_id), $request->file('models'));
+    }
+
+    function destroy($id) {
+        $article = Article::find($id);
+        $article->status = 'inactive';
+        $article->save();
     }
 
     function pdf($ids) {
@@ -426,12 +412,6 @@ class ArticleController extends Controller
         $article->save();
         $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['model' => $article], 201);
-    }
-
-    function destroy($id) {
-        $article = Article::find($id);
-        $article->status = 'inactive';
-        $article->save();
     }
 
     function delete(Request $request) {

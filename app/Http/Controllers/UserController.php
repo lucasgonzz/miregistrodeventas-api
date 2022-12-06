@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\AfipInformation;
 use App\Collection;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\StringHelper;
 use App\Http\Controllers\Helpers\UserHelper;
@@ -81,14 +82,17 @@ class UserController extends Controller
         $user->order_description    = $request->order_description;
         $user->save();
 
+
         $configuration = UserConfiguration::where('user_id', $this->userId())
                                             ->first();
+        $current_value = $configuration->iva_included;
         $configuration->show_articles_without_stock     = $request->configuration['show_articles_without_stock'];
         $configuration->iva_included                    = $request->configuration['iva_included'];
         $configuration->set_articles_updated_at_always  = $request->configuration['set_articles_updated_at_always'];
         $configuration->limit_items_in_sale_per_page    = $request->configuration['limit_items_in_sale_per_page'];
         $configuration->apply_price_type_in_services    = $request->configuration['apply_price_type_in_services'];
         $configuration->save();
+        $this->updateArticlesPrices($current_value, $request->configuration['iva_included']);
 
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {
@@ -101,6 +105,14 @@ class UserController extends Controller
             return response()->json(['repeated' => false], 200);
         } else {
             return response()->json(['repeated' => true], 200);
+        }
+    }
+
+    function updateArticlesPrices($current_value, $new_value) {
+        Log::info('current_value: '.$current_value);
+        Log::info('new_value: '.$new_value);
+        if ($current_value != $new_value) {
+            ArticleHelper::setArticlesFinalPrice();
         }
     }
 

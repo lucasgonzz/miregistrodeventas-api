@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Helpers\ProviderHelper;
+use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Imports\ProvidersImport;
 use App\Provider;
 use App\User;
@@ -85,7 +86,8 @@ class ProviderController extends Controller
     }
 
     function import(Request $request) {
-        Excel::import(new ProvidersImport, $request->file('providers'));
+        $columns = GeneralHelper::getImportColumns($request);
+        Excel::import(new ProvidersImport($columns, $request->start_row, $request->finish_row), $request->file('models'));
     }
 
     function getFullModel($id) {

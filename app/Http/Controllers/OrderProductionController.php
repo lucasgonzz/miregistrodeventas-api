@@ -48,8 +48,7 @@ class OrderProductionController extends Controller
             'user_id'                       => $this->userId(), 
         ]);
         OrderProductionHelper::attachArticles($model, $request->articles);
-        OrderProductionHelper::sendCreatedMail($model, $request->send_mail);
-        // return response()->json(['model' => $this->getFullModel($model->id)], 201);
+        // OrderProductionHelper::sendCreatedMail($model, $request->send_mail);
         $model = OrderProductionHelper::setArticles([$this->getFullModel($model->id)])[0];
         return response()->json(['model' => $model], 201);
     }

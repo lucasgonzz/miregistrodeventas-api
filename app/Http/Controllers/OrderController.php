@@ -55,39 +55,10 @@ class OrderController extends Controller {
 
     function cancel(Request $request, $id) {
         $model = Order::find($id);
-        $model->status = 'canceled';
+        $model->order_status_id = $this->getModelBy('order_statuses', 'name', 'Cancelado', false, 'id');
         $model->save();
         OrderHelper::restartArticleStock($model);
         MessageHelper::sendOrderCanceledMessage($request->description, $model);
         return response()->json(['model' => $this->fullModel('App\Order', $model->id)], 200);
-    }
-
-    function finish($order_id) {
-        $order = Order::find($order_id);
-        $order->status = 'finished';
-        $order->save();
-        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
-        OrderHelper::deleteCartOrder($order);
-        MessageHelper::sendOrderFinishedMessage($order);
-        // $buyer = Buyer::find($order->buyer_id);
-        // $buyer->notify(new OrderFinished($order));
-        // OrderHelper::sendOrderFinishedNotification($order);
-        return response(null, 200);
-    }
-
-    function deliver($order_id) {
-        $order = Order::where('id', $order_id)
-                        ->withAll()
-                        ->first();
-        $order->status = 'delivered';
-        $order->save();
-        $order->articles = ArticleHelper::setArticlesKeyAndVariant($order->articles);
-        MessageHelper::sendOrderDeliveredMessage($order);
-        // $buyer = Buyer::find($order->buyer_id);
-        // $buyer->notify(new OrderDelivered($order));
-        // event(new OrderDeliveredEvent($order));
-
-        $sale = $this->saveSale($order);
-        return response()->json(['sale' => $sale], 201);
     }
 }

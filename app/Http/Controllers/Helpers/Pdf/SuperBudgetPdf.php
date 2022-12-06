@@ -22,6 +22,7 @@ class SuperBudgetPdf extends fpdf {
 		$this->SetLineWidth(.5);
 		$this->AddPage();
 		$this->printClient();
+		$this->printTitles();
 		$this->printFeatures();
 		$this->printResumen();
 		$this->printOfferValidity();
@@ -69,6 +70,15 @@ class SuperBudgetPdf extends fpdf {
 		$line_height = 20;
 		$this->Cell(190, $line_height, 'Cliente: '.$this->model->client, $this->b, 0, 'L');
 		$this->y += $line_height;
+	}
+
+	function printTitles() {
+		$this->x = 10;
+		$this->SetFont('Arial', '', 12);
+		foreach ($this->model->super_budget_titles as $title) {
+			$this->MultiCell(190, 5, $title->text, $this->b, 'L',);
+		}
+		$this->y += 5;
 	}
 
 	function printFeatures() {
@@ -182,7 +192,7 @@ class SuperBudgetPdf extends fpdf {
 		$line_height = 7;
 		$this->SetFont('Arial', '', 10);
 
-		$plazo_de_pago = '50% adelantado y 50% contra entrega.';
+		$plazo_de_pago = '50% en la entrega y 50% luego del chequeo por parte del cliente.';
 
 		$this->x = 10;
 		$this->Cell(190, $line_height, $plazo_de_pago, $this->b, 0, 'L');

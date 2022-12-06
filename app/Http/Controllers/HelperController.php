@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Article;
 use App\Budget;
 use App\BudgetStatus;
+use App\Category;
 use App\Client;
 use App\CurrentAcount;
 use App\Http\Controllers\Helpers\ArticleHelper;
@@ -90,6 +91,47 @@ class HelperController extends Controller
         //     return back();
         // }
         echo('------------------- TERMINO ----------------------');
+    }
+
+    function setArticlesProvider($company_name) {
+        $id = 1;
+        $user = User::where('company_name', $company_name)->first();
+        $articles = Article::where('user_id', $user->id)
+                            ->orderBy('id', 'ASC')
+                            ->get();
+        $index = 1;
+        foreach ($articles as $article) {
+            if (count($article->providers) >= 1) {
+                $article->provider_id = $article->providers[count($article->providers)-1]->id;
+                $article->save();
+                echo 'Articulo id '.$article->id.': '.$article->name.'. last provider_id: '.$article->provider_id.' </br>';
+                echo "---------------------------------------------------------------- </br>";
+                $index++;
+            }
+        }
+        echo('------------------- TERMINO ----------------------');
+        echo ($index.' articulos actualizados');
+    }
+
+    function setArticlesCategory($company_name) {
+        $id = 1;
+        $user = User::where('company_name', $company_name)->first();
+        $articles = Article::where('user_id', $user->id)
+                            ->orderBy('id', 'ASC')
+                            ->get();
+        $index = 1;
+        foreach ($articles as $article) {
+            if (!is_null($article->sub_category)) {
+                $category = Category::find($article->sub_category->category_id);
+                $article->category_id = $category->id;
+                $article->save();
+                echo 'Articulo id '.$article->id.': '.$article->name.'. last category_id: '.$article->category_id.' </br>';
+                echo "---------------------------------------------------------------- </br>";
+                $index++;
+            }
+        }
+        echo('------------------- TERMINO ----------------------');
+        echo ($index.' articulos actualizados');
     }
 
     function setTitlesHostingImages($company_name) {

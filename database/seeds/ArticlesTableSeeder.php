@@ -645,6 +645,7 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => $article['cost'],
                 'stock'             => $article['stock'] ,
                 'price'             => $article['price'],
+                'provider_id'       => $article['provider_id'],
                 // 'sub_category_id'   => $this->getSubcategoryId($user, $article),
                 'user_id'           => $user->id,
             ]);    
@@ -875,6 +876,8 @@ class ArticlesTableSeeder extends Seeder
                 'cost'              => $article['cost'],
                 'status'            => isset($article['status']) ? $article['status'] : 'active',
                 'stock'             => $article['stock'] ,
+                'provider_id'       => $article['provider_id'],
+                'apply_provider_percentage_gain' => 1,
                 'price'             => $article['price'],
                 'sub_category_id'   => $this->getSubcategoryId($user, $article),
                 'user_id'           => $user->id,
@@ -894,6 +897,7 @@ class ArticlesTableSeeder extends Seeder
                                         'amount' => $article['stock'],
                                     ]);
             $this->createDescriptions($art); 
+            ArticleHelper::setFinalPrice($art, 308);
         }
     }
 

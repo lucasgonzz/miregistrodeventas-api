@@ -335,33 +335,11 @@ Route::middleware('auth:sanctum')->group(function () {
 		// Provider-prices-list
 		Route::delete('provider-price-list/{id}', 'ProviderPriceListController@destroy');
 		// Categorias
-		Route::get('/categories', 
-			'CategoryController@index'
-		);
-		Route::post('/categories', 
-			'CategoryController@store'
-		);
-		Route::put('/categories', 
-			'CategoryController@update'
-		);
-		Route::delete('/categories/{id}', 
-			'CategoryController@delete'
-		);
+		Route::resource('/category', 'CategoryController');
 		// Sub Categorias
-		Route::get('/sub-categories', 
-			'SubCategoryController@index'
-		);
+		Route::resource('/sub-category', 'SubCategoryController');
 		Route::get('/sub-categories/for-vender/{ids}', 
 			'SubCategoryController@forVender'
-		);
-		Route::post('/sub-categories', 
-			'SubCategoryController@store'
-		);
-		Route::put('/sub-categories', 
-			'SubCategoryController@update'
-		);
-		Route::delete('/sub-categories/{id}', 
-			'SubCategoryController@delete'
 		);
 		// Codigos de barra
 		Route::get('/bar-codes', 
@@ -435,18 +413,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 
 	// Prices List
-	Route::get('/prices-lists', 
-		'PricesListController@index'
-	);
-	Route::post('/prices-lists', 
-		'PricesListController@store'
-	);
-	Route::put('/prices-lists/{id}', 
-		'PricesListController@update'
-	);
-	Route::delete('/prices-lists/{id}', 
-		'PricesListController@delete'
-	);
+	Route::resource('/prices-list', 'PricesListController');
 
 	// PriceType
 	Route::resource('price-type', 'PriceTypeController');

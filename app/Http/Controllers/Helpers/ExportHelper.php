@@ -39,7 +39,7 @@ class ExportHelper {
 		$price_types = Self::getPriceTypes();
 		if (count($price_types) >= 1) {
 			foreach ($articles as $article) {
-				$price = $article->price;
+				$price = $article->final_price;
 				foreach ($price_types as $price_type) {
 					$price = $price + ($price * $price_type->percentage / 100);
 					$article->{$price_type->name} = $price; 
