@@ -21,6 +21,7 @@ class PagoPdf extends fpdf {
 
 		$this->AddPage();
 		$this->printPago();
+		$this->paymentMethods();
 		$this->description();
 		PdfHelper::firma($this);
 		$this->pesos();
@@ -62,7 +63,17 @@ class PagoPdf extends fpdf {
 		$this->SetFont('Arial', 'B', 11);
 		$this->Cell(200, 7, 'Recibimos de '.$this->model->client->name, $this->b, 1, 'L');
 		$this->x = 5;
-		$this->Cell(200, 7, 'la cantidad de pesos '.$this->model->haber, $this->b, 1, 'L');
+		$this->Cell(200, 7, 'la cantidad de pesos '.Numbers::price($this->model->haber), $this->b, 1, 'L');
+	}
+
+	function paymentMethods() {
+		if (!is_null($this->model->current_acount_payment_methods)) {
+			foreach ($this->model->current_acount_payment_methods as $payment_method) {
+				$this->x = 5;
+				$this->SetFont('Arial', '', 11);
+				$this->Cell(200, 7, 'Pago con '.$payment_method->name.' $'.Numbers::price($payment_method->pivot->amount), $this->b, 1, 'L');
+			}
+		}
 	}
 
 	function description() {
@@ -77,7 +88,7 @@ class PagoPdf extends fpdf {
 		$this->x = 155;
 		$this->y -= 5;
 		$this->SetFont('Arial', '', 11);
-		$this->Cell(50, 7, 'Son $'.$this->model->haber, 1, 1, 'L');
+		$this->Cell(50, 7, 'Son $'.Numbers::price($this->model->haber), 1, 1, 'L');
 	}
 
 	function Footer() {

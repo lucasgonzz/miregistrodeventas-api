@@ -255,18 +255,18 @@ class BudgetPdf extends fpdf {
 
 	function printArticle($article) {
 		$this->x = 5;
-		$this->Cell(20, $this->line_height, $article->bar_code, $this->b, 0, 'C');
+		$this->Cell(20, $this->line_height, $article->bar_code, $this->b, 0, 'L');
 		$y_1 = $this->y;
-		$this->MultiCell(80, $this->line_height, $article->name, $this->b, 'C', false);
+		$this->MultiCell(80, $this->line_height, $article->name, $this->b, 'L', false);
 		$this->x = 125;
 
 	    $y_2 = $this->y;
 		$this->y = $y_1;
 		$this->x = 105;
-		$this->Cell(30, $this->line_height, '$'.Numbers::price($article->pivot->price), $this->b, 0, 'C');
-		$this->Cell(20, $this->line_height, $article->pivot->amount, $this->b, 0, 'C');
-		$this->Cell(20, $this->line_height, $this->getBonus($article), $this->b, 0, 'C');
-		$this->Cell(30, $this->line_height, '$'.Numbers::price(BudgetHelper::totalArticle($article)), $this->b, 0, 'C');
+		$this->Cell(30, $this->line_height, '$'.Numbers::price($article->pivot->price), $this->b, 0, 'L');
+		$this->Cell(20, $this->line_height, $article->pivot->amount, $this->b, 0, 'L');
+		$this->Cell(20, $this->line_height, $this->getBonus($article), $this->b, 0, 'L');
+		$this->Cell(30, $this->line_height, '$'.Numbers::price(BudgetHelper::totalArticle($article)), $this->b, 0, 'L');
 		$this->y = $y_2;
 	}
 

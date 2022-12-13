@@ -53,6 +53,8 @@ Route::get('/titles/set-hosting-image/{company_name}', 'HelperController@setTitl
 Route::get('/orders/set-status/{company_name}', 'HelperController@setOrdersStatus');
 Route::get('/articles/set-provider/{company_name}', 'HelperController@setArticlesProvider');
 Route::get('/articles/set-category/{company_name}', 'HelperController@setArticlesCategory');
+Route::get('/articles/set-price/{company_name}', 'HelperController@setArticlesPrices');
+Route::get('/articles/check-price/{company_name}', 'HelperController@getArticlesWithPrices');
 Route::get('/articles/set-final-price/{company_name}', 'Helpers\ArticleHelper@setArticlesFinalPrice');
 
 Route::get('a', function() {

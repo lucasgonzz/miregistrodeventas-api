@@ -93,6 +93,39 @@ class HelperController extends Controller
         echo('------------------- TERMINO ----------------------');
     }
 
+    function setArticlesPrices($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+        $articles = Article::where('user_id', $user->id)
+                            ->orderBy('id', 'ASC')
+                            ->get();
+        $index = 1;
+        foreach ($articles as $article) {
+            if (!is_null($article->percentage_gain) || ($article->apply_provider_percentage_gain && !is_null($article->provider) && !is_null($article->provider->percentage_gain))) {
+                $article->price = null;
+                $article->save();
+                ArticleHelper::setFinalPrice($article, $user->id);
+                echo ('Actualizando '.$article->name.', price quedo en '.$article->price.' </br>');
+                $index++;
+            }
+        }
+        echo('------------------- TERMINO ----------------------');
+        echo ($index.' articulos actualizados');
+    }
+
+    function getArticlesWithPrices($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+        $articles = Article::where('user_id', $user->id)
+                            ->orderBy('id', 'ASC')
+                            ->get();
+        $index = 1;
+        foreach ($articles as $article) {
+            if (!is_null($article->percentage_gain) && !is_null($article->price)) {
+                echo($article->name.' tiene percentage_gain: '.$article->percentage_gain.' y price: '.$article->price.' </br>');
+                echo('-------------------------------------------------------------- </br>');
+            }
+        }
+    }
+
     function setArticlesProvider($company_name) {
         $id = 1;
         $user = User::where('company_name', $company_name)->first();

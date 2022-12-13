@@ -42,6 +42,7 @@ class ProviderController extends Controller
             'cuit'              => $request->cuit,
             'observations'      => $request->observations,
             'percentage_gain'   => $request->percentage_gain,
+            'dolar'             => $request->dolar,
             'location_id'       => $request->location_id,
             'iva_condition_id'  => $request->iva_condition_id,
             'user_id'           => $this->getArticleOwnerId(),
@@ -52,16 +53,17 @@ class ProviderController extends Controller
 
     function update(Request $request, $id) {
         $model = Provider::find($id);
-        $model->name = ucwords($request->name);
-        $model->phone = ucwords($request->phone);
-        $model->address = ucwords($request->address);
-        $model->email = $request->email;
-        $model->razon_social = $request->razon_social;
-        $model->cuit = $request->cuit;
-        $model->observations = $request->observations;
-        $model->percentage_gain = $request->percentage_gain;
-        $model->location_id = $request->location_id;
-        $model->iva_condition_id = $request->iva_condition_id;
+        $model->name                = ucwords($request->name);
+        $model->phone               = ucwords($request->phone);
+        $model->address             = ucwords($request->address);
+        $model->email               = $request->email;
+        $model->razon_social        = $request->razon_social;
+        $model->cuit                = $request->cuit;
+        $model->observations        = $request->observations;
+        $model->percentage_gain     = $request->percentage_gain;
+        $model->dolar               = $request->dolar;
+        $model->location_id         = $request->location_id;
+        $model->iva_condition_id    = $request->iva_condition_id;
         $model->save();
         ProviderHelper::attachProviderPriceLists($model, $request->provider_price_lists);
         return response()->json(['model' => $this->getFullModel($model->id)], 200);

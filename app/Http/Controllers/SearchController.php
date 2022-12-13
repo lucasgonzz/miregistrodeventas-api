@@ -36,11 +36,14 @@ class SearchController extends Controller
                 }
             }
         }
+        if ($model_name_param == 'article' || $model_name_param == 'client' || $model_name_param == 'provider') {
+            $models = $models->where('status', 'active');
+        }
         $models = $models->withAll()
                         ->get();
-        if ($model_name_param == 'article') {
-            $models = ArticleHelper::setPrices($models);
-        }
+        // if ($model_name_param == 'article') {
+        //     $models = ArticleHelper::setPrices($models);
+        // }
         return response()->json(['models' => $models], 200);
     }
 }

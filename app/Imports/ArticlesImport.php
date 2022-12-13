@@ -98,10 +98,10 @@ class ArticlesImport implements ToCollection
             'price'             => ImportHelper::getColumnValue($row, 'precio', $this->columns),
             'sub_category_id'   => ImportHelper::getSubcategoryId(ImportHelper::getColumnValue($row, 'categoria', $this->columns), ImportHelper::getColumnValue($row, 'sub_categoria', $this->columns)),
         ];
-        if (!is_null($article)) {
+        if (!is_null($article) && $this->isDataUpdated($article, $data)) {
             $data['slug'] = ArticleHelper::slug(ImportHelper::getColumnValue($row, 'nombre', $this->columns), $article->id);
             $article->update($data);
-        } else {
+        } else if (is_null($article)) {
             if (!is_null(ImportHelper::getColumnValue($row, 'codigo', $this->columns))) {
                 $data['num'] = ImportHelper::getColumnValue($row, 'codigo', $this->columns);
             } else {
@@ -110,10 +110,23 @@ class ArticlesImport implements ToCollection
             $data['slug'] = ArticleHelper::slug(ImportHelper::getColumnValue($row, 'nombre', $this->columns));
             $data['user_id'] = UserHelper::userId();
             $article = Article::create($data);
-        }
+        } 
         $this->setDiscounts($row, $article);
         $this->setProvider($row, $article);
         ArticleHelper::setFinalPrice($article);
+    }
+
+    function isDataUpdated($article, $data) {
+        return  $article->name            != $data['name'] ||
+                $article->bar_code        != $data['bar_code'] ||
+                $article->provider_code   != $data['provider_code'] ||
+                $article->stock           != $data['stock'] ||
+                $article->stock_min       != $data['stock_min'] ||
+                $article->iva_id          != $data['iva_id'] ||
+                $article->cost            != $data['cost'] ||
+                $article->cost_in_dollars != $data['cost_in_dollars'] ||
+                $article->percentage_gain != $data['percentage_gain'] ||
+                $article->price           != $data['price'];
     }
 
     function isFirstRow($row) {

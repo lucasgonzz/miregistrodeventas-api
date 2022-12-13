@@ -38,7 +38,7 @@ class ArticleController extends Controller
                             ->where('status', $status)
                             ->orderBy('created_at', 'DESC')
                             ->withAll()
-                            ->paginate(5);
+                            ->paginate(500);
         return response()->json(['models' => $models], 200);
     }
 
@@ -79,6 +79,7 @@ class ArticleController extends Controller
         $article->slug                              = ArticleHelper::slug($request->name);
         $article->cost                              = $request->cost;
         $article->cost_in_dollars                   = $request->cost_in_dollars;
+        $article->provider_cost_in_dollars          = $request->provider_cost_in_dollars;
         $article->apply_provider_percentage_gain    = $request->apply_provider_percentage_gain;
         $article->price                             = $request->price;
         $article->percentage_gain                   = $request->percentage_gain;
@@ -121,6 +122,7 @@ class ArticleController extends Controller
         $article->sub_category_id                   = $request->sub_category_id;
         $article->cost                              = $request->cost;
         $article->cost_in_dollars                   = $request->cost_in_dollars;
+        $article->provider_cost_in_dollars          = $request->provider_cost_in_dollars;
         $article->brand_id                          = $request->brand_id;
         $article->iva_id                            = $request->iva_id;
         $article->percentage_gain                   = $request->percentage_gain;

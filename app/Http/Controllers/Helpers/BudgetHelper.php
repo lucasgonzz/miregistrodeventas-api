@@ -126,20 +126,11 @@ class BudgetHelper {
 			$bonus = $article['pivot']['bonus'];
 			$location = $article['pivot']['location'];
 			$price = $article['pivot']['price'];
-			if ($article['status'] == 'from_budget' && $id < 0) {
-				$article = Article::create([
-					'provider_code'	=> isset($article['provider_code']) ? $article['provider_code'] : null,
-					'bar_code'		=> isset($article['bar_code']) ? $article['bar_code'] : null,
-					'name'	 		=> $article['name'],
-        			'slug'   		=> ArticleHelper::slug($article['name']),
-					'price'	 		=> $price,
-					'status' 		=> 'from_budget',
-					'user_id'		=> UserHelper::userId(),
-				]);
-			} else if ($article['status'] == 'from_budget' && $id > 0) {
+			if ($article['status'] == 'inactive' && $id > 0) {
 				$art = Article::find($article['id']);
-				$art->bar_code = $article['bar_code'];
-				$art->name = $article['name'];
+				$art->bar_code 		= $article['bar_code'];
+				$art->provider_code = $article['provider_code'];
+				$art->name 			= $article['name'];
 				$art->save();
 			}
 			$budget->articles()->attach($article['id'], [

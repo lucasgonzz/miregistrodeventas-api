@@ -59,7 +59,7 @@ class SaleController extends Controller
                         ->get();
         if (count($sales) >= 1) {
             $sale = $sales[count($sales)-1];
-            $sale->articles = ArticleHelper::setPrices($sale->articles);
+            // $sale->articles = ArticleHelper::setPrices($sale->articles);
             return response()->json(['sale' => $sale]);
         }
         return response()->json(['sale' => null]);

@@ -39,6 +39,7 @@ class CreateArticlesTable extends Migration
             $table->integer('featured')->nullable();
             $table->integer('provider_price_list_id')->unsigned()->nullable();
             $table->boolean('cost_in_dollars')->default(0)->nullable();
+            $table->boolean('provider_cost_in_dollars')->default(0)->nullable();
             $table->boolean('apply_provider_percentage_gain')->default(1)->nullable();
 
             $table->foreign('user_id')

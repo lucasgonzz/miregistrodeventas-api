@@ -71,6 +71,12 @@ Route::middleware('auth:sanctum')->group(function () {
 		'ScheduleController@delete'
 	);
 
+	// UserPayments
+	Route::get('/user-payment/{model_id}/{from_date}/{until_date?}', 
+		'UserPaymentController@index'
+	);
+	Route::resource('user-payment', 'UserPaymentController');
+
 	// PaymentMethods
 	Route::resource('payment-method', 'PaymentMethodController');
 

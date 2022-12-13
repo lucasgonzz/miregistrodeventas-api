@@ -21,62 +21,6 @@ use Illuminate\Support\Str;
 
 class ArticleHelper {
 
-    static function setPrices($articles) {
-        $user = UserHelper::user();
-        foreach ($articles as $article) {
-            $cost = $article->cost;
-            if ($article->cost_in_dollars) {
-                $cost = $cost * $user->dollar;
-            }
-            $last_provider_percentage_gain = Self::lastProviderPercentageGain($article);
-            if ((!is_null($last_provider_percentage_gain) && $article->apply_provider_percentage_gain) || ($article->percentage_gain)) {
-                $article->price = null;
-                $article->save();
-            }
-            $price = 0;
-            if (is_null($article->price) || $article->price == '') {
-
-                if ($article->apply_provider_percentage_gain) {
-                    if (!is_null($article->provider_price_list_id) && !is_null($article->provider_price_list)) {
-                        $price = Numbers::redondear($cost + ($cost * Numbers::percentage($article->provider_price_list->percentage)));
-                    } else if (!is_null($last_provider_percentage_gain)) {
-                        $price = Numbers::redondear($cost + ($cost * Numbers::percentage($last_provider_percentage_gain)));
-                    }
-                }
-
-                if (!is_null($article->percentage_gain)) {
-                    if ($price == 0) {
-                        $price = Numbers::redondear($cost + ($cost * Numbers::percentage($article->percentage_gain)));
-                    } else {
-                        $price = Numbers::redondear($price + ($price * Numbers::percentage($article->percentage_gain)));
-                    }
-                }
-            } 
-            if (!$user->configuration->iva_included && Self::hasIva($article)) {
-                if ($price == 0) {
-                    $price = Numbers::redondear($article->price + ($article->price * Numbers::percentage($article->iva->percentage)));
-                } else {
-                    $price = Numbers::redondear($price + ($price * Numbers::percentage($article->iva->percentage)));
-                }
-            }
-            if ($price > 0) {
-                $article->price = $price;
-            }
-            if (count($article->discounts) >= 1) {
-                foreach ($article->discounts as $discount) {
-                    $article->price = Numbers::redondear($article->price - ($article->price * Numbers::percentage($discount->percentage)));
-                }
-            }
-            $cost = substr($article->cost, 0, strpos($article->cost, '.'));
-            $decimals = substr($article->cost, strpos($article->cost, '.')+1);
-            if (substr($decimals, 2) == '0000') {
-                $decimals = substr($decimals, 0, 2);
-            }
-            $article->cost = floatval($cost.'.'.$decimals);
-        }
-        return $articles;
-    }
-
     static function setArticlesFinalPrice($company_name = null) {
         if (!is_null($company_name)) {
             // echo ('company_name: '.$company_name);
@@ -101,10 +45,18 @@ class ArticleHelper {
         } else {
             $user = User::find($user_id);
         }
+        if (!is_null($article->percentage_gain) || ($article->apply_provider_percentage_gain && !is_null($article->provider) && !is_null($article->provider->percentage_gain))) {
+            $article->price = null;
+            $article->save();
+        }
         if (is_null($article->price) || $article->price == '') {
             $cost = $article->cost;
             if ($article->cost_in_dollars) {
                 $cost = $cost * $user->dollar;
+            } else if ($article->provider_cost_in_dollars && !is_null($article->provider->dolar)) {
+                // Log::info('dolar_provider: '.$article->provider->dolar);
+                $cost = $cost * $article->provider->dolar;
+                // Log::info('nuevo costo: '.$cost);
             }
             $final_price = $cost;
             if ($article->apply_provider_percentage_gain) {
@@ -154,6 +106,7 @@ class ArticleHelper {
 
         // echo($article->name.' final_price: '.$article->final_price.' </br>');
         // echo('-------------------------------------------------------------- </br>');
+        $article->timestamps = false;
         $article->save();
     }
 

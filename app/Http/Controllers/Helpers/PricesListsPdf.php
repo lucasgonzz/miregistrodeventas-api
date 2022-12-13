@@ -59,47 +59,43 @@ class PricesListsPdf extends AlphaPDF {
 
 	function printArticles() {
 		$this->Y = 27;
-		$this->setFont('Arial', '', 12);
-		$articles = ArticleHelper::setPrices($this->prices_list->articles);
-		foreach ($articles as $article) {
+		$this->setFont('Arial', '', 10);
+		$printed = 0;
+		foreach ($this->prices_list->articles as $article) {
+			if ($printed == 3) {
+				$this->addPage();
+            	$this->Y = 27;
+            	$printed = 0;
+			}
 			$this->article = $article;
 			$this->printArticle();
+			$printed++;
 		}
 	}
 
 	function printArticle() {
-		$next_y = $this->getNextY();
-		if ($next_y < 290) {
-			$image = ArticleHelper::getFirstImage($this->article);
-			// dd($image);
-			// $image = null;
-	        $this->setY($this->Y);
-			if (!is_null($image)) {
-	        	$this->Image($image, 10, $this->Y+5, 60);
-	        	$this->Line(80, $this->y, 80, $this->y+80);
-		        $this->SetX(80);
-				$this->Cell(95,$this->getLineHeight(),ArticleHelper::getShortName($this->article->name, 47), 0,0,'C');
-				$this->Cell(35,$this->getLineHeight(),ArticleHelper::price($this->article->price),0 ,0,'C');
-	        	$this->Line(175, $this->y, 175, $this->y+80);
-	        	$this->Y += 80;
-			} else {
-				$this->setX(0);
-    			$description_text = $this->getDescriptionText();
-		        // $this->MultiCell(100,$this->line_height,$this->article->id.'. Y= '.$this->Y.'. next_y= '.$next_y,0,'L', false);
-		        $this->MultiCell(80,$this->line_height,$description_text,0,'L', false);
-		        $this->SetY($this->Y);
-				$this->setX(80);
-				$this->Cell(95,$this->getLineHeight(),ArticleHelper::getShortName($this->article->name, 37),'L',0,'C');
-				$this->Cell(35,$this->getLineHeight(),ArticleHelper::price($this->article->price),'L',0,'C');
-	        	$this->Y += $this->getLineHeight();
-			}
-	        $this->printLine();
+		$image = ArticleHelper::getFirstImage($this->article);
+        $this->setY($this->Y);
+		if (!is_null($image)) {
+        	$this->Image($image, 10, $this->Y+5, 60);
+        	$this->Line(80, $this->y, 80, $this->y+80);
+	        $this->SetX(80);
+			$this->Cell(95,80, $this->article->name, 0, 0, 'C');
+			$this->Cell(35,80, ArticleHelper::price($this->article->final_price), 0, 0, 'C');
+        	$this->Line(175, $this->y, 175, $this->y+80);
+        	$this->Y += 80;
 		} else {
-			// dd($this->article->id);
-			$this->AddPage();
-            $this->Y = 27;
-            $this->printArticle();
+			$this->setX(0);
+			$description_text = $this->getDescriptionText();
+	        $this->MultiCell(80,$this->line_height,$description_text,0,'L', false);
+	        $this->SetY($this->Y);
+			$this->setX(80);
+			$this->Cell(95,$this->getLineHeight(),ArticleHelper::getShortName($this->article->name, 37),'L',0,'C');
+			$this->Cell(35,$this->getLineHeight(),ArticleHelper::price($this->article->final_price),'L',0,'C');
+        	$this->Y += $this->getLineHeight();
 		}
+        $this->printLine();
+		
 	}
 	
     function printLine() {

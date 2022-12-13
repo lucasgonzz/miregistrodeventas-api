@@ -72,14 +72,15 @@ class UserController extends Controller
     // Confirguracion - Editar
     function update(Request $request) {
         $user = User::where('id', $this->userId())->with('employees')->first();
-        $user->name                 = StringHelper::modelName($request->name, true);
-        $user->phone                = $request->phone;
-        $user->online_description   = $request->online_description;
-        $user->has_delivery         = $request->has_delivery;
-        $user->delivery_price       = $request->delivery_price;
-        $user->online_prices        = $request->online_prices;
-        $user->dollar               = $request->dollar;
-        $user->order_description    = $request->order_description;
+        $user->name                             = StringHelper::modelName($request->name, true);
+        $user->phone                            = $request->phone;
+        $user->online_description               = $request->online_description;
+        $user->has_delivery                     = $request->has_delivery;
+        $user->delivery_price                   = $request->delivery_price;
+        $user->online_prices                    = $request->online_prices;
+        $user->dollar                           = $request->dollar;
+        $user->order_description                = $request->order_description;
+        $user->show_articles_without_images     = $request->show_articles_without_images;
         $user->save();
 
 

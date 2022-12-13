@@ -54,6 +54,7 @@ class ProvidersTableSeeder extends Seeder
     	        Provider::create([
                     'num'     => $ct->num('providers', $user->id), 
     	        	'name'    => $provider,
+                    'dolar'   => 500,
                     'address' => $addresses[$index],
                     'email'   => 'lucasgonzalez5500@gmail.com',
     	        	'user_id' => $user->id,

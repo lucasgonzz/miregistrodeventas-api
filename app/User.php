@@ -41,6 +41,10 @@ class User extends Authenticatable
         $query->with('afip_information.iva_condition', 'plan.permissions', 'plan.features', 'subscription', 'addresses', 'extencions.permissions', 'permissions.extencion', 'addresses', 'configuration');
     }
 
+    public function user_payments() {
+        return $this->hasMany('App\UserPayment');
+    }
+
     public function configuration() {
         return $this->hasOne('App\UserConfiguration');
     }

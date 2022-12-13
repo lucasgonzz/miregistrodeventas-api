@@ -101,7 +101,7 @@ class SalesTableSeeder extends Seeder
             $articles = Article::where('user_id', $user->id)
                                 ->take(2)
                                 ->get();
-            $articles = ArticleHelper::setPrices($articles);
+            // $articles = ArticleHelper::setPrices($articles);
             foreach ($articles as $article) {
                 $sale->articles()->attach($article->id, [
                                             'amount'      => 2,
@@ -125,7 +125,7 @@ class SalesTableSeeder extends Seeder
             ]);
             $articles = Article::where('user_id', $user->id)
                                 ->get();
-            $articles = ArticleHelper::setPrices($articles);
+            // $articles = ArticleHelper::setPrices($articles);
             foreach ($articles as $article) {
                 $sale->articles()->attach($article->id, [
                                             'amount'      => 2,
@@ -142,7 +142,7 @@ class SalesTableSeeder extends Seeder
         ]);
         $articles = Article::where('user_id', $user->id)
                             ->get();
-        $articles = ArticleHelper::setPrices($articles);
+        // $articles = ArticleHelper::setPrices($articles);
         foreach ($articles as $article) {
             $sale->articles()->attach($article->id, [
                                         'amount'      => 2,
@@ -168,7 +168,7 @@ class SalesTableSeeder extends Seeder
                 $articles = Article::where('user_id', $user->id)
                                     ->take(2)
                                     ->get();
-                $articles = ArticleHelper::setPrices($articles);
+                // $articles = ArticleHelper::setPrices($articles);
                 foreach ($articles as $article) {
                     $sale->articles()->attach($article->id, [
                                                 'amount'      => 2,
