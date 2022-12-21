@@ -37,6 +37,23 @@ class HelperController extends Controller
         }
     }
 
+    function setProvidersNum($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+        $providers = Provider::where('user_id', $user->id)
+                            ->orderBy('id', 'ASC')
+                            ->get();
+        foreach ($providers as $provider) {
+            $provider->num = null;
+            $provider->save();
+        }
+        foreach ($providers as $provider) {
+            $provider->num = $this->num('providers');
+            $provider->save();
+            echo "Proveedor ".$provider->name." num: ".$provider->num." </br>";
+            echo "------------------------------------------------------ </br>";
+        }
+    }
+
     function setClientsSaldos($company_name) {
         $user = User::where('company_name', $company_name)->first();
         $clients = Client::where('user_id', $user->id)->get();

@@ -9,9 +9,8 @@ class ComboHelper {
 	static function attachArticles($combo, $articles) {
 		$combo->articles()->sync([]);
 		foreach ($articles as $article) {
-			$article = (object)$article;
-			$combo->articles()->attach($article->id, [
-														'amount' => $article->amount
+			$combo->articles()->attach($article['id'], [
+														'amount' => $article['pivot']['amount']
 													]);
 		}
 	}

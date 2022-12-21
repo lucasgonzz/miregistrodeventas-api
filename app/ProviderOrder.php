@@ -9,7 +9,7 @@ class ProviderOrder extends Model
     protected $guarded = [];
 
     function scopeWithAll($query) {
-        $query->with('articles', 'provider', 'provider_order_afip_tickets');
+        $query->with('articles', 'provider', 'provider_order_afip_tickets', 'provider_order_status');
     }
 
     function provider_order_afip_tickets() {
@@ -22,6 +22,10 @@ class ProviderOrder extends Model
 
     function provider() {
         return $this->belongsTo('App\Provider');
+    }
+
+    function provider_order_status() {
+        return $this->belongsTo('App\ProviderOrderStatus');
     }
 
     function articles() {

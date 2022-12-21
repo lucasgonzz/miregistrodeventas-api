@@ -10,38 +10,38 @@ class ComboController extends Controller
 {
 
     public function index() {
-        $combos = Combo::where('user_id', $this->userId())
+        $models = Combo::where('user_id', $this->userId())
                         ->orderBy('created_at', 'DESC')
                         ->with('articles')
                         ->get();
-        $combos = ComboHelper::setArticles($combos);
-        return response()->json(['combos' => $combos], 200);
+        $models = ComboHelper::setArticles($models);
+        return response()->json(['models' => $models], 200);
     }
 
     public function store(Request $request) {
-        $combo = Combo::create([
+        $model = Combo::create([
             'name'      => $request->name,
             'price'     => $request->price,
             'user_id'   => $this->userId(),
         ]);
-        ComboHelper::attachArticles($combo, $request->articles);
-        $combo = ComboHelper::getFullModel($combo->id);
-        return response()->json(['combo' => $combo], 201);
+        ComboHelper::attachArticles($model, $request->articles);
+        $model = ComboHelper::getFullModel($model->id);
+        return response()->json(['model' => $model], 201);
     }
 
     public function update(Request $request, $id) {
-        $combo = Combo::find($id);
-        $combo->name = $request->name;
-        $combo->price = $request->price;
-        $combo->save();
-        ComboHelper::attachArticles($combo, $request->articles);
-        $combo = ComboHelper::getFullModel($combo->id);
-        return response()->json(['combo' => $combo], 200);
+        $model = Combo::find($id);
+        $model->name = $request->name;
+        $model->price = $request->price;
+        $model->save();
+        ComboHelper::attachArticles($model, $request->articles);
+        $model = ComboHelper::getFullModel($model->id);
+        return response()->json(['model' => $model], 200);
     }
 
     public function destroy($id) {
-        $combo = Combo::find($id);
-        $combo->delete();
+        $model = Combo::find($id);
+        $model->delete();
         return response(null, 200);
     }
 }

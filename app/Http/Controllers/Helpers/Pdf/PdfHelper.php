@@ -32,21 +32,18 @@ class PdfHelper {
 
 	static function logo($instance) {
         // Logo
-        $user = UserHelper::getFullModel();
-        if (!is_null($user->hosting_image_url)) {
+        $logo_url = ImageHelper::image();
+        if (!is_null($logo_url)) {
         	if (env('APP_ENV') == 'local') {
         		$instance->Image('https://img.freepik.com/vector-gratis/fondo-plantilla-logo_1390-55.jpg', 5, 5, 40, 25);
         	} else {
-	        	$image = $user->image_url;
-	        	if (!$user->from_cloudinary) {
-	        		$image = $user->hosting_image_url;
-	        	}
-	        	$instance->Image($image, 5, 5, 40, 25);
+	        	$instance->Image($logo_url, 5, 5, 40, 25);
         	}
         }
 		
 		$instance->SetFont('Arial', 'B', 9);
 
+		$user = UserHelper::getFullModel();
 		// Razon social
 		$instance->y = 5;
 		if (!is_null($user->afip_information)) {

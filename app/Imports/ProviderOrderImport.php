@@ -85,6 +85,7 @@ class ProviderOrderImport implements ToCollection
                 'cost'              => ImportHelper::getColumnValue($row, 'costo', $this->columns),
                 'received_cost'     => ImportHelper::getColumnValue($row, 'costo_recibido', $this->columns),
                 'iva_id'            => ImportHelper::getIvaId(ImportHelper::getColumnValue($row, 'iva', $this->columns), $article),
+                'update_cost'       => 0,
             ],
         ];
         return $saved_article;

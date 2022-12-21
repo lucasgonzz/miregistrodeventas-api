@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Log;
 class ImageHelper {
 
 	static function image($model = null, $from_model = false, $cropped = true) {
-		$image_url = ''; 
+		$image_url = null; 
 		if (is_null($model)) {
 			$model = UserHelper::getFullModel();
 		}
@@ -17,7 +17,7 @@ class ImageHelper {
 		} else {
 			$image_url = $model->{$from_model}->hosting_image_url;
 		}
-		if ($image_url) {
+		if (!is_null($image_url)) {
 			if (env('APP_ENV') == 'production') {
                 $position = strpos($image_url, 'storage');
                 $first = substr($image_url, 0, $position);
@@ -26,6 +26,7 @@ class ImageHelper {
 			}
 			return $image_url;
 		}
+		return $image_url;
 	}
 
 	static function saveHostingImage($cloudinary_url) {

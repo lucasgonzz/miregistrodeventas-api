@@ -68,8 +68,8 @@ class NewSalePdf extends fpdf {
 				'key'	=> 'location.name',
 			],
 			[
-				'text' 	=> 'Cuit',
-				'key'	=> 'cuit',
+				'text' 	=> 'Direccion',
+				'key'	=> 'address',
 			],
 		];
 	}

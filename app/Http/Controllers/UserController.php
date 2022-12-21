@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\AfipInformation;
 use App\Collection;
 use App\Http\Controllers\Helpers\ArticleHelper;
+use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
 use App\Http\Controllers\Helpers\StringHelper;
 use App\Http\Controllers\Helpers\UserHelper;
@@ -49,6 +50,7 @@ class UserController extends Controller
             'expired_at'         =>  Carbon::now()->addMonth(),
             'created_at'         =>  Carbon::now(),
         ]);
+        $commerce->extencions()->attach([1, 3, 4, 7, 8]);
 
         UserConfiguration::create([
             'current_acount_pagado_details'         => 'Recibo de pago (saldado)',
@@ -93,7 +95,7 @@ class UserController extends Controller
         $configuration->limit_items_in_sale_per_page    = $request->configuration['limit_items_in_sale_per_page'];
         $configuration->apply_price_type_in_services    = $request->configuration['apply_price_type_in_services'];
         $configuration->save();
-        $this->updateArticlesPrices($current_value, $request->configuration['iva_included']);
+        GeneralHelper::checkNewValuesForArticlesPrices($current_value, $request->configuration['iva_included']);
 
         $repeated_company_name = $this->isCompanyNameRepeated($request->company_name);
         if (!$repeated_company_name) {
@@ -106,14 +108,6 @@ class UserController extends Controller
             return response()->json(['repeated' => false], 200);
         } else {
             return response()->json(['repeated' => true], 200);
-        }
-    }
-
-    function updateArticlesPrices($current_value, $new_value) {
-        Log::info('current_value: '.$current_value);
-        Log::info('new_value: '.$new_value);
-        if ($current_value != $new_value) {
-            ArticleHelper::setArticlesFinalPrice();
         }
     }
 

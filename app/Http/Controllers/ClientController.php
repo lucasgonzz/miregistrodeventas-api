@@ -46,6 +46,7 @@ class ClientController extends Controller
             'address'           => $request->address,
             'location_id'       => $request->location_id,
             'cuit'              => $request->cuit,
+            'description'       => $request->description,
             'razon_social'      => $request->razon_social,
             'iva_condition_id'  => $request->iva_condition_id,
             'price_type_id'     => $request->price_type_id,
@@ -65,6 +66,7 @@ class ClientController extends Controller
         $client->address            = $request->address;
         $client->location_id        = $request->location_id;
         $client->cuit               = $request->cuit;
+        $client->description        = $request->description;
         $client->razon_social       = $request->razon_social;
         $client->iva_condition_id   = $request->iva_condition_id;
         $client->price_type_id      = $request->price_type_id;

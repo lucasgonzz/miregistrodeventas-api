@@ -176,6 +176,7 @@ class SaleController extends Controller
                 CurrentAcountHelper::checkSaldos('client', $sale->client_id);
             }
             $sale->client_id = $request->client_id;
+            Log::info('se actualizo el client_id: '.$sale->client_id);
         }
         $sale->updated_at = Carbon::now();
         $sale->save();

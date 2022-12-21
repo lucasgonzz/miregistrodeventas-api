@@ -66,7 +66,7 @@ class ProvidersImport implements ToCollection
             'cuit'              => ImportHelper::getColumnValue($row, 'cuit', $this->columns),
             'observations'      => ImportHelper::getColumnValue($row, 'observaciones', $this->columns),
         ];
-        if (!is_null($provider)) {
+        if (!is_null($provider) && $this->isDataUpdated($provider, $data)) {
             $provider->update($data);
         } else {
             $codigo = ImportHelper::getColumnValue($row, 'codigo', $this->columns);
@@ -80,5 +80,16 @@ class ProvidersImport implements ToCollection
         }
     }
 
+    function isDataUpdated($provider, $data) {
+        return  $provider->name                 != $data['name'] ||
+                $provider->phone                != $data['phone'] ||
+                $provider->address              != $data['address'] ||
+                $provider->location_id          != $data['location_id'] ||
+                $provider->email                != $data['email'] ||
+                $provider->iva_condition_id     != $data['iva_condition_id'] ||
+                $provider->razon_social         != $data['razon_social'] ||
+                $provider->cuit                 != $data['cuit'] ||
+                $provider->observations         != $data['observations'];
+    }
 
 }

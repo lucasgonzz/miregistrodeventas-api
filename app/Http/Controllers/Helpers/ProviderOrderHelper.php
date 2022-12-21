@@ -78,6 +78,7 @@ class ProviderOrderHelper {
 
 	static function attachArticles($articles, $provider_order) {
 		$last_received = Self::getLastReceived($provider_order);
+		Self::deleteInactiveArticles($provider_order);
 		$provider_order->articles()->sync([]);
 		foreach ($articles as $article) {
 			if ($article['status'] == 'inactive') {
@@ -99,6 +100,14 @@ class ProviderOrderHelper {
 			Self::updateArticleStock($article, $last_received, $provider_order);
 		}
 		Self::saveCurrentAcount($provider_order);
+	}
+
+	static function deleteInactiveArticles($provider_order) {
+		foreach ($provider_order->articles as $article) {
+			if ($article->status == 'inactive') {
+				$article->delete();
+			}
+		}
 	}
 
 	static function getIvaId($article) {

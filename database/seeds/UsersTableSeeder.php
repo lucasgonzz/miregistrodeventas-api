@@ -17,23 +17,27 @@ class UsersTableSeeder extends Seeder
     public function run()
     {
 
-        $this->fiushh();
+        if (env('FOR_SERVER') == 'la_barraca') {
+            $this->la_barraca();
+        } else {
+            $this->fiushh();
 
-        $this->pinocho();
+            $this->pinocho();
 
-        $this->candy();
+            $this->candy();
 
-        $this->kasAberturas();
+            $this->kasAberturas();
 
-        $this->nebulaStore();
+            $this->nebulaStore();
 
-        $this->mcElectronica();
+            $this->mcElectronica();
 
-        $this->colman();
+            $this->colman();
 
-        $this->la_barraca();
+            $this->la_barraca();
 
-        $this->super();
+            $this->super();
+        }
 
     }
 

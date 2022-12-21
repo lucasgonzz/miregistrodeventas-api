@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Helpers\ProviderHelper;
+use App\Exports\ProviderExport;
 use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Imports\ProvidersImport;
 use App\Provider;
@@ -13,19 +13,10 @@ use Maatwebsite\Excel\Facades\Excel;
 class ProviderController extends Controller
 {
 
-    function getArticleOwnerId() {
-        $user = Auth()->user();
-        if (is_null($user->owner_id)) {
-            return $user->id;
-        } else {
-            return $user->owner_id;
-        }
-    }
-
     function index() {
-    	$models = Provider::where('user_id', $this->getArticleOwnerId())
+    	$models = Provider::where('user_id', $this->userId())
                             ->where('status', 'active')
-                            ->orderBy('name', 'ASC')
+                            ->orderBy('created_at', 'DESC')
                             ->withAll()
                             ->get();
         return response()->json(['models' => $models], 200);
@@ -45,14 +36,15 @@ class ProviderController extends Controller
             'dolar'             => $request->dolar,
             'location_id'       => $request->location_id,
             'iva_condition_id'  => $request->iva_condition_id,
-            'user_id'           => $this->getArticleOwnerId(),
+            'user_id'           => $this->userId(),
         ]);
-        ProviderHelper::attachProviderPriceLists($model, $request->provider_price_lists);
-        return response()->json(['model' => $this->getFullModel($model->id)], 201);
+        return response()->json(['model' => $this->fullModel('App\Provider', $model->id)], 201);
     }
 
     function update(Request $request, $id) {
         $model = Provider::find($id);
+        $last_percentage_gain       = $model->percentage_gain;
+        $last_dolar                 = $model->dolar;
         $model->name                = ucwords($request->name);
         $model->phone               = ucwords($request->phone);
         $model->address             = ucwords($request->address);
@@ -65,8 +57,9 @@ class ProviderController extends Controller
         $model->location_id         = $request->location_id;
         $model->iva_condition_id    = $request->iva_condition_id;
         $model->save();
-        ProviderHelper::attachProviderPriceLists($model, $request->provider_price_lists);
-        return response()->json(['model' => $this->getFullModel($model->id)], 200);
+        GeneralHelper::checkNewValuesForArticlesPrices($last_percentage_gain, $model->percentage_gain, 'provider_id', $model->id);
+        GeneralHelper::checkNewValuesForArticlesPrices($last_dolar, $model->dolar, 'provider_id', $model->id);
+        return response()->json(['model' => $this->fullModel('App\Provider', $model->id)], 200);
     }
 
     function setComercioCityUser(Request $request) {
@@ -92,11 +85,8 @@ class ProviderController extends Controller
         Excel::import(new ProvidersImport($columns, $request->start_row, $request->finish_row), $request->file('models'));
     }
 
-    function getFullModel($id) {
-        $model = Provider::where('id', $id)
-                        ->withAll()
-                        ->first();
-        return $model;
+    function export() {
+        return Excel::download(new ProviderExport, 'comerciocity-proveedores.xlsx');
     }
 
 }

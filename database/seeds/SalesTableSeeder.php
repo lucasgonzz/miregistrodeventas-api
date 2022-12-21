@@ -51,7 +51,7 @@ class SalesTableSeeder extends Seeder
                     $sale->articles()->attach($article->id, [
                                                 'amount'      => 2,
                                                 'cost'        => $article->cost,
-                                                'price'       => $article->price,
+                                                'price'       => $article->final_price,
                                             ]);
                 }
                 $discounts = DiscountHelper::getDiscountsFromDiscountsId([1]);
@@ -82,7 +82,7 @@ class SalesTableSeeder extends Seeder
                 $sale->articles()->attach($article->id, [
                                             'amount'      => 2,
                                             'cost'        => $article->cost,
-                                            'price'       => $article->price,
+                                            'price'       => $article->final_price,
                                         ]);
             }
         }
@@ -106,7 +106,7 @@ class SalesTableSeeder extends Seeder
                 $sale->articles()->attach($article->id, [
                                             'amount'      => 2,
                                             'cost'        => $article->cost,
-                                            'price'       => $article->price,
+                                            'price'       => $article->final_price,
                                         ]);
             }
         }
@@ -130,7 +130,7 @@ class SalesTableSeeder extends Seeder
                 $sale->articles()->attach($article->id, [
                                             'amount'      => 2,
                                             'cost'        => $article->cost,
-                                            'price'       => $article->price,
+                                            'price'       => $article->final_price,
                                         ]);
             }
         }
@@ -147,7 +147,7 @@ class SalesTableSeeder extends Seeder
             $sale->articles()->attach($article->id, [
                                         'amount'      => 2,
                                         'cost'        => $article->cost,
-                                        'price'       => $article->price,
+                                        'price'       => $article->final_price,
                                     ]);
         }
     }
@@ -173,7 +173,7 @@ class SalesTableSeeder extends Seeder
                     $sale->articles()->attach($article->id, [
                                                 'amount'      => 2,
                                                 'cost'        => $article->cost,
-                                                'price'       => $article->price,
+                                                'price'       => $article->final_price,
                                             ]);
                 }
             }

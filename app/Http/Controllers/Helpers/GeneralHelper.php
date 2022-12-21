@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Helpers;
 
 use App\Article;
+use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -45,6 +46,20 @@ class GeneralHelper {
             $index++;
         }
         return $result;
+    }
+
+    static function checkNewValuesForArticlesPrices($current_value, $new_value, $from_model_id = null, $model_id = null) {
+        if ($current_value != $new_value) {
+            if (!is_null($from_model_id)) {
+                $articles = Article::where($from_model_id, $model_id)
+                                    ->get();
+                foreach ($articles as $article) {
+                    ArticleHelper::setFinalPrice($article);
+                }
+            } else {
+                ArticleHelper::setArticlesFinalPrice();
+            }
+        }
     }
 
     static function getPivotValue($model, $prop, $ignore_0 = false) {

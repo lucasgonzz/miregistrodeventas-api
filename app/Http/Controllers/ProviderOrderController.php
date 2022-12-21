@@ -42,7 +42,7 @@ class ProviderOrderController extends Controller
             'user_id'                   => $this->userId(),
         ]);
         ProviderOrderHelper::attachArticles($request->articles, $provider_order);
-        ProviderOrderHelper::attachAfipTickets($request->provider_order_afip_tickets, $provider_order);
+        // ProviderOrderHelper::attachAfipTickets($request->provider_order_afip_tickets, $provider_order);
         // ProviderOrderHelper::sendEmail($request->send_email, $provider_order);
         $provider_order = $this->fullModel('App\ProviderOrder', $provider_order->id);
         return response()->json(['model' => $provider_order], 201);
@@ -54,7 +54,7 @@ class ProviderOrderController extends Controller
         $provider_order->provider_order_status_id   = $request->provider_order_status_id;
         $provider_order->save();
         ProviderOrderHelper::attachArticles($request->articles, $provider_order);
-        ProviderOrderHelper::attachAfipTickets($request->provider_order_afip_tickets, $provider_order);
+        // ProviderOrderHelper::attachAfipTickets($request->provider_order_afip_tickets, $provider_order);
         // ProviderOrderHelper::sendEmail($request->send_email, $provider_order);
         $provider_order = $this->fullModel('App\ProviderOrder', $provider_order->id);
         return response()->json(['model' => $provider_order], 201);

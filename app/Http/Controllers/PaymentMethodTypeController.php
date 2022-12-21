@@ -9,6 +9,6 @@ class PaymentMethodTypeController extends Controller
 {
     function index() {
         $models = PaymentMethodType::all();
-        return response()->json(['payment_method_types' => $models], 200);
+        return response()->json(['models' => $models], 200);
     }
 }

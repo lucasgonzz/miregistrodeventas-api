@@ -168,6 +168,9 @@ class ArticleController extends Controller
             if ($request->form['percentage_price'] != '') {
                 $model->price += $model->price * floatval($request->form['percentage_price']) / 100;
             }
+            if ($request->form['category_id'] != 0) {
+                $model->category_id = $request->form['category_id'];
+            }
             if ($request->form['sub_category_id'] != 0) {
                 $model->sub_category_id = $request->form['sub_category_id'];
             }
@@ -282,8 +285,7 @@ class ArticleController extends Controller
         }
         $image->first = 1;
         $image->save();
-        $article = ArticleHelper::getFullArticle($article->id);
-        return response()->json(['model' => $article], 200);
+        return response()->json(['model' => $this->fullModel('App\Article', $article->id)], 200);
     }
 
     function updateImages(Request $request) {
@@ -397,7 +399,6 @@ class ArticleController extends Controller
         foreach (explode('-', $ids) as $id) {
             $articles[] = Article::find($id);
         }
-        $articles = ArticleHelper::setPrices($articles);
         (new ArticleTicketPdf($articles));
     }
 
@@ -412,6 +413,7 @@ class ArticleController extends Controller
             $article->name = $request->name;
         }
         $article->save();
+        ArticleHelper::setFinalPrice($article);
         $article = ArticleHelper::getFullArticle($article->id);
         return response()->json(['model' => $article], 201);
     }

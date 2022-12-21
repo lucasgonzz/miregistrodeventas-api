@@ -25,7 +25,7 @@ use Maatwebsite\Excel\Facades\Excel;
 |
 */
 
-Route::get('/order-productions/pdf/{link}', function($link) {
+Route::get('/order-production/image-pdf/{link}', function($link) {
 	return response()->file(storage_path().'/app/public/pdf/'.$link);
 });
 
@@ -34,8 +34,8 @@ Route::get('/afip/{sale_id}', 'AfipWsController@init');
 
 Route::get('/articles/pdf/{ids}', 'ArticleController@pdf');
 
-Route::get('/budgets/pdf/{id}', 'BudgetController@pdf');
-Route::get('/order-productions/print-pdf/{id}', 'OrderProductionController@pdf');
+Route::get('/budget/pdf/{id}', 'BudgetController@pdf');
+Route::get('/order-production/pdf/{id}', 'OrderProductionController@pdf');
 Route::get('/order-productions/articles-pdf/{id}', 'OrderProductionController@articlesPdf');
 
 Route::get('/provider-order/pdf/{id}', 'ProviderOrderController@pdf');
@@ -44,6 +44,7 @@ Route::get('/clients/check-saldos/{client_id}',
 	'ClientController@checkCurrentAcounts'
 );
 
+Route::get('/providers/set-num/{company_name}', 'HelperController@setProvidersNum');
 Route::get('/clients/set-saldos/{company_name}', 'HelperController@setClientsSaldos');
 Route::get('/budgets/set-articles/{company_name}', 'HelperController@setArticlesFromBudgets');
 Route::get('/order-productions/set-articles/{company_name}', 'HelperController@setArticlesFromOrderProductions');
@@ -146,6 +147,7 @@ Route::get('/sales/tickets/pdf/{sale_id}/{address_id?}', 'SaleController@ticketP
 
 // Exel
 Route::get('/articles/excel/export', 'ArticleController@export');
+Route::get('/provider/excel/export', 'ProviderController@export');
 
 // Imprimir articulos
 Route::get('/pdf/{columns}/{articles_ids}/{orientation}/{header?}', 'PdfController@articles');

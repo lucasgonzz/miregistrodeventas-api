@@ -12,6 +12,9 @@ Route::get('/plans',
 	'PlanController@index'
 );
 
+// Update Features
+Route::get('update-feature', 'UpdateFeatureController@index');
+
 Route::middleware('auth:sanctum')->group(function () {
 
 	Route::get('/auth-user', 'UserController@user');
@@ -43,6 +46,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::delete('/addresses/{id}', 
 		'AddressController@delete'
 	);
+
 	// Afip Information
 	Route::put('/afip-information', 
 		'AfipInformationController@update'
@@ -81,7 +85,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::resource('payment-method', 'PaymentMethodController');
 
 	// PaymentMethodTypes
-	Route::get('payment-method-types', 'PaymentMethodTypeController@index');
+	Route::get('payment-method-type', 'PaymentMethodTypeController@index');
 
 	// DeliveryZones
 	Route::resource('delivery-zone', 'DeliveryZoneController');
@@ -91,6 +95,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// CreditCards
 	Route::resource('credit-card', 'CreditCardController');
+
+	// CreditCardPaymentPlans
+	Route::resource('credit-card-payment-plan', 'CreditCardPaymentPlanController');
 
 	// -----------------------SUPER--------------------------------------------------
 	Route::resource('super-user', 'SuperUserController');
@@ -271,7 +278,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	);
 
 	// ProviderOrderAfipTickets
-	Route::delete('provider-order-afip-ticket/{id}', 'ProviderOrderAfipTicketController@destroy');
+	Route::resource('provider-order-afip-ticket', 'ProviderOrderAfipTicketController');
 
 	// ProviderOrderStatuses
 	Route::get('/provider-order-status', 
@@ -339,7 +346,8 @@ Route::middleware('auth:sanctum')->group(function () {
 			'ProviderController@import'
 		);
 		// Provider-prices-list
-		Route::delete('provider-price-list/{id}', 'ProviderPriceListController@destroy');
+		Route::resource('provider-price-list', 'ProviderPriceListController');
+
 		// Categorias
 		Route::resource('/category', 'CategoryController');
 		// Sub Categorias
@@ -425,7 +433,7 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::resource('price-type', 'PriceTypeController');
 
 	// Combos
-	Route::resource('combos', 'ComboController');
+	Route::resource('combo', 'ComboController');
 
 	// Services
 	Route::post('services', 'ServiceController@store');
@@ -455,14 +463,11 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::put('/images/set-color', 
 		'ImageController@setColor'
 	);
-	Route::get('/articles/set-first-image/{image_id}', 
+	Route::get('/article/set-first-image/{image_id}', 
 		'ArticleController@setFirstImage'
 	);
 	Route::put('/article/image/{article_id}', 
 		'ArticleController@addImage'
-	);
-	Route::get('/articles/set-first-image/{image_id}', 
-		'ArticleController@setFirstImage'
 	);
 	Route::get('/articles/delete-image/{image_id}', 
 		'ArticleController@deleteImage'

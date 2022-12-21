@@ -425,7 +425,7 @@ class ArticleHelper {
         $article = Article::where('id', $article_id)
                             ->withAll()
                             ->first();
-        $article = Self::setPrices([$article])[0];
+        // $article = Self::setPrices([$article])[0];
         return $article;
     }
 
