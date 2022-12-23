@@ -33,6 +33,14 @@ class OrderController extends Controller {
         return response()->json(['models' => $models], 200);
     }
 
+    function indexUnconfirmed() {
+        $models = Order::where('user_id', $this->userId())
+                        ->where('order_status_id', 1)
+                        ->withAll()
+                        ->get();
+        return response()->json(['models' => $models], 200);
+    }
+
     function show($id) {
         return response()->json(['model' => $this->fullModel('App\Order', $id)], 200);
     }

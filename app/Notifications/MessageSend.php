@@ -62,7 +62,7 @@ class MessageSend extends Notification
     public function toMail($notifiable)
     {
         $logo_url = ImageHelper::image();
-        Log::info('MAIL logo_url: '.$ logo_url);
+        Log::info('MAIL logo_url: '.$logo_url);
         return (new MailMessage)
                     ->from(Auth()->user()->email, Auth()->user()->company_name)
                     ->subject($this->title)

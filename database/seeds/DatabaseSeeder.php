@@ -76,6 +76,7 @@ class DatabaseSeeder extends Seeder
             $this->call(CreditCardSeeder::class);
             $this->call(CreditCardPaymentPlanSeeder::class);
             $this->call(UpdateFeatureSeeder::class);
+            $this->call(OrderSeeder::class);
         }
     }
 }

@@ -701,6 +701,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/order/{from_date}/{until_date?}', 
 		'OrderController@index'
 	);
+	Route::get('/order-unconfirmed', 
+		'OrderController@indexUnconfirmed'
+	);
 	Route::get('/order-previus-days/{index}', 
 		'OrderController@previusDays'
 	);
