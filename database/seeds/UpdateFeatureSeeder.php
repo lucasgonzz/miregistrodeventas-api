@@ -14,20 +14,28 @@ class UpdateFeatureSeeder extends Seeder
     {
         $models = [
             [
-                'name' => 'Excel',
-                'description' => 'Luego de la importacion solo se seteara la fecha de actualizado a los articulos que se les haya hecho alguna modificacion.',
+                'name' => 'Excel para CLIENTES',
+                'description' => 'Esta disponible la opcion para exportar e importar archivo excel de tus clientes.',
             ],
             [
-                'name' => 'Dolar para proveedores',
-                'description' => 'Ahora se puede asignar un valor de dolar para cada proveedor, para luego indicar en los articulos que su costo esta en dolares de ese proveedor.',
+                'name' => 'Imprimir CLIENTES',
+                'description' => 'Esta disponible la opcion para generar un PDF con tus clientes.',
             ],
             [
-                'name' => 'Cientes',
-                'description' => 'Correccion en el guardado de datos.',
+                'name'  => 'Exportar solo los FILTRADOS',
+                'description' => 'Luego de hacer una busqueda, vas a poder exportar a Excel o PDF solo los resultados filtrados.'
             ],
             [
-                'name' => 'Imagenes de articulos',
-                'description' => 'Correccion en el guardado y randerizado de imagenes.',
+                'name'  => 'Iva en los pedidos a proveedores',
+                'description' => 'Opcion para especificar si el Iva esta incluido en el precio final y en cuenta corriente en los pedidos a proveedores.'
+            ],
+            [
+                'name'  => 'Actualizar contraseña a empleados',
+                'description' => 'Opcion para cambiar la contraseña a los empleados.'
+            ],
+            [
+                'name'  => 'Actualizacion en los saldos de los clientes',
+                'description' => 'Despues de hacer o actualizar una venta, se actualizara automaticamente el saldo del cliente.'
             ],
         ];
         foreach ($models as $model) {

@@ -37,6 +37,7 @@ class ProviderOrderController extends Controller
     function store(Request $request) {
         $provider_order = ProviderOrder::create([
             'num'                       => ProviderOrderHelper::getNum(),
+            'total_with_iva'            => $request->total_with_iva,
             'provider_id'               => $request->provider_id,
             'provider_order_status_id'  => $request->provider_order_status_id,
             'user_id'                   => $this->userId(),
@@ -50,6 +51,7 @@ class ProviderOrderController extends Controller
 
     function update(Request $request, $id) {
         $provider_order = ProviderOrder::find($id);
+        $provider_order->total_with_iva             = $request->total_with_iva;
         $provider_order->provider_id                = $request->provider_id;
         $provider_order->provider_order_status_id   = $request->provider_order_status_id;
         $provider_order->save();

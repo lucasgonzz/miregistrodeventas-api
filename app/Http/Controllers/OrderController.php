@@ -9,6 +9,7 @@ use App\Http\Controllers\Helpers\CartHelper;
 use App\Http\Controllers\Helpers\GeneralHelper;
 use App\Http\Controllers\Helpers\MessageHelper;
 use App\Http\Controllers\Helpers\OrderHelper;
+use App\Http\Controllers\Helpers\Pdf\OrderPdf;
 use App\Http\Controllers\Helpers\SaleHelper;
 use App\Notifications\OrderCanceled as OrderCanceledNotification;
 use App\Notifications\OrderDelivered;
@@ -68,5 +69,10 @@ class OrderController extends Controller {
         OrderHelper::restartArticleStock($model);
         MessageHelper::sendOrderCanceledMessage($request->description, $model);
         return response()->json(['model' => $this->fullModel('App\Order', $model->id)], 200);
+    }
+
+    function pdf($id) {
+        $model = Order::find($id);
+        new OrderPdf($model);
     }
 }

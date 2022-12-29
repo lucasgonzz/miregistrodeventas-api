@@ -1,5 +1,6 @@
 <?php
 
+use App\Article;
 use App\Buyer;
 use App\Order;
 use App\User;
@@ -26,13 +27,22 @@ class OrderSeeder extends Seeder
             ],
         ];
         foreach ($models as $model) {
-            Order::create([
+            $order = Order::create([
+                'num'                   => 1,
                 'buyer_id'              => $model['buyer_id'],
                 'order_status_id'       => $model['order_status_id'],
                 'deliver'               => $model['deliver'],
                 'created_at'            => $model['created_at'],
                 'user_id'               => $user->id,
             ]);
+            $articles = Article::where('user_id', $user->id)
+                                ->get();
+            foreach ($articles as $article) {
+                $order->articles()->attach($article->id, [
+                    'amount'    => 2,
+                    'price'     => $article->final_price,
+                ]); 
+             }     
         }
     }
 }

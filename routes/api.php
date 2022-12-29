@@ -573,6 +573,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 	// Clientes
 	Route::resource('/client', 'ClientController');
+	Route::get('/client-show/{id}', 'ClientController@show');
 
 	// CurrentAcounts
 	Route::get('/current-acount/{model_name}/{model_id}/{months_ago}', 

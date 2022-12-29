@@ -32,17 +32,24 @@ Route::get('/order-production/image-pdf/{link}', function($link) {
 Route::get('/delete-subs', 'SubscriptionController@deleteAll');
 Route::get('/afip/{sale_id}', 'AfipWsController@init');
 
-Route::get('/articles/pdf/{ids}', 'ArticleController@pdf');
 
-Route::get('/budget/pdf/{id}', 'BudgetController@pdf');
-Route::get('/order-production/pdf/{id}', 'OrderProductionController@pdf');
-Route::get('/order-productions/articles-pdf/{id}', 'OrderProductionController@articlesPdf');
 
-Route::get('/provider-order/pdf/{id}', 'ProviderOrderController@pdf');
 
 Route::get('/clients/check-saldos/{client_id}', 
 	'ClientController@checkCurrentAcounts'
 );
+Route::get('/client/excel/export', 
+	'ClientController@export'
+);
+
+// PDF
+Route::get('/client/pdf', 'ClientController@pdf');
+Route::get('/order/pdf/{id}', 'OrderController@pdf');
+Route::get('/provider-order/pdf/{id}', 'ProviderOrderController@pdf');
+Route::get('/budget/pdf/{id}', 'BudgetController@pdf');
+Route::get('/order-production/pdf/{id}', 'OrderProductionController@pdf');
+Route::get('/order-productions/articles-pdf/{id}', 'OrderProductionController@articlesPdf');
+Route::get('/articles/pdf/{ids}', 'ArticleController@pdf');
 
 Route::get('/providers/set-num/{company_name}', 'HelperController@setProvidersNum');
 Route::get('/clients/set-saldos/{company_name}', 'HelperController@setClientsSaldos');

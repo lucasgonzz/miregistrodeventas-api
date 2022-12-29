@@ -13,6 +13,7 @@ use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Notifications\BudgetCreated;
+use App\Notifications\CreatedSale;
 use App\OrderProduction;
 use App\Sale;
 use Carbon\Carbon;
@@ -73,6 +74,7 @@ class BudgetHelper {
             	'employee_id'           => SaleHelper::getEmployeeId(),
 	            'save_current_acount' 	=> 0,
 	        ]);
+        	$sale->user->notify(new CreatedSale($sale));
 		}
 	}
 

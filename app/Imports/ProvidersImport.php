@@ -68,7 +68,7 @@ class ProvidersImport implements ToCollection
         ];
         if (!is_null($provider) && $this->isDataUpdated($provider, $data)) {
             $provider->update($data);
-        } else {
+        } else if (is_null($provider)) {
             $codigo = ImportHelper::getColumnValue($row, 'codigo', $this->columns);
             if (!is_null($codigo)) {
                 $data['num'] = $codigo;

@@ -23,6 +23,7 @@ class CreateUsersTable extends Migration
             $table->string('company_name', 128)->nullable();
             $table->enum('type', ['commerce', 'provider'])->default('commerce');
             $table->string('password', 128);
+            $table->string('visible_password', 128)->nullable();
             $table->string('prev_password', 128)->nullable();
             $table->integer('owner_id')->nullable()->unsigned();
             $table->integer('plan_id')->unsigned()->nullable();

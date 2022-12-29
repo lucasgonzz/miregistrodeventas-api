@@ -16,12 +16,12 @@ class PdfHelper {
 	static function header($instance, $data) {
 		Self::logo($instance);
 		Self::title($instance, $data['title']);
-		Self::numeroFecha($instance, $data['num'], $data['date']);
+		Self::numeroFecha($instance, $data);
 		Self::commerceInfo($instance);
 		
 		Self::commerceInfoLine($instance);
 
-		Self::modelInfo($instance, $data['model_info'], $data['model_props']);
+		Self::modelInfo($instance, $data);
 		if (isset($data['current_acount'])) {
 			Self::currentAcountInfo($instance, $data['current_acount'], $data['client_id'], $data['compra_actual']);
 		}
@@ -92,14 +92,19 @@ class PdfHelper {
 		$instance->Cell(50, 7, 'Firma', 'T', 1, 'C');
 	}
 
-	static function numeroFecha($instance, $num, $date) {
+	static function numeroFecha($instance, $data) {
 		$instance->SetFont('Arial', 'B', 14);
 		$start_y = 5;
 		$instance->y = 5;
 		$instance->x = 120;
 		// Numero
-		$instance->Cell(40, 10, 'N° '.$num, $instance->b, 0, 'L');
-		$instance->Cell(45, 10, date_format($date, 'd/m/Y'), $instance->b, 1, 'R');
+		if (isset($data['num'])) {
+			$instance->Cell(40, 10, 'N° '.$data['num'], $instance->b, 0, 'L');
+		}
+		if (isset($data['date'])) {
+			$instance->Cell(45, 10, date_format($data['date'], 'd/m/Y'), $instance->b, 0, 'R');
+		}
+		$instance->y += 10;
 		
 		// Num pag
 		$instance->SetFont('Arial', '', 10);
@@ -165,14 +170,14 @@ class PdfHelper {
 		$instance->Line(105, 20, 105, 30);
 	}
 
-	static function modelInfo($instance, $model, $props) {
-		if (!is_null($model)) {
+	static function modelInfo($instance, $data) {
+		if (isset($data['model_info']) && !is_null($data['model_info'])) {
 		    $instance->x = 5;
 		    $start_y = $instance->y;
 		    $instance->SetFont('Arial', '', 10);
-		    foreach ($props as $prop) {
+		    foreach ($data['model_props'] as $prop) {
 		    	$instance->x = 5;
-				$instance->Cell(100, 5, $prop['text'].': '.Self::getPropValue($model, $prop), $instance->b, 1, 'L');
+				$instance->Cell(100, 5, $prop['text'].': '.Self::getPropValue($data['model_info'], $prop), $instance->b, 1, 'L');
 		    }
 		    $instance->Line(5, $start_y, 105, $start_y);
 		    $instance->Line(105, $start_y, 105, $instance->y);

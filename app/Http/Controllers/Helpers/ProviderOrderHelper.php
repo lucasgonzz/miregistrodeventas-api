@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Helpers;
 
 use App\Article;
 use App\CurrentAcount;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Notifications\ProviderOrderCreated;
@@ -167,7 +168,13 @@ class ProviderOrderHelper {
 		$total = 0;
 		foreach ($provider_order->articles as $article) {
 			if ($article->pivot->cost != '' && $article->pivot->received > 0) {
-				$total += $article->pivot->cost * $article->pivot->received;
+				$total_article = $article->pivot->cost * $article->pivot->received;
+				if ($provider_order->total_with_iva && !is_null($article->pivot->iva_id)) {
+					$ct = new Controller();
+					$iva = $ct->getModelBy('ivas', 'id', $article->pivot->iva_id);
+					$total_article += $total_article * $iva->percentage / 100;
+				}
+				$total += $total_article;
 			}
 		}
 		return $total;

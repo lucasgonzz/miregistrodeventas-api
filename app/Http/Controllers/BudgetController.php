@@ -44,9 +44,8 @@ class BudgetController extends Controller
             'budget_status_id'          => $request->budget_status_id,
             'user_id'                   => $this->userId(),
         ]);
-        $old_total = BudgetHelper::getTotal($budget);
         BudgetHelper::attachArticles($budget, $request->articles);
-        BudgetHelper::checkStatus($budget, $old_total);
+        BudgetHelper::checkStatus($this->fullModel('App\Budget', $budget->id));
         // BudgetHelper::attachOptionalStatuses($budget, $request->optional_statuses);
         BudgetHelper::sendMail($budget, $request->send_mail);
 
@@ -62,7 +61,7 @@ class BudgetController extends Controller
         $budget->budget_status_id = $request->budget_status_id;
         $budget->save();
         BudgetHelper::attachArticles($budget, $request->articles);
-        BudgetHelper::checkStatus($budget);
+        BudgetHelper::checkStatus($this->fullModel('App\Budget', $budget->id));
         return response()->json(['model' => BudgetHelper::getFullModel($budget->id)], 200);
     }
 

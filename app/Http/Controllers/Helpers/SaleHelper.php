@@ -21,6 +21,7 @@ use App\Http\Controllers\Helpers\UserHelper;
 use App\Http\Controllers\SaleController;
 use App\Sale;
 use App\SaleType;
+use App\Service;
 use App\Variant;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
@@ -186,11 +187,20 @@ class SaleHelper extends Controller {
         }
     }
 
-    static function updateArticlesPrices($sale, $articles) {
-        foreach ($articles as $article) {
-            $sale->articles()->updateExistingPivot($article['id'], [
-                                                    'price' => $article['price_vender'],
-                                                ]);
+    static function updateItemsPrices($sale, $items) {
+        foreach ($items as $item) {
+            if (isset($item['is_article']) && $item['price_vender'] != '') {
+                $sale->articles()->updateExistingPivot($item['id'], [
+                                                        'price' => $item['price_vender'],
+                                                    ]);
+            } else if (isset($item['is_service']) && $item['price_vender'] != '') {
+                $service = Service::find($item['id']);
+                $service->price = $item['price_vender'];
+                $service->save();
+                $sale->services()->updateExistingPivot($item['id'], [
+                                                        'price' => $item['price_vender'],
+                                                    ]);
+            }
         }
     }
 

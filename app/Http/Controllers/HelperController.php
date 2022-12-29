@@ -14,6 +14,7 @@ use App\Http\Controllers\Helpers\ImageHelper;
 use App\Order;
 use App\OrderProduction;
 use App\OrderStatus;
+use App\Provider;
 use App\Title;
 use App\User;
 use Illuminate\Http\Request;

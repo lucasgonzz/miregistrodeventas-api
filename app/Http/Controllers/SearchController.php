@@ -9,10 +9,16 @@ use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
-    function search(Request $request, $model_name_param) {
+    function search(Request $request, $model_name_param, $_filters = null) {
         $model_name = GeneralHelper::getModelName($model_name_param);
         $models = $model_name::where('user_id', $this->userId());
-        foreach ($request->filters as $filter) {
+        if (is_null($_filters)) {
+            $filters = $request->filters;
+        } else {
+            $filters = $_filters;
+        }
+        Log::info($filters);
+        foreach ($filters as $filter) {
             if (isset($filter['type'])) {
                 if ($filter['type'] == 'number') {
                     if ($filter['number_type'] == 'min' && $filter['value'] != '') {
@@ -47,6 +53,10 @@ class SearchController extends Controller
         // if ($model_name_param == 'article') {
         //     $models = ArticleHelper::setPrices($models);
         // }
-        return response()->json(['models' => $models], 200);
+        if (is_null($_filters)) {
+            return response()->json(['models' => $models], 200);
+        } else {
+            return $models;
+        }
     }
 }

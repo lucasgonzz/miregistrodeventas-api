@@ -9,9 +9,11 @@ use App\Http\Controllers\Helpers\ClientHelper;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintClients;
+use App\Http\Controllers\Helpers\Pdf\ClientPdf;
 use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\Sale\Commissioners as SaleHelper_Commissioners;
 use App\Http\Controllers\SaleController;
+use App\Http\Controllers\SearchController;
 use App\Imports\ClientsImport;
 use App\Sale;
 use App\Seller;
@@ -19,6 +21,7 @@ use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Log;
 
 class ClientController extends Controller
 {
@@ -33,8 +36,7 @@ class ClientController extends Controller
     }
 
     function show($id) {
-        $client = ClientHelper::getFullModel($id);
-        return response()->json(['model' => $client], 200);
+        return response()->json(['model' => $this->fullModel('App\Client', $id)], 200);
     }
 
     function store(Request $request) {
@@ -88,23 +90,30 @@ class ClientController extends Controller
         return response()->json(['user_finded' => false, 200]);
     }
 
-    function pdf($seller_id) {
-        if ($seller_id == 'undefined') {
-            $seller = new \stdClass();
-            $seller->name = 'Oscar';
-            $seller->surname = '';
-            $clients = Client::where('seller_id', null)
-                                ->get();
-            $clients = ClientHelper::setClientsSaldo($clients);
+    function pdf(Request $request) {
+        // dd(!is_null($request->get('fitlers')));
+        if (isset($request->all()['filters'])) {
+            // dd($request->all()['filters']);
+            $_filters = json_decode($request->all()['filters']);
+            $ct = new SearchController();
+            $filters = [];
+            foreach ($_filters as $filter) {
+                $filters[] = (array)$filter;
+            }
+            // dd($filters);
+            $models = $ct->search($request, 'client', $filters);
+            // dd($models);
         } else {
-            $seller = Seller::where('id', $seller_id)
-                            ->with('clients')
-                            ->first();
-            $clients = ClientHelper::setClientsSaldo($seller->clients);
+            $models = Client::where('user_id', $this->userId())
+                            ->get();
         }
-        // dd($seller->clients);
-        $pdf = new PdfPrintClients($seller, $clients);
-        $pdf->printClients();
+            // $models = Client::where('user_id', $this->userId())
+                            // ->get();
+        $pdf = new ClientPdf($models);
+    }
+
+    function export() {
+        return Excel::download(new ClientExport, 'comerciocity-clientes.xlsx');
     }
 
     function isRegister($client_name) {

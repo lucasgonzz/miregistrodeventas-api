@@ -25,8 +25,9 @@ class EmployeeController extends Controller
                         ->first();
 
         $model->permissions()->sync($request->permissions_id);
-        $model->dni = $request->dni;
-        // $model->password = bcrypt($request->password);
+        $model->visible_password    = $request->visible_password;
+        $model->password            = bcrypt($request->visible_password);
+        $model->dni                 = $request->dni;
         $model->save();
 
         $model = User::where('id', $request->id)
@@ -42,9 +43,8 @@ class EmployeeController extends Controller
 
     function store(Request $request) {
     	$user = auth()->user();
-        $model = User::where('owner_id', $this->userId())
-                            ->where('dni', $request->dni)
-                            ->first();
+        $model = User::where('dni', $request->dni)
+                        ->first();
 
 
         if (is_null($model)) {
@@ -52,7 +52,8 @@ class EmployeeController extends Controller
                 'name'              => ucfirst($request->name),
                 'dni'               => $request->dni,
         		'company_name'      => $user->company_name,
-        		'password'          => Hash::make($request->password),
+                'visible_password'  => $request->visible_password,
+        		'password'          => Hash::make($request->visible_password),
                 'owner_id'          => UserHelper::userId(),
                 'percentage_card'   => $user->percentage_card,
                 'type'              => $user->type,

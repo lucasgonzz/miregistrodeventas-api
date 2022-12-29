@@ -106,4 +106,11 @@ class GeneralHelper {
         return $models;
     }
 
+    static function getRelation($model, $relation_name, $prop_name = 'name') {
+        if (!is_null($model->{$relation_name})) {
+            return $model->{$relation_name}->{$prop_name};
+        }
+        return null;
+    }
+
 }

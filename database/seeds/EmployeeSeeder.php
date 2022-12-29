@@ -22,6 +22,7 @@ class EmployeeSeeder extends Seeder
                 'name'      => 'Franco',
                 'dni'       => '123',
                 'password'  => bcrypt('123'),
+                'visible_password'  => '123',
                 'type'      => $user->type,
                 'owner_id'  => $user->id,
             ],
@@ -31,6 +32,7 @@ class EmployeeSeeder extends Seeder
                 'type'      => $user->type,
                 'owner_id'  => $user->id,
                 'password'  => bcrypt('1234'),
+                'visible_password'  => '1234',
             ],
         ];
         foreach ($models as $model) {

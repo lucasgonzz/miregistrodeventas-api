@@ -186,16 +186,19 @@ class SaleController extends Controller
         if ($sale->client_id) {
             SaleHelper::updateCurrentAcountsAndCommissions($sale);
         }
+        $sale->user->notify(new CreatedSale($sale));
         return response()->json(['sale' => $sale], 200);
     }
 
     function updatePrices(Request $request, $id) {
         $model = Sale::find($id);
-        SaleHelper::updateArticlesPrices($model, $request->articles);
+        SaleHelper::updateItemsPrices($model, $request->items);
         if ($model->client_id) {
             SaleHelper::updateCurrentAcountsAndCommissions($model);
         }
-        return response()->json(['model' => $this->fullModel('App\Sale', $id)], 200);
+        $sale = $this->fullModel('App\Sale', $id);
+        $sale->user->notify(new CreatedSale($sale));
+        return response()->json(['model' => $sale], 200);
     }
 
     function store(Request $request) {
