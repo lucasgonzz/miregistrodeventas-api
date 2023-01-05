@@ -37,8 +37,9 @@ class NewSalePdf extends fpdf {
 	function getFields() {
 		$fields = [
 			'#' 		=> 5,
-			'Codigo' 	=> 40,
-			'Nombre' 	=> 75,
+			'Num' 		=> 15,
+			'Codigo' 	=> 35,
+			'Nombre' 	=> 65,
 			'Cant' 		=> 15,
 		];
 
@@ -130,6 +131,14 @@ class NewSalePdf extends fpdf {
 			'C'
 		);
 		$this->Cell(
+			$this->getFields()['Num'], 
+			$this->line_height, 
+			$item->num, 
+			$this->b, 
+			0, 
+			'C'
+		);
+		$this->Cell(
 			$this->getFields()['Codigo'], 
 			$this->line_height, 
 			$item->bar_code, 
@@ -148,7 +157,7 @@ class NewSalePdf extends fpdf {
 	    );
 	    $y_2 = $this->y;
 	    $this->y = $y_1;
-	    $this->x = $this->start_x + $this->getFields()['#'] + $this->getFields()['Codigo'] + $this->getFields()['Nombre'];
+	    $this->x = $this->start_x + $this->getFields()['#'] + $this->getFields()['Num'] + $this->getFields()['Codigo'] + $this->getFields()['Nombre'];
 		$this->Cell(
 			$this->getFields()['Cant'], 
 			$this->line_height, 
@@ -188,7 +197,7 @@ class NewSalePdf extends fpdf {
 		if ($this->with_prices) {
 			$this->Line($this->start_x, $this->y, 210-$this->start_x, $this->y);
 		} else {
-			$width = 5 + $this->getFields()['#'] + $this->getFields()['Codigo'] + $this->getFields()['Nombre'] + $this->getFields()['Cant'];
+			$width = 5 + $this->getFields()['#'] + $this->getFields()['Num'] + $this->getFields()['Codigo'] + $this->getFields()['Nombre'] + $this->getFields()['Cant'];
 			$this->Line($this->start_x, $this->y, $width, $this->y);
 		}
 	}

@@ -292,12 +292,12 @@ class BudgetPdf extends fpdf {
 		// $this->SetLineWidth(.2);
 		if ($this->budget->observations != '') {
 		    $this->x = 5;
-	    	$this->SetFont('Arial', 'B', 12);
-			$this->Cell(100, 10, 'Observaciones', 'BTL', 0, 'L');
-			$this->y += 10;
+		    $this->y += 5;
+	    	$this->SetFont('Arial', 'B', 10);
+			$this->Cell(100, $this->line_height, 'Observaciones', 0, 1, 'L');
 		    $this->x = 5;
 	    	$this->SetFont('Arial', '', 10);
-	    	$this->MultiCell(200, $this->line_height, $this->budget->observation, $this->b, 'LTB', false);
+	    	$this->MultiCell(200, $this->line_height, $this->budget->observations, $this->b, 'LTB', false);
 	    	$this->x = 5;
 		}
 	}

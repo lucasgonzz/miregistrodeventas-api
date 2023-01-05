@@ -10,7 +10,7 @@ class SuperBudget extends Model
     protected $dates = ['offer_validity'];
 
     function scopeWithAll($query) {
-        $query->with('super_budget_features');
+        $query->with('super_budget_features.super_budget_feature_items');
     }
 
     function super_budget_titles() {

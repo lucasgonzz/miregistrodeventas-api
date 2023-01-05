@@ -51,6 +51,12 @@ class OrderController extends Controller {
         return response()->json(['days' => $days], 200);
     }
 
+    function update(Request $request, $id) {
+        $model = Order::find($id);
+        OrderHelper::attachArticles($model, $request->articles);
+        return response()->json(['model' => $this->fullModel('App\Order', $id)], 200);
+    }
+
     function updateStatus(Request $request, $id) {
         $model = Order::find($id);
         OrderHelper::discountArticleStock($model);

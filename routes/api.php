@@ -711,6 +711,9 @@ Route::middleware('auth:sanctum')->group(function () {
 	Route::get('/order-show/{id}', 
 		'OrderController@show'
 	);
+	Route::put('/order/{id}', 
+		'OrderController@update'
+	);
 	Route::put('/order/update-status/{order_id}', 
 		'OrderController@updateStatus'
 	);

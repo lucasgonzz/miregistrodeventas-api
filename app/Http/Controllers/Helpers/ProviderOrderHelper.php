@@ -79,15 +79,17 @@ class ProviderOrderHelper {
 
 	static function attachArticles($articles, $provider_order) {
 		$last_received = Self::getLastReceived($provider_order);
-		Self::deleteInactiveArticles($provider_order);
+		// Self::deleteInactiveArticles($provider_order);
 		$provider_order->articles()->sync([]);
 		foreach ($articles as $article) {
 			if ($article['status'] == 'inactive') {
 				$art = Article::find($article['id']);
-				$art->bar_code = $article['bar_code'];
-				$art->provider_code = $article['provider_code'];
-				$art->name = $article['name'];
-				$art->save();
+				if (!is_null($art)) {
+					$art->bar_code = $article['bar_code'];
+					$art->provider_code = $article['provider_code'];
+					$art->name = $article['name'];
+					$art->save();
+				}
 			} 
 			$provider_order->articles()->attach($article['id'], [
 											'amount' 		=> $article['pivot']['amount'],

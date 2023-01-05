@@ -60,6 +60,16 @@ class OrderHelper {
         return $orders;
     }
 
+    static function attachArticles($model, $articles) {
+        $model->articles()->detach();
+        foreach ($articles as $article) {
+            $model->articles()->attach($article['id'], [
+                'price' => $article['pivot']['price'],
+                'amount' => $article['pivot']['amount'],
+            ]);
+        }
+    }
+
     static function deleteCartOrder($order) {
         $cart = Cart::where('order_id', $order->id)
                     ->first();
@@ -125,12 +135,13 @@ class OrderHelper {
                 $client_id = $order->buyer->comercio_city_client_id;
             }
             $sale = Sale::create([
-                'user_id'  => UserHelper::userId(),
-                'buyer_id' => $order->buyer_id,
-                'client_id' => $client_id,
-                'num_sale' => $num_sale,
-                'save_current_acount' => 1,
-                'order_id' => $order->id,
+                'user_id'               => UserHelper::userId(),
+                'buyer_id'              => $order->buyer_id,
+                'client_id'             => $client_id,
+                'num_sale'              => $num_sale,
+                'save_current_acount'   => 1,
+                'order_id'              => $order->id,
+                'employee_id'           => SaleHelper::getEmployeeId(),
             ]);
             SaleHelper::attachArticlesFromOrder($sale, $order->articles);
             if (!is_null($order->buyer->comercio_city_client)) {

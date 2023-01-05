@@ -110,6 +110,16 @@ class SuperBudgetPdf extends fpdf {
 				$this->MultiCell(190, $line_height, $feature->description, $this->b, 'L', false);
 			}
 
+			// ITEMS
+			$line_height = 5;
+			if (count($feature->super_budget_feature_items) >= 1) {
+				foreach ($feature->super_budget_feature_items as $item) {
+					$this->SetFont('Arial', '', 10);
+					$this->x = 15;
+					$this->MultiCell(185, $line_height, '* '.$item->text, $this->b, 'L', false);
+				}
+			}
+
 			// TIEMPO DE DESARROLLO
 			$this->y += 2;
 			$this->x = 10;

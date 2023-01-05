@@ -38,7 +38,12 @@ class ArticleController extends Controller
                             ->where('status', $status)
                             ->orderBy('created_at', 'DESC')
                             ->withAll()
-                            ->paginate(500);
+                            ->paginate(100);
+        if (count($models) < 100) {
+            Log::info('page: '.request()->page);
+            $user->articles_pages = request()->page;
+            $user->save();
+        }
         return response()->json(['models' => $models], 200);
     }
 

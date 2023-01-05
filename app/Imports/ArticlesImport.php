@@ -97,6 +97,7 @@ class ArticlesImport implements ToCollection
             'percentage_gain'   => ImportHelper::getColumnValue($row, 'margen_de_ganancia', $this->columns),
             'price'             => ImportHelper::getColumnValue($row, 'precio', $this->columns),
             'sub_category_id'   => ImportHelper::getSubcategoryId(ImportHelper::getColumnValue($row, 'categoria', $this->columns), ImportHelper::getColumnValue($row, 'sub_categoria', $this->columns)),
+            // 'provider_id'       => $this->provider_id != 0 ? $this->provider_id : ImportHelper::getColumnValue($row, 'proveedor', $this->columns),
         ];
         if (!is_null($article) && $this->isDataUpdated($article, $data)) {
             $data['slug'] = ArticleHelper::slug(ImportHelper::getColumnValue($row, 'nombre', $this->columns), $article->id);
@@ -126,6 +127,7 @@ class ArticlesImport implements ToCollection
                 $article->cost            != $data['cost'] ||
                 $article->cost_in_dollars != $data['cost_in_dollars'] ||
                 $article->percentage_gain != $data['percentage_gain'] ||
+                $article->provider_id     != $data['provider_id'] ||
                 $article->price           != $data['price'];
     }
 
@@ -154,8 +156,12 @@ class ArticlesImport implements ToCollection
     }
 
     function setProvider($row, $article) {
-        if (!is_null(ImportHelper::getColumnValue($row, 'proveedor', $this->columns))) {
-            $provider_id = $this->ct->getModelBy('providers', 'name', ImportHelper::getColumnValue($row, 'proveedor', $this->columns), true, 'id');
+        if ($this->provider_id != 0 || !is_null(ImportHelper::getColumnValue($row, 'proveedor', $this->columns))) {
+            if ($this->provider_id != 0) {
+                $provider_id = $this->provider_id;
+            } else {
+                $provider_id = $this->ct->getModelBy('providers', 'name', ImportHelper::getColumnValue($row, 'proveedor', $this->columns), true, 'id');
+            }
             $article->provider_id = $provider_id;
             $article->save();
             $article->providers()->attach($provider_id, [

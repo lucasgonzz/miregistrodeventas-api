@@ -14,28 +14,16 @@ class UpdateFeatureSeeder extends Seeder
     {
         $models = [
             [
-                'name' => 'Excel para CLIENTES',
-                'description' => 'Esta disponible la opcion para exportar e importar archivo excel de tus clientes.',
+                'name' => 'Edicion de pedidos de la tienda',
+                'description' => 'Esta disponible la edicion de los articulos de los pedidos de la tienda online.',
             ],
             [
-                'name' => 'Imprimir CLIENTES',
-                'description' => 'Esta disponible la opcion para generar un PDF con tus clientes.',
+                'name' => 'Atajo a las recetas de los articulos',
+                'description' => 'Ahora se puede ingresar a la receta de los articulos desde las ordenes de produccion desde el boton "receta".',
             ],
             [
-                'name'  => 'Exportar solo los FILTRADOS',
-                'description' => 'Luego de hacer una busqueda, vas a poder exportar a Excel o PDF solo los resultados filtrados.'
-            ],
-            [
-                'name'  => 'Iva en los pedidos a proveedores',
-                'description' => 'Opcion para especificar si el Iva esta incluido en el precio final y en cuenta corriente en los pedidos a proveedores.'
-            ],
-            [
-                'name'  => 'Actualizar contraseña a empleados',
-                'description' => 'Opcion para cambiar la contraseña a los empleados.'
-            ],
-            [
-                'name'  => 'Actualizacion en los saldos de los clientes',
-                'description' => 'Despues de hacer o actualizar una venta, se actualizara automaticamente el saldo del cliente.'
+                'name' => 'Informe mas preciso de la descarga de articulos',
+                'description' => 'La aplicacion delegara toda la descarga de articulos a un segundo plano, e informara con mas precision el estado de la descarga de articulos.',
             ],
         ];
         foreach ($models as $model) {

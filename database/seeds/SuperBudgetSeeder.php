@@ -2,6 +2,7 @@
 
 use App\SuperBudget;
 use App\SuperBudgetFeature;
+use App\SuperBudgetFeatureItem;
 use App\SuperBudgetTitle;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -15,6 +16,131 @@ class SuperBudgetSeeder extends Seeder
      */
     public function run()
     {
+
+        $diana = [
+            'client' => 'Bartolome Kablan',
+            'offer_validity'    => Carbon::now()->addDays(7),
+            'hour_price'        => 3500,
+            'delivery_time'     => '6 semanas, el tiempo de entrega puede variar dependiendo las revisiones solicitadas por el cliente.',
+            'titles'             => [
+                [
+                    'text' => 'Presupuesto para el desarrollo de Aplicación Web con almacenamiento de datos en la Nube.'
+                ],
+                [
+                    'text' => 'La tecnología en la Nube permite acceder la información desde cualquier dispositivo conectado a internet.'
+                ],
+                [
+                    'text' => 'El desarrollo en esta arquitectura permite que se puedan ir haciendo mejoras en el sistema una que vez el cliente comienza a usarlo, estas mejoras a realizarse, las irá identificando el cliente conforme utilice el programa.'
+                ],
+                [
+                    'text' => 'El soporte de servidores corre por nuestra cuenta, con copias de seguridad diarias de la información cargada en el sistema. Soporte para que ingresen los propietarios y empleados del negocio como los clientes, por lo que se cobra un mantenimiento mensual de $1000.',
+                ],
+            ],
+            'features'          => [
+                [
+                    'title'             => 'Dar de alta canchas',
+                    'description'       => 'El usuario administrador podrá dar de alta, editar y eliminar canchas dentro del sistema, cada cancha constara de un nombre y una descripcion',
+                    'development_time'  => 3,
+                ],
+                [
+                    'title'             => 'Dar de alta Horarios',
+                    'description'       => 'El usuario administrador podrá dar de alta, editar y eliminar horarios dentro del sistema, cada horario constara de un nombre y una descripcion',
+                    'development_time'  => 3,
+                ],
+                [
+                    'title'             => 'Vincular las canchas con los horarios',
+                    'description'       => 'Una vez creada la cancha "Futbol" y los horarios "Tarde" y "Noche", podra vincular la cancha Futbol al horario Tarde, asegnando la duracion en horas del turno y un precio por la duracion asignada, y la misma cancha vincularla al horario Noche con otro precio distinto. Todas las canchas van a poder vincularse con todos los horarios dados de alta.',
+                    'development_time'  => 3,
+                ],
+                [
+                    'title'             => 'Dar de alta productos',
+                    'description'       => 'El usuario podrá dar de alta, editar y eliminar productos dentro del sistema, cada producto constara de un nombre, costo, precio y stock. Todo el conjunto de articulos conformara el inventario.',
+                    'development_time'  => 3,
+                ],
+                [
+                    'title'             => 'Dar de alta turnos para las canchas',
+                    'description'       => 'El usuario podrá crear turnos para las canchas, que reprecentaran los alquileres de las mismas. Los pasos para dar de alta un turno son:',
+                    'items'             => [
+                        'Escoger la cancha y la fecha.',
+                        'En base a la cancha y la fecha seleccionadas se mostrarian los horarios/turnos disponibles.',
+                        'Una vez seleccionado el horario, podra seleccionar el metodo de pago.',
+                        'Luego de indicar la información anterior, se dara de alta el turno.'
+                    ],
+                    'development_time'  => 5,
+                ],
+                [
+                    'title'             => 'Dar de alta productos',
+                    'description'       => 'El usuario podrá dar de alta, editar y eliminar productos dentro del sistema, cada producto constara de un nombre, costo, precio y stock. Todo el conjunto de articulos conformara el inventario.',
+                    'development_time'  => 3,
+                ],
+                [
+                    'title'             => 'Crear ventas de productos',
+                    'description'       => 'El usuario podrá dar de crear ventas, las ventas estaran conformadas por los productos previamente dados de alta, a los cuales indicara la cantidad al mometo de agregar a una venta.',
+                    'items'             => [
+                        'Las ventas solo estaran conformadas por productos',
+                        'No tendran la posibilidad de asignar un cliente',
+                        'No tendran la posibilidad de imprimirlas',
+                        'Tendran la posibilidad de indicar que empleado la realizo',
+                    ],
+                    'development_time'  => 5,
+                ],
+                [
+                    'title'             => 'Seccion CAJA',
+                    'description'       => 'Tendra disponible una seccion para ver los movimientos de la CAJA, aqui se visualizaran las ventas de la cantina, los turnos dados de alta, y un resumen de los metodos de pago utilizados y los montos de cada para cada metodo, tanto para la cantina como para los alquileres.',
+                    'development_time'  => 4,
+                ],
+                [
+                    'title'             => 'Dar de alta empleados',
+                    'description'       => 'Se podran crear, editar y eliminar empleados, con el fin de darles acceso a las distintas partes dentro del sistema y que cada uno pueda dejar registro de las ventas realizadas.',
+                    'development_time'  => 4,
+                ],
+                [
+                    'title'             => 'Pagina para ingreso de los clientes y reserva de canchas',
+                    'description'       => 'Pagina alojada en un dominio a eleccion del cliente, ejemplo "canchasbartolo.com", a la que ingresaran los clientes, con la opcion para reservar una cancha. Los pasos serian:',
+                    'items'             => [
+                        'Escoger la cancha y la fecha',
+                        'En base a la cancha y la fecha seleccionadas se mostrarian los horarios disponibles',
+                        'Una vez seleccionado el horario, tendra la unica opcion de abonar el total con su cuenta de MercadoPago.',
+                        'Luego de recibir el pago, se informaria mediante mail al cliente de la correcta reservacion de la cancha y se actualizaria la lista de reservas en la parte del negocio'
+                    ],
+                    'development_time'  => 7,
+                ],
+            ],
+        ];
+        
+        
+        $model = $diana;
+        $_model = SuperBudget::create([
+            'client'            => $model['client'],
+            'offer_validity'    => $model['offer_validity'],
+            'hour_price'        => $model['hour_price'],
+            'delivery_time'     => $model['delivery_time'],
+        ]);
+        foreach ($model['titles'] as $title) {
+            SuperBudgetTitle::create([
+                'text'             => $title['text'],
+                'super_budget_id'   => $_model->id,
+            ]);
+        }
+        foreach ($model['features'] as $feature) {
+            $_feature = SuperBudgetFeature::create([
+                'title'             => $feature['title'],
+                'description'       => $feature['description'],
+                'development_time'  => $feature['development_time'],
+                'super_budget_id'   => $_model->id,
+            ]);
+            if (isset($feature['items'])) {
+                foreach ($feature['items'] as $item) {
+                    SuperBudgetFeatureItem::create([
+                        'text'                      => $item,
+                        'super_budget_feature_id'   => $_feature->id,
+                    ]);
+                }
+            }
+        }
+    }
+ 
+    function diana() {
         $diana = [
             'client' => 'Comision CEF',
             'offer_validity'    => Carbon::now()->addDays(7),
@@ -62,28 +188,6 @@ class SuperBudgetSeeder extends Seeder
                 ],
             ],
         ];
-        
-        $model = $diana;
-        $_model = SuperBudget::create([
-            'client'            => $model['client'],
-            'offer_validity'    => $model['offer_validity'],
-            'hour_price'        => $model['hour_price'],
-            'delivery_time'     => $model['delivery_time'],
-        ]);
-        foreach ($model['titles'] as $title) {
-            SuperBudgetTitle::create([
-                'text'             => $title['text'],
-                'super_budget_id'   => $_model->id,
-            ]);
-        }
-        foreach ($model['features'] as $feature) {
-            SuperBudgetFeature::create([
-                'title'             => $feature['title'],
-                'description'       => $feature['description'],
-                'development_time'  => $feature['development_time'],
-                'super_budget_id'   => $_model->id,
-            ]);
-        }
     }
 
     function laBarraca() {

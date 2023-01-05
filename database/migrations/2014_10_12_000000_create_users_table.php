@@ -42,6 +42,7 @@ class CreateUsersTable extends Migration
             $table->boolean('show_articles_without_images')->default(0);
             $table->string('default_article_image_url')->nullable();
             $table->boolean('from_cloudinary')->default(0);
+            $table->integer('articles_pages')->nullable();
             $table->rememberToken();
 
             $table->enum('status', ['commerce', 'admin', 'super']);
