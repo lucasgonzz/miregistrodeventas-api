@@ -33,7 +33,7 @@ class SuperBudgetSeeder extends Seeder
                     'text' => 'El desarrollo en esta arquitectura permite que se puedan ir haciendo mejoras en el sistema una que vez el cliente comienza a usarlo, estas mejoras a realizarse, las irá identificando el cliente conforme utilice el programa.'
                 ],
                 [
-                    'text' => 'El soporte de servidores corre por nuestra cuenta, con copias de seguridad diarias de la información cargada en el sistema. Soporte para que ingresen los propietarios y empleados del negocio como los clientes, por lo que se cobra un mantenimiento mensual de $1000.',
+                    'text' => 'El soporte de servidores corre por nuestra cuenta, con copias de seguridad diarias de la información cargada en el sistema. Soporte para que ingresen los propietarios y empleados del negocio como los clientes, por lo que se cobra un mantenimiento mensual de $1000. Además se brindara un dominio, escogido por el cliente, para que accedan los sus clientes, este dominio tiene un costo de renovación anual de $4000',
                 ],
             ],
             'features'          => [

@@ -12,7 +12,7 @@ class OrderProduction extends Model
 
     function scopeWithAll($query) {
         // $query->with('articles', 'order_production_status', 'client.comercio_city_user');
-        $query->with('articles.recipe.articles', 'articles_finished', 'order_production_status', 'client.comercio_city_user');
+        $query->with('articles.recipe.articles', 'articles.recipe.article', 'articles_finished', 'order_production_status', 'client.comercio_city_user');
     }
 
     function budget() {

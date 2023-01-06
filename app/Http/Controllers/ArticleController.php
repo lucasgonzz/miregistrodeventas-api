@@ -34,15 +34,22 @@ class ArticleController extends Controller
 
     function index($status = 'active') {
         $user = Auth()->user();
-        $models = Article::where('user_id', $this->userId())
-                            ->where('status', $status)
-                            ->orderBy('created_at', 'DESC')
-                            ->withAll()
-                            ->paginate(100);
-        if (count($models) < 100) {
-            Log::info('page: '.request()->page);
-            $user->articles_pages = request()->page;
-            $user->save();
+        if ($status == 'active') {
+            $models = Article::where('user_id', $this->userId())
+                                ->where('status', $status)
+                                ->orderBy('created_at', 'DESC')
+                                ->withAll()
+                                ->paginate(100);
+            if (count($models) < 100) {
+                $user->articles_pages = request()->page;
+                $user->save();
+            }
+        } else {
+            $models = Article::where('user_id', $this->userId())
+                                ->where('status', $status)
+                                ->orderBy('created_at', 'DESC')
+                                ->withAll()
+                                ->get();
         }
         return response()->json(['models' => $models], 200);
     }

@@ -57,6 +57,7 @@ class OrderProductionController extends Controller
         $model = OrderProduction::find($request->id);
         $model->client_id                    = $request->client_id;
         $model->order_production_status_id   = $request->order_production_status_id;
+        $model->updated_at = Carbon::now();
         $model->save();
         OrderProductionHelper::attachArticles($model, $request->articles);
         OrderProductionHelper::sendUpdatedMail($model);

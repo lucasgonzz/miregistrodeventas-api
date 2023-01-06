@@ -36,7 +36,10 @@ class EmployeeSeeder extends Seeder
             ],
         ];
         foreach ($models as $model) {
-            User::create($model);
+            $employee = User::create($model);
+            for ($permission_id = 1; $permission_id < 20; ++$permission_id) {
+                $employee->permissions()->attach($permission_id);
+            }
         }
     }
 }

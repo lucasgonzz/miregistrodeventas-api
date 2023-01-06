@@ -17,6 +17,7 @@ use App\Http\Controllers\Helpers\SaleHelper;
 use App\Http\Controllers\Helpers\UserHelper;
 use App\Http\Controllers\PaymentController;
 use App\Listerners\OrderConfirmedListene;
+use App\Notifications\CreatedSale;
 use App\Notifications\OrderConfirmed as OrderConfirmedNotification;
 use App\Notifications\OrderFinished as OrderFinishedNotification;
 use App\Notifications\PaymentError as PaymentErrorNotification;
@@ -147,6 +148,7 @@ class OrderHelper {
             if (!is_null($order->buyer->comercio_city_client)) {
                 SaleHelper::attachCurrentAcountsAndCommissions($sale, $order->buyer->comercio_city_client_id, [], []);
             }
+            $sale->user->notify(new CreatedSale($sale));
         }
     }
 
