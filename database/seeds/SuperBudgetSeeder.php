@@ -16,8 +16,99 @@ class SuperBudgetSeeder extends Seeder
      */
     public function run()
     {
+        $model = $this->angelo();
+        $_model = SuperBudget::create([
+            'client'            => $model['client'],
+            'offer_validity'    => $model['offer_validity'],
+            'hour_price'        => $model['hour_price'],
+            'delivery_time'     => $model['delivery_time'],
+        ]);
+        foreach ($model['titles'] as $title) {
+            SuperBudgetTitle::create([
+                'text'             => $title['text'],
+                'super_budget_id'   => $_model->id,
+            ]);
+        }
+        foreach ($model['features'] as $feature) {
+            $_feature = SuperBudgetFeature::create([
+                'title'             => $feature['title'],
+                'description'       => isset($feature['description']) ? $feature['description'] : null,
+                'development_time'  => $feature['development_time'],
+                'super_budget_id'   => $_model->id,
+            ]);
+            if (isset($feature['items'])) {
+                foreach ($feature['items'] as $item) {
+                    SuperBudgetFeatureItem::create([
+                        'text'                      => $item,
+                        'super_budget_feature_id'   => $_feature->id,
+                    ]);
+                }
+            }
+        }
+    }
 
-        $diana = [
+    function angelo() {
+        return [
+            'client' => 'Angelo Pasteleria',
+            'offer_validity'    => Carbon::now()->addDays(7),
+            'hour_price'        => 3500,
+            'delivery_time'     => '4 semanas, el tiempo de entrega puede variar dependiendo las revisiones solicitadas por el cliente.',
+            'titles'             => [
+                [
+                    'text' => 'Presupuesto para el desarrollo de Aplicación Web con almacenamiento de datos en la Nube.'
+                ],
+                [
+                    'text' => 'La tecnología en la Nube permite acceder la información desde cualquier dispositivo conectado a internet.'
+                ],
+                [
+                    'text' => 'El desarrollo en esta arquitectura permite que se puedan ir haciendo mejoras en el sistema una que vez el cliente comienza a usarlo, estas mejoras a realizarse, las irá identificando el cliente conforme utilice el programa.'
+                ],
+                [
+                    'text' => 'El soporte de servidores corre por nuestra cuenta, con copias de seguridad diarias de la información cargada en el sistema. Soporte para que ingresen los propietarios y empleados del negocio como los clientes, por lo que se cobra un mantenimiento mensual de $1000. Además se brindara un dominio, escogido por el cliente, para que accedan los sus clientes, este dominio tiene un costo de renovación anual de $4000',
+                ],
+            ],
+            'features'          => [
+                [
+                    'title'             => 'Solo el usuario administrador podra ver el total de las ventas',
+                    'development_time'  => 1,
+                ],
+                [
+                    'title'             => 'Solo el usuario administrador podra eliminar pedidos',
+                    'development_time'  => 1,
+                ],
+                [
+                    'title'             => 'Indicar el metodo de pago para cada venta',
+                    'description'       => 'El usuario administrador podra dar de alta, editar y eliminar METODOS DE PAGO, para luego indicarlo en las ventas.',
+                    'development_time'  => 1,
+                ],
+                [
+                    'title'             => 'Indicar el tipo de venta',
+                    'description'       => 'El usuario administrador podra dar de alta, editar y eliminar TIPOS DE VENTA, y asignarle a cada uno que cree un color, para luego indicarlo en las ventas. Por ejemplo:',
+                    'items'             => [
+                        'Tipo de venta: "Salon", color: "Rojo"',
+                        'Tipo de venta: "Take away", color: "Naranja"',
+                    ],
+                    'development_time'  => 3,
+                ],
+                [
+                    'title'             => 'Color amarillo para los pedidos entregados',
+                    'development_time'  => 1,
+                ],
+                [
+                    'title'             => 'Indicar si una venta fue pagada',
+                    'development_time'  => 1,
+                ],
+                [
+                    'title'             => 'Indicar si una venta fue actualizada',
+                    'description'       => 'Los items agregados a un pedido apareceran resaltados, el pedido aparecera con un aviso de que fue modificado y se actualizaran las demas computadoras con una notificacion del pedido que fue modificado',
+                    'development_time'  => 2,
+                ],
+            ],
+        ];
+    }
+
+    function canchas_bartolo() {
+        return [
             'client' => 'Bartolome Kablan',
             'offer_validity'    => Carbon::now()->addDays(7),
             'hour_price'        => 3500,
@@ -107,37 +198,6 @@ class SuperBudgetSeeder extends Seeder
                 ],
             ],
         ];
-        
-        
-        $model = $diana;
-        $_model = SuperBudget::create([
-            'client'            => $model['client'],
-            'offer_validity'    => $model['offer_validity'],
-            'hour_price'        => $model['hour_price'],
-            'delivery_time'     => $model['delivery_time'],
-        ]);
-        foreach ($model['titles'] as $title) {
-            SuperBudgetTitle::create([
-                'text'             => $title['text'],
-                'super_budget_id'   => $_model->id,
-            ]);
-        }
-        foreach ($model['features'] as $feature) {
-            $_feature = SuperBudgetFeature::create([
-                'title'             => $feature['title'],
-                'description'       => $feature['description'],
-                'development_time'  => $feature['development_time'],
-                'super_budget_id'   => $_model->id,
-            ]);
-            if (isset($feature['items'])) {
-                foreach ($feature['items'] as $item) {
-                    SuperBudgetFeatureItem::create([
-                        'text'                      => $item,
-                        'super_budget_feature_id'   => $_feature->id,
-                    ]);
-                }
-            }
-        }
     }
  
     function diana() {

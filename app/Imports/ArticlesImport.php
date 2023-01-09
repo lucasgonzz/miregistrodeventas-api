@@ -26,13 +26,6 @@ class ArticlesImport implements ToCollection
         $this->ct = new Controller();
         $this->provider_id = $provider_id;
         $this->provider = null;
-        $this->initProvider();
-    }
-
-    function initProvider() {
-        if ($this->provider_id != 0) {
-            $this->provider = Provider::find($this->provider_id);
-        }
     }
 
     function checkRow($row) {
@@ -127,7 +120,6 @@ class ArticlesImport implements ToCollection
                 $article->cost            != $data['cost'] ||
                 $article->cost_in_dollars != $data['cost_in_dollars'] ||
                 $article->percentage_gain != $data['percentage_gain'] ||
-                $article->provider_id     != $data['provider_id'] ||
                 $article->price           != $data['price'];
     }
 
@@ -162,13 +154,15 @@ class ArticlesImport implements ToCollection
             } else {
                 $provider_id = $this->ct->getModelBy('providers', 'name', ImportHelper::getColumnValue($row, 'proveedor', $this->columns), true, 'id');
             }
-            $article->provider_id = $provider_id;
-            $article->save();
-            $article->providers()->attach($provider_id, [
-                                            'amount' => ImportHelper::getColumnValue($row, 'stock_actual', $this->columns),
-                                            'cost'   => ImportHelper::getColumnValue($row, 'costo', $this->columns),
-                                            'price'  => ImportHelper::getColumnValue($row, 'precio', $this->columns),
-                                        ]);
+            if ($article->provider_id != $provider_id) {
+                $article->provider_id = $provider_id;
+                $article->save();
+                $article->providers()->attach($provider_id, [
+                                                'amount' => ImportHelper::getColumnValue($row, 'stock_actual', $this->columns),
+                                                'cost'   => ImportHelper::getColumnValue($row, 'costo', $this->columns),
+                                                'price'  => ImportHelper::getColumnValue($row, 'precio', $this->columns),
+                                            ]);
+            }
         }
     }
 }
