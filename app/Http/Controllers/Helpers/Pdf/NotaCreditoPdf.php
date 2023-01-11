@@ -54,7 +54,6 @@ class NotaCreditoPdf extends fpdf {
 
 	function Header() {
 		$data = [
-			'num' 				=> '',
 			'date'				=> $this->model->created_at,
 			'title' 			=> 'Nota de Credito',
 			'model_info'		=> $this->model->client,

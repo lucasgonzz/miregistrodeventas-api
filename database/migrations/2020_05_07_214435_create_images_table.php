@@ -27,7 +27,8 @@ class CreateImagesTable extends Migration
             //         ->references('id')->on('users');
             $table->foreign('article_id')
                     ->references('id')->on('articles');
-
+                    
+            $table->timestamps();
         });
     }
 

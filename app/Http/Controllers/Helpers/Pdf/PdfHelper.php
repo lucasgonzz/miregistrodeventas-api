@@ -35,9 +35,9 @@ class PdfHelper {
         $logo_url = ImageHelper::image();
         if (!is_null($logo_url)) {
         	if (env('APP_ENV') == 'local') {
-        		$instance->Image('https://img.freepik.com/vector-gratis/fondo-plantilla-logo_1390-55.jpg', 5, 5, 40, 25);
+        		$instance->Image('https://img.freepik.com/vector-gratis/fondo-plantilla-logo_1390-55.jpg', 5, 5, 25, 25);
         	} else {
-	        	$instance->Image($logo_url, 5, 5, 40, 25);
+	        	$instance->Image($logo_url, 5, 5, 25, 25);
         	}
         }
 		
@@ -48,21 +48,21 @@ class PdfHelper {
 		$instance->y = 5;
 		if (!is_null($user->afip_information)) {
 			if (!is_null($user->afip_information->razon_social)) {
-				$instance->x = 45;
+				$instance->x = 35;
 				$instance->Cell(40, 5, $user->afip_information->razon_social, $instance->b, 1, 'L');
 			}
 		}
 
 		// Condicion IVA
 		if (!is_null($user->afip_information) && !is_null($user->afip_information->iva_condition)) {
-			$instance->x = 45;
+			$instance->x = 35;
 			$instance->Cell(40, 5, $user->afip_information->iva_condition->name, $instance->b, 1, 'L');
 		}
 
 		// Telefono
 		$instance->y += 5;
 		if (!is_null($user->phone)) {
-			$instance->x = 45;
+			$instance->x = 35;
 			$instance->SetFont('Arial', 'B', 10);
 			$instance->Cell(10, 5, 'Tel: ', $instance->b, 0, 'L');
 
@@ -72,7 +72,7 @@ class PdfHelper {
 
 		// Sitio Web
 		if (!is_null($user->online)) {
-			$instance->x = 45;
+			$instance->x = 35;
 			$instance->SetFont('Arial', 'B', 10);
 			$instance->Cell(10, 5, 'Web: ', $instance->b, 0, 'L');
 
@@ -102,7 +102,12 @@ class PdfHelper {
 			$instance->Cell(40, 10, 'N° '.$data['num'], $instance->b, 0, 'L');
 		}
 		if (isset($data['date'])) {
+			$instance->x = 160;
 			$instance->Cell(45, 10, date_format($data['date'], 'd/m/Y'), $instance->b, 0, 'R');
+		}
+		if (isset($data['date_formated'])) {
+			$instance->x = 160;
+			$instance->Cell(45, 10, $data['date_formated'], $instance->b, 0, 'R');
 		}
 		$instance->y += 10;
 		
@@ -209,6 +214,16 @@ class PdfHelper {
 	    $instance->x = 155;
 	    $instance->SetFont('Arial', 'B', 12);
 		$instance->Cell(50, 10, 'Total: $'.Numbers::price($total), $instance->b, 1, 'R');
+	}
+
+	static function getWidthUntil($until_field, $fields, $start = 5) {
+		foreach ($fields as $key => $value) {
+			$start += $value;
+			if ($key == $until_field) {
+				break;
+			}
+		}
+		return $start;
 	}
 
 	static function tableHeader($instance, $fields) {

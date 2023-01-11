@@ -58,12 +58,11 @@ class ClientPdf extends fpdf {
 		$this->SetFont('Arial', '', 10);
 		$this->x = 5;
 		foreach ($this->clients as $client) {
-			if ($this->y < 210) {
+			if ($this->y < 260) {
 				$this->printClient($client);
 			} else {
 				$this->AddPage();
 				$this->x = 5;
-				$this->y = 90;
 				$this->printClient($client);
 			}
 		}
@@ -74,14 +73,22 @@ class ClientPdf extends fpdf {
 		$y_1 = $this->y;
 		$this->MultiCell($this->getFields()['Nombre'], $this->line_height, $client->name, $this->b, 'L', false);
 	    $y_2 = $this->y;
-		$this->x = $this->getFields()['Nombre']+5;
+		$this->x = PdfHelper::getWidthUntil('Nombre', $this->getFields());
 		$this->y = $y_1;
 
-		$this->Cell($this->getFields()['Saldo'], $this->line_height, $client->saldo, $this->b, 0, 'L');
-		$this->Cell($this->getFields()['Localidad'], $this->line_height, GeneralHelper::getRelation($client, 'location'), $this->b, 0, 'L');
+		$this->Cell($this->getFields()['Saldo'], $this->line_height, '$'.Numbers::price($client->saldo), $this->b, 0, 'L');
+
+		$this->MultiCell($this->getFields()['Localidad'], $this->line_height, GeneralHelper::getRelation($client, 'location'), $this->b, 'L', false);
+		if ($this->y > $y_2) {
+			$y_2 = $this->y;
+		}
+		
+		$this->y = $y_1;
+		$this->x = PdfHelper::getWidthUntil('Localidad', $this->getFields());
 
 		$this->MultiCell($this->getFields()['Direccion'], $this->line_height, $client->address, $this->b, 'L', false);
-		$this->x = 5 + $this->getFields()['Nombre']+$this->getFields()['Saldo']+$this->getFields()['Localidad']+$this->getFields()['Direccion'];
+		$this->x = PdfHelper::getWidthUntil('Direccion', $this->getFields());
+
 		if ($this->y > $y_2) {
 			$y_2 = $this->y;
 		}

@@ -80,7 +80,7 @@ class PagoPdf extends fpdf {
 		if (!is_null($this->model->description)) {
 			$this->x = 5;
 			$this->SetFont('Arial', '', 11);
-			$this->Cell(200, 7, 'Aclaraciones: '.$this->model->description, $this->b, 1, 'L');
+			$this->MultiCell(200, 7, 'Aclaraciones: '.$this->model->description, $this->b, 'L', false);
 		}
 	}
 

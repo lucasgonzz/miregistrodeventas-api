@@ -11,6 +11,7 @@ use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\DiscountHelper;
 use App\Http\Controllers\Helpers\Numbers;
 use App\Http\Controllers\Helpers\PdfPrintCurrentAcounts;
+use App\Http\Controllers\Helpers\Pdf\CurrentAcountPdf;
 use App\Http\Controllers\Helpers\Pdf\NotaCreditoPdf;
 use App\Http\Controllers\Helpers\Pdf\PagoPdf;
 use App\Http\Controllers\Helpers\SaleHelper;
@@ -125,8 +126,17 @@ class CurrentAcountController extends Controller
     }
 
     function pdfFromModel($model_name, $model_id, $months_ago) {
-        $pdf = new PdfPrintCurrentAcounts(null, $model_name, $model_id, $months_ago);
-        $pdf->printCurrentAcounts();
+        $months_ago = Carbon::now()->subMonths($months_ago);
+        $models = CurrentAcount::whereDate('created_at', '>=', $months_ago)
+                                ->orderBy('created_at', 'ASC');
+                                
+        if ($model_name == 'client') {
+            $models = $models->where('client_id', $model_id);
+        } else if ($model_name == 'provider') {
+            $models = $models->where('provider_id', $model_id);
+        }
+        $models = $models->get();
+        new CurrentAcountPdf($models);
     }
 
     function pdf($ids, $model_name) {

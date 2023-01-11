@@ -202,7 +202,7 @@ class SuperBudgetPdf extends fpdf {
 		$line_height = 7;
 		$this->SetFont('Arial', '', 10);
 
-		$plazo_de_pago = '50% en la entrega y 50% luego del chequeo por parte del cliente.';
+		$plazo_de_pago = '50% en la primer entrega y 50% luego del chequeo por parte del cliente.';
 
 		$this->x = 10;
 		$this->Cell(190, $line_height, $plazo_de_pago, $this->b, 0, 'L');
