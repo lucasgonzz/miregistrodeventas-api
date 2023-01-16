@@ -51,6 +51,7 @@ Route::get('/order-production/pdf/{id}', 'OrderProductionController@pdf');
 Route::get('/order-productions/articles-pdf/{id}', 'OrderProductionController@articlesPdf');
 Route::get('/articles/pdf/{ids}', 'ArticleController@pdf');
 
+Route::get('/articles/repeated-num/{company_name}', 'HelperController@getRepetitiveArticles');
 Route::get('/providers/set-num/{company_name}', 'HelperController@setProvidersNum');
 Route::get('/clients/set-saldos/{company_name}', 'HelperController@setClientsSaldos');
 Route::get('/budgets/set-articles/{company_name}', 'HelperController@setArticlesFromBudgets');

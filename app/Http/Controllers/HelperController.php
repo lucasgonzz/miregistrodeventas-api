@@ -8,6 +8,7 @@ use App\BudgetStatus;
 use App\Category;
 use App\Client;
 use App\CurrentAcount;
+use App\Http\Controllers\Controller;
 use App\Http\Controllers\Helpers\ArticleHelper;
 use App\Http\Controllers\Helpers\CurrentAcountHelper;
 use App\Http\Controllers\Helpers\ImageHelper;
@@ -36,6 +37,92 @@ class HelperController extends Controller
             }
             $budget->save();
         }
+    }
+
+    function getRepetitiveArticles($company_name) {
+        $user = User::where('company_name', $company_name)->first();
+
+        // $nums = Article::where('user_id', $user->id)
+        //                     ->where('status', 'active')
+        //                     ->whereNotNull('num')
+        //                     ->pluck('num')
+        //                     ->toArray();
+        // $repeateds = array();
+        // foreach(array_count_values($nums) as $val => $c) {
+        //     if($c > 1) $repeateds[] = $val;
+        // }
+
+        // $ct = new Controller();
+
+        // foreach ($repeateds as $num) {
+        //     $articles = Article::where('user_id', $user->id)
+        //                         ->where('num', $num)
+        //                         ->where('status', 'active')
+        //                         ->get()
+        //                         ->toArray();
+
+        //     for ($i = 1; $i < count($articles); ++$i) {
+        //         $article = Article::find($articles[$i]['id']);
+        //         echo $article->name.' tenia num: '.$article->num.' </br>';
+        //         $article->num = $ct->num('articles');
+        //         echo 'Ahora tiene '.$article->num.' </br>';
+        //         echo "------------------------------------------------------------------------- </br>";
+        //         $article->save();
+        //     }
+        // }
+
+        $names = Article::where('user_id', $user->id)
+                            // ->where('status', 'active')
+                            ->whereNotNull('name')
+                            ->pluck('name')
+                            ->toArray();
+        $repeateds = array();
+        foreach(array_count_values($names) as $val => $c) {
+            if($c > 1) $repeateds[] = $val;
+        }
+
+
+        foreach ($repeateds as $name) {
+            $articles = Article::where('user_id', $user->id)
+                                ->where('name', $name)
+                                // ->where('status', 'active')
+                                ->pluck('id')
+                                ->toArray();
+            // dd($articles);
+            foreach ($articles as $id) {
+                $article = Article::find($id);
+                $article->status = 'active';
+                $article->save();
+                echo "Se activo ".$article->name;
+            }
+            // echo "Maximo: ".max($articles).' </br>';
+            // $index = 0;
+            // foreach ($articles as $id => $final_price) {
+            //     if ($final_price == max($articles)) {
+            //         break;
+            //     } else {
+            //         $index++;
+            //     }
+            // }
+            // echo "Solo se dejaria el indice: ".$index.' </br>';
+
+            // $new_index = 0;
+            // foreach ($articles as $id => $final_price) {
+            //     if ($new_index != $index) {
+            //         $article = Article::find($id);
+            //         $article->status = 'inactive';
+            //         $article->save();
+            //         echo "El indice: ".$new_index.', osea el con precio de: '.$article->final_price.', se eliminaria </br>';
+            //     }
+            //     $new_index++;
+            // }
+            // // echo "El de id: ".$articles[max($articles)].' </br>';
+            // echo "------------------------------------------------------------------ </br>";
+        }
+
+        // Nums
+        
+       
     }
 
     function setProvidersNum($company_name) {
